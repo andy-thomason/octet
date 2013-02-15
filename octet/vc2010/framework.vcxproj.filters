@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{76606fcc-0ac6-4fde-9e1b-6af8f6d55c71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{b83a6541-642c-4340-95ab-2a6fe90b959f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples">
+      <UniqueIdentifier>{fab195f8-6a6c-4397-831b-b1e300be9e89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{b1b70663-16b0-4eac-bc03-11a3ed39d8c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\triangle">
+      <UniqueIdentifier>{1f348333-c192-4c48-9f41-3aae8eadb5e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\texture">
+      <UniqueIdentifier>{d62eafe4-ad0a-4872-8ce8-ce561175d08e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\gif">
+      <UniqueIdentifier>{76ed9d0b-0f21-4737-bfa9-50e76a055353}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\cube">
+      <UniqueIdentifier>{816a8f12-3fd8-4d7b-815e-a52b66d108b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="containers">
+      <UniqueIdentifier>{c41f517a-aed7-4ced-a38b-021e1dbd5bb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{132a4a63-46dc-4d77-a15f-7217c4d5a9dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\duck">
+      <UniqueIdentifier>{4def34f1-4430-4a17-92b3-d7c38585c3f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\bump">
+      <UniqueIdentifier>{07c8444d-f276-4589-9fc2-bcf2b47062a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\physics">
+      <UniqueIdentifier>{09dc34fd-b820-45b9-bba2-a2f15f22386f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="physics">
+      <UniqueIdentifier>{f42b20cd-f653-4372-8abf-b44da01a21fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\ping">
+      <UniqueIdentifier>{669cac0d-8e23-4ebc-8652-1c3b1f23d893}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\invaderers">
+      <UniqueIdentifier>{7d447309-b187-4141-8539-b41a1bdd17ef}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\shaders\color_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\shaders\shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\shaders\texture_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\matrix.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\vector.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\platform\platform.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\triangle\triangle_app.h">
+      <Filter>examples\triangle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\platform\gl_defs.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\platform\windows_specific.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\examples.h">
+      <Filter>examples</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\texture\texture_app.h">
+      <Filter>examples\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\platform\app_common.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\gif\gif_app.h">
+      <Filter>examples\gif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\cube\cube_app.h">
+      <Filter>examples\cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\dynarray.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\chars.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\dictionary.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\double_list.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\mesh.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\allocator.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\shaders\phong_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\duck\duck_app.h">
+      <Filter>examples\duck</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\mesh_builder.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\mesh_state.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\collada_builder.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\app_utils.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\gif_decoder.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\resource_manager.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\random.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\bump\bump_app.h">
+      <Filter>examples\bump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\shaders\bump_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics\physics.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\physics\physics_app.h">
+      <Filter>examples\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics\physics_world.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\ptr.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\bump_material.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\lighting.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\material.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\platform\glut_specific.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\ping\ping_app.h">
+      <Filter>examples\ping</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\invaderers\invaderers_app.h">
+      <Filter>examples\invaderers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\examples\main.cpp">
+      <Filter>examples</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

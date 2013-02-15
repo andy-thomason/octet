@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// (C) Andy Thomason 2012
+//
+// Modular Framework for OpenGLES2 rendering on multiple platforms.
+//
+// include all examples
+
+#include "../platform/platform.h"
+
+#include "triangle/triangle_app.h"
+#include "texture/texture_app.h"
+#include "gif/gif_app.h"
+#include "ping/ping_app.h"
+#include "cube/cube_app.h"
+#include "duck/duck_app.h"
+#include "bump/bump_app.h"
+#include "physics/physics_app.h"
+
+inline void run_examples(int argc, char **argv) {
+  app::init_all(argc, argv);
+
+  /*
+  // triangle sample: start here to learn how to draw a triangle
+  triangle_app app1(argc, argv);
+  app1.init();
+
+  // texture sample: continue here to learn how to draw a textured triangle
+  texture_app app2(argc, argv);
+  app2.init();
+
+  // gif sample: continue here to learn how to load and draw a GIF texture
+  gif_app app3(argc, argv);
+  app3.init();
+
+  // pong sample: continue here to learn how to make a simple game
+  ping_app app4(argc, argv);
+  app4.init();
+
+  // cube sample: continue here to learn how to draw stock 3d geometry
+  cube_app app5(argc, argv);
+  app5.init();
+  */
+
+  // duck sample: continue here to learn how to load collada geometry
+  duck_app app6(argc, argv);
+  app6.init();
+
+/*
+  // bump map sample: continue here to learn how to draw bump mapped textures
+  bump_app app7(argc, argv);
+  app7.init();
+
+  // physics sample: continue here to learn how to annimate using physics
+  physics_app app8(argc, argv);
+  app8.init();
+*/
+
+  app::run_all_apps();
+}

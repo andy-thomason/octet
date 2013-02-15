@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0D5E21BA-86C8-4A17-B9A1-4D905592CD6B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>framework</RootNamespace>
+    <ProjectName>octet</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\containers\allocator.h" />
+    <ClInclude Include="..\src\containers\chars.h" />
+    <ClInclude Include="..\src\containers\dictionary.h" />
+    <ClInclude Include="..\src\containers\double_list.h" />
+    <ClInclude Include="..\src\containers\dynarray.h" />
+    <ClInclude Include="..\src\containers\ptr.h" />
+    <ClInclude Include="..\src\examples\bump\bump_app.h" />
+    <ClInclude Include="..\src\examples\cube\cube_app.h" />
+    <ClInclude Include="..\src\examples\duck\duck_app.h" />
+    <ClInclude Include="..\src\examples\examples.h" />
+    <ClInclude Include="..\src\examples\gif\gif_app.h" />
+    <ClInclude Include="..\src\examples\invaderers\invaderers_app.h" />
+    <ClInclude Include="..\src\examples\physics\physics_app.h" />
+    <ClInclude Include="..\src\examples\ping\ping_app.h" />
+    <ClInclude Include="..\src\examples\texture\texture_app.h" />
+    <ClInclude Include="..\src\examples\triangle\triangle_app.h" />
+    <ClInclude Include="..\src\math\matrix.h" />
+    <ClInclude Include="..\src\math\random.h" />
+    <ClInclude Include="..\src\math\vector.h" />
+    <ClInclude Include="..\src\physics\physics.h" />
+    <ClInclude Include="..\src\physics\physics_world.h" />
+    <ClInclude Include="..\src\platform\app_common.h" />
+    <ClInclude Include="..\src\platform\glut_specific.h" />
+    <ClInclude Include="..\src\platform\gl_defs.h" />
+    <ClInclude Include="..\src\platform\platform.h" />
+    <ClInclude Include="..\src\platform\windows_specific.h" />
+    <ClInclude Include="..\src\resources\app_utils.h" />
+    <ClInclude Include="..\src\resources\bump_material.h" />
+    <ClInclude Include="..\src\resources\collada_builder.h" />
+    <ClInclude Include="..\src\resources\gif_decoder.h" />
+    <ClInclude Include="..\src\resources\lighting.h" />
+    <ClInclude Include="..\src\resources\material.h" />
+    <ClInclude Include="..\src\resources\mesh.h" />
+    <ClInclude Include="..\src\resources\mesh_builder.h" />
+    <ClInclude Include="..\src\resources\mesh_state.h" />
+    <ClInclude Include="..\src\resources\resource_manager.h" />
+    <ClInclude Include="..\src\shaders\bump_shader.h" />
+    <ClInclude Include="..\src\shaders\color_shader.h" />
+    <ClInclude Include="..\src\shaders\phong_shader.h" />
+    <ClInclude Include="..\src\shaders\shader.h" />
+    <ClInclude Include="..\src\shaders\texture_shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\examples\main.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
