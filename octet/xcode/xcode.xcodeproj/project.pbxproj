@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		814C3AF716B5450900910C5D /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 814C3AF616B5450900910C5D /* OpenAL.framework */; };
 		8153DFA61684F05300A7DA33 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8153DFA51684F05300A7DA33 /* OpenGL.framework */; };
+		81AB65B716E6ACB800AB99C9 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AB65B616E6ACB800AB99C9 /* OpenCL.framework */; };
 		81F9EFD3168E29C700B1187D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81F9EF9D168E29C700B1187D /* main.cpp */; };
 		81F9F1B3169A3D3400B1187D /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81F9F1B2169A3D3400B1187D /* GLUT.framework */; };
 /* End PBXBuildFile section */
@@ -30,6 +31,7 @@
 		814C3AF616B5450900910C5D /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		8153DFA51684F05300A7DA33 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		8162EF77169F68EA0048E3B2 /* ping_app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ping_app.h; path = ping/ping_app.h; sourceTree = "<group>"; };
+		81AB65B616E6ACB800AB99C9 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
 		81E3C2CB1684FE0700D27962 /* libXplugin.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libXplugin.dylib; path = usr/lib/libXplugin.dylib; sourceTree = SDKROOT; };
 		81E3C2CD1684FE5800D27962 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		81E3C2CF1685001900D27962 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
@@ -83,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81AB65B716E6ACB800AB99C9 /* OpenCL.framework in Frameworks */,
 				814C3AF716B5450900910C5D /* OpenAL.framework in Frameworks */,
 				81F9F1B3169A3D3400B1187D /* GLUT.framework in Frameworks */,
 				8153DFA61684F05300A7DA33 /* OpenGL.framework in Frameworks */,
@@ -95,6 +98,7 @@
 		81105D821684E62100D624ED = {
 			isa = PBXGroup;
 			children = (
+				81AB65B616E6ACB800AB99C9 /* OpenCL.framework */,
 				814C3AF616B5450900910C5D /* OpenAL.framework */,
 				81F9F1B2169A3D3400B1187D /* GLUT.framework */,
 				81E3C2CF1685001900D27962 /* QTKit.framework */,
@@ -119,8 +123,8 @@
 			children = (
 				81F9EF8C168E29C700B1187D /* src */,
 			);
-			path = xcode;
-			sourceTree = "<group>";
+			name = xcode;
+			sourceTree = SOURCE_ROOT;
 		};
 		81F9EF8C168E29C700B1187D /* src */ = {
 			isa = PBXGroup;
@@ -134,7 +138,7 @@
 				81F9EFCD168E29C700B1187D /* shaders */,
 			);
 			name = src;
-			path = ../../src;
+			path = ../src;
 			sourceTree = "<group>";
 		};
 		81F9EF8D168E29C700B1187D /* containers */ = {
