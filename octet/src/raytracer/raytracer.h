@@ -63,7 +63,7 @@ public:
     if (clGetPlatformIDs(1, &platform, NULL)) { app::error("clGetPlatformIDs"); }
 
     cl_device_id devices[32];
-    size_t devices_size;
+    cl_uint devices_size;
     if (clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 32, devices, &devices_size)) { app::error("clGetDeviceIDs"); }
     cl_device_id device = devices[0];
 
@@ -73,6 +73,7 @@ public:
 
     cl_int error = 0;
 
+    #if 0
     // Create CL context properties, add WGL context & handle to DC 
     cl_context_properties properties[] = { 
       CL_GL_CONTEXT_KHR,   (cl_context_properties)wglGetCurrentContext(), // WGL Context 
@@ -91,6 +92,7 @@ public:
     clGetGLContextInfoKHR(
       properties, CL_DEVICES_FOR_GL_CONTEXT_KHR, sizeof(devices), devices, &size
     );*/
+    #endif
 
     // Create a context using the supported devices
     //int count = size / sizeof(cl_device_id);
@@ -266,7 +268,7 @@ public:
 #else
 class raytracer {
 public:
-  void ray_trace(const context &ctxt) {
+  void init() {
   }
 };
 

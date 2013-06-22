@@ -27,10 +27,11 @@
   #include "gl_defs.h"
   #if OCTET_OPENCL
     #include <CL/cl.h>
-  #enif
+  #endif
 #elif defined(__APPLE__)
   #include <OpenAL/alc.h>
   #include <OpenAL/al.h>
+  #include <OpenCL/cl.h>
   #include <GLUT/glut.h>
   #if OCTET_OPENCL
     #include <OpenCL/opencl.h>
