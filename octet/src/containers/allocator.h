@@ -6,8 +6,11 @@
 //
 // game-style memory allocator
 //
+// this is a placeholder for a game-style memory allocator
+// using malloc and free is frowned upon in grown-up circles.
 
 class allocator {
+  // singleton state, a bit like an old-world global variable
   struct state_t {
     int num_bytes;
   };
@@ -16,69 +19,6 @@ class allocator {
     static state_t instance;
     return instance;
   }
-/*
-  class state {
-    enum {
-      pool_granularity = 16,
-      num_pools = 16,
-      page_size = 65563,
-    };
-
-    struct pool {
-      
-    };
-
-    pool *pools[num_pools];
-
-    // pool size is a compromise between 
-    static unsigned which_pool(unsigned bytes) {
-      if (bytes <= 16) {
-        return 0;
-      } else if (bytes <= 32) {
-        return 1;
-      } else if (bytes <= 48) {
-        return 2;
-      } else if (bytes <= 64) {
-        return 3;
-      } else {
-      }
-    }
-
-    // one page of a virtual memory system
-    struct pool {
-      unsigned char bytes[page_size - sizeof(pool*)];
-      pool *next;
-    };
-
-  public:
-
-    state() {
-      memset(pools, 0, sizeof(pools[0]) * num_pools);
-      assert(sizeof(pool) == page_size);
-    }
-
-    void *malloc(size_t size) {
-      if (size == 0) return NULL;
-
-      unsigned pool = (size - 1) / pool_granularity;
-
-      if (pool >= num_pools) {
-        // todo: use VirtualAlloc for windows etc.
-        return ::malloc(size);
-      } else {
-        if (!pools[pool]) {
-          
-        }
-      }
-    }
-  };
-
-  // singleton state
-  static state &s() {
-    state s;
-    return s;
-  }
-  */
 
 public:
   // todo: implement this from scratch

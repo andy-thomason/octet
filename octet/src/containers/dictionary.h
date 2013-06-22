@@ -8,6 +8,17 @@
 //
 // strings and values are owned by the dictionary.
 //
+// This is like a JavaScript or Python dictionary but for text keys only.
+// It is about twenty times faster than using std::map<std::string, xxx>
+//
+// example:
+//
+// dictionary<int> my_dict;
+// my_dict["fred"] = 27; 
+// my_dict["anne"] = 28; 
+//
+// int annes_age = my_dict["anne"];
+//
 template <class value_t, class allocator_t=allocator> class dictionary {
   struct entry_t { const char *key; unsigned hash; value_t value; };
   entry_t *entries;
@@ -24,6 +35,7 @@ template <class value_t, class allocator_t=allocator> class dictionary {
     return hash;
   }
   
+  // internal method to find an entry for a key
   entry_t *find( const char *key, unsigned hash ) {
     unsigned mask = max_entries - 1;
     for (unsigned i = 0; i != max_entries; ++i) {
@@ -38,6 +50,7 @@ template <class value_t, class allocator_t=allocator> class dictionary {
     return 0;
   }
   
+  // grow the dictionary when needed
   void expand() {
     entry_t *old_entries = entries;
     unsigned old_max_entries = max_entries;
@@ -54,6 +67,7 @@ template <class value_t, class allocator_t=allocator> class dictionary {
     allocator_t::free(old_entries, sizeof(entry_t) * old_max_entries);
   }
 public:
+  // make a new dictionary
   dictionary() {
     num_entries = 0;
     max_entries = 4;
@@ -61,6 +75,7 @@ public:
     memset(entries, 0, sizeof(entry_t) * max_entries);
   }
   
+  // index the dictionary
   value_t &operator[]( const char *key ) {
     unsigned hash = calc_hash( key );
     entry_t *entry = find( key, hash );
@@ -80,6 +95,7 @@ public:
     return entry->value;
   }
 
+  // bye bye dictionary. Use the allocator to free up memory.
   ~dictionary() {
     for (unsigned i = 0; i != max_entries; ++i) {
       entry_t *entry = &entries[i];

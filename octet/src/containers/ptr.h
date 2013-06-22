@@ -7,7 +7,18 @@
 // self deleting "smart" pointer
 //
 
-// 
+// This is a "smart" pointer class
+// If you have to use "new" you can use it to guarantee a "delete" when
+// the smart pointer goes out of scope or is deleted.
+//
+// Smart pointers "own" objects which have been allocated with new:
+// example:
+//
+// {
+//   ptr<my_class> fred(new my_class());
+//   fred->my_method();
+// } <-- object gets deleted here
+//
 template <class item_t, class allocator_t=allocator> class ptr {
   // wrapped pointer to the object
   item_t *item;
@@ -36,7 +47,7 @@ public:
   // get a pointer to the constant item
   operator const item_t *() const { return item; }
 
-  // get a pointer to the item
+  // get a pointer to the item. Beware! do not store or pass this pointer.
   operator item_t *() const { return item; }
 
   // get a pointer to the item

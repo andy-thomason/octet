@@ -4,8 +4,18 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// dynarray class
+// Dynamic array (like std::vector)
 //
+// example:
+//
+//   dynarray<int> my_array;
+//   my_array.push_back(1);
+//   my_array.push_back(2);
+//   my_array.push_back(3);
+//
+//   // now treat the array like an ordinary array.
+//   printf("%d\n", my_array[1]);
+
 
 // this is a dummy class used to customise the placement new and delete
 struct dynarray_dummy_t {};

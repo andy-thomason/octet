@@ -4,7 +4,12 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// no-frills string class: holds an asciz string
+// no-frills string class: holds an asciiz string
+//
+// example:
+//
+//   chars my_string = "hello world";
+//   printf("%s\n", my_string.c_str());
 //
 
 template <typename allocator_t> class chars {

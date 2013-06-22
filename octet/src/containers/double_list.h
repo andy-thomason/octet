@@ -8,14 +8,25 @@
 //
 // Double-linked list class
 //
-template <class item, class allocator> class double_list {
+// example:
+//
+//   double_list<int> my_list;
+//   my_list.push_back(1);
+//   my_list.push_back(2);
+//   my_list.push_back(3);
+//
+//   for (auto i = my_list.begin(); i != my_list.end(); ++i) {
+//     printf("%d\n", *i);
+//   }
+// 
+template <class item, class allocator_t=allocator> class double_list {
   struct double_list_head {
-    // replace these with a pool allocator
+    // this makes new and delete use the allocator
     void *operator new(size_t size) {
-      return allocator::malloc(size);
+      return allocator_t::malloc(size);
     }
     void operator delete(void *ptr, size_t size) {
-      return allocator::free(ptr, size);
+      return allocator_t::free(ptr, size);
     }
     double_list_head *next;
     double_list_head *prev;
@@ -91,6 +102,7 @@ public:
     return iterator(new_node);
   }
 
+  // you can erase one element from the node
   iterator erase(iterator it) {
     double_list_head tmp = *it.node;
     tmp.next->prev = tmp.prev;
