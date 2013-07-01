@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012 (MIT license)
+// (C) Andy Thomason 2012-2013 (MIT license)
 //
 // Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -60,6 +60,9 @@
 #include "../resources/tinyxml/tinyxmlparser.cpp"
 
 #include "../resources/mesh_state.h"
+#include "../resources/material.h"
+#include "../resources/lighting.h"
+#include "../resources/camera.h"
 
 #include "../shaders/shader.h"
 #include "../shaders/color_shader.h"
@@ -70,11 +73,14 @@
 #include "../resources/app_utils.h"
 #include "../resources/gif_decoder.h"
 #include "../resources/mesh_builder.h"
-#include "../resources/collada_builder.h"
-#include "../resources/mesh.h"
 #include "../resources/resource_manager.h"
 #include "../resources/bump_material.h"
-#include "../resources/lighting.h"
+#include "../resources/collada_builder.h"
+#include "../resources/scene.h"
+#include "../resources/mesh.h"
+
+// forward references
+#include "../resources/material.inl"
 
 #include "../physics/physics.h"
 

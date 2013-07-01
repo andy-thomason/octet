@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -8,7 +8,10 @@
 //
 
 class lighting {
+  // lights in world space
   dynarray<vec4> lights;
+
+  // lights in camera space
   dynarray<vec4> transformed_lights;
 
 public:
@@ -25,6 +28,8 @@ public:
     transformed_lights.resize(lights.size());
   }
 
+  // compute camera relative light information
+  // todo: only include lights in range
   void compute(const mat4 &worldToCamera) {
     for (unsigned i = 0; i != lights.size(); ++i) {
       transformed_lights[i] = lights[i];
@@ -36,6 +41,7 @@ public:
     }
   }
 
+  // raw light data for shaders
   vec4 *data() {
     assert(transformed_lights.size() && "must have lights!");
     return &transformed_lights[0];

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -21,7 +21,7 @@ class allocator {
   }
 
 public:
-  // todo: implement this from scratch
+  // todo: implement this from scratch using a pool allocator
   static void *malloc(size_t size) {
     //printf("malloc -> %d\n", state().num_bytes);
     state().num_bytes += size;
@@ -32,6 +32,10 @@ public:
     state().num_bytes -= size;
     //printf("free -> %d\n", state().num_bytes);
     return ::free(ptr);
+  }
+
+  static void *realloc(void *ptr, size_t old_size, size_t size) {
+    return ::realloc(ptr, size);
   }
 };
 

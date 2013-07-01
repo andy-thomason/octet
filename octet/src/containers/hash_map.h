@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -94,7 +94,7 @@ public:
     max_entries = 0;
   }
 
-  // get the capacity of the map
-  int size() { return max_entries; }
+  // get the number of used entries in the map
+  int size() { return num_entries; }
   entry_t *get_entries() { return entries; }
 };

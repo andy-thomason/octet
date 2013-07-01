@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// cube example: How to draw basic 3D geometry
+// duck example: How to load a mesh from a collada file
+//
+// Level: 1
 //
 // Demonstrates:
 //   Basic framework app

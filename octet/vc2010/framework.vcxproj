@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -81,6 +81,7 @@
     <ClInclude Include="..\src\containers\double_list.h" />
     <ClInclude Include="..\src\containers\dynarray.h" />
     <ClInclude Include="..\src\containers\ptr.h" />
+    <ClInclude Include="..\src\examples\animation\animation_app.h" />
     <ClInclude Include="..\src\examples\bump\bump_app.h" />
     <ClInclude Include="..\src\examples\cube\cube_app.h" />
     <ClInclude Include="..\src\examples\duck\duck_app.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="..\src\resources\mesh_builder.h" />
     <ClInclude Include="..\src\resources\mesh_state.h" />
     <ClInclude Include="..\src\resources\resource_manager.h" />
+    <ClInclude Include="..\src\resources\scene.h" />
     <ClInclude Include="..\src\shaders\bump_shader.h" />
     <ClInclude Include="..\src\shaders\color_shader.h" />
     <ClInclude Include="..\src\shaders\phong_shader.h" />

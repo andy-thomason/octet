@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -12,6 +12,7 @@ class phong_shader : public shader {
 
   GLuint modelToProjection_index; // index for model space to projection space matrix
   GLuint modelToCamera_index;     // second matrix used for lighting maps model to camera space
+  GLuint cameraToProjection_index;// used in skinned shader
   GLuint light_direction_index;   // direction of light in camera space
   GLuint samplers_index;          // index for texture samplers
   GLuint shininess_index;         // index for shininess factor (~30 is good)
@@ -89,6 +90,7 @@ public:
 
     // extract the indices of the uniforms to use later
     modelToProjection_index = glGetUniformLocation(program(), "modelToProjection");
+    cameraToProjection_index = glGetUniformLocation(program(), "cameraToProjection");
     modelToCamera_index = glGetUniformLocation(program(), "modelToCamera");
     light_direction_index = glGetUniformLocation(program(), "light_direction");
     samplers_index = glGetUniformLocation(program(), "samplers");
@@ -106,6 +108,24 @@ public:
     glUniform3fv(light_direction_index, 1, light_direction.get());
     glUniformMatrix4fv(modelToProjection_index, 1, GL_FALSE, modelToProjection.get());
     glUniformMatrix4fv(modelToCamera_index, 1, GL_FALSE, modelToCamera.get());
+    glUniform4fv(light_ambient_index, 1, light_ambient.get());
+    glUniform4fv(light_diffuse_index, 1, light_diffuse.get());
+    glUniform4fv(light_specular_index, 1, light_specular.get());
+    glUniform1f(shininess_index, shininess);
+
+    // we use textures 0-3 for material properties.
+    static const GLint samplers[] = { 0, 1, 2, 3, 4 };
+    glUniform1iv(samplers_index, num_samplers, samplers);
+  }
+
+  void render_skinned(const mat4 &cameraToProjection, const mat4 *modelToCamera, int num_matrices, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular, int num_samplers=4) {
+    // tell openGL to use the program
+    shader::render();
+
+    // customize the program with uniforms
+    glUniform3fv(light_direction_index, 1, light_direction.get());
+    glUniformMatrix4fv(cameraToProjection_index, 1, GL_FALSE, cameraToProjection.get());
+    glUniformMatrix4fv(modelToCamera_index, num_matrices, GL_FALSE, (float*)modelToCamera);
     glUniform4fv(light_ambient_index, 1, light_ambient.get());
     glUniform4fv(light_diffuse_index, 1, light_diffuse.get());
     glUniform4fv(light_specular_index, 1, light_specular.get());

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -9,25 +9,23 @@
 
 class bump_shader : public phong_shader {
 public:
-  void init() {
-    // this is the vertex shader.
+  void init(bool is_skinned=false) {
+    // this is the vertex shader for regular geometry
     // it is called for each corner of each triangle
     // it inputs pos and uv from each corner
     // it outputs gl_Position, normal_ and uv_ to the rasterizer
     // normal_ is the normal in camera space to make calculations easier
     const char vertex_shader[] =
-      "#define lowp\n"
-      "#define highp\n"
-      "varying lowp vec2 uv_;"
-      "varying lowp vec3 normal_;"
-      "varying lowp vec3 tangent_;"
-      "varying lowp vec3 bitangent_;"
+      "varying vec2 uv_;"
+      "varying vec3 normal_;"
+      "varying vec3 tangent_;"
+      "varying vec3 bitangent_;"
       ""
-      "attribute highp vec4 pos;"
-      "attribute lowp vec3 normal;"
-      "attribute lowp vec3 tangent;"
-      "attribute lowp vec3 bitangent;"
-      "attribute lowp vec2 uv;"
+      "attribute vec4 pos;"
+      "attribute vec3 normal;"
+      "attribute vec3 tangent;"
+      "attribute vec3 bitangent;"
+      "attribute vec2 uv;"
       ""
       "uniform mat4 modelToProjection;"
       "uniform mat4 modelToCamera;"
@@ -41,50 +39,90 @@ public:
       "}"
     ;
 
+    // this is the vertex shader for skinned geometry
+    // this is the shader for skinned geometry
+    // it is not terribly efficient, but does the job.
+    // it is generally better to use quaternions as they
+    // are smaller and don't collapse joints.
+    const char skinned_vertex_shader[] =
+      "varying vec2 uv_;"
+      "varying vec3 normal_;"
+      "varying vec3 tangent_;"
+      "varying vec3 bitangent_;"
+      ""
+      "attribute vec4 pos;"
+      "attribute vec3 normal;"
+      "attribute vec3 tangent;"
+      "attribute vec3 bitangent;"
+      "attribute vec2 uv;"
+      "attribute vec3 blendweight;"
+      "attribute vec4 blendindex;"
+      ""
+      "uniform mat4 cameraToProjection;"
+      "uniform mat4 modelToCamera[32];"
+      ""
+      "void main() {"
+      "  uv_ = uv;"
+      "  vec4 index = floor(blendweight);"
+      "  mat4 m2c0 = modelToCamera[1.0 - blendweight.x - blendweight.y - blendweight.z];"
+      "  mat4 m2c1 = modelToCamera[blendindex.x];"
+      "  mat4 m2c2 = modelToCamera[blendindex.y];"
+      "  mat4 m2c3 = modelToCamera[blendindex.z];"
+      "  mat4 modelToCamera = m2c0 * frac.x + m2c1 * frac.y + m2c2 * frac.z + m2c3 * frac.w;"
+      "  mat4 modelToProjection = cameraToProjection * modelToCamera;" // note gl matrices work backwards!
+      "  normal_ = (modelToCamera * vec4(normal,0)).xyz;"
+      "  tangent_ = (modelToCamera * vec4(tangent,0)).xyz;"
+      "  bitangent_ = (modelToCamera * vec4(bitangent,0)).xyz;"
+      "  gl_Position = modelToProjection * pos;"
+      "}"
+    ;
+
     // this is the fragment shader
     // after the rasterizer breaks the triangle into fragments
     // this is called for every fragment
     // it outputs gl_FragColor, the color of the pixel and inputs normal_ and uv_
     // the four samplers give emissive, diffuse, specular and ambient colors
     const char fragment_shader[] =
-      "#define lowp\n"
-      "#define highp\n"
-      "varying lowp vec2 uv_;"
-      "varying lowp vec3 normal_;"
-      "varying lowp vec3 tangent_;"
-      "varying lowp vec3 bitangent_;"
-      "uniform lowp vec3 light_direction;"
-      "uniform lowp vec4 light_diffuse;"
-      "uniform lowp vec4 light_ambient;"
-      "uniform lowp vec4 light_specular;"
+      "varying vec2 uv_;"
+      "varying vec3 normal_;"
+      "varying vec3 tangent_;"
+      "varying vec3 bitangent_;"
+      "uniform vec3 light_direction;"
+      "uniform vec4 light_diffuse;"
+      "uniform vec4 light_ambient;"
+      "uniform vec4 light_specular;"
       "uniform sampler2D samplers[5];"
       "uniform float shininess;"
       ""
       "void main() {"
-      "  lowp vec3 bump = normalize(vec3(texture2D(samplers[4], uv_).xy-vec2(0.5, 0.5), 1));"
-      "  lowp vec3 nnormal = normalize(bump.x * tangent_ + bump.y * bitangent_ + bump.z * normal_);"
-      "  lowp vec3 half_direction = normalize(light_direction + vec3(0, 0, 1));"
-      "  lowp float diffuse_factor = max(dot(light_direction, nnormal), 0.0);"
-      "  lowp float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess);"
-      "  lowp vec4 diffuse = texture2D(samplers[0], uv_);"
-      "  lowp vec4 ambient = texture2D(samplers[1], uv_);"
-      "  lowp vec4 emission = texture2D(samplers[2], uv_);"
-      "  lowp vec4 specular = texture2D(samplers[3], uv_);"
+      "  vec3 bump = normalize(vec3(texture2D(samplers[4], uv_).xy-vec2(0.5, 0.5), 1));"
+      "  vec3 nnormal = normalize(bump.x * tangent_ + bump.y * bitangent_ + bump.z * normal_);"
+      "  vec3 half_direction = normalize(light_direction + vec3(0, 0, 1));"
+      "  float diffuse_factor = max(dot(light_direction, nnormal), 0.0);"
+      "  float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess);"
+      "  vec4 diffuse = texture2D(samplers[0], uv_);"
+      "  vec4 ambient = texture2D(samplers[1], uv_);"
+      "  vec4 emission = texture2D(samplers[2], uv_);"
+      "  vec4 specular = texture2D(samplers[3], uv_);"
       "  gl_FragColor = "
       "    ambient * light_ambient +"
       "    diffuse * light_diffuse * diffuse_factor +"
       "    emission +"
       "    specular * light_specular * specular_factor;"
-      //"  gl_FragColor = vec4(light_direction,1) + diffuse * 0.1f;"
+      //"  gl_FragColor = vec4(1, 1, 1, 1);"
       "}"
     ;
     
     // use the common shader code to compile and link the shaders
     // the result is a shader program
-    phong_shader::init_uniforms(vertex_shader, fragment_shader);
+    phong_shader::init_uniforms(is_skinned ? skinned_vertex_shader : vertex_shader, fragment_shader);
   }
 
   void render(const mat4 &modelToProjection, const mat4 &modelToCamera, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular) {
     phong_shader::render(modelToProjection, modelToCamera, light_direction, shininess, light_ambient, light_diffuse, light_specular, 5);
+  }
+
+  void render_skinned(const mat4 &cameraToProjection, const mat4 *modelToCamera, int num_matrices, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular) {
+    phong_shader::render_skinned(cameraToProjection, modelToCamera, num_matrices, light_direction, shininess, light_ambient, light_diffuse, light_specular, 5);
   }
 };

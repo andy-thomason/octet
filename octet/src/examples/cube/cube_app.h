@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // cube example: How to draw basic 3D geometry
+//
+// Level: 0
 //
 // Demonstrates:
 //   Basic framework app

@@ -49,6 +49,9 @@
     <Filter Include="examples\invaderers">
       <UniqueIdentifier>{7d447309-b187-4141-8539-b41a1bdd17ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="examples\animation">
+      <UniqueIdentifier>{31031b39-f071-4db0-838b-69d4cad71958}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\shaders\color_shader.h">
@@ -173,6 +176,12 @@
     </ClInclude>
     <ClInclude Include="..\src\examples\invaderers\invaderers_app.h">
       <Filter>examples\invaderers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\examples\animation\animation_app.h">
+      <Filter>examples\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\scene.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

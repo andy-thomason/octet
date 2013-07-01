@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -93,6 +93,12 @@ public:
       memcpy((void*)entry->key, key, bytes);
     }
     return entry->value;
+  }
+
+  bool contains(const char *key) {
+    unsigned hash = calc_hash( key );
+    entry_t *entry = find( key, hash );
+    return entry && entry->key;
   }
 
   // bye bye dictionary. Use the allocator to free up memory.

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -104,6 +104,14 @@ public:
     resize(size_+1);
     data_[old_length] = new_item;
   }
+
+  item_t &back() {
+    return data_[size_-1];
+  }
+
+  bool is_empty() {
+    return size_ == 0;
+  }
   
   item_t &operator[](int_size_t elem) { return data_[elem]; }
   const item_t &operator[](int_size_t elem) const { return data_[elem]; }
@@ -169,11 +177,6 @@ public:
       data_ = new_data;
       capacity_ = new_capacity;
     }
-  }
-
-  item_t &back() {
-    //assert(size_ != 0);
-    return data_[size_ - 1];
   }
 
   void pop_back() {

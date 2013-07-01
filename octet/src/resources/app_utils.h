@@ -1,14 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 //
 class app_utils {
   #ifdef WIN32
+    // vc2010/../
     static const char *prefix() { return "../"; }
   #else
+    // xcode/../
     static const char *prefix() { return "../"; }
   #endif
   

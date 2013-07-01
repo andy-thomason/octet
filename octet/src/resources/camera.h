@@ -62,6 +62,12 @@ public:
     modelToProjection = modelToCamera * cameraToProjection;
   }
 
+  // call this many times to build matrices for uniforms.
+  const mat4 &get_cameraToProjection()
+  {
+    return cameraToProjection;
+  }
+
   // use this to get the camera from the scene
   int node() {
     return node_;

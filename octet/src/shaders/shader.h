@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -42,6 +42,7 @@ public:
     glBindAttribLocation(program, mesh_state::attribute_normal, "normal");
     glBindAttribLocation(program, mesh_state::attribute_tangent, "tangent");
     glBindAttribLocation(program, mesh_state::attribute_bitangent, "bitangent");
+    glBindAttribLocation(program, mesh_state::attribute_blendweight, "blendweight");
     glBindAttribLocation(program, mesh_state::attribute_color, "color");
     glBindAttribLocation(program, mesh_state::attribute_uv, "uv");
     glLinkProgram(program);

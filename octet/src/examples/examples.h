@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -18,6 +18,7 @@
 #include "bump/bump_app.h"
 #include "physics/physics_app.h"
 #include "raytrace/raytrace_app.h"
+#include "animation/animation_app.h"
 
 static app *app_factory(const char *name, int argc, char **argv) {
   if (!strcmp(name, "triangle")) return new triangle_app(argc, argv);    //  triangle sample: start here to learn how to draw a triangle
@@ -30,6 +31,7 @@ static app *app_factory(const char *name, int argc, char **argv) {
   else if (!strcmp(name, "bump")) return new bump_app(argc, argv);       //  bump map sample: continue here to learn how to draw bump mapped textures
   else if (!strcmp(name, "physics")) return new physics_app(argc, argv); //  physics sample: continue here to learn how to annimate using physics
   else if (!strcmp(name, "raytrace")) return new raytrace_app(argc, argv); //  raytracing sample: a simple ray tracer
+  else if (!strcmp(name, "animation")) return new animation_app(argc, argv); //  load a collada scene and animate it
   else return 0;
 }
 

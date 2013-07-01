@@ -11,18 +11,35 @@ class mesh_state {
 public:
   // standard attribute names
   enum attribute {
-    attribute_pos,
-    attribute_normal,
-    attribute_tangent,
-    attribute_bitangent,
-    attribute_color,
-    attribute_weights,
+    attribute_position = 0,
+    attribute_pos = 0,
+    attribute_blendweight = 1,
+    attribute_normal = 2,
+    attribute_diffuse = 3,
+    attribute_color = 3,
+    attribute_specular = 4,
+    attribute_tessfactor = 5,
+    attribute_fogcoord = 5,
+    attribute_psize = 6,
+    attribute_blendindices = 7,
+    attribute_texcoord = 8,
     attribute_uv = 8,
+    attribute_tangent = 14,
+    attribute_bitangent = 15,
+    attribute_binormal = 15,
   };
 
   struct resource {
     unsigned char *ptr;
     GLuint buffer;
+  };
+
+
+  struct mesh_instance {
+    int node;
+    int mesh;
+    int material;
+    int skeleton;
   };
 
 private:
@@ -43,6 +60,9 @@ private:
   unsigned char use_vbo;
   unsigned char num_slots;
 
+  chars<allocator> geometry_name;
+  chars<allocator> component_name;
+
   mesh_state(mesh_state &rhs);
 
 public:
@@ -54,10 +74,22 @@ public:
     release();
   }
 
-  void init() {
-    memset(this, 0, sizeof(*this));
+  void init(const char *geometry_name="", const char *component_name="") {
+    memset(format, 0, sizeof(format));
+
+    num_indices = 0;
+    num_vertices = 0;
+    stride = 0;
+    mode = 0;
+    index_type = 0;
+
+    use_vbo = 0;
+    num_slots = 0;
     index_type = GL_UNSIGNED_SHORT;
     mode = GL_TRIANGLES;
+
+    this->geometry_name = geometry_name;
+    this->component_name = component_name;
   }
 
   void release() {
@@ -159,6 +191,16 @@ public:
       return vec4(x, y, z, w);
     }
     return vec4(0, 0, 0, 0);
+  }
+
+  // get name of geometry for debugging and scene management
+  const char *get_geometry_name() {
+    return geometry_name.c_str();
+  }
+
+  // get name of geometry component for debugging and scene management
+  const char *get_component_name() {
+    return component_name.c_str();
   }
 
   void set_value(unsigned slot, unsigned index, vec4 value) {
@@ -268,6 +310,30 @@ public:
     }
     fprintf(file, "\n  </indices>\n");
     fprintf(file, "</model>\n");
+  }
+
+  // render a mesh with OpenGL
+  // assume the shader, uniforms and render params are already set up.
+  void render() {
+    unsigned char *base = 0;
+    unsigned char *index_base = 0;
+    begin_render(&base, &index_base);
+
+    for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
+      unsigned size = get_size(slot);
+      unsigned kind = get_kind(slot);
+      unsigned attr = get_attr(slot);
+      unsigned offset = get_offset(slot);
+      glVertexAttribPointer(attr, size, kind, GL_FALSE, get_stride(), (void*)(base + offset));
+      glEnableVertexAttribArray(attr);
+    }
+
+    glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)index_base);
+
+    for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
+      unsigned attr = get_attr(slot);
+      glDisableVertexAttribArray(attr);
+    }
   }
 };
 

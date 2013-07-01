@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // texture example: How to draw triangles with textures
+//
+// Level: 0
 //
 // Demonstrates:
 //   Basic framework app
@@ -14,10 +16,10 @@
 //
 
 class texture_app : public app {
-  mat4 modelToWorld;
-  mat4 cameraToWorld;
-  texture_shader texture_shader_;
-  GLuint texture_handle_;
+  mat4 modelToWorld;              // this matrix converts from model space to world space
+  mat4 cameraToWorld;             // this matrix converts from camera space to world space
+  texture_shader texture_shader_; // this builds a shader to use with textures
+  GLuint texture_handle_;         // this is an OpenGL texture handle which is used to draw the image.
 
 public:
 

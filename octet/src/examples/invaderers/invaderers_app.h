@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // invaderer example: simple game with sprites and sounds
+//
+// Level: 1
 //
 // Demonstrates:
 //   Basic framework app

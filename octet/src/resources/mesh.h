@@ -1,83 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// 3D mesh container
+// 3D mesh container. Slightly higher level than mesh_state
+// This has some function for building boxes, spheres and so on.
 //
-
-class collision {
-  static bool unit_test_triange_box_collision() {
-    vec4 centre(3, 3, 3, 0);
-    float size = 2;
-    
-    vec4 tris[] = {
-      // horizontal triangles at centre
-      vec4(-1.0f, -1.0f, 3.0f, 1.0f),   vec4( 0.5f, -1.0f, 3.0f, 1.0f),   vec4( 0.5f, 0.5f, 3.0f, 1.0f),
-      vec4(-1.0f, -1.0f, 3.0f, 1.0f),   vec4( 1.0f, -1.0f, 3.0f, 1.0f),   vec4( 1.0f, 1.0f, 3.0f, 1.0f),
-      vec4(-1.0f, -1.0f, 3.0f, 1.0f),   vec4( 2.0f, -1.0f, 3.0f, 1.0f),   vec4( 2.0f, 2.0f, 3.0f, 1.0f),
-    };
-
-    for (int i = 0; i != sizeof(tris)/sizeof(vec4)/3; ++i) {
-      vec4 pos[] = { tris[i*3+0], tris[i*3+1], tris[i*3+2] };
-      bool hit = triangle_cube_collision(centre, size, pos);
-    }
-    return true;
-  }
-
-  static float fmin(float a, float b) { return a < b ? a : b; }
-  static float fmax(float a, float b) { return a > b ? a : b; }
-
-  static bool edge(const vec4 &p0, const vec4 &p1, const vec4 &p2, int y, int z, float size) {
-    float dist_p0 = p0[z] * p1[y] - p0[y] * p1[z];
-    float dist_p2 = ( p1[y] - p0[y] ) * p2[z] - ( p1[z] - p0[z] ) * p2[y];
-    float dist_cube = fabsf( ( p1[y] - p0[y] ) + ( p1[z] - p0[z] ) ) * size;
-    return fmin(dist_p0, dist_p2) > dist_cube || fmax(dist_p0, dist_p2) < -dist_cube;
-  }
-
-public:
-  static bool triangle_cube_collision(const vec4 &centre, float size, vec4 *pos) {
-    vec4 p0 = pos[0] - centre;
-    vec4 p1 = pos[1] - centre;
-    vec4 p2 = pos[2] - centre;
-
-    // points on triangles vs faces on cube
-    vec4 min = p0.min(p1.min(p2));
-    vec4 max = p0.max(p1.max(p2));
-    if (
-      min.x() < size && max.x() > -size &&
-      min.y() < size && max.y() > -size &&
-      min.z() < size && max.z() > -size
-    ) {
-      return false;
-    }
-
-    // points on cube vs. face of triangle
-    vec4 normal = (p1 - p0).cross(p2 - p0);
-    float dist_face = fabsf(normal.dot(p0));
-    float dist_cube = ( fabsf(normal.x()) + fabsf(normal.y()) + fabsf(normal.z()) ) * size;
-    if (dist_face > dist_cube) {
-      return false;
-    }
-
-    return (
-      edge(p0, p1, p2, 0, 1, size) &&
-      edge(p0, p1, p2, 1, 2, size) &&
-      edge(p0, p1, p2, 2, 0, size) &&
-      edge(p1, p2, p0, 0, 1, size) &&
-      edge(p1, p2, p0, 1, 2, size) &&
-      edge(p1, p2, p0, 2, 0, size) &&
-      edge(p2, p0, p1, 0, 1, size) &&
-      edge(p2, p0, p1, 1, 2, size) &&
-      edge(p2, p0, p1, 2, 0, size)
-    );
-  }
-
-  static bool unit_test() {
-    return unit_test_triange_box_collision();
-  }
-};
+// todo: add functions for quantising, re-indexing and tri-stripping.
+//
 
 class mesh : public mesh_state {
 
@@ -139,6 +70,8 @@ public:
     builder.get_mesh_state(*this, id);
   }
 
+  // make a bunch of lines to show normals.
+  // render this with GL_LINES
   void make_normal_visualizer(const mesh &source, float length, unsigned normal_attr) {
     release();
     mesh_builder builder;
@@ -247,28 +180,6 @@ public:
       vec4 new_bitangent = get_value(bitangent_slot, i).xyz().normalize();
       set_value(tangent_slot, i, new_tangent);
       set_value(bitangent_slot, i, new_bitangent);
-    }
-  }
-
-  void render() {
-    unsigned char *base = 0;
-    unsigned char *index_base = 0;
-    begin_render(&base, &index_base);
-
-    for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
-      unsigned size = get_size(slot);
-      unsigned kind = get_kind(slot);
-      unsigned attr = get_attr(slot);
-      unsigned offset = get_offset(slot);
-      glVertexAttribPointer(attr, size, kind, GL_FALSE, get_stride(), (void*)(base + offset));
-      glEnableVertexAttribArray(attr);
-    }
-
-    glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)index_base);
-
-    for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
-      unsigned attr = get_attr(slot);
-      glDisableVertexAttribArray(attr);
     }
   }
 

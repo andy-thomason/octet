@@ -17,6 +17,9 @@ class scene {
   // every node has a parent node except the roots with -1
   dynarray<int> parentNodes;
 
+  // a skeleton is a set of nodes followed by -1. eg. skeletons 0 and 4: 0 1 2 -1 3 4 5 6 -1
+  dynarray<int> skeletons;
+
   // each of these is a set of (node, mesh, material)
   dynarray<mesh_state::mesh_instance> mesh_instances;
 
@@ -32,14 +35,12 @@ class scene {
   // set of lights
   dynarray<camera> cameras;
 
-  int current_camera;
   int frame_number;
 
 public:
   // create an empty scene
   scene() {
     frame_number = 0;
-    current_camera = 0;
   }
 
   // how many nodes to we have?
@@ -47,9 +48,22 @@ public:
     return (int)modelToParent.size();
   }
 
-  // how many mesh instances to we have?
+  // how many mesh instances do we have?
   int num_mesh_instances() {
     return (int)mesh_instances.size();
+  }
+
+  // how many cameras do we have?
+  int num_cameras() {
+    return (int)cameras.size();
+  }
+
+  int add_node(int parent, const mat4 &modelToParent_, const char *name) {
+    int node_index = (int)modelToParent.size();
+    modelToParent.push_back(modelToParent_);
+    parentNodes.push_back(parent);
+    nodeNamesToNodes[name] = node_index;
+    return node_index;
   }
 
   // compute the node to world matrix for an individual node;
@@ -57,10 +71,35 @@ public:
     mat4 result = modelToParent[node];
     node = parentNodes[node];
     while (node != -1) {
-      result = modelToParent[node] * result;
+      //result = modelToParent[node] * result;
+      result = result * modelToParent[node];
       node = parentNodes[node];
     }
     return result;
+  }
+
+  void calcRelativeMatrices(mat4 *modelToCamera, int node, int num_nodes) {
+    /*for (int i = 0; i != parentNodes.size(); ++i) {
+      printf("%d ", parentNodes[i]);
+    }
+    printf(" [%d]\n", node);*/
+    for (int rel_node = 1; rel_node < num_nodes; ++rel_node) {
+      int abs_node = node + rel_node;
+      int abs_parent = parentNodes[abs_node];
+      int rel_parent = abs_parent - node;
+      if (rel_parent >= 0 && rel_parent < num_nodes) {
+        // use the parent transform to make a new matrix from an earlier one.
+        modelToCamera[rel_node] = modelToParent[abs_node] * modelToCamera[rel_parent];
+      } else {
+        // rel_parent out of range: play safe and return the original matrix
+        modelToCamera[rel_node] = modelToCamera[0];
+      }
+    }
+  }
+
+  // access camera information
+  camera &get_camera(int index) {
+    return cameras[index];
   }
 
   // access the relative matrix for a specific node
@@ -80,53 +119,83 @@ public:
   
   // load a scene from a collada file
   void make_collada_scene(collada_builder &builder, const char *name) {
-    builder.get_scene(name, modelToParent, nodeNamesToNodes, parentNodes, mesh_instances, meshes, materials);
+    collada_builder::scene_state s = { modelToParent, nodeNamesToNodes, parentNodes, mesh_instances, skeletons, meshes, materials, cameras };
+
+    builder.get_scene(name, s);
 
     // temp. lights
-    vec4 light_dir = vec4(1, 1, 1, 0).normalize();
+    vec4 light_dir = vec4(-1, -1, -1, 0).normalize();
     vec4 light_ambient = vec4(0.3f, 0.3f, 0.3f, 1);
     vec4 light_diffuse = vec4(1, 1, 1, 1);
     vec4 light_specular = vec4(1, 1, 1, 1);
     lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
 
-    // temp. camera
-    camera cam;
-    float n = 0.1f, f = 1000.0f;
-    cam.set_params(0, -n, n, -n, n, n, f, false);
-    cameras.push_back(cam);
+    // default camera
+    if (cameras.size() == 0) {
+      mat4 m;
+      m.loadIdentity();
+      m.rotateX(90);
+      m.translate(0.0, 1.0f, 1.5f);
+      int node = add_node(-1, m, "default_cam");
+      camera cam;
+      float n = 0.1f, f = 1000.0f;
+      cam.set_params(node, -n, n, -n, n, n, f, false);
+      cameras.push_back(cam);
+    }
   }
 
   // call OpenGL to draw all the mesh instances (node + mesh + material)
-  void render(bump_shader &shader, const mat4 &cameraToWorld) {
+  void render(bump_shader &shader, int camera_index=0) {
     frame_number++;
+
+    if (cameras.size() == 0) {
+      return;
+    }
+
+    mat4 cameraToWorld;
+    camera &cam = get_camera(camera_index);
+    cameraToWorld = calcModelToWorld(cam.node());
 
     mat4 worldToCamera;
     cameraToWorld.invertQuick(worldToCamera);
     lighting_set.compute(worldToCamera);
-    camera &cam = cameras[0];
     cam.set_cameraToWorld(cameraToWorld);
 
     for (int i = 0; i != (int)mesh_instances.size(); ++i) {
       mesh_state::mesh_instance &m = mesh_instances[i];
-      mat4 modelToWorld = calcModelToWorld(m.node);
       mesh_state &mesh_st = *meshes[m.mesh];
       bump_material &mat = materials[m.material];
 
-      if (frame_number == 1) {
+      /*if (frame_number == 1) {
         printf("!! %d %s\n", i, modelToWorld.toString());
+      }*/
+
+      if (m.skeleton == -1) {
+        // normal rendering for single matrix objects
+        // build a projection matrix: model -> world -> camera -> projection
+        // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
+        mat4 modelToWorld = calcModelToWorld(m.node);
+        mat4 modelToCamera;
+        mat4 modelToProjection;
+        cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
+        mat.render(shader, modelToProjection, modelToCamera, lighting_set.data());
+      } else {
+        // multi-matrix rendering for characters
+        mat4 modelToCamera[32];
+        mat4 modelToProjection;
+        int si = m.skeleton;
+        int di = 0;
+        mat4 cameraToProjection = cam.get_cameraToProjection();
+        while (skeletons[si] != -1 && di < 32) {
+          int src_node = skeletons[si];
+          mat4 modelToWorld = calcModelToWorld(src_node);
+          modelToCamera[0] = modelToWorld * worldToCamera;
+          cam.get_matrices(modelToProjection, modelToCamera[di++], modelToWorld);
+          si++;
+        }
+        //mat.render(shader, modelToProjection, modelToCamera[0], lighting_set.data());
+        mat.render_skinned(shader, cameraToProjection, modelToCamera, di, lighting_set.data());
       }
-
-      // build a projection matrix: model -> world -> camera -> projection
-      // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-      mat4 modelToCamera;
-      mat4 modelToProjection;
-      cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
-      //printf("1 %s\n", modelToProjection.toString());
-      //modelToProjection = mat4::build_camera_matrices(modelToCamera, worldToCamera, modelToWorld, cameraToWorld);
-      //printf("2 %s\n", modelToProjection.toString());
-
-      mat.render(shader, modelToProjection, modelToCamera, lighting_set.data());
-
       mesh_st.render();
     }
   }

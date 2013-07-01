@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012-2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -56,6 +56,29 @@ public:
     vec4 &light_diffuse = lights[3];
     vec4 &light_specular = lights[4];
     shader.render(modelToProjection, modelToCamera, light_direction, shininess, light_ambient, light_diffuse, light_specular);
+    
+    // set textures 0, 1, 2, 3 to their respective values
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ambient);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, emission);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, specular);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, bump);
+    glActiveTexture(GL_TEXTURE0);
+  }
+
+  void render_skinned(bump_shader &shader, const mat4 &cameraToProjection, const mat4 *modelToCamera, int num_nodes, vec4 *lights) {
+    // todo: pass lights directly to shader
+    //vec4 &position = lights[0];
+    vec4 &light_direction = lights[1];
+    vec4 &light_ambient = lights[2];
+    vec4 &light_diffuse = lights[3];
+    vec4 &light_specular = lights[4];
+    shader.render_skinned(cameraToProjection, modelToCamera, num_nodes, light_direction, shininess, light_ambient, light_diffuse, light_specular);
     
     // set textures 0, 1, 2, 3 to their respective values
     glActiveTexture(GL_TEXTURE0);
