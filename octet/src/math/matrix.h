@@ -40,6 +40,28 @@ public:
     v[0] = x; v[1] = y; v[2] = z; v[3] = w;
   }
 
+  // initialise the matrix one row at a time
+  void init_row_major(const float *f)
+  {
+    init(
+      vec4(f[0], f[4], f[8], f[12]),
+      vec4(f[1], f[5], f[9], f[13]),
+      vec4(f[2], f[6], f[10], f[14]),
+      vec4(f[3], f[7], f[11], f[15])
+    );
+  }
+
+  // initialise the matrix one column at a time
+  void init_col_major(const float *f)
+  {
+    init(
+      vec4(f[0], f[1], f[2], f[3]),
+      vec4(f[4], f[5], f[6], f[7]),
+      vec4(f[8], f[9], f[10], f[11]),
+      vec4(f[12], f[13], f[14], f[15])
+    );
+  }
+
   vec4 &operator[](int i) { return v[i]; }
   const vec4 &operator[](int i) const { return v[i]; }
 
@@ -51,6 +73,7 @@ public:
   float *get() { return &v[0][0]; }
   const float *get() const { return &v[0][0]; }
   
+  // OpenGL-style scale of this matrix
   mat4 &scale(float x, float y, float z) {
     for (int i = 0; i != 4; ++i) {
       v[i][0] *= x;
@@ -60,11 +83,13 @@ public:
     return *this;
   }
   
+  // OpenGL-style translate of this matrix
   mat4 &translate(float x, float y, float z) {
     v[3] = lmul(vec4(x,y,z,1));
     return *this;
   }
   
+  // note this treats matrices as row-major unlike gl matrices which are column-major
   mat4 operator*(const mat4 &r) const
   {
     mat4 res;
@@ -158,7 +183,7 @@ public:
         v0[1]*v1[2]*v2[0] - v0[2]*v1[1]*v2[0] + v0[2]*v1[0]*v2[1] - v0[0]*v1[2]*v2[1] - v0[1]*v1[0]*v2[2] + v0[0]*v1[1]*v2[2]
       ) * rdet
     );
- }
+  }
 
   // 3x3 adjoint matrix, used for generalized 3x3 invert
   mat4 adjoint3x3() const {
@@ -178,6 +203,7 @@ public:
     return v[0].cross(v[1]).dot(v[2]);
   }
   
+  // complete 4x4 determinant
   float det4x4() const {
     vec4 v0 = v[0];
     vec4 v1 = v[1];
@@ -198,7 +224,7 @@ public:
     return adjoint3x3() * (1.0f/det3x3());
   }
   
-  // general inverse of 3x4 matrix
+  // general inverse of 3x4 matrix (with v[3] = vec4(0, 0, 0, 1))
   mat4 inverse3x4() const {
     float rdet = 1.0f / det3x3();
     mat4 d = adjoint3x3();
@@ -262,6 +288,16 @@ public:
   // multiply by scalar
   mat4 operator*(float r) const { return mat4(v[0]*r, v[1]*r, v[2]*r, v[3]*r); }
 
+  // postmultiply vector
+  vec4 operator*(const vec4 &r) const {
+    return vec4(
+      v[0].dot(r),
+      v[1].dot(r),
+      v[2].dot(r),
+      v[3].dot(r)
+    );
+  }
+
   // convert rotation matrix to quaternion
   quat toQuaternion() const {
     float trace = v[0][0] + v[1][1] + v[2][2];
@@ -316,6 +352,7 @@ public:
 
     // model -> world -> camera -> projection
     return modelToWorld * worldToCamera * cameraToProjection;
+    //return projectionFromCamera * cameraFromWorld * worldFromModel;
   }
 
   // helper function for building a simple camera
@@ -344,6 +381,7 @@ public:
   vec4 &w() { return v[3]; }
 };
 
+// vector times a matrix (premultiplication)
 inline vec4 vec4::operator*(const mat4 &r) const
 {
   return r.lmul(*this);

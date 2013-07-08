@@ -20,6 +20,9 @@ class scene {
   // a skeleton is a set of nodes followed by -1. eg. skeletons 0 and 4: 0 1 2 -1 3 4 5 6 -1
   dynarray<int> skeletons;
 
+  // for skinned meshes, we need a few more data
+  dynarray<mesh_state::skin> skins;
+
   // each of these is a set of (node, mesh, material)
   dynarray<mesh_state::mesh_instance> mesh_instances;
 
@@ -108,8 +111,19 @@ public:
   }
 
   // get an index for a named node.
-  int index(const char *name) {
+  int get_index(const char *name) {
     return nodeNamesToNodes[name];
+  }
+
+  // convert index to name (slow)
+  const char *node_name(int index) {
+    const char *name = "??";
+    for (int i = 0; i != nodeNamesToNodes.num_indices(); ++i) {
+      if (nodeNamesToNodes.value(i) == index) {
+        name = nodeNamesToNodes.key(i);
+      }
+    }
+    return name;
   }
 
   // get a mesh object if one exists for this node or NULL if not
@@ -145,7 +159,7 @@ public:
   }
 
   // call OpenGL to draw all the mesh instances (node + mesh + material)
-  void render(bump_shader &shader, int camera_index=0) {
+  void render(bump_shader &object_shader, bump_shader &skin_shader, int camera_index=0) {
     frame_number++;
 
     if (cameras.size() == 0) {
@@ -161,16 +175,17 @@ public:
     lighting_set.compute(worldToCamera);
     cam.set_cameraToWorld(cameraToWorld);
 
-    for (int i = 0; i != (int)mesh_instances.size(); ++i) {
-      mesh_state::mesh_instance &m = mesh_instances[i];
+    for (int mesh_index = 0; mesh_index != (int)mesh_instances.size(); ++mesh_index) {
+      mesh_state::mesh_instance &m = mesh_instances[mesh_index];
       mesh_state &mesh_st = *meshes[m.mesh];
       bump_material &mat = materials[m.material];
+      mesh_state::skin *skin = mesh_st.get_skin();
 
       /*if (frame_number == 1) {
         printf("!! %d %s\n", i, modelToWorld.toString());
       }*/
 
-      if (m.skeleton == -1) {
+      if (m.skeleton == -1 || !skin) {
         // normal rendering for single matrix objects
         // build a projection matrix: model -> world -> camera -> projection
         // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
@@ -178,7 +193,7 @@ public:
         mat4 modelToCamera;
         mat4 modelToProjection;
         cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
-        mat.render(shader, modelToProjection, modelToCamera, lighting_set.data());
+        mat.render(object_shader, modelToProjection, modelToCamera, lighting_set.data());
       } else {
         // multi-matrix rendering for characters
         mat4 modelToCamera[32];
@@ -189,12 +204,18 @@ public:
         while (skeletons[si] != -1 && di < 32) {
           int src_node = skeletons[si];
           mat4 modelToWorld = calcModelToWorld(src_node);
-          modelToCamera[0] = modelToWorld * worldToCamera;
-          cam.get_matrices(modelToProjection, modelToCamera[di++], modelToWorld);
+          mat4 bindToModel = skin->bindToModel[di];
+          mat4 meshToBind = skin->modelToBind;
+          modelToCamera[di] = meshToBind * bindToModel * modelToWorld * worldToCamera;
+          if (frame_number == 1) {
+            const char *name = node_name(src_node);
+            printf("mi=%d node=%d name=%s mx=%s\n", mesh_index, src_node, name, modelToCamera[di].toString());
+          }
           si++;
+          di++;
         }
-        //mat.render(shader, modelToProjection, modelToCamera[0], lighting_set.data());
-        mat.render_skinned(shader, cameraToProjection, modelToCamera, di, lighting_set.data());
+        //modelToCamera[1] = modelToCamera[0];
+        mat.render_skinned(skin_shader, cameraToProjection, modelToCamera, di, lighting_set.data());
       }
       mesh_st.render();
     }

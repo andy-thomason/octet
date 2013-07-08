@@ -29,17 +29,40 @@ public:
     attribute_binormal = 15,
   };
 
+  // a resource can be stored in a gl buffer or memory
   struct resource {
     unsigned char *ptr;
     GLuint buffer;
   };
 
-
+  // how to draw a mesh
   struct mesh_instance {
+    // which node (model to world matrix) to use
     int node;
+
+    // which mesh to render
     int mesh;
+
+    // what material to use
     int material;
+
+    // for characters, which skin to use
+    int skin;
+
+    // for characters, which skeleton to use
     int skeleton;
+  };
+
+  // extra information for skinned meshes
+  struct skin {
+    // the original transform of the skin to world space (bind space)
+    mat4 modelToBind;
+
+    // for each node, map from world space (bind space) to model space
+    dynarray<mat4> bindToModel;
+
+    // a name for each joint.
+    dynarray<string> joints;
   };
 
 private:
@@ -63,6 +86,9 @@ private:
   chars<allocator> geometry_name;
   chars<allocator> component_name;
 
+  // optional skin
+  ptr<skin> skin_;
+
   mesh_state(mesh_state &rhs);
 
 public:
@@ -74,7 +100,7 @@ public:
     release();
   }
 
-  void init(const char *geometry_name="", const char *component_name="") {
+  void init(const char *geometry_name="", const char *component_name="", skin *_skin=0) {
     memset(format, 0, sizeof(format));
 
     num_indices = 0;
@@ -90,6 +116,8 @@ public:
 
     this->geometry_name = geometry_name;
     this->component_name = component_name;
+
+    skin_ = _skin;
   }
 
   void release() {
@@ -162,6 +190,27 @@ public:
 
   unsigned get_num_slots() const {
     return num_slots;
+  }
+
+  // get the optional skin data
+  skin *get_skin() const {
+    return (skin*)skin_;
+  }
+
+  // set the optional skin
+  // note: the mesh state owns the skin.
+  void set_skin(skin *value) {
+    skin_ = value;
+  }
+
+  // return true if this mesh has a particular attribute
+  bool has_attribute(unsigned attr) {
+    for (unsigned i = 0; i != num_slots; ++i) {
+      if (get_attr(i) == attr) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // avoid using these, please! Just for testing

@@ -183,6 +183,7 @@ public:
     }
   }
 
+  // apply a matrix to every position
   void transform(unsigned attr, mat4 &matrix) {
     if (get_use_vbo() || get_num_vertices() == 0) {
       return;
@@ -196,6 +197,7 @@ public:
     }
   }
 
+  // clone a mesh state
   void copy(const mesh &source) {
     copy_format(source);
     copy_params(source);
@@ -211,10 +213,7 @@ public:
     copy_vertices(source);
   }
 
-  void dump(FILE *file) {
-    dump(file);
-  }
-
+  // *very* slow ray cast.
   bool ray_cast(const vec4 &org, const vec4 &dir, int indices[], vec4 &bary) {
     //static FILE *file = fopen("c:/tmp/3.txt","w");
     //fprintf(file, "org=%s dir=%s\n", org.toString(), dir.toString());
@@ -269,6 +268,7 @@ public:
     return false;
   }
 
+  // get the axis aligned bounding box (ie. the min and max of x, y, z)
   void get_aabb(const mat4 &modelToWorld, vec4 &min, vec4 &max) {
     unsigned pos_slot = get_slot(mesh_state::attribute_pos);
 
@@ -285,7 +285,7 @@ public:
     }
   }
 
-  template <class T > void get_triangles(const mat4 &modelToWorld, int max_depth, T &out) {
+  /*template <class T > void get_triangles(const mat4 &modelToWorld, int max_depth, T &out) {
     unsigned pos_slot = get_slot(mesh_state::attribute_pos);
 
     for (unsigned i = 0; i != get_num_indices(); i += 3) {
@@ -300,7 +300,7 @@ public:
       vec4 p2 = get_value(pos_slot, idx[2]) * modelToWorld;
       out.triangle(i, p0, p1, p2);
     }
-  }
+  }*/
 
 };
 

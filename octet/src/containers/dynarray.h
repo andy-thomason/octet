@@ -27,15 +27,18 @@ void *operator new(size_t size, void *place, dynarray_dummy_t x) { return place;
 void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 // dynamic array class similar to std::vector
-template <class item_t, class allocator_t=allocator> class dynarray {
+template <class item_t, class allocator_t=allocator, bool use_new_delete=true> class dynarray {
   item_t *data_;
   typedef unsigned int_size_t;
   int_size_t size_;
   int_size_t capacity_;
   enum { min_capacity = 8 };
+
   void reset() {
-    for (int_size_t i = 0; i != size_; ++i) {
-      data_[i].~item_t();
+    if (use_new_delete) {
+      for (int_size_t i = 0; i != size_; ++i) {
+        data_[i].~item_t();
+      }
     }
     if (data_) {
       allocator_t::free(data_, capacity_ * sizeof(item_t));
@@ -127,12 +130,14 @@ public:
     dynarray_dummy_t x;
     if (new_length >= size_ && new_length <= capacity_) {
       if (trace) printf("case 1: growing dynarray up to capacity_\n");
-      int_size_t len = size_; // avoid aliases
-      while (len < new_length) {
-        new (data_ + len, x)item_t;
-        ++len;
+      if (use_new_delete) {
+        int_size_t len = size_; // avoid aliases
+        while (len < new_length) {
+          new (data_ + len, x)item_t;
+          ++len;
+        }
       }
-      size_ = len;
+      size_ = new_length;
     } else if (new_length > capacity_) {
       if (trace) printf("case 2: growing dynarray beyond capacity_\n");
       int_size_t new_capacity = capacity_ == 0 ? min_capacity : capacity_ * 2;
@@ -140,18 +145,23 @@ public:
 
       reserve(new_capacity);
 
-      // initialize the rest to default
-      for (int_size_t i = size_; i < new_length; ++i) {
-        new (data_ + i, x) item_t;
+      if (use_new_delete) {
+        // initialize the rest to default
+        for (int_size_t i = size_; i < new_length; ++i) {
+          new (data_ + i, x) item_t;
+        }
       }
 
       size_ = new_length;
     } else {
       if (trace) printf("case 3: shrinking dynarray\n");
-      int_size_t len = size_; // avoid aliases
-      while (len > new_length) {
-        --len;
-        data_[len].~item_t();
+
+      if (use_new_delete) {
+        int_size_t len = size_; // avoid aliases
+        while (len > new_length) {
+          --len;
+          data_[len].~item_t();
+        }
       }
       size_ = new_length;
       if (size_ == 0) reset();
@@ -163,10 +173,12 @@ public:
       dynarray_dummy_t x;
       item_t *new_data = (item_t *)allocator_t::malloc(sizeof(item_t) * new_capacity);
       
-      // initialize new data_ elements from old ones
-      for (int_size_t i = 0; i != size_; ++i) {
-        new (new_data + i, x) item_t(data_[i]);
-        data_[i].~item_t();
+      if (use_new_delete) {
+        // initialize new data_ elements from old ones
+        for (int_size_t i = 0; i != size_; ++i) {
+          new (new_data + i, x) item_t(data_[i]);
+          data_[i].~item_t();
+        }
       }
 
       // free up data_
@@ -184,3 +196,9 @@ public:
     size_--;
   }
 };
+
+// dumbarray:
+//   high performance vector does not use new and delete
+template <class item_t, class allocator_t=allocator> class dumbarray : public dynarray<item_t, allocator_t, false> {
+};
+

@@ -24,7 +24,7 @@ public:
     dictionary<int> &nodeNamesToNodes;
     dynarray<int> &parentNodes;
     dynarray<mesh_state::mesh_instance> &mesh_instances;
-    dynarray<int> &skeletons;
+    dynarray<int> &bones;
     dynarray<mesh_state *> &meshes;
     dynarray<bump_material> &materials;
     dynarray<camera> &cameras;
@@ -35,7 +35,7 @@ public:
   enum { default_material_index = 0 };
 private:
   TiXmlDocument doc;
-  str doc_path;
+  string doc_path;
   dictionary<TiXmlElement *, allocator> ids;
   dynarray<float> temp_floats;
 
@@ -110,6 +110,8 @@ private:
   // convert a string like "1.2 3.4 43.12" into an array of float values
   void atofv(dynarray<float> &values, const char *src) {  
     values.resize(0);
+    if (!src) return;
+
     while (*src > 0 && *src <= ' ') ++src;
     while(*src != 0) {
       double whole = 0, msign = 1;
@@ -150,7 +152,7 @@ private:
   }
 
   // convert an ascii sequence of integers like "fred bert harry" into an array of strings
-  void atonv(dynarray<str> &values, const char *src) {
+  void atonv(dynarray<string> &values, const char *src) {
     values.resize(0);
     while (*src != 0 && *src <= ' ') ++src;
     while(*src != 0) {
@@ -174,8 +176,9 @@ private:
     dynarray<int> vcount;              // from skin vcount
     dynarray<float> raw_weights;       // from WEIGHT semantic - one per vertex
     dynarray<int> raw_indices;         // from JOINT semantic - one per vertex - must match INV_BIND_MATRIX
-    dynarray<str> node_names;          // from JOINT semantic - sids of affected nodes
     dynarray<float> inv_bind_matrices; // from INV_BIND_MATRIX semantic
+    dynarray<float> bind_shape_matrix; // from BIND_SHAPE_MATRIX element
+    string joints;                     // from JOINT semantic - sids of affected nodes
 
     // OpenGL-style skin state
     enum { max_indices = 4 };
@@ -330,16 +333,11 @@ private:
     } else if (state.pass == 3) {
       // skin pass
       if (!strcmp(semantic, "JOINT")) {
-        atonv(state.skin->node_names, accessor_source_elem->GetText());
-
         for (unsigned i = 0; i != num_vertices; ++i) {
           unsigned index = state.p[i * state.input_stride + state.input_offset];
           unsigned src_idx = accessor_offset_int + index * accessor_stride_int;
           state.skin->raw_indices[i] = src_idx;
         }
-      } else if (!strcmp(semantic, "INV_BIND_MATRIX")) {
-        atofv(state.skin->inv_bind_matrices, accessor_source_elem->GetText());
-        // todo: check that this matches nodes
       } else if (!strcmp(semantic, "WEIGHT")) {
         dynarray<float> accessor_floats;
         atofv(accessor_floats, accessor_source_elem->GetText());
@@ -398,8 +396,8 @@ private:
       TiXmlElement *image = find_id(image_name);
       const char *url_attr = text(child(image, "init_from"));
       if (url_attr) {
-        str new_path = doc_path;
-        str url = url_attr;
+        string new_path = doc_path;
+        string url = url_attr;
         int extension_pos = url.extension_pos();
         if (extension_pos != -1) {
           // at present we only accept gifs. Use image alchemy to convert files.
@@ -528,7 +526,7 @@ private:
     }
   }
 
-  // add the <instance_geometry> material
+  // add an <instance_geometry> mesh instance
   void add_instance_geometry(TiXmlElement *element, int node_index, scene_state &s) {
     const char *url = element->Attribute("url");
     url += url[0] == '#';
@@ -538,6 +536,7 @@ private:
     add_mesh_instances(technique_common, url, node_index, -1, s);
   }
 
+  // add an <instance_controller> skin instance
   void add_instance_controller(TiXmlElement *element, int node_index, scene_state &s) {
     const char *controller_url = attr(element, "url");
     TiXmlElement *bind_material = child(element, "bind_material");
@@ -546,13 +545,15 @@ private:
     TiXmlElement *skin = child(controller, "skin");
     if (!skin) return;
 
-    int num_skeletons = 0;
+    int num_bones = 0;
     for (TiXmlElement *skeleton = child(element, "skeleton"); skeleton; skeleton = sibling(skeleton, "skeleton")) {
-      num_skeletons++;
+      num_bones++;
     }
 
-    int skeleton_index = (int)s.skeletons.size();
+    int skeleton_index = (int)s.bones.size();
     TiXmlElement *skeleton = child(element, "skeleton");
+    int num_nodes = (int)s.parentNodes.size();
+    dictionary<int> skin_joints;
     while (skeleton) {
       const char *skeleton_id = text(skeleton);
       if (skeleton_id[0] == '#') skeleton_id++;
@@ -560,13 +561,24 @@ private:
         printf("warning: skeleton node not found\n");
         return;
       }
-      s.skeletons.push_back(s.nodeNamesToNodes[skeleton_id]);
+      int node_index = s.nodeNamesToNodes[skeleton_id];
+      int i = node_index + 1;
+
+      // todo: sort and filter bones by skin joint sids.
+      s.bones.push_back(node_index);
+      while (i < num_nodes && s.parentNodes[i] >= node_index) {
+        s.bones.push_back(i);
+        ++i;
+      }
+      /*for (int j = node_index; j != i; ++j) {
+        printf("n%d %s %s\n", j, attr(s.nodes[j], "id"), attr(s.nodes[j], "sid"));
+      }*/
       skeleton = sibling(skeleton, "skeleton");
     }
-    s.skeletons.push_back(-1);
+    s.bones.push_back(-1);
 
-    const char *url = skin->Attribute("source");
-    add_mesh_instances(technique_common, url, node_index, skeleton_index, s);
+    //const char *url = skin->Attribute("source");
+    add_mesh_instances(technique_common, controller_url, node_index, skeleton_index, s);
   }
 
   float quick_float(TiXmlElement *parent, const char *name) {
@@ -612,6 +624,9 @@ private:
           meshes[mesh_index] = mesh;
           mesh->init(id, mesh_child->Attribute("material"));
           get_mesh_component(*mesh, geometry, mesh_child, NULL);
+    FILE *file = fopen("c:\\tmp\\1.txt","wb");
+    mesh->dump(file);
+    fclose(file);
         }
       }
     }
@@ -622,9 +637,33 @@ private:
     TiXmlElement *lib_ctrl = doc.RootElement()->FirstChildElement("library_controllers");
     for (TiXmlElement *controller = lib_ctrl->FirstChildElement(); controller != NULL; controller = controller->NextSiblingElement()) {
       TiXmlElement *skin_elem = controller->FirstChildElement("skin");
-      const char *id = controller->Attribute("id");
+      const char *controller_id = controller->Attribute("id");
       TiXmlElement *geometry = find_id(attr(skin_elem, "source"));
+      TiXmlElement *bind_shape_matrix = child(skin_elem, "bind_shape_matrix");
+      TiXmlElement *joints_elem = child(skin_elem, "joints");
       skin_state skin;
+
+      if (bind_shape_matrix) {
+        atofv(skin.bind_shape_matrix, text(bind_shape_matrix));
+      }
+
+      if (joints_elem) {
+        TiXmlElement *input = child(joints_elem, "input");
+        while (input) {
+          const char *semantic = attr(input, "semantic");
+          const char *source_id = attr(input, "source");
+          if (!strcmp(semantic, "JOINT")) {
+            TiXmlElement *name_array = child(find_id(source_id), "Name_array");
+            if (name_array) {
+              skin.joints = text(name_array);
+            }
+          } else if (!strcmp(semantic, "INV_BIND_MATRIX")) {
+            TiXmlElement *float_array = child(find_id(source_id), "float_array");
+            atofv(skin.inv_bind_matrices, text(float_array));
+          }
+          input = sibling(input, "input");
+        }
+      }
 
       TiXmlElement *vertex_weights = skin_elem ? skin_elem->FirstChildElement("vertex_weights") : 0;
       if (vertex_weights && geometry) {
@@ -638,11 +677,33 @@ private:
         ) {
           if (is_mesh_component(mesh_child->Value())) {
             int mesh_index = (int)meshes.size();
+            mesh_state::skin *mesh_skin = new mesh_state::skin();
+
+            if (skin.bind_shape_matrix.size() >= 16) {
+              mesh_skin->modelToBind.init_row_major(&skin.bind_shape_matrix[0]);
+            } else {
+              mesh_skin->modelToBind.loadIdentity();
+            }
+
+            mesh_skin->bindToModel.resize(skin.inv_bind_matrices.size()/16);
+
+            for (unsigned i = 0; i != mesh_skin->bindToModel.size(); ++i) {
+              mesh_skin->bindToModel[i].init_row_major(&skin.inv_bind_matrices[i*16]);
+            }
+
+            atonv(mesh_skin->joints, skin.joints);
+
             mesh_state *mesh = new mesh_state();
             meshes.resize(mesh_index+1);
             meshes[mesh_index] = mesh;
-            mesh->init(id, mesh_child->Attribute("material"));
+            mesh->init(controller_id, mesh_child->Attribute("material"), mesh_skin);
             get_mesh_component(*mesh, geometry, mesh_child, &skin);
+
+            unsigned index = mesh->get_slot(mesh_state::attribute_blendindices);
+            for (unsigned i = 0; i != mesh->get_num_vertices(); ++i) {
+              vec4 v = mesh->get_value(index, i);
+              //printf("%d %s\n", i, v.toString());
+            }
           }
         }
       }
@@ -892,9 +953,9 @@ private:
     s.allocate(vsize, isize, app_common::can_use_vbos());
     s.assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
     s.set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_SHORT);
-    /*FILE *file = fopen("c:\\tmp\\3.txt","wb");
+    FILE *file = fopen("c:\\tmp\\2.txt","wb");
     s.dump(file);
-    fclose(file);*/
+    fclose(file);
   }
 
   // get blend weights and matrices from a skin

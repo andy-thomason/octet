@@ -18,7 +18,8 @@ class animation_app : public app {
   scene app_scene;
 
   // shader to draw a shaded, textured triangle
-  bump_shader shader_;
+  bump_shader object_shader;
+  bump_shader skin_shader;
 public:
 
   // this is called when we construct the class
@@ -27,16 +28,12 @@ public:
 
   // this is called once OpenGL is initialized
   void app_init() {
-    // set up the shader
-    shader_.init();
+    // set up the shaders
+    object_shader.init(false);
+    skin_shader.init(true);
 
     collada_builder builder;
-    //builder.load("assets/blender.freemovies.co.uk/monkeyManRunCycleTutFinal.dae");
-    //builder.load("assets/opengameart.org/KzuOpenGameArt_3uhox/FemaleOpenGameArt.dae");
     builder.load("assets/skinning/skin.dae");
-//C:\projects\octet\octet\assets\opengameart.org\KzuOpenGameArt_3uhox\FemaleOpenGameArt.dae
-    //builder.load("assets/cubeattr.dae");
-    //builder.load("assets/box_cone.dae");
 
     const char *def_scene = builder.get_default_scene();
     app_scene.make_collada_scene(builder, def_scene);
@@ -55,10 +52,10 @@ public:
     glEnable(GL_DEPTH_TEST);
 
     // improve draw speed by culling back faces - and avoid flickering edges
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
 
-    app_scene.render(shader_);
+    app_scene.render(object_shader, skin_shader);
   }
 };

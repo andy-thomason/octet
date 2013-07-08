@@ -126,4 +126,4 @@ public:
   operator const char *() { return data_; }
 };
 
-typedef chars<allocator> str;
+typedef chars<allocator> string;

@@ -37,5 +37,17 @@ public:
   static void *realloc(void *ptr, size_t old_size, size_t size) {
     return ::realloc(ptr, size);
   }
+
+  static allocator& instance() {
+    static allocator instance_;
+    return instance_;
+  }
 };
 
+inline void *operator new(size_t size, allocator &alloc) {
+  return alloc.malloc(size);
+}
+
+inline void operator delete(void *ptr, size_t size, allocator &alloc) {
+  return alloc.free(ptr, size);
+}

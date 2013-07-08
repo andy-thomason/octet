@@ -101,6 +101,23 @@ public:
     return entry && entry->key;
   }
 
+  // allow iteration over keys and values
+  int num_indices() const {
+    return max_entries;
+  }
+
+  // get a specific key
+  const char *key(unsigned index) const {
+    assert(index < max_entries);
+    return entries[index].key;
+  }
+
+  // access a specific value
+  value_t &value(unsigned index) {
+    assert(index < max_entries);
+    return entries[index].value;
+  }
+
   // bye bye dictionary. Use the allocator to free up memory.
   ~dictionary() {
     for (unsigned i = 0; i != max_entries; ++i) {

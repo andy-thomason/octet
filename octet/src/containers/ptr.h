@@ -42,6 +42,7 @@ public:
   item_t *operator=(item_t *new_item) {
     if (item) delete item;
     item = new_item;
+    return new_item;
   }
 
   // get a pointer to the constant item
