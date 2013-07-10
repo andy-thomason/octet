@@ -26,7 +26,7 @@ public:
   }
   
   // add a rigid body to the world and return a handle to access it
-  int add_rigid_body(const mat4 &modelToWorld, const vec4 &param, bool is_dynamic, body_kind kind) {
+  int add_rigid_body(const mat4t &modelToWorld, const vec4 &param, bool is_dynamic, body_kind kind) {
     btCollisionShape *shape = 0;
     switch (kind) {
       case body_box: shape = new btBoxShape(btVector3(param[0], param[1], param[2])); break;
@@ -62,7 +62,7 @@ public:
     return result;
   }
   
-  void get_modelToWorld(mat4 &modelToWorld, int handle) {
+  void get_modelToWorld(mat4t &modelToWorld, int handle) {
     btRigidBody *rigid_body = rigid_bodies[handle];
     btQuaternion btq = rigid_body->getOrientation();
     btVector3 pos = rigid_body->getCenterOfMassPosition();

@@ -30,29 +30,29 @@ public:
     physics_index = _physics_index;
   }
 
-  void render(physics_world &world, bump_shader &shader, const mat4 &worldToCamera, const mat4 &cameraToProjection, lighting &lights) {
-    mat4 modelToWorld;
+  void render(physics_world &world, bump_shader &shader, const mat4t &worldToCamera, const mat4t &cameraToProjection, lighting &lights) {
+    mat4t modelToWorld;
     world.get_modelToWorld(modelToWorld, physics_index);
-    mat4 modelToCamera = modelToWorld * worldToCamera;
-    mat4 modelToProjection = modelToCamera * cameraToProjection;
+    mat4t modelToCamera = modelToWorld * worldToCamera;
+    mat4t modelToProjection = modelToCamera * cameraToProjection;
     vec4 *light_uniforms = lights.data();
     material->render(shader, modelToProjection, modelToCamera, light_uniforms);
     box_mesh->render();
   }
 
   void accelerate(physics_world &world, float amount) {
-    mat4 modelToWorld;
+    mat4t modelToWorld;
     world.get_modelToWorld(modelToWorld, physics_index);
     world.apply_impulse(physics_index, modelToWorld[2] * amount);
   }
 
   void turn(physics_world &world, float amount) {
-    mat4 modelToWorld;
+    mat4t modelToWorld;
     world.get_modelToWorld(modelToWorld, physics_index);
     world.apply_torque_impulse(physics_index, modelToWorld[1] * amount);
   }
 
-  void get_modelToWorld(physics_world &world, mat4 &modelToWorld) {
+  void get_modelToWorld(physics_world &world, mat4t &modelToWorld) {
     world.get_modelToWorld(modelToWorld, physics_index);
   }
 };
@@ -63,7 +63,7 @@ class physics_app : public app {
 
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw a bump mapped shaded, textured triangle
   bump_shader bump_shader_;
@@ -114,7 +114,7 @@ public:
     float box_spacing = 1.5f;
     boxes.resize(num_boxes+1);
 
-    mat4 modelToWorld;
+    mat4t modelToWorld;
     modelToWorld.loadIdentity();
     modelToWorld.translate(-0.5f * box_spacing * (num_boxes-1), 4.0f, 0);
 
@@ -156,11 +156,11 @@ public:
     cameraToWorld.translate(0, 2, 5);
 
     // flip cameraToWorld around to transform from world to camera
-    mat4 worldToCamera;
+    mat4t worldToCamera;
     cameraToWorld.invertQuick(worldToCamera);
 
     // build a projection matrix to add perspective
-    mat4 cameraToProjection;
+    mat4t cameraToProjection;
     cameraToProjection.loadIdentity();
     float n = 0.125f, f = 256.0f;
     cameraToProjection.frustum(-n, n, -n, n, n, f);

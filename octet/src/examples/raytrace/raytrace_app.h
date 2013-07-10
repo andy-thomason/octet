@@ -24,7 +24,7 @@ class raytrace_app : public app {
 
   // Matrices to transform points on our triangles to the world space
   // This allows us to move and rotate our triangles
-  dynarray<mat4> modelToWorld;
+  dynarray<mat4t> modelToWorld;
 
   // meshes for our objects
   dynarray<mesh*> meshes;
@@ -37,7 +37,7 @@ class raytrace_app : public app {
   
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw the final scene
   texture_shader texture_shader_;
@@ -82,14 +82,14 @@ public:
     builder.load("assets/duck_triangulate.dae");
     duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib");
 
-    mat4 mat;
+    mat4t mat;
     mat.loadIdentity();
     modelToWorld.push_back(mat);
     meshes.push_back(&duck_mesh);
     materials.push_back(&duck_material);
 
     // the original duck is a bit too big, shrink it with a matrix
-    mat4 shrink;
+    mat4t shrink;
     shrink.loadIdentity();
     shrink.translate(0, -50, 0);
     shrink.scale(0.03f, 0.03f, 0.03f);
@@ -140,7 +140,7 @@ public:
     // build a projection matrix: model -> world -> camera -> projection
     // this matrix is used to map the square to fill the screen
     // in this case we use an "ortho" projection.
-    mat4 modelToProjection;
+    mat4t modelToProjection;
     modelToProjection.loadIdentity();
     modelToProjection.translate(0, 0, 1);
     modelToProjection.ortho(-1, 1, -1, 1, 0.125f, 128.125);

@@ -16,8 +16,8 @@
 //
 
 class texture_app : public app {
-  mat4 modelToWorld;              // this matrix converts from model space to world space
-  mat4 cameraToWorld;             // this matrix converts from camera space to world space
+  mat4t modelToWorld;              // this matrix converts from model space to world space
+  mat4t cameraToWorld;             // this matrix converts from camera space to world space
   texture_shader texture_shader_; // this builds a shader to use with textures
   GLuint texture_handle_;         // this is an OpenGL texture handle which is used to draw the image.
 
@@ -55,7 +55,7 @@ public:
 
     // build a projection matrix: model -> world -> camera -> projection
     // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4 modelToProjection = mat4::build_projection_matrix(modelToWorld, cameraToWorld);
+    mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
 
     // spin the triangle by rotating about Z (the view direction)
     modelToWorld.rotateZ(1);

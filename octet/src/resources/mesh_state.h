@@ -7,7 +7,7 @@
 // raw 3D mesh container
 //
 
-class mesh_state {
+class mesh_state : public resource {
 public:
   // standard attribute names
   enum attribute {
@@ -56,10 +56,10 @@ public:
   // extra information for skinned meshes
   struct skin {
     // the original transform of the skin to world space (bind space)
-    mat4 modelToBind;
+    mat4t modelToBind;
 
     // for each node, map from world space (bind space) to model space
-    dynarray<mat4> bindToModel;
+    dynarray<mat4t> bindToModel;
 
     // a name for each joint.
     dynarray<string> joints;

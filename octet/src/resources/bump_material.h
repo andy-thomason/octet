@@ -7,7 +7,7 @@
 // Bump mapped Material 
 //
 
-class bump_material {
+class bump_material : public material {
   // material
   GLuint diffuse;
   GLuint ambient;
@@ -48,7 +48,7 @@ public:
     shininess = 30.0f;
   }
 
-  void render(bump_shader &shader, const mat4 &modelToProjection, const mat4 &modelToCamera, vec4 *lights) {
+  void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, vec4 *lights) {
     // todo: pass lights directly to shader
     //vec4 &position = lights[0];
     vec4 &light_direction = lights[1];
@@ -71,7 +71,7 @@ public:
     glActiveTexture(GL_TEXTURE0);
   }
 
-  void render_skinned(bump_shader &shader, const mat4 &cameraToProjection, const mat4 *modelToCamera, int num_nodes, vec4 *lights) {
+  void render_skinned(bump_shader &shader, const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_nodes, vec4 *lights) {
     // todo: pass lights directly to shader
     //vec4 &position = lights[0];
     vec4 &light_direction = lights[1];

@@ -25,7 +25,7 @@ class mesh_builder {
   dynarray<sphere> spheres;
 
   // current orientation and position of components
-  mat4 matrix;
+  mat4t matrix;
 
   // For a cube, add the front face. Matrix transforms are used to add the others.
   void add_front_face(float size) {
@@ -47,7 +47,7 @@ class mesh_builder {
     float rnv = 1.0f / num_vertices;
     float angle = 3.1415926536f * 2 * rnv;
     float delta_c = cosf(angle), delta_s = sinf(angle);
-    mat4 save_matrix = matrix;
+    mat4t save_matrix = matrix;
     unsigned first_index = (unsigned)vertices.size();
     float u = 0;
     for (unsigned i = 0; i <= num_vertices; ++i) {
@@ -62,7 +62,7 @@ class mesh_builder {
   void add_cone_or_sphere(float radius, float height, unsigned slices, unsigned stacks, float uvscale, bool is_sphere) {
     float rstacks = 1.0f / stacks;
 
-    mat4 save_matrix = matrix;
+    mat4t save_matrix = matrix;
 
     // start at the south pole and work up
     matrix.translate(0, 0, -radius);

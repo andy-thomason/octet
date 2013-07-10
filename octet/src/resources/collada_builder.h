@@ -20,14 +20,15 @@
 class collada_builder {
 public:
   struct scene_state {
-    dynarray<mat4> &modelToParent;
+    dynarray<mat4t> &modelToParent;
     dictionary<int> &nodeNamesToNodes;
     dynarray<int> &parentNodes;
     dynarray<mesh_state::mesh_instance> &mesh_instances;
     dynarray<int> &bones;
-    dynarray<mesh_state *> &meshes;
-    dynarray<bump_material> &materials;
-    dynarray<camera> &cameras;
+    dynarray<ref<mesh_state>> &meshes;
+    dynarray<ref<animation>> &animations;
+    dynarray<ref<bump_material>> &materials;
+    dynarray<ref<camera>> &cameras;
     dynarray<TiXmlElement *> nodes;
     int default_camera;
   };
@@ -197,6 +198,7 @@ private:
     unsigned input_offset;
     unsigned input_stride;
     unsigned slot;
+    unsigned vertex_input_offset;
     int pass;
     skin_state *skin;
   };
@@ -423,13 +425,14 @@ private:
     return 0;
   }
 
-  void add_materials(dynarray<bump_material> &materials) {
+  void add_materials(dynarray<ref<bump_material>> &materials) {
     TiXmlElement *lib_mat = doc.RootElement()->FirstChildElement("library_materials");
 
     // material 0 is the default material
     int mat_index = 0;
     materials.resize(1);
-    materials[default_material_index].make_color(vec4(0.5, 0.5, 0.5, 1), false, false);
+    materials[default_material_index] = new bump_material();
+    materials[default_material_index]->make_color(vec4(0.5, 0.5, 0.5, 1), false, false);
 
     if (!lib_mat) return;
 
@@ -451,9 +454,9 @@ private:
         GLuint specular = get_texture(shader, profile_COMMON, "specular", "#808080ff");
         GLuint bump = get_texture(shader, profile_COMMON, "bump", "#808080ff");
         float shininess = get_float(shader, "shininess");
-        materials[mat_index].init(diffuse, ambient, emission, specular, bump, shininess);
+        materials[mat_index]->init(diffuse, ambient, emission, specular, bump, shininess);
       } else {
-        materials[mat_index].make_color(vec4(0.5, 0.5, 0.5, 0), false, false);
+        materials[mat_index]->make_color(vec4(0.5, 0.5, 0.5, 0), false, false);
       }
     }
   }
@@ -587,27 +590,37 @@ private:
   }
 
   // add a camera to the scene
-  void add_instance_camera(TiXmlElement *child, int node_index, dynarray<camera> &cameras) {
-    const char *url = child->Attribute("url");
+  void add_instance_camera(TiXmlElement *elem, int node_index, dynarray<ref<camera>> &cameras) {
+    const char *url = elem->Attribute("url");
     TiXmlElement *cam = find_id(url);
     if (!cam) return;
 
-    TiXmlElement *optics = cam ? cam->FirstChildElement("optics") : 0;
-    TiXmlElement *technique_common = optics ? optics->FirstChildElement("technique_common") : 0;
-    TiXmlElement *perspective = technique_common ? technique_common->FirstChildElement("perspective") : 0;
-    TiXmlElement *params = perspective ? perspective : technique_common ? technique_common->FirstChildElement("ortho") : 0;
+    TiXmlElement *optics = child(cam, "optics");
+    TiXmlElement *technique_common = child(optics, "technique_common");
+    TiXmlElement *perspective = child(technique_common, "perspective");
+    TiXmlElement *ortho = child(technique_common, "ortho");
+    TiXmlElement *params = perspective ? perspective : ortho;
     if (params) {
       float n = quick_float(params, "znear");
       float f = quick_float(params, "zfar");
+      float aspect_ratio = quick_float(params, "aspect_ratio");
       int camera_index = cameras.size();
       cameras.resize(camera_index+1);
-      camera &c = cameras[camera_index];
-      c.set_params(node_index, -n, n, -n, n, n, f, perspective == 0);
+      camera *c = cameras[camera_index] = new camera();
+      if (perspective) {
+        float xfov = quick_float(params, "xfov");
+        float yfov = quick_float(params, "yfov");
+        c->set_perspective(node_index, xfov, yfov, aspect_ratio, n, f);
+      } else {
+        float xmag = quick_float(params, "xmag");
+        float ymag = quick_float(params, "ymag");
+        c->set_ortho(node_index, xmag, ymag, aspect_ratio, n, f);
+      }
     }
   }
 
   // add a geometry element to the list of mesh states
-  void add_geometry(dynarray<mesh_state *> &meshes) {
+  void add_geometry(dynarray<ref<mesh_state>> &meshes) {
     TiXmlElement *lib_geom = doc.RootElement()->FirstChildElement("library_geometries");
     for (TiXmlElement *geometry = lib_geom->FirstChildElement(); geometry != NULL; geometry = geometry->NextSiblingElement()) {
       TiXmlElement *mesh = geometry->FirstChildElement("mesh");
@@ -624,16 +637,13 @@ private:
           meshes[mesh_index] = mesh;
           mesh->init(id, mesh_child->Attribute("material"));
           get_mesh_component(*mesh, geometry, mesh_child, NULL);
-    FILE *file = fopen("c:\\tmp\\1.txt","wb");
-    mesh->dump(file);
-    fclose(file);
         }
       }
     }
   }
 
   // add a geometry element to the list of mesh states
-  void add_controllers(dynarray<mesh_state *> &meshes) {
+  void add_controllers(dynarray<ref<mesh_state>> &meshes) {
     TiXmlElement *lib_ctrl = doc.RootElement()->FirstChildElement("library_controllers");
     for (TiXmlElement *controller = lib_ctrl->FirstChildElement(); controller != NULL; controller = controller->NextSiblingElement()) {
       TiXmlElement *skin_elem = controller->FirstChildElement("skin");
@@ -698,12 +708,49 @@ private:
             meshes[mesh_index] = mesh;
             mesh->init(controller_id, mesh_child->Attribute("material"), mesh_skin);
             get_mesh_component(*mesh, geometry, mesh_child, &skin);
+          }
+        }
+      }
+    }
+  }
 
-            unsigned index = mesh->get_slot(mesh_state::attribute_blendindices);
-            for (unsigned i = 0; i != mesh->get_num_vertices(); ++i) {
-              vec4 v = mesh->get_value(index, i);
-              //printf("%d %s\n", i, v.toString());
+  // add <library_animations> to the scene
+  void add_animations(scene_state &s) {
+    TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_animations");
+    for (TiXmlElement *anim_elem = child(lib_anim, "animation"); anim_elem != NULL; anim_elem = sibling(anim_elem, "animation")) {
+      animation *anim = new animation();
+      //anim->init(app_utils::atom(attr(anim_elem, "id")));
+      s.animations.push_back(anim);
+      for (TiXmlElement *channel_elem = child(anim_elem, "channel"); channel_elem != NULL; channel_elem = sibling(channel_elem, "channel")) {
+        string target = attr(channel_elem, "target");
+        TiXmlElement *sampler_elem = find_id(attr(channel_elem, "source"));
+        if (sampler_elem) {
+          dynarray<float> times;
+          dynarray<float> transforms;
+          dynarray<string> interpolation;
+
+          TiXmlElement *input = child(sampler_elem, "input");
+          while (input) {
+            const char *semantic = attr(input, "semantic");
+            const char *source_id = attr(input, "source");
+            if (!strcmp(semantic, "INPUT")) {
+              TiXmlElement *float_array = child(find_id(source_id), "float_array");
+              atofv(times, text(float_array));
+            } else if (!strcmp(semantic, "OUTPUT")) {
+              TiXmlElement *float_array = child(find_id(source_id), "float_array");
+              atofv(transforms, text(float_array));
+            } else if (!strcmp(semantic, "INTERPOLATION")) {
+              TiXmlElement *name_array = child(find_id(source_id), "Name_array");
+              if (name_array) {
+                atonv(interpolation, text(name_array));
+              }
             }
+            input = sibling(input, "input");
+          }
+
+          if (times.size() && transforms.size() == times.size()*16 && interpolation.size() == times.size()) {
+            int num_times = (int)times.size();
+            anim->add_channel_from_matrices(num_times, &times[0], &transforms[0]);
           }
         }
       }
@@ -752,7 +799,7 @@ private:
     s.modelToParent.resize(num_nodes);
     for (int node_index = 0; node_index != num_nodes; ++node_index) {
       TiXmlElement *node = s.nodes[node_index];
-      mat4 &matrix = s.modelToParent[node_index];
+      mat4t &matrix = s.modelToParent[node_index];
       matrix.loadIdentity();
 
       for (TiXmlElement *child = node->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
@@ -760,7 +807,7 @@ private:
         if (!strcmp(value, "matrix")) {
           atofv(temp_floats, child->GetText());
           if (temp_floats.size() >= 16) {
-            mat4 tmp(
+            mat4t tmp(
               vec4(temp_floats[0], temp_floats[4], temp_floats[8], temp_floats[12]),
               vec4(temp_floats[1], temp_floats[5], temp_floats[9], temp_floats[13]),
               vec4(temp_floats[2], temp_floats[6], temp_floats[10], temp_floats[14]),
@@ -898,6 +945,7 @@ private:
     state.vertices.resize(state.attr_stride * num_vertices);
     state.input_offset = 0;
     state.attr_offset = 0;
+    state.vertex_input_offset = 0;
 
     // build the attributes
     for (TiXmlElement *input = mesh_child->FirstChildElement("input");
@@ -908,6 +956,9 @@ private:
       state.input_offset = offset ? atoi(offset) : 0;
       state.pass = 2;
       parse_input(state, input);
+      if (!strcmp(attr(input, "semantic"), "VERTEX")) {
+        state.vertex_input_offset = state.input_offset;
+      }
     }
 
     if (skin) {
@@ -916,14 +967,15 @@ private:
       unsigned p_size = state.p.size();
       unsigned num_vertices = p_size / state.input_stride;
       for (unsigned i = 0; i != num_vertices; ++i) {
-        unsigned index = state.p[i * state.input_stride + state.input_offset];
+        unsigned index = state.p[i * state.input_stride + state.vertex_input_offset];
+        if (0) {
+          app_utils::log("i%d\n", index);
+        }
         for (int j = 0; j != blendindices_stride; ++j) {
           state.vertices[state.attr_stride * i + blendindices_offset + j] = (float)state.skin->gl_indices[index * blendindices_stride + j];
-          //printf("i %f\n", state.vertices[state.attr_stride * i + blendindices_offset + j]);
         }
         for (int j = 0; j != blendweight_stride; ++j) {
           state.vertices[state.attr_stride * i + blendweight_offset + j] = state.skin->gl_weights[index * blendweight_stride + j];
-          //printf("w %f\n", state.vertices[state.attr_stride * i + blendweight_offset + j]);
         }
       }
     }
@@ -953,9 +1005,11 @@ private:
     s.allocate(vsize, isize, app_common::can_use_vbos());
     s.assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
     s.set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_SHORT);
-    FILE *file = fopen("c:\\tmp\\2.txt","wb");
-    s.dump(file);
-    fclose(file);
+    if (0) {
+      FILE *file = app_utils::log("mesh skin=%p\n", skin);
+      s.dump(file);
+      fflush(file);
+    }
   }
 
   // get blend weights and matrices from a skin
@@ -1025,20 +1079,21 @@ private:
       }
       start += vc;
     }
-    /*FILE *f = fopen("\\tmp\\1.txt","w");
-    for (int i = 0; i != skin->raw_indices.size(); ++i) {
-      fprintf(f, "ri %d %d\n", i, skin->raw_indices[i]);
+    if (0) {
+      FILE *f = app_utils::log("raw weights & indices\n");
+      for (int i = 0; i != skin->raw_indices.size(); ++i) {
+        fprintf(f, "ri %d %d\n", i, skin->raw_indices[i]);
+      }
+      for (int i = 0; i != skin->raw_weights.size(); ++i) {
+        fprintf(f, "rw %d %f\n", i, skin->raw_weights[i]);
+      }
+      for (int i = 0; i != skin->gl_indices.size(); ++i) {
+        fprintf(f, "i %d %d\n", i, skin->gl_indices[i]);
+      }
+      for (int i = 0; i != skin->gl_weights.size(); ++i) {
+        fprintf(f, "w %d %f\n", i, skin->gl_weights[i]);
+      }
     }
-    for (int i = 0; i != skin->raw_weights.size(); ++i) {
-      fprintf(f, "rw %d %f\n", i, skin->raw_weights[i]);
-    }
-    for (int i = 0; i != skin->gl_indices.size(); ++i) {
-      fprintf(f, "i %d %d\n", i, skin->gl_indices[i]);
-    }
-    for (int i = 0; i != skin->gl_weights.size(); ++i) {
-      fprintf(f, "w %d %f\n", i, skin->gl_weights[i]);
-    }
-    fclose(f);*/
   }
 
   // does this thing have triangles in it?
@@ -1110,6 +1165,8 @@ public:
     add_geometry(s.meshes);
 
     add_controllers(s.meshes);
+
+    add_animations(s);
 
     build_heirachy(scene_element, s);
     build_matrices(s);

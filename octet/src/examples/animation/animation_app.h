@@ -20,6 +20,8 @@ class animation_app : public app {
   // shader to draw a shaded, textured triangle
   bump_shader object_shader;
   bump_shader skin_shader;
+
+  int time;
 public:
 
   // this is called when we construct the class
@@ -33,10 +35,14 @@ public:
     skin_shader.init(true);
 
     collada_builder builder;
-    builder.load("assets/skinning/skin.dae");
+    builder.load("assets/skinning/skin_unrot.dae");
 
     const char *def_scene = builder.get_default_scene();
     app_scene.make_collada_scene(builder, def_scene);
+
+    app_scene.play_all_animations();
+
+    time = 0;
   }
 
   // this is called to draw the world
@@ -51,11 +57,17 @@ public:
     // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
     glEnable(GL_DEPTH_TEST);
 
-    // improve draw speed by culling back faces - and avoid flickering edges
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
+    if (app_scene.num_cameras() == 0) {
+      return;
+    }
 
-    app_scene.render(object_shader, skin_shader);
+    mat4t cameraToWorld;
+    camera *cam = app_scene.get_camera(0);
+
+    app_scene.update(time);
+
+    app_scene.render(object_shader, skin_shader, *cam);
+
+    //app_scene.node_to_parent(5).rotateX(1);
   }
 };

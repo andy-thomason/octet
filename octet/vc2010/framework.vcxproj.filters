@@ -183,6 +183,15 @@
     <ClInclude Include="..\src\resources\scene.h">
       <Filter>resources</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\resources\camera.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\resource.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\ref.h">
+      <Filter>containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp">

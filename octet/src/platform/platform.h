@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <math.h>
 #include <assert.h>
 
@@ -41,6 +42,7 @@
 #include "../containers/double_list.h"
 #include "../containers/dynarray.h"
 #include "../containers/ptr.h"
+#include "../containers/ref.h"
 
 #ifdef WIN32
   #include "windows_specific.h"
@@ -59,10 +61,12 @@
 #include "../resources/tinyxml/tinyxmlerror.cpp"
 #include "../resources/tinyxml/tinyxmlparser.cpp"
 
+#include "../resources/resource.h"
 #include "../resources/mesh_state.h"
 #include "../resources/material.h"
 #include "../resources/lighting.h"
 #include "../resources/camera.h"
+#include "../resources/animation.h"
 
 #include "../shaders/shader.h"
 #include "../shaders/color_shader.h"

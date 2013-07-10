@@ -5,6 +5,7 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 //
+
 class app_utils {
   #ifdef WIN32
     // vc2010/../
@@ -134,6 +135,18 @@ public:
     alGenBuffers(1, &id);
     alBufferData(id, kind, &buffer[offset], size, rate);
     return id;
+  }
+
+  // write some text to log.txt
+  static FILE * log(const char *fmt, ...) {
+    static FILE *file;
+    va_list list;
+    va_start(list, fmt);
+    if (!file) file = fopen("log.txt", "w");
+    vfprintf(file, fmt, list);
+    va_end(list);
+    fflush(file);
+    return file;
   }
 };
 

@@ -13,7 +13,7 @@ public:
     int height;
     GLuint texture_handle;
 
-    mat4 cameraToWorld;
+    mat4t cameraToWorld;
     float near_plane;
     float far_plane;
     float near_plane_xmax;
@@ -22,7 +22,7 @@ public:
     lighting *lights;
 
     int num_objects;
-    mat4 *modelToWorld;
+    mat4t *modelToWorld;
     mesh **meshes;
     bump_material **materials;
   };
@@ -164,7 +164,7 @@ public:
 
 
     /*for (int i = 0; i != ctxt.num_objects; ++i) {
-      mat4 modelToWorld = ctxt.modelToWorld[i];
+      mat4t modelToWorld = ctxt.modelToWorld[i];
       mesh *mesh = ctxt.meshes[i];
       vec4 min, max;
       modelToWorld.translate(3, 3, 3);
@@ -200,7 +200,7 @@ public:
     if (error) app::error("clCreateBuffer - octree");
 
     for (int i = 0; i != ctxt.num_objects; ++i) {
-      mat4 modelToWorld = ctxt.modelToWorld[i];
+      mat4t modelToWorld = ctxt.modelToWorld[i];
       mesh *mesh = ctxt.meshes[i];
       vec4 min, max;
       // adjust size of voxels

@@ -27,59 +27,55 @@ public:
     // it inputs pos and uv from each corner
     // it outputs gl_Position, normal_ and uv_ to the rasterizer
     // normal_ is the normal in camera space to make calculations easier
-    const char vertex_shader[] =
-      "#define lowp\n"
-      "#define highp\n"
-      "varying lowp vec2 uv_;"
-      "varying lowp vec3 normal_;"
-      ""
-      "attribute highp vec4 pos;"
-      "attribute lowp vec3 normal;"
-      "attribute lowp vec2 uv;"
-      ""
-      "uniform mat4 modelToProjection;"
-      "uniform mat4 modelToCamera;"
-      ""
-      "void main() {"
-      "  uv_ = uv;"
-      "  normal_ = (modelToCamera * vec4(normal,0)).xyz;"
-      "  gl_Position = modelToProjection * pos;"
-      "}"
-    ;
+    const char vertex_shader[] = SHADER_STR(
+      varying vec2 uv_;
+      varying vec3 normal_;
+      
+      attribute vec4 pos;
+      attribute vec3 normal;
+      attribute vec2 uv;
+      
+      uniform mat4 modelToProjection;
+      uniform mat4 modelToCamera;
+      
+      void main() {
+        uv_ = uv;
+        normal_ = (modelToCamera * vec4(normal,0)).xyz;
+        gl_Position = modelToProjection * pos;
+      }
+    );
 
     // this is the fragment shader
     // after the rasterizer breaks the triangle into fragments
     // this is called for every fragment
     // it outputs gl_FragColor, the color of the pixel and inputs normal_ and uv_
     // the four samplers give emissive, diffuse, specular and ambient colors
-    const char fragment_shader[] =
-      "#define lowp\n"
-      "#define highp\n"
-      "varying lowp vec2 uv_;"
-      "varying lowp vec3 normal_;"
-      "uniform lowp vec3 light_direction;"
-      "uniform lowp vec4 light_diffuse;"
-      "uniform lowp vec4 light_ambient;"
-      "uniform lowp vec4 light_specular;"
-      "uniform sampler2D samplers[4];"
-      "uniform float shininess;"
-      ""
-      "void main() {"
-      "  lowp vec3 nnormal = normalize(normal_);"
-      "  lowp vec3 half_direction = normalize(light_direction + vec3(0, 0, 1));"
-      "  lowp float diffuse_factor = max(dot(light_direction, nnormal), 0.0);"
-      "  lowp float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess);"
-      "  lowp vec4 diffuse = texture2D(samplers[0], uv_);"
-      "  lowp vec4 ambient = texture2D(samplers[1], uv_);"
-      "  lowp vec4 emission = texture2D(samplers[2], uv_);"
-      "  lowp vec4 specular = texture2D(samplers[3], uv_);"
-      "  gl_FragColor = "
-      "    ambient * light_ambient +"
-      "    diffuse * light_diffuse * diffuse_factor +"
-      "    emission +"
-      "    specular * light_specular * specular_factor;"
-      "}"
-    ;
+    const char fragment_shader[] = SHADER_STR(
+      varying vec2 uv_;
+      varying vec3 normal_;
+      uniform vec3 light_direction;
+      uniform vec4 light_diffuse;
+      uniform vec4 light_ambient;
+      uniform vec4 light_specular;
+      uniform sampler2D samplers[4];
+      uniform float shininess;
+      
+      void main() {
+        vec3 nnormal = normalize(normal_);
+        vec3 half_direction = normalize(light_direction + vec3(0, 0, 1));
+        float diffuse_factor = max(dot(light_direction, nnormal), 0.0);
+        float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess);
+        vec4 diffuse = texture2D(samplers[0], uv_);
+        vec4 ambient = texture2D(samplers[1], uv_);
+        vec4 emission = texture2D(samplers[2], uv_);
+        vec4 specular = texture2D(samplers[3], uv_);
+        gl_FragColor = 
+          ambient * light_ambient +
+          diffuse * light_diffuse * diffuse_factor +
+          emission +
+          specular * light_specular * specular_factor;
+      }
+    );
     init_uniforms(vertex_shader, fragment_shader);
   }
 
@@ -100,7 +96,7 @@ public:
     light_specular_index = glGetUniformLocation(program(), "light_specular");
   }
 
-  void render(const mat4 &modelToProjection, const mat4 &modelToCamera, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular, int num_samplers=4) {
+  void render(const mat4t &modelToProjection, const mat4t &modelToCamera, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular, int num_samplers=4) {
     // tell openGL to use the program
     shader::render();
 
@@ -118,7 +114,7 @@ public:
     glUniform1iv(samplers_index, num_samplers, samplers);
   }
 
-  void render_skinned(const mat4 &cameraToProjection, const mat4 *modelToCamera, int num_matrices, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular, int num_samplers=4) {
+  void render_skinned(const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_matrices, const vec4 &light_direction, float shininess, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular, int num_samplers=4) {
     // tell openGL to use the program
     shader::render();
 

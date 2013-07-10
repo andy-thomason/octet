@@ -17,7 +17,7 @@
 
 class box {
   // where is our box (overkill for a ping game!)
-  mat4 modelToWorld;
+  mat4t modelToWorld;
 
   // half the width of the box
   float halfWidth;
@@ -39,10 +39,10 @@ public:
     color = _color;
   }
 
-  void render(color_shader &shader, mat4 &cameraToWorld) {
+  void render(color_shader &shader, mat4t &cameraToWorld) {
     // build a projection matrix: model -> world -> camera -> projection
     // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4 modelToProjection = mat4::build_projection_matrix(modelToWorld, cameraToWorld);
+    mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
 
     // set up the uniforms for the shader
     shader.render(modelToProjection, color);
@@ -95,7 +95,7 @@ public:
 class ping_app : public app {
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw a solid color
   color_shader color_shader_;

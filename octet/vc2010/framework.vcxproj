@@ -81,6 +81,7 @@
     <ClInclude Include="..\src\containers\double_list.h" />
     <ClInclude Include="..\src\containers\dynarray.h" />
     <ClInclude Include="..\src\containers\ptr.h" />
+    <ClInclude Include="..\src\containers\ref.h" />
     <ClInclude Include="..\src\examples\animation\animation_app.h" />
     <ClInclude Include="..\src\examples\bump\bump_app.h" />
     <ClInclude Include="..\src\examples\cube\cube_app.h" />
@@ -104,6 +105,7 @@
     <ClInclude Include="..\src\platform\windows_specific.h" />
     <ClInclude Include="..\src\resources\app_utils.h" />
     <ClInclude Include="..\src\resources\bump_material.h" />
+    <ClInclude Include="..\src\resources\camera.h" />
     <ClInclude Include="..\src\resources\collada_builder.h" />
     <ClInclude Include="..\src\resources\gif_decoder.h" />
     <ClInclude Include="..\src\resources\lighting.h" />
@@ -111,6 +113,7 @@
     <ClInclude Include="..\src\resources\mesh.h" />
     <ClInclude Include="..\src\resources\mesh_builder.h" />
     <ClInclude Include="..\src\resources\mesh_state.h" />
+    <ClInclude Include="..\src\resources\resource.h" />
     <ClInclude Include="..\src\resources\resource_manager.h" />
     <ClInclude Include="..\src\resources\scene.h" />
     <ClInclude Include="..\src\shaders\bump_shader.h" />

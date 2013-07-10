@@ -7,7 +7,7 @@
 // Vector class
 //
 
-class mat4;
+class mat4t;
 
 #if defined( USE_SSE )
 class vec4 {
@@ -20,7 +20,7 @@ public:
   float &operator[](int i) { return v128.m128_f32[i]; }
   const float &operator[](int i) const { return v128.m128_f32[i]; }
   vec4 operator*(float r) const { return vec4(_mm_mul_ps(v128, _mm_set_ss(r))); }
-  vec4 operator*(const mat4 &r) const;
+  vec4 operator*(const mat4t &r) const;
   vec4 operator+(const vec4 &r) const { return vec4(_mm_add_ps(v128, r.v128)); }
   vec4 operator-(const vec4 &r) const { return vec4(_mm_sub_ps(v128, r.v128)); }
   vec4 operator*(const vec4 &r) const { return vec4(_mm_mul_ps(v128, r.v128)); }
@@ -87,7 +87,7 @@ public:
   vec4 operator-(float r) const { return vec4(v[0]-r, v[1]-r, v[2]-r, v[3]-r); }
   vec4 operator*(float r) const { return vec4(v[0]*r, v[1]*r, v[2]*r, v[3]*r); }
   vec4 operator/(float r) const { float rcp = 1.0f / r; return vec4(v[0]*rcp, v[1]*rcp, v[2]*rcp, v[3]*rcp); }
-  vec4 operator*(const mat4 &r) const;
+  vec4 operator*(const mat4t &r) const;
   vec4 operator+(const vec4 &r) const { return vec4(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2], v[3]+r.v[3]); }
   vec4 operator-(const vec4 &r) const { return vec4(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2], v[3]-r.v[3]); }
   vec4 operator*(const vec4 &r) const { return vec4(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2], v[3]*r.v[3]); }

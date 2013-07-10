@@ -7,7 +7,7 @@
 // Material 
 //
 
-class material {
+class material : public resource {
   // material
   GLuint diffuse;
   GLuint ambient;
@@ -47,6 +47,6 @@ public:
     this->shininess = shininess;
   }
 
-  void render(class bump_shader &shader, const mat4 &modelToProjection, const mat4 &modelToCamera, const vec4 &light_direction, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular);
+  void render(class bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, const vec4 &light_direction, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular);
 };
 

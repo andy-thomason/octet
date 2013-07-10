@@ -6,6 +6,10 @@
 //
 // Common shader code - compiles and links shaders
 
+// "stringifying macro" makes shaders more readable 
+// (effectively puts quotes around X)
+#define SHADER_STR(X) #X
+
 class shader {
   GLuint program_;
 public:

@@ -19,7 +19,7 @@
 
 class sprite {
   // where is our sprite (overkill for a ping game!)
-  mat4 modelToWorld;
+  mat4t modelToWorld;
 
   // half the width of the sprite
   float halfWidth;
@@ -47,13 +47,13 @@ public:
     enabled = true;
   }
 
-  void render(texture_shader &shader, mat4 &cameraToWorld) {
+  void render(texture_shader &shader, mat4t &cameraToWorld) {
     // invisible sprite... used for gameplay.
     if (!texture) return;
 
     // build a projection matrix: model -> world -> camera -> projection
     // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4 modelToProjection = mat4::build_projection_matrix(modelToWorld, cameraToWorld);
+    mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
 
     // set up opengl to draw textured triangles using sampler 0 (GL_TEXTURE0)
     glActiveTexture(GL_TEXTURE0);
@@ -138,7 +138,7 @@ public:
 class invaderers_app : public app {
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw a textured triangle
   texture_shader texture_shader_;

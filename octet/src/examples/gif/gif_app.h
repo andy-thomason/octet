@@ -18,11 +18,11 @@
 class gif_app : public app {
   // Matrix to transform points on our triangle to the world space
   // This allows us to move and rotate our triangle
-  mat4 modelToWorld;
+  mat4t modelToWorld;
 
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw a textured triangle
   texture_shader texture_shader_;
@@ -68,7 +68,7 @@ public:
 
     // build a projection matrix: model -> world -> camera -> projection
     // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4 modelToProjection = mat4::build_projection_matrix(modelToWorld, cameraToWorld);
+    mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
 
     // spin the triangle by rotating about Z (the view direction)
     modelToWorld.rotateZ(1);

@@ -20,11 +20,11 @@
 class bump_app : public app {
   // Matrix to transform points on our triangle to the world space
   // This allows us to move and rotate our triangle
-  mat4 modelToWorld;
+  mat4t modelToWorld;
 
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw a shaded, textured triangle
   bump_shader bump_shader_;
@@ -84,9 +84,9 @@ public:
 
     // build a projection matrix: model -> world -> camera -> projection
     // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4 modelToCamera;
-    mat4 worldToCamera;
-    mat4 modelToProjection = mat4::build_camera_matrices(modelToCamera, worldToCamera, modelToWorld, cameraToWorld);
+    mat4t modelToCamera;
+    mat4t worldToCamera;
+    mat4t modelToProjection = mat4t::build_camera_matrices(modelToCamera, worldToCamera, modelToWorld, cameraToWorld);
     float shininess = 30.0f;
     vec4 light_dir = vec4(1, 1, 1, 0).normalize() * worldToCamera;
     vec4 light_ambient = vec4(0.3f, 0.3f, 0.3f, 1);

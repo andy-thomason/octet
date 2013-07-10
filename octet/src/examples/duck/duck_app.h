@@ -20,11 +20,11 @@
 class duck_app : public app {
   // Matrix to transform points on our triangle to the world space
   // This allows us to move and rotate our triangle
-  mat4 modelToWorld;
+  mat4t modelToWorld;
 
   // Matrix to transform points in our camera space to the world.
   // This lets us move our camera
-  mat4 cameraToWorld;
+  mat4t cameraToWorld;
 
   // shader to draw a shaded, textured triangle
   phong_shader phong_shader_;
@@ -61,7 +61,7 @@ public:
     duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib");
 
     // the original duck is a bit too big, shrink it with a matrix
-    mat4 shrink;
+    mat4t shrink;
     shrink.loadIdentity();
     shrink.translate(0, -50, 0);
     shrink.scale(0.03f, 0.03f, 0.03f);
@@ -94,9 +94,9 @@ public:
 
     // build a projection matrix: model -> world -> camera -> projection
     // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4 modelToCamera;
-    mat4 worldToCamera;
-    mat4 modelToProjection = mat4::build_camera_matrices(modelToCamera, worldToCamera, modelToWorld, cameraToWorld);
+    mat4t modelToCamera;
+    mat4t worldToCamera;
+    mat4t modelToProjection = mat4t::build_camera_matrices(modelToCamera, worldToCamera, modelToWorld, cameraToWorld);
     //printf("m2c=%s\n", modelToCamera.toString());
     //printf("w2c=%s\n", worldToCamera.toString());
     float shininess = 30.0f;

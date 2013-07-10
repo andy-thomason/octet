@@ -43,7 +43,7 @@ public:
   }
 
   // start drawing with this shader
-  void render(const mat4 &modelToProjection, const vec4 &emissive_color) {
+  void render(const mat4t &modelToProjection, const vec4 &emissive_color) {
     // start using the program
     shader::render();
 

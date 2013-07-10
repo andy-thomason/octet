@@ -30,7 +30,7 @@ public:
 
   // compute camera relative light information
   // todo: only include lights in range
-  void compute(const mat4 &worldToCamera) {
+  void compute(const mat4t &worldToCamera) {
     for (unsigned i = 0; i != lights.size(); ++i) {
       transformed_lights[i] = lights[i];
     }

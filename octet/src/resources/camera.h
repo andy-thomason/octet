@@ -7,10 +7,12 @@
 // Scene camera
 //
 
-class camera {
+class camera : public resource {
   // camera parameters
   int node_;
   bool is_ortho;
+
+  // size (at near plane)
   float left;
   float right;
   float bottom;
@@ -19,8 +21,8 @@ class camera {
   float farVal;
 
   // generated matrices
-  mat4 worldToCamera;
-  mat4 cameraToProjection;
+  mat4t worldToCamera;
+  mat4t cameraToProjection;
 
 public:
   camera() {
@@ -38,8 +40,32 @@ public:
     node_ = node;
   }
 
+  void set_perspective(int node_index, float xfov, float yfov, float aspect_ratio, float n, float f)
+  {
+    float xscale = 0.5f;
+    float yscale = 0.5f;
+    if (xfov && yfov) {
+      xscale = tanf(xfov * (3.14159f/180/2));
+      yscale = tanf(yfov * (3.14159f/180/2));
+    } else if (yfov && aspect_ratio) {
+      yscale = tanf(yfov * (3.14159f/180/2));
+      xscale = yscale / aspect_ratio;
+    } else if (xfov && aspect_ratio) {
+      xscale = tanf(xfov * (3.14159f/180/2));
+      yscale = xscale * aspect_ratio;
+    }
+    //printf("%f %f\n", xscale, yscale);
+    set_params(node_index, -n * xscale, n * xscale, -n * yscale, n * yscale, n, f, false);
+  }
+
+  void set_ortho(int node_index, float xmag, float ymag, float aspect_ratio, float n, float f)
+  {
+    set_params(node_index, -xmag, xmag, -ymag, ymag, n, f, true);
+  }
+
+
   // call this once a frame to set up the camera position
-  void set_cameraToWorld(const mat4 &cameraToWorld) {
+  void set_cameraToWorld(const mat4t &cameraToWorld) {
     // flip it around to transform from world to camera
     cameraToWorld.invertQuick(worldToCamera);
 
@@ -53,7 +79,7 @@ public:
   }
 
   // call this many times to build matrices for uniforms.
-  void get_matrices(mat4 &modelToProjection, mat4 &modelToCamera, const mat4 &modelToWorld)
+  void get_matrices(mat4t &modelToProjection, mat4t &modelToCamera, const mat4t &modelToWorld)
   {
     // model -> world -> camera
     modelToCamera = modelToWorld * worldToCamera;
@@ -63,7 +89,7 @@ public:
   }
 
   // call this many times to build matrices for uniforms.
-  const mat4 &get_cameraToProjection()
+  const mat4t &get_cameraToProjection()
   {
     return cameraToProjection;
   }

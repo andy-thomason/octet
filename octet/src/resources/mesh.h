@@ -184,7 +184,7 @@ public:
   }
 
   // apply a matrix to every position
-  void transform(unsigned attr, mat4 &matrix) {
+  void transform(unsigned attr, mat4t &matrix) {
     if (get_use_vbo() || get_num_vertices() == 0) {
       return;
     }
@@ -214,6 +214,9 @@ public:
   }
 
   // *very* slow ray cast.
+  // returns "barycentric" coordinates.
+  // eg. hit pos = bary[0] * pos0 + bary[1] * pos1 + bary[2] * pos2;
+  // eg. hit uv = bary[0] * uv0 + bary[1] * uv1 + bary[2] * uv2;
   bool ray_cast(const vec4 &org, const vec4 &dir, int indices[], vec4 &bary) {
     //static FILE *file = fopen("c:/tmp/3.txt","w");
     //fprintf(file, "org=%s dir=%s\n", org.toString(), dir.toString());
@@ -269,7 +272,7 @@ public:
   }
 
   // get the axis aligned bounding box (ie. the min and max of x, y, z)
-  void get_aabb(const mat4 &modelToWorld, vec4 &min, vec4 &max) {
+  void get_aabb(const mat4t &modelToWorld, vec4 &min, vec4 &max) {
     unsigned pos_slot = get_slot(mesh_state::attribute_pos);
 
     {
@@ -285,7 +288,7 @@ public:
     }
   }
 
-  /*template <class T > void get_triangles(const mat4 &modelToWorld, int max_depth, T &out) {
+  /*template <class T > void get_triangles(const mat4t &modelToWorld, int max_depth, T &out) {
     unsigned pos_slot = get_slot(mesh_state::attribute_pos);
 
     for (unsigned i = 0; i != get_num_indices(); i += 3) {

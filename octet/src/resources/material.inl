@@ -7,7 +7,7 @@
 // Material: this inl file solves circular dependencies for the render function
 //
 
-inline void material::render(bump_shader &shader, const mat4 &modelToProjection, const mat4 &modelToCamera, const vec4 &light_direction, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular) {
+inline void material::render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, const vec4 &light_direction, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular) {
   shader.render(modelToProjection, modelToCamera, light_direction, shininess, light_ambient, light_diffuse, light_specular);
     
   // set textures 0, 1, 2, 3 to their respective values
