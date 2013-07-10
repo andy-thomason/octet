@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.65.0 r53189</authoring_tool>
+    </contributor>
+    <created>2013-07-09T17:14:15</created>
+    <modified>2013-07-09T17:14:15</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_cameras>
+    <camera id="Camera-camera" name="Camera.002">
+      <optics>
+        <technique_common>
+          <perspective>
+            <xfov sid="xfov">49.13434</xfov>
+            <aspect_ratio>1.777778</aspect_ratio>
+            <znear sid="znear">0.1</znear>
+            <zfar sid="zfar">100</zfar>
+          </perspective>
+        </technique_common>
+      </optics>
+    </camera>
+  </library_cameras>
+  <library_images/>
+  <library_geometries>
+    <geometry id="Cube-mesh" name="Cube">
+      <mesh>
+        <source id="Cube-mesh-positions">
+          <float_array id="Cube-mesh-positions-array" count="84">-0.1999999 -0.1999999 -1 -0.1999999 0.1999999 -1 0.1999999 0.1999999 -1 0.1999999 -0.1999999 -1 -0.1999999 -0.1999999 1 -0.1999999 0.1999999 1 0.1999999 0.1999999 1 0.1999999 -0.1999999 1 -0.1999999 0.1999999 0.6966292 -0.1999999 -0.1999999 0.6966292 0.1999999 0.1999999 0.6966292 0.1999999 -0.1999999 0.6966292 -0.1999999 -0.1999999 0.3952543 0.1999999 -0.1999999 0.3952543 0.1999999 0.1999999 0.3952543 -0.1999999 0.1999999 0.3952543 -0.1999999 -0.1999999 0.06894481 0.1999999 -0.1999999 0.06894481 0.1999999 0.1999999 0.06894481 -0.1999999 0.1999999 0.06894481 -0.1999999 0.1999999 -0.2651004 0.1999999 0.1999999 -0.2651004 0.1999999 -0.1999999 -0.2651004 -0.1999999 -0.1999999 -0.2651004 -0.1999999 -0.1999999 -0.6214154 0.1999999 -0.1999999 -0.6214154 0.1999999 0.1999999 -0.6214154 -0.1999999 0.1999999 -0.6214154</float_array>
+          <technique_common>
+            <accessor source="#Cube-mesh-positions-array" count="28" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube-mesh-normals">
+          <float_array id="Cube-mesh-normals-array" count="78">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1 -1 0 0 0 1 0 1 0 0 0 -1 0 0 -1 0 -1 0 0 1 0 0 0 1 0 0 1 0 1 0 0 0 -1 0 -1 0 0 -1 0 0 0 1 0 1 0 0 0 -1 0 0 1 0 1 0 0 -1 0 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#Cube-mesh-normals-array" count="26" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Cube-mesh-vertices">
+          <input semantic="POSITION" source="#Cube-mesh-positions"/>
+        </vertices>
+        <polylist count="26">
+          <input semantic="VERTEX" source="#Cube-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube-mesh-normals" offset="1"/>
+          <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 </vcount>
+          <p>1 0 0 0 24 0 27 0 27 1 26 1 2 1 1 1 26 2 25 2 3 2 2 2 0 3 3 3 25 3 24 3 0 4 1 4 2 4 3 4 7 5 6 5 5 5 4 5 4 6 5 6 8 6 9 6 5 7 6 7 10 7 8 7 6 8 7 8 11 8 10 8 7 9 4 9 9 9 11 9 11 10 9 10 12 10 13 10 9 11 8 11 15 11 12 11 10 12 11 12 13 12 14 12 8 13 10 13 14 13 15 13 15 14 14 14 18 14 19 14 14 15 13 15 17 15 18 15 13 16 12 16 16 16 17 16 12 17 15 17 19 17 16 17 16 18 19 18 20 18 23 18 19 19 18 19 21 19 20 19 18 20 17 20 22 20 21 20 17 21 16 21 23 21 22 21 20 22 21 22 26 22 27 22 21 23 22 23 25 23 26 23 23 24 20 24 27 24 24 24 22 25 23 25 24 25 25 25</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+  </library_geometries>
+  <library_animations>
+    <animation id="Armature_radius_pose_matrix">
+      <source id="Armature_radius_pose_matrix-input">
+        <float_array id="Armature_radius_pose_matrix-input-array" count="2">0.04166662 0.8333333</float_array>
+        <technique_common>
+          <accessor source="#Armature_radius_pose_matrix-input-array" count="2" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Armature_radius_pose_matrix-output">
+        <float_array id="Armature_radius_pose_matrix-output-array" count="32">1 0 0 0 0 1 0 1 0 0 1 0 0 0 0 1 1 0 0 0 0 0.7071065 0.707107 1 0 -0.707107 0.7071065 0 0 0 0 1</float_array>
+        <technique_common>
+          <accessor source="#Armature_radius_pose_matrix-output-array" count="2" stride="16">
+            <param name="TRANSFORM" type="float4x4"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Armature_radius_pose_matrix-interpolation">
+        <Name_array id="Armature_radius_pose_matrix-interpolation-array" count="2">LINEAR LINEAR</Name_array>
+        <technique_common>
+          <accessor source="#Armature_radius_pose_matrix-interpolation-array" count="2" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Armature_radius_pose_matrix-sampler">
+        <input semantic="INPUT" source="#Armature_radius_pose_matrix-input"/>
+        <input semantic="OUTPUT" source="#Armature_radius_pose_matrix-output"/>
+        <input semantic="INTERPOLATION" source="#Armature_radius_pose_matrix-interpolation"/>
+      </sampler>
+      <channel source="#Armature_radius_pose_matrix-sampler" target="radius/transform"/>
+    </animation>
+  </library_animations>
+  <library_controllers>
+    <controller id="Armature_Cube-skin" name="Armature">
+      <skin source="#Cube-mesh">
+        <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
+        <source id="Armature_Cube-skin-joints">
+          <Name_array id="Armature_Cube-skin-joints-array" count="2">humerus radius</Name_array>
+          <technique_common>
+            <accessor source="#Armature_Cube-skin-joints-array" count="2" stride="1">
+              <param name="JOINT" type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Armature_Cube-skin-bind_poses">
+          <float_array id="Armature_Cube-skin-bind_poses-array" count="32">1 0 0 0 0 0 1 1.070548 0 -1 0 0 0 0 0 1 1 0 0 0 0 0 1 0.07054829 0 -1 0 0 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Armature_Cube-skin-bind_poses-array" count="2" stride="16">
+              <param name="TRANSFORM" type="float4x4"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Armature_Cube-skin-weights">
+          <float_array id="Armature_Cube-skin-weights-array" count="56">0.8448904 0.1551095 0.8590769 0.140923 0.8448904 0.1551095 0.8590769 0.140923 0.1376891 0.8623109 0.1506093 0.8493908 0.1376891 0.8623109 0.1506092 0.8493908 0.5048431 0.4951568 0.4912898 0.5087103 0.4912899 0.5087102 0.5048431 0.4951569 0.6680901 0.3319099 0.6819601 0.31804 0.6680902 0.3319098 0.6819601 0.31804 0.7564903 0.2435098 0.7705186 0.2294815 0.7564904 0.2435097 0.7705186 0.2294815 0.8147978 0.1852023 0.8006904 0.1993096 0.8147978 0.1852023 0.8006904 0.1993097 0.8227904 0.1772096 0.8369373 0.1630626 0.8227904 0.1772096 0.8369373 0.1630626</float_array>
+          <technique_common>
+            <accessor source="#Armature_Cube-skin-weights-array" count="56" stride="1">
+              <param name="WEIGHT" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <joints>
+          <input semantic="JOINT" source="#Armature_Cube-skin-joints"/>
+          <input semantic="INV_BIND_MATRIX" source="#Armature_Cube-skin-bind_poses"/>
+        </joints>
+        <vertex_weights count="28">
+          <input semantic="JOINT" source="#Armature_Cube-skin-joints" offset="0"/>
+          <input semantic="WEIGHT" source="#Armature_Cube-skin-weights" offset="1"/>
+          <vcount>2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 </vcount>
+          <v>0 0 1 1 0 2 1 3 0 4 1 5 0 6 1 7 0 8 1 9 0 10 1 11 0 12 1 13 0 14 1 15 0 16 1 17 0 18 1 19 0 20 1 21 0 22 1 23 0 24 1 25 0 26 1 27 0 28 1 29 0 30 1 31 0 32 1 33 0 34 1 35 0 36 1 37 0 38 1 39 0 40 1 41 0 42 1 43 0 44 1 45 0 46 1 47 0 48 1 49 0 50 1 51 0 52 1 53 0 54 1 55</v>
+        </vertex_weights>
+      </skin>
+    </controller>
+  </library_controllers>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Armature" name="Armature" type="NODE">
+        <translate sid="location">-2.3771e-16 0 -1.070548</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <node id="humerus" name="humerus" sid="humerus" type="JOINT">
+          <matrix sid="transform">1 0 0 0 0 7.54979e-8 -1 0 0 1 7.54979e-8 0 0 0 0 1</matrix>
+          <node id="radius" name="radius" sid="radius" type="JOINT">
+            <matrix sid="transform">1 -1.06642e-9 -3.55452e-10 0 1.00541e-9 0.7071065 0.707107 1 -5.0273e-10 -0.707107 0.7071065 0 0 0 0 1</matrix>
+          </node>
+        </node>
+      </node>
+      <node id="Cube" name="Cube" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_controller url="#Armature_Cube-skin">
+          <skeleton>#humerus</skeleton>
+        </instance_controller>
+      </node>
+      <node id="Camera" name="Camera" type="NODE">
+        <translate sid="location">-5.64057 0.6268626 0.7665697</translate>
+        <rotate sid="rotationZ">0 0 1 -90.00004</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 90.00004</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_camera url="#Camera-camera"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
