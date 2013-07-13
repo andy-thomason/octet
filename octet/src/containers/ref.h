@@ -53,6 +53,9 @@ public:
   // get a pointer to the item. Beware! do not store or pass this pointer.
   operator item_t *() { return item; }
 
+  // get a pointer to the item from a constant reference
+  operator item_t *() const { return item; }
+
   // get a pointer to the item
   item_t * operator ->() const { return item; }
 

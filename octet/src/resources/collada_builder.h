@@ -20,7 +20,6 @@
 class collada_builder {
 public:
 
-  enum { default_material_index = 0 };
 private:
   TiXmlDocument doc;
   string doc_path;
@@ -465,60 +464,26 @@ private:
         const char *target = instance->Attribute("target");
         if (target && target[0] == '#') target++;
         // add a node/mesh/material combination to the mesh_instance
-        if (url) {
+        if (symbol && url) {
           string new_url;
-          if (symbol) {
-            new_url.format("%s+%s", new_url, symbol);
-          } else {
-            new_url.format("%s", new_url);
-          }
-          resource *res = dict.get_resource(new_url);
-          mesh_state *mesh = res ? res->get_mesh_state() : 0;
-          res = target ? dict.get_resource(target) : 0;
-          bump_material *mat = res ? res->get_bump_material() : 0;
+          new_url.format("%s+%s", new_url, symbol);
+          mesh_state *mesh = dict.get_mesh_state(new_url);
+          bump_material *mat = dict.get_bump_material(target);
+          if (!mat) mat = dict.get_bump_material("default_material");
           if (mesh) {
             mesh_instance *mi = new mesh_instance(node_index, mesh, mat, skn, skel);
             s.add_mesh_instance(mi);
           }
-
-          /*for (int mesh_index = 0; mesh_index != s.num_meshes(); ++mesh_index) {
-            //printf("%s/%s %s/%s\n", meshes[mesh_index]->get_geometry_name(), url, meshes[mesh_index]->get_component_name(), symbol);
-            mesh_state *mesh = 
-            if (
-              !strcmp(s.meshes[mesh_index]->get_geometry_name(), url) &&
-              !strcmp(s.meshes[mesh_index]->get_component_name(), symbol)
-            ) {
-              int material_index = find_material_index(target);
-              int mi_index = (int)s.mesh_instances.size();
-              s.mesh_instances.resize(mi_index+1);
-              mesh_state::mesh_instance &mi = s.mesh_instances[mi_index];
-              mi.node = node_index;
-              mi.mesh = mesh_index;
-              mi.material = material_index;
-              mi.skeleton = skeleton_index;
-            }
-          }*/
         }
       }
-    }
-
-    // use the default material for geometry with no specified material
-    /*for (int mesh_index = 0; mesh_index != s.meshes.size(); ++mesh_index) {
-      //printf("%s/%s %s/%s\n", meshes[mesh_index]->get_geometry_name(), url, meshes[mesh_index]->get_component_name(), symbol);
-      if (
-        !strcmp(s.meshes[mesh_index]->get_geometry_name(), url) &&
-        !strcmp(s.meshes[mesh_index]->get_component_name(), "")
-      ) {
-        int material_index = default_material_index;
-        int mi_index = (int)s.mesh_instances.size();
-        s.mesh_instances.resize(mi_index+1);
-        mesh_state::mesh_instance &mi = s.mesh_instances[mi_index];
-        mi.node = node_index;
-        mi.mesh = mesh_index;
-        mi.material = material_index;
-        mi.skeleton = skeleton_index;
+    } else {
+      mesh_state *mesh = dict.get_mesh_state(url);
+      bump_material *mat = dict.get_bump_material("default_material");
+      if (mesh) {
+        mesh_instance *mi = new mesh_instance(node_index, mesh, mat, skn, skel);
+        s.add_mesh_instance(mi);
       }
-    }*/
+    }
   }
 
   // add an <instance_geometry> mesh instance
@@ -536,18 +501,15 @@ private:
     const char *controller_url = attr(element, "url");
     TiXmlElement *bind_material = child(element, "bind_material");
     TiXmlElement *technique_common = child(bind_material, "technique_common");
-    //TiXmlElement *controller = find_id(controller_url);
-    //TiXmlElement *skin_elem = child(controller, "skin");
-    //if (!skin_elem) return;
 
     int num_bones = 0;
     for (TiXmlElement *skel_elem = child(element, "skeleton"); skel_elem; skel_elem = sibling(skel_elem, "skeleton")) {
       num_bones++;
     }
 
-    resource *res = dict.get_resource(controller_url);
-    skin *skn = dict.get_skin(controller_url);
-    if (!skn) return;
+    mesh_state *mesh = dict.get_mesh_state(controller_url);
+    if (!mesh || !mesh->get_skin()) return;
+    skin *skn = mesh->get_skin();
 
     skeleton *skel = new skeleton();
     TiXmlElement *skel_elem = child(element, "skeleton");
@@ -611,6 +573,13 @@ private:
         c->set_ortho(node_index, xmag, ymag, aspect_ratio, n, f);
       }
     }
+  }
+
+  // add a light to the scene
+  void add_instance_light(TiXmlElement *elem, int node_index, resources &dict, scene &s) {
+    const char *url = elem->Attribute("url");
+    TiXmlElement *light = find_id(url);
+    if (!light) return;
   }
 
   // add a geometry element to the list of mesh states
@@ -821,6 +790,8 @@ private:
           add_instance_controller(child, node_index, dict, s);
         } else if (!strcmp(value, "instance_camera")) {
           add_instance_camera(child, node_index, dict, s);
+        } else if (!strcmp(value, "instance_light")) {
+          add_instance_light(child, node_index, dict, s);
         }
       }
     }
@@ -882,6 +853,7 @@ private:
       new_url.format("%s+%s", id, symbol);
       dict.set_resource(new_url, mesh);
     } else {
+      printf("add mesh resource %s\n", id);
       dict.set_resource(id, mesh);
     }
 
@@ -1105,6 +1077,7 @@ private:
       build_heirachy(nodes, elem, dict, *scn);
       build_matrices(nodes, dict, *scn);
     }
+
   }
 
 public:
@@ -1158,23 +1131,7 @@ public:
     return ivs ? ivs->Attribute("url") : 0;
   }
 
-  // get the materials, geometry and nodes
-  /*void get_scene(const char *scene_name, resources &dict) {
-    TiXmlElement *scene_element = find_id(scene_name);
-    if (!scene_element) return;
-
-    add_materials(dict);
-
-    add_geometry(dict);
-
-    add_controllers(dict);
-
-    add_animations(dict);
-
-    build_heirachy(scene_element, s);
-    build_matrices(s);
-  }*/
-
+  // extract resources from the collada file into a collection.
   void get_resources(resources &dict) {
     add_materials(dict);
 

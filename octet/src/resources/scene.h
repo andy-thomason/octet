@@ -80,26 +80,23 @@ class scene : public resource {
         // multi-matrix rendering for characters
         mat4t modelToCamera[32];
         mat4t modelToProjection;
-        int si = 0;
-        int di = 0;
         mat4t cameraToProjection = cam.get_cameraToProjection();
         int num_bones = skel->get_num_bones();
-        for (int si = 0; si != num_bones && di < 32; ++si) {
-          int src_node = skel->get_bone(si);
+        num_bones = num_bones < 32 ? num_bones : 32;
+        for (int bi = 0; bi != num_bones; ++bi) {
+          int src_node = skel->get_bone(bi);
           mat4t modelToWorld = calcModelToWorld(src_node);
-          mat4t bindToModel = skn->get_bindToModel(di);
+          mat4t bindToModel = skn->get_bindToModel(bi);
           mat4t meshToBind = skn->get_modelToBind();
-          modelToCamera[di] = meshToBind * bindToModel * modelToWorld * worldToCamera;
+          modelToCamera[bi] = meshToBind * bindToModel * modelToWorld * worldToCamera;
           if (frame_number == 1) {
             const char *name = node_name(src_node);
             mat4t z = bindToModel * modelToWorld;
             //printf("mi=%d node=%d name=%s mx=%s\n", mesh_index, src_node, name, modelToCamera[di].toString());
             printf("mi=%d node=%d name=%s z=%s\n", mesh_index, src_node, name, z.toString());
           }
-          si++;
-          di++;
         }
-        mat->render_skinned(skin_shader, cameraToProjection, modelToCamera, di, lighting_set.data());
+        mat->render_skinned(skin_shader, cameraToProjection, modelToCamera, num_bones, lighting_set.data());
       }
       mesh->render();
     }
@@ -110,6 +107,28 @@ public:
   // create an empty scene
   scene() {
     frame_number = 0;
+
+  }
+
+  void create_default_camera_and_lights() {
+    // default camera_instance
+    if (camera_instances.size() == 0) {
+      mat4t m;
+      m.loadIdentity();
+      m.rotateX(90);
+      m.translate(0.0, 1.0f, 1.5f);
+      int node = add_node(-1, m, "default_cam", "");
+      camera_instance *cam = new camera_instance();
+      float n = 0.1f, f = 1000.0f;
+      cam->set_params(node, -n, n, -n, n, n, f, false);
+      camera_instances.push_back(cam);
+    }
+
+    vec4 light_dir = vec4(-1, -1, -1, 0).normalize();
+    vec4 light_ambient = vec4(0.3f, 0.3f, 0.3f, 1);
+    vec4 light_diffuse = vec4(1, 1, 1, 1);
+    vec4 light_specular = vec4(1, 1, 1, 1);
+    lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
   }
 
   int add_node(const mat4t &modelToParent, int parent, atom_t sid) {

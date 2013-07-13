@@ -40,6 +40,10 @@ public:
     builder.get_resources(dict);
     app_scene = dict.get_scene(builder.get_default_scene());
 
+    assert(app_scene);
+
+    app_scene->create_default_camera_and_lights();
+
     animation *anim = dict.get_animation("Armature_radius_pose_matrix");
     app_scene->play(anim, app_scene->get_node_index("Armature"), true);
   }
@@ -67,7 +71,5 @@ public:
     app_scene->update(1.0f/30);
 
     app_scene->render(object_shader, skin_shader, *cam);
-
-    //app_scene.node_to_parent(5).rotateX(1);
   }
 };

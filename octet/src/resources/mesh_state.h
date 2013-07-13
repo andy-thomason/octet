@@ -171,8 +171,8 @@ public:
   }
 
   // get the optional skin data
-  const skin *get_skin() const {
-    return (const skin*)skin_;
+  skin *get_skin() const {
+    return (skin*)skin_;
   }
 
   // set the optional skin
