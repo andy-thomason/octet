@@ -37,16 +37,26 @@ class scene : public resource {
   // animations playing at the moment
   dynarray<ref<animation_instance>> animation_instances;
 
-  // animations playing at the moment
+  // cameras available
   dynarray<ref<camera_instance>> camera_instances;
 
-  // animations playing at the moment
+  // lights available
   dynarray<ref<light_instance>> light_instances;
 
-  // compiled set of lights
+  // compiled set of active lights
   lighting lighting_set;
 
   int frame_number;
+
+  /*void metadata(meta &m) {
+    m.visit(modelToParent);
+    m.visit(sids);
+    m.visit(parentNodes);
+    m.visit(mesh_instances);
+    m.visit(animation_instances);
+    m.visit(camera_instances);
+    m.visit(light_instances);
+  }*/
 
   void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
     mat4t cameraToWorld = calcModelToWorld(cam.node());
@@ -56,7 +66,7 @@ class scene : public resource {
     lighting_set.compute(worldToCamera);
     cam.set_cameraToWorld(cameraToWorld);
 
-    for (int mesh_index = 0; mesh_index != (int)mesh_instances.size(); ++mesh_index) {
+    for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
       mesh_instance *mi = mesh_instances[mesh_index];
       const mesh_state *mesh = mi->get_mesh();
       const skin *skn = mi->get_skin();
@@ -107,7 +117,6 @@ public:
   // create an empty scene
   scene() {
     frame_number = 0;
-
   }
 
   void create_default_camera_and_lights() {
@@ -166,6 +175,11 @@ public:
   // how many camera_instances do we have?
   int num_camera_instances() {
     return (int)camera_instances.size();
+  }
+
+  // how many light_instances do we have?
+  int num_light_instances() {
+    return (int)light_instances.size();
   }
 
   // 
@@ -246,33 +260,6 @@ public:
     }
     return name;
   }
-
-  // load a scene from a collada file
-  /*void make_collada_scene(collada_builder &builder, const char *name) {
-    collada_builder::scene_state s = { modelToParent, sids, nodeNamesToNodes, parentNodes, mesh_instances, skeletons, meshes, materials, camera_instances };
-
-    builder.get_scene(name, s);
-
-    // temp. lights
-    vec4 light_dir = vec4(-1, -1, -1, 0).normalize();
-    vec4 light_ambient = vec4(0.3f, 0.3f, 0.3f, 1);
-    vec4 light_diffuse = vec4(1, 1, 1, 1);
-    vec4 light_specular = vec4(1, 1, 1, 1);
-    lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
-
-    // default camera_instance
-    if (camera_instances.size() == 0) {
-      mat4t m;
-      m.loadIdentity();
-      m.rotateX(90);
-      m.translate(0.0, 1.0f, 1.5f);
-      int node = add_node(-1, m, "default_cam", "");
-      camera_instance *cam = new camera_instance();
-      float n = 0.1f, f = 1000.0f;
-      cam->set_params(node, -n, n, -n, n, n, f, false);
-      camera_instances.push_back(cam);
-    }
-  }*/
 
   // advance all the animation instances
   void update(float delta_time) {

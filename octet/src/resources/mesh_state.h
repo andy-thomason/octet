@@ -15,36 +15,6 @@ public:
     GLuint buffer;
   };
 
-  /*// how to draw a mesh
-  struct mesh_instance {
-    // which node (model to world matrix) to use
-    int node;
-
-    // which mesh to render
-    int mesh;
-
-    // what material to use
-    int material;
-
-    // for characters, which skin to use
-    int skin;
-
-    // for characters, which skeleton to use
-    int skeleton;
-  };
-
-  // extra information for skinned meshes
-  struct skin {
-    // the original transform of the skin to world space (bind space)
-    mat4t modelToBind;
-
-    // for each node, map from world space (bind space) to model space
-    dynarray<mat4t> bindToModel;
-
-    // a name for each joint.
-    dynarray<string> joints;
-  };*/
-
 private:
   // todo: make this private
   gl_resource vertices;
@@ -115,7 +85,6 @@ public:
 
   // eg. add_attribute(attribute_pos, 3, GL_FLOAT)
   unsigned add_attribute(unsigned attr, unsigned size, unsigned kind, unsigned offset) {
-    printf("aa %d\n", num_slots);
     assert(num_slots < max_slots);
     format[num_slots] = (offset << 9) + (attr << 5) + ((size-1) << 3) + (kind - GL_BYTE);
     return num_slots++;

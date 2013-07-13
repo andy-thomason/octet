@@ -523,10 +523,10 @@ private:
         printf("warning: skeleton node not found\n");
         return;
       }
-      int i = node_index + 1;
+      int i = skel_node + 1;
 
       // todo: sort and filter bones by skin joint sids.
-      skel->add_bone(node_index);
+      skel->add_bone(skel_node);
       while (i < num_nodes && s.get_parent(i) >= node_index) {
         skel->add_bone(i);
         ++i;
