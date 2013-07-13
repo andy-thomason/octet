@@ -9,33 +9,13 @@
 
 class mesh_state : public resource {
 public:
-  // standard attribute names
-  enum attribute {
-    attribute_position = 0,
-    attribute_pos = 0,
-    attribute_blendweight = 1,
-    attribute_normal = 2,
-    attribute_diffuse = 3,
-    attribute_color = 3,
-    attribute_specular = 4,
-    attribute_tessfactor = 5,
-    attribute_fogcoord = 5,
-    attribute_psize = 6,
-    attribute_blendindices = 7,
-    attribute_texcoord = 8,
-    attribute_uv = 8,
-    attribute_tangent = 14,
-    attribute_bitangent = 15,
-    attribute_binormal = 15,
-  };
-
-  // a resource can be stored in a gl buffer or memory
-  struct resource {
+  // a gl_resource can be stored in a gl buffer or memory
+  struct gl_resource {
     unsigned char *ptr;
     GLuint buffer;
   };
 
-  // how to draw a mesh
+  /*// how to draw a mesh
   struct mesh_instance {
     // which node (model to world matrix) to use
     int node;
@@ -63,12 +43,12 @@ public:
 
     // a name for each joint.
     dynarray<string> joints;
-  };
+  };*/
 
 private:
   // todo: make this private
-  resource vertices;
-  resource indices;
+  gl_resource vertices;
+  gl_resource indices;
 
   // compressed format: aaaassttt
   enum { max_slots = 16 };
@@ -83,24 +63,23 @@ private:
   unsigned char use_vbo;
   unsigned char num_slots;
 
-  chars<allocator> geometry_name;
-  chars<allocator> component_name;
-
   // optional skin
-  ptr<skin> skin_;
+  ref<skin> skin_;
 
   mesh_state(mesh_state &rhs);
 
 public:
-  mesh_state() {
-    init();
+  RESOURCE_META(mesh_state)
+
+  mesh_state(skin *_skin=0) {
+    init(_skin);
   }
 
   ~mesh_state() {
     release();
   }
 
-  void init(const char *geometry_name="", const char *component_name="", skin *_skin=0) {
+  void init(skin *_skin=0) {
     memset(format, 0, sizeof(format));
 
     num_indices = 0;
@@ -113,9 +92,6 @@ public:
     num_slots = 0;
     index_type = GL_UNSIGNED_SHORT;
     mode = GL_TRIANGLES;
-
-    this->geometry_name = geometry_name;
-    this->component_name = component_name;
 
     skin_ = _skin;
   }
@@ -139,6 +115,8 @@ public:
 
   // eg. add_attribute(attribute_pos, 3, GL_FLOAT)
   unsigned add_attribute(unsigned attr, unsigned size, unsigned kind, unsigned offset) {
+    printf("aa %d\n", num_slots);
+    assert(num_slots < max_slots);
     format[num_slots] = (offset << 9) + (attr << 5) + ((size-1) << 3) + (kind - GL_BYTE);
     return num_slots++;
   }
@@ -193,8 +171,8 @@ public:
   }
 
   // get the optional skin data
-  skin *get_skin() const {
-    return (skin*)skin_;
+  const skin *get_skin() const {
+    return (const skin*)skin_;
   }
 
   // set the optional skin
@@ -242,16 +220,6 @@ public:
     return vec4(0, 0, 0, 0);
   }
 
-  // get name of geometry for debugging and scene management
-  const char *get_geometry_name() {
-    return geometry_name.c_str();
-  }
-
-  // get name of geometry component for debugging and scene management
-  const char *get_component_name() {
-    return component_name.c_str();
-  }
-
   void set_value(unsigned slot, unsigned index, vec4 value) {
     if (!use_vbo && get_kind(slot) == GL_FLOAT) {
       float *src = (float*)(vertices.ptr + stride * index + get_offset(slot));
@@ -275,7 +243,7 @@ public:
     return 0;
   }
 
-  void begin_render(unsigned char **base, unsigned char **index_base) {
+  void begin_render(unsigned char **base, unsigned char **index_base) const {
     if (use_vbo) {
       glBindBuffer(GL_ARRAY_BUFFER, vertices.buffer);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices.buffer);
@@ -363,7 +331,7 @@ public:
 
   // render a mesh with OpenGL
   // assume the shader, uniforms and render params are already set up.
-  void render() {
+  void render() const {
     unsigned char *base = 0;
     unsigned char *index_base = 0;
     begin_render(&base, &index_base);

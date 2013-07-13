@@ -18,6 +18,8 @@ class bump_material : public material {
   float shininess;
 
 public:
+  RESOURCE_META(bump_material)
+
   // default constructor makes a blank material.
   bump_material() {
     diffuse = 0;
@@ -41,14 +43,14 @@ public:
   void make_color(const vec4 &color, bool bumpy, bool shiny) {
     char name[16];
     sprintf(name, "#%02x%02x%02x%02x", (int)(color[0]*255.0f+0.5f), (int)(color[1]*255.0f+0.5f), (int)(color[2]*255.0f+0.5f), (int)(color[3]*255.0f+0.5f));
-    diffuse = ambient = resource_manager::get_texture_handle(GL_RGBA, name);
-    emission = resource_manager::get_texture_handle(GL_RGBA, "#00000000");
-    specular = resource_manager::get_texture_handle(GL_RGBA, shiny ? "#80808000" : "#00000000");
-    bump = resource_manager::get_texture_handle(GL_RGBA, bumpy ? "!bump" : "#0000ff00");
+    diffuse = ambient = resources::get_texture_handle(GL_RGBA, name);
+    emission = resources::get_texture_handle(GL_RGBA, "#00000000");
+    specular = resources::get_texture_handle(GL_RGBA, shiny ? "#80808000" : "#00000000");
+    bump = resources::get_texture_handle(GL_RGBA, bumpy ? "!bump" : "#0000ff00");
     shininess = 30.0f;
   }
 
-  void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, vec4 *lights) {
+  void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, vec4 *lights) const {
     // todo: pass lights directly to shader
     //vec4 &position = lights[0];
     vec4 &light_direction = lights[1];
@@ -71,7 +73,7 @@ public:
     glActiveTexture(GL_TEXTURE0);
   }
 
-  void render_skinned(bump_shader &shader, const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_nodes, vec4 *lights) {
+  void render_skinned(bump_shader &shader, const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_nodes, vec4 *lights) const {
     // todo: pass lights directly to shader
     //vec4 &position = lights[0];
     vec4 &light_direction = lights[1];

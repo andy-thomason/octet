@@ -76,8 +76,8 @@ public:
     // attribute_pos (=0) is position of each corner
     // each corner has 3 floats (x, y, z)
     // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
-    glEnableVertexAttribArray(mesh_state::attribute_pos);
+    glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
+    glEnableVertexAttribArray(attribute_pos);
     
     // this is an array of the positions of the corners of the texture in 2D
     static const float uvs[] = {
@@ -90,8 +90,8 @@ public:
     // attribute_uv is position in the texture of each corner
     // each corner (vertex) has 2 floats (x, y)
     // there is no gap between the 2 floats and hence the stride is 2*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
-    glEnableVertexAttribArray(mesh_state::attribute_uv);
+    glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
+    glEnableVertexAttribArray(attribute_uv);
     
     // finally, draw the sprite (4 vertices)
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -378,13 +378,13 @@ public:
     cameraToWorld.loadIdentity();
     cameraToWorld.translate(0, 0, 3);
 
-    GLuint ship = resource_manager::get_texture_handle(GL_RGBA, "assets/invaderers/ship.gif");
+    GLuint ship = resources::get_texture_handle(GL_RGBA, "assets/invaderers/ship.gif");
     sprites[ship_sprite].init(ship, 0, -2.75f, 0.25f, 0.25f);
 
-    GLuint GameOver = resource_manager::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
+    GLuint GameOver = resources::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
     sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
 
-    GLuint invaderer = resource_manager::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
+    GLuint invaderer = resources::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
     for (int j = 0; j != num_rows; ++j) {
       for (int i = 0; i != num_cols; ++i) {
         assert(first_invaderer_sprite + i + j*num_cols <= last_invaderer_sprite);
@@ -395,14 +395,14 @@ public:
     }
 
     // set the border to white for clarity
-    GLuint white = resource_manager::get_texture_handle(GL_RGB, "#ffffff");
+    GLuint white = resources::get_texture_handle(GL_RGB, "#ffffff");
     sprites[first_border_sprite+0].init(white, 0, -3, 6, 0.2f);
     sprites[first_border_sprite+1].init(white, 0,  3, 6, 0.2f);
     sprites[first_border_sprite+2].init(white, -3, 0, 0.2f, 6);
     sprites[first_border_sprite+3].init(white, 3,  0, 0.2f, 6);
 
     // use the missile texture
-    GLuint missile = resource_manager::get_texture_handle(GL_RGBA, "assets/invaderers/missile.gif");
+    GLuint missile = resources::get_texture_handle(GL_RGBA, "assets/invaderers/missile.gif");
     for (int i = 0; i != num_missiles; ++i) {
       // create missiles off-screen
       sprites[first_missile_sprite+i].init(missile, 20, 0, 0.0625f, 0.25f);
@@ -410,7 +410,7 @@ public:
     }
 
     // use the bomb texture
-    GLuint bomb = resource_manager::get_texture_handle(GL_RGBA, "assets/invaderers/bomb.gif");
+    GLuint bomb = resources::get_texture_handle(GL_RGBA, "assets/invaderers/bomb.gif");
     for (int i = 0; i != num_bombs; ++i) {
       // create bombs off-screen
       sprites[first_bomb_sprite+i].init(bomb, 20, 0, 0.0625f, 0.25f);
@@ -418,8 +418,8 @@ public:
     }
 
     // sounds
-    whoosh = resource_manager::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
-    bang = resource_manager::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
+    whoosh = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
+    bang = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
     cur_source = 0;
     alGenSources(num_sound_sources, sources);
 

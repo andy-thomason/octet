@@ -135,9 +135,6 @@
     <ClInclude Include="..\src\resources\gif_decoder.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\resource_manager.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\math\random.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -183,19 +180,42 @@
     <ClInclude Include="..\src\resources\scene.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\camera.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\resources\resource.h">
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\containers\ref.h">
       <Filter>containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\resources\animation.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\animation_instance.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\mesh_instance.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\resources.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\skeleton.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\skin.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\camera_instance.h">
+      <Filter>resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp">
       <Filter>examples</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\resources\material.inl">
+      <Filter>resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

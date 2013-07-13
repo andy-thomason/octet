@@ -51,6 +51,8 @@ class raytrace_app : public app {
   // texture for our frame buffer
   GLuint texture_handle_;
 
+  // container for resources
+  resources dict;
 public:
 
   // this is called when we construct the class
@@ -76,11 +78,11 @@ public:
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    //texture_handle_ = resource_manager::get_texture_handle(GL_RGB, "assets/duckCM.gif");
+    //texture_handle_ = resources::get_texture_handle(GL_RGB, "assets/duckCM.gif");
 
     collada_builder builder;
     builder.load("assets/duck_triangulate.dae");
-    duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib");
+    duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
 
     mat4t mat;
     mat.loadIdentity();
@@ -93,12 +95,12 @@ public:
     shrink.loadIdentity();
     shrink.translate(0, -50, 0);
     shrink.scale(0.03f, 0.03f, 0.03f);
-    duck_mesh.transform(mesh_state::attribute_pos, shrink);
+    duck_mesh.transform(attribute_pos, shrink);
 
-    GLuint diffuse = resource_manager::get_texture_handle(GL_RGB, "assets/duckCM.gif");
-    GLuint emission = resource_manager::get_texture_handle(GL_RGB, "#000000");
-    GLuint specular = resource_manager::get_texture_handle(GL_RGB, "#ffffff");
-    GLuint bump = resource_manager::get_texture_handle(GL_RGB, "#0000ff");
+    GLuint diffuse = resources::get_texture_handle(GL_RGB, "assets/duckCM.gif");
+    GLuint emission = resources::get_texture_handle(GL_RGB, "#000000");
+    GLuint specular = resources::get_texture_handle(GL_RGB, "#ffffff");
+    GLuint bump = resources::get_texture_handle(GL_RGB, "#0000ff");
 
     duck_material.init(diffuse, diffuse, emission, specular, bump, 30.0f);
 
@@ -157,8 +159,8 @@ public:
     // attribute_pos (=0) is position of each corner
     // each corner has 3 floats (x, y, z)
     // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
-    glEnableVertexAttribArray(mesh_state::attribute_pos);
+    glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
+    glEnableVertexAttribArray(attribute_pos);
     
     // this is an array of the positions of the corners of the texture in 2D
     static const float uvs[] = {
@@ -171,8 +173,8 @@ public:
     // attribute_uv is position in the texture of each corner
     // each corner (vertex) has 2 floats (x, y)
     // there is no gap between the 2 floats and hence the stride is 2*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
-    glEnableVertexAttribArray(mesh_state::attribute_uv);
+    glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
+    glEnableVertexAttribArray(attribute_uv);
     
     // finally, draw the texture (3 vertices)
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

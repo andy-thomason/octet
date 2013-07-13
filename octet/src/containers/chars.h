@@ -31,6 +31,18 @@ public:
 
   ~chars() { release(); }
 
+  chars &format(const char *fmt, ...) {
+    release();
+    va_list v;
+    va_start(v, fmt);
+    int len = _vscprintf(fmt, v);
+    if (len) {
+      data_ = (char*)allocator_t::malloc(len+1);
+      vsprintf_s(data_, len+1, fmt, v);
+    }
+    return *this;
+  }
+
   chars &operator=(const char *value) {
     release();
     if (value) {

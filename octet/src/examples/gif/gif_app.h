@@ -47,7 +47,7 @@ public:
     cameraToWorld.translate(0, 0, 3);
 
     // use helper function to generate an OpenGL texture
-    texture_handle_ = resource_manager::get_texture_handle(GL_RGBA, "assets/stars.gif");
+    texture_handle_ = resources::get_texture_handle(GL_RGBA, "assets/stars.gif");
   }
 
   // this is called to draw the world
@@ -89,8 +89,8 @@ public:
     // attribute_pos (=0) is position of each corner
     // each corner has 3 floats (x, y, z)
     // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
-    glEnableVertexAttribArray(mesh_state::attribute_pos);
+    glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
+    glEnableVertexAttribArray(attribute_pos);
     
     // this is an array of the positions of the corners of the texture in 2D
     static const float uvs[] = {
@@ -103,8 +103,8 @@ public:
     // attribute_uv is position in the texture of each corner
     // each corner (vertex) has 2 floats (x, y)
     // there is no gap between the 2 floats and hence the stride is 2*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
-    glEnableVertexAttribArray(mesh_state::attribute_uv);
+    glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)uvs );
+    glEnableVertexAttribArray(attribute_uv);
     
     // finally, draw the texture (3 vertices)
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

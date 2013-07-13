@@ -7,7 +7,8 @@
 // self deleting "smart" pointer
 //
 
-// This is a "smart" pointer class
+// This is a non-sharing "smart" pointer class
+//
 // If you have to use "new" you can use it to guarantee a "delete" when
 // the smart pointer goes out of scope or is deleted.
 //

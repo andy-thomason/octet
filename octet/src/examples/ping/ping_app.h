@@ -59,8 +59,8 @@ public:
     // attribute_pos (=0) is position of each corner
     // each corner has 3 floats (x, y, z)
     // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-    glVertexAttribPointer(mesh_state::attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
-    glEnableVertexAttribArray(mesh_state::attribute_pos);
+    glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
+    glEnableVertexAttribArray(attribute_pos);
     
     // finally, draw the box (4 vertices)
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

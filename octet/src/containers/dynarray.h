@@ -76,11 +76,11 @@ public:
     void operator--() { elem--; }
   };
 
-  iterator begin() {
+  iterator begin() const {
     return iterator(this, 0);
   }
 
-  iterator end() {
+  iterator end() const {
     return iterator(this, size_);
   }
   
@@ -108,22 +108,22 @@ public:
     data_[old_length] = new_item;
   }
 
-  item_t &back() {
+  item_t &back() const {
     return data_[size_-1];
   }
 
-  bool is_empty() {
+  bool is_empty() const {
     return size_ == 0;
   }
   
   item_t &operator[](int_size_t elem) { return data_[elem]; }
   const item_t &operator[](int_size_t elem) const { return data_[elem]; }
   
-  int_size_t size() { return size_; }
+  int_size_t size() const { return size_; }
 
-  int_size_t capacity() { return capacity_; }
+  int_size_t capacity() const { return capacity_; }
 
-  void *data() { return data_; }
+  void *data() const { return data_; }
   
   void resize(int_size_t new_length) {
     bool trace = false; // hack this for detailed traces
@@ -164,7 +164,7 @@ public:
         }
       }
       size_ = new_length;
-      if (size_ == 0) reset();
+      //if (size_ == 0) reset();
     }
   }
 

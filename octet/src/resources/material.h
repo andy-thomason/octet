@@ -21,6 +21,8 @@ class material : public resource {
   };
 
 public:
+  RESOURCE_META(material)
+
   // default constructor makes a blank material.
   material() {
     diffuse = 0;

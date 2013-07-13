@@ -56,9 +56,9 @@ public:
     //cube_mesh.make_cone();
     //cube_mesh.make_sphere();
 
-    diffuse = ambient = resource_manager::get_texture_handle(GL_RGB, "!bricks");
-    emission = resource_manager::get_texture_handle(GL_RGB, "#000000");
-    specular = resource_manager::get_texture_handle(GL_RGB, "#ffffff");
+    diffuse = ambient = resources::get_texture_handle(GL_RGB, "!bricks");
+    emission = resources::get_texture_handle(GL_RGB, "#000000");
+    specular = resources::get_texture_handle(GL_RGB, "#ffffff");
   }
 
   // this is called to draw the world

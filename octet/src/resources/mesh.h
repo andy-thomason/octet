@@ -66,8 +66,8 @@ public:
     b.get_mesh_state(*this);
   }
 
-  void make_collada_mesh(collada_builder &builder, const char *id) {
-    builder.get_mesh_state(*this, id);
+  void make_collada_mesh(collada_builder &builder, const char *id, resources &dict) {
+    builder.get_mesh_state(*this, id, dict);
   }
 
   // make a bunch of lines to show normals.
@@ -78,7 +78,7 @@ public:
     
     builder.init(source.get_num_vertices()*2, source.get_num_vertices()*2);
 
-    unsigned pos_slot = source.get_slot(mesh_state::attribute_pos);
+    unsigned pos_slot = source.get_slot(attribute_pos);
     unsigned normal_slot = source.get_slot(normal_attr);
     for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
       vec4 pos = source.get_value(pos_slot, i);
@@ -105,8 +105,8 @@ public:
 
     // add tangent and bitangent
     unsigned stride = source.get_stride();
-    unsigned tangent_slot = add_attribute(mesh_state::attribute_tangent, 3, GL_FLOAT, stride);
-    unsigned bitangent_slot = add_attribute(mesh_state::attribute_bitangent, 3, GL_FLOAT, stride + 12);
+    unsigned tangent_slot = add_attribute(attribute_tangent, 3, GL_FLOAT, stride);
+    unsigned bitangent_slot = add_attribute(attribute_bitangent, 3, GL_FLOAT, stride + 12);
 
     unsigned vsize = (stride + 24) * source.get_num_vertices();
     unsigned isize = mesh_state::kind_size(get_index_type()) * source.get_num_indices();
@@ -114,9 +114,9 @@ public:
     set_params(stride + 24, source.get_num_indices(), source.get_num_vertices(), source.get_mode(), source.get_index_type());
     copy_indices(source);
 
-    unsigned pos_slot = source.get_slot(mesh_state::attribute_pos);
-    unsigned uv_slot = source.get_slot(mesh_state::attribute_uv);
-    //unsigned normal_slot = source.get_slot(mesh_state::attribute_normal);
+    unsigned pos_slot = source.get_slot(attribute_pos);
+    unsigned uv_slot = source.get_slot(attribute_uv);
+    //unsigned normal_slot = source.get_slot(attribute_normal);
 
     for (unsigned slot = 0; slot != source.get_num_slots(); ++slot) {
       for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
@@ -220,7 +220,7 @@ public:
   bool ray_cast(const vec4 &org, const vec4 &dir, int indices[], vec4 &bary) {
     //static FILE *file = fopen("c:/tmp/3.txt","w");
     //fprintf(file, "org=%s dir=%s\n", org.toString(), dir.toString());
-    unsigned pos_slot = get_slot(mesh_state::attribute_pos);
+    unsigned pos_slot = get_slot(attribute_pos);
     for (unsigned i = 0; i != get_num_indices(); i += 3) {
       unsigned idx[3] = {
         get_index(i),
@@ -273,7 +273,7 @@ public:
 
   // get the axis aligned bounding box (ie. the min and max of x, y, z)
   void get_aabb(const mat4t &modelToWorld, vec4 &min, vec4 &max) {
-    unsigned pos_slot = get_slot(mesh_state::attribute_pos);
+    unsigned pos_slot = get_slot(attribute_pos);
 
     {
       vec4 v = get_value(pos_slot, 0) * modelToWorld;
@@ -289,7 +289,7 @@ public:
   }
 
   /*template <class T > void get_triangles(const mat4t &modelToWorld, int max_depth, T &out) {
-    unsigned pos_slot = get_slot(mesh_state::attribute_pos);
+    unsigned pos_slot = get_slot(attribute_pos);
 
     for (unsigned i = 0; i != get_num_indices(); i += 3) {
       unsigned idx[3] = {

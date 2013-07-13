@@ -198,9 +198,9 @@ public:
     s.assign(vsize, isize, (unsigned char*)&vertices[0], (unsigned char*)&indices[0]);
     s.set_params(sizeof(vertex), indices.size(), vertices.size(), GL_TRIANGLES, GL_UNSIGNED_SHORT);
 
-    s.add_attribute(mesh_state::attribute_pos, 3, GL_FLOAT, 0);
-    s.add_attribute(mesh_state::attribute_normal, 3, GL_FLOAT, 12);
-    s.add_attribute(mesh_state::attribute_uv, 2, GL_FLOAT, 24);
+    s.add_attribute(attribute_pos, 3, GL_FLOAT, 0);
+    s.add_attribute(attribute_normal, 3, GL_FLOAT, 12);
+    s.add_attribute(attribute_uv, 2, GL_FLOAT, 24);
   }
 
   void scale(float x, float y, float z) {

@@ -4,7 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// "smart" pointer for reference counting classes
+// Sharing "smart" pointer for reference counting classes
 //
 // These should only be used in long-lived containers, never on the stack.
 //
@@ -19,20 +19,29 @@ public:
     item = 0;
   }
 
-  ref(const ref &rhs) {
+  ref(ref &rhs) {
     item = rhs.item;
-    item->add_ref();
+    if (item) item->add_ref();
   }
 
   // initialize with new item - pointer then "owns" object
   ref(item_t *new_item) {
-    new_item->add_ref();
+    if (new_item) new_item->add_ref();
     item = new_item;
   }
 
   // replace item with new one - frees any old object
+  const ref &operator=(const ref &rhs) {
+    item_t *new_item = rhs.item;
+    if (new_item) new_item->add_ref();
+    if (item) item->release();
+    item = new_item;
+    return rhs;
+  }
+
+  // replace item with new one - frees any old object
   item_t *operator=(item_t *new_item) {
-    new_item->add_ref();
+    if (new_item) new_item->add_ref();
     if (item) item->release();
     item = new_item;
     return new_item;

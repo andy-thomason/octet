@@ -61,30 +61,55 @@
 #include "../resources/tinyxml/tinyxmlerror.cpp"
 #include "../resources/tinyxml/tinyxmlparser.cpp"
 
-#include "../resources/resource.h"
-#include "../resources/mesh_state.h"
-#include "../resources/material.h"
-#include "../resources/lighting.h"
-#include "../resources/camera.h"
-#include "../resources/animation.h"
+// standard attribute names
+enum attribute {
+  attribute_position = 0,
+  attribute_pos = 0,
+  attribute_blendweight = 1,
+  attribute_normal = 2,
+  attribute_diffuse = 3,
+  attribute_color = 3,
+  attribute_specular = 4,
+  attribute_tessfactor = 5,
+  attribute_fogcoord = 5,
+  attribute_psize = 6,
+  attribute_blendindices = 7,
+  attribute_texcoord = 8,
+  attribute_uv = 8,
+  attribute_tangent = 14,
+  attribute_bitangent = 15,
+  attribute_binormal = 15,
+};
 
+#include "../resources/app_utils.h"
+#include "../resources/resource.h"
+#include "../resources/resources.h"
 #include "../shaders/shader.h"
 #include "../shaders/color_shader.h"
 #include "../shaders/texture_shader.h"
 #include "../shaders/phong_shader.h"
 #include "../shaders/bump_shader.h"
+#include "../resources/skin.h"
+#include "../resources/skeleton.h"
+#include "../resources/mesh_state.h"
+#include "../resources/material.h"
+#include "../resources/bump_material.h"
+#include "../resources/lighting.h"
+#include "../resources/animation.h"
+#include "../resources/camera_instance.h"
+#include "../resources/light_instance.h"
+#include "../resources/mesh_instance.h"
+#include "../resources/animation_instance.h"
+#include "../resources/scene.h"
 
-#include "../resources/app_utils.h"
 #include "../resources/gif_decoder.h"
 #include "../resources/mesh_builder.h"
-#include "../resources/resource_manager.h"
-#include "../resources/bump_material.h"
 #include "../resources/collada_builder.h"
-#include "../resources/scene.h"
 #include "../resources/mesh.h"
 
 // forward references
 #include "../resources/material.inl"
+#include "../resources/resources.inl"
 
 #include "../physics/physics.h"
 

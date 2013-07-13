@@ -7,7 +7,7 @@
 // Scene camera
 //
 
-class camera : public resource {
+class camera_instance : public resource {
   // camera parameters
   int node_;
   bool is_ortho;
@@ -25,7 +25,9 @@ class camera : public resource {
   mat4t cameraToProjection;
 
 public:
-  camera() {
+  RESOURCE_META(camera_instance)
+
+  camera_instance() {
   }
 
   // call this once to set up the camera
@@ -40,6 +42,7 @@ public:
     node_ = node;
   }
 
+  // set the parameters as in the collada perspective element
   void set_perspective(int node_index, float xfov, float yfov, float aspect_ratio, float n, float f)
   {
     float xscale = 0.5f;
@@ -79,7 +82,7 @@ public:
   }
 
   // call this many times to build matrices for uniforms.
-  void get_matrices(mat4t &modelToProjection, mat4t &modelToCamera, const mat4t &modelToWorld)
+  void get_matrices(mat4t &modelToProjection, mat4t &modelToCamera, const mat4t &modelToWorld) const
   {
     // model -> world -> camera
     modelToCamera = modelToWorld * worldToCamera;
@@ -89,13 +92,13 @@ public:
   }
 
   // call this many times to build matrices for uniforms.
-  const mat4t &get_cameraToProjection()
+  const mat4t &get_cameraToProjection() const
   {
     return cameraToProjection;
   }
 
   // use this to get the camera from the scene
-  int node() {
+  int node() const {
     return node_;
   }
 };

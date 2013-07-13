@@ -9,12 +9,25 @@
 
 typedef int atom_t;
 
+class skin;
+class skeleton;
+class mesh_state;
+class material;
+class bump_material;
+class animation;
+class camera_instance;
+class light_instance;
+class mesh_instance;
+class animation_instance;
+class scene;
+
+#define RESOURCE_META(classname) classname *get_##classname() { return this; }
+
 class resource {
-  atom_t name;
   int ref_count;
+
 public:
   resource() {
-    name = 0;
     ref_count = 0;
   }
 
@@ -23,30 +36,22 @@ public:
   }
 
   void release() {
-    if (--ref_count) {
+    if (--ref_count == 0) {
       delete this;
     }
   }
 
-  void set_name(atom_t value) {
-    name = value;
-  }
+  virtual skin *get_skin() { return 0; }
+  virtual skeleton *get_skeleton() { return 0; }
+  virtual mesh_state *get_mesh_state() { return 0; }
+  virtual material *get_material() { return 0; }
+  virtual bump_material *get_bump_material() { return 0; }
+  virtual animation *get_animation() { return 0; }
+  virtual camera_instance *get_camera_instance() { return 0; }
+  virtual light_instance *get_light_instance() { return 0; }
+  virtual mesh_instance *get_mesh_instance() { return 0; }
+  virtual animation_instance *get_animation_instance() { return 0; }
+  virtual scene *get_scene() { return 0; }
 
-  atom_t get_name() {
-    return name;
-  }
-
-  // get a unique int for a string.
-  static atom_t atom(const char *name) {
-    static dictionary<int> *dict;
-    static atom_t num_atoms = 1;
-    // avoid C++ static thread lock
-    if (!dict) dict = new dictionary<int>();
-    if (dict->contains(name)) {
-      return (*dict)[name];
-    } else {
-      return (*dict)[name] = num_atoms++;
-    }
-  }
 };
 

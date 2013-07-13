@@ -23,24 +23,30 @@ class allocator {
 public:
   // todo: implement this from scratch using a pool allocator
   static void *malloc(size_t size) {
-    //printf("malloc -> %d\n", state().num_bytes);
     state().num_bytes += size;
-    return ::malloc(size);
+    void *res = ::malloc(size);
+    //printf("malloc %p[%d] -> %d\n", res, size, state().num_bytes);
+    return res;
   }
 
   static void free(void *ptr, size_t size) {
     state().num_bytes -= size;
-    //printf("free -> %d\n", state().num_bytes);
+    //printf("free %p[%d] -> %d\n", ptr, size, state().num_bytes);
     return ::free(ptr);
   }
 
   static void *realloc(void *ptr, size_t old_size, size_t size) {
-    return ::realloc(ptr, size);
+    state().num_bytes += size - old_size;
+    void *res = ::realloc(ptr, size);
+    //printf("realloc %p[%d] -> %p[%d] %d\n", ptr, old_size, res, size, state().num_bytes);
+    return res;
   }
 
-  static allocator& instance() {
-    static allocator instance_;
-    return instance_;
+  // crude check of stack integrity
+  static void test(const char *label) {
+    printf("test %s\n", label);
+    ::free(::malloc(8192));
+    ::free(::malloc(32));
   }
 };
 

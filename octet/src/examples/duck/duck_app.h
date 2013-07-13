@@ -40,6 +40,9 @@ class duck_app : public app {
   GLuint ambient;
   GLuint emission;
   GLuint specular;
+
+  // container for resources
+  resources dict;
 public:
 
   // this is called when we construct the class
@@ -58,21 +61,21 @@ public:
 
     collada_builder builder;
     builder.load("assets/duck_triangulate.dae");
-    duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib");
+    duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
 
     // the original duck is a bit too big, shrink it with a matrix
     mat4t shrink;
     shrink.loadIdentity();
     shrink.translate(0, -50, 0);
     shrink.scale(0.03f, 0.03f, 0.03f);
-    duck_mesh.transform(mesh_state::attribute_pos, shrink);
+    duck_mesh.transform(attribute_pos, shrink);
 
     //duck_normals.make_normal_visualizer(duck_mesh, 0.1f);
 
-    diffuse = ambient = resource_manager::get_texture_handle(GL_RGB, "assets/duckCM.gif");
-    //diffuse = ambient = resource_manager::get_texture_handle(GL_RGB, "!bump");
-    emission = resource_manager::get_texture_handle(GL_RGB, "#000000");
-    specular = resource_manager::get_texture_handle(GL_RGB, "#ffffff");
+    diffuse = ambient = resources::get_texture_handle(GL_RGB, "assets/duckCM.gif");
+    //diffuse = ambient = resources::get_texture_handle(GL_RGB, "!bump");
+    emission = resources::get_texture_handle(GL_RGB, "#000000");
+    specular = resources::get_texture_handle(GL_RGB, "#ffffff");
   }
 
   // this is called to draw the world

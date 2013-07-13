@@ -15,13 +15,13 @@
 //
 
 class animation_app : public app {
-  scene app_scene;
+  ref<scene> app_scene;
+  resources dict;
 
   // shader to draw a shaded, textured triangle
   bump_shader object_shader;
   bump_shader skin_shader;
 
-  int time;
 public:
 
   // this is called when we construct the class
@@ -37,12 +37,11 @@ public:
     collada_builder builder;
     builder.load("assets/skinning/skin_unrot.dae");
 
-    const char *def_scene = builder.get_default_scene();
-    app_scene.make_collada_scene(builder, def_scene);
+    builder.get_resources(dict);
+    app_scene = dict.get_scene(builder.get_default_scene());
 
-    app_scene.play_all_animations();
-
-    time = 0;
+    animation *anim = dict.get_animation("Armature_radius_pose_matrix");
+    app_scene->play(anim, app_scene->get_node_index("Armature"), true);
   }
 
   // this is called to draw the world
@@ -57,16 +56,17 @@ public:
     // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
     glEnable(GL_DEPTH_TEST);
 
-    if (app_scene.num_cameras() == 0) {
+    if (app_scene->num_camera_instances() == 0) {
       return;
     }
 
     mat4t cameraToWorld;
-    camera *cam = app_scene.get_camera(0);
+    camera_instance *cam = app_scene->get_camera_instance(0);
 
-    app_scene.update(time);
+    // update matrices. assume 30 fps.
+    app_scene->update(1.0f/30);
 
-    app_scene.render(object_shader, skin_shader, *cam);
+    app_scene->render(object_shader, skin_shader, *cam);
 
     //app_scene.node_to_parent(5).rotateX(1);
   }

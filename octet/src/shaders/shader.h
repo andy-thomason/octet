@@ -42,14 +42,14 @@ public:
     glAttachShader(program, fragment_shader);
 
     // standardize the attribute slots    
-    glBindAttribLocation(program, mesh_state::attribute_pos, "pos");
-    glBindAttribLocation(program, mesh_state::attribute_normal, "normal");
-    glBindAttribLocation(program, mesh_state::attribute_tangent, "tangent");
-    glBindAttribLocation(program, mesh_state::attribute_bitangent, "bitangent");
-    glBindAttribLocation(program, mesh_state::attribute_blendweight, "blendweight");
-    glBindAttribLocation(program, mesh_state::attribute_blendindices, "blendindices");
-    glBindAttribLocation(program, mesh_state::attribute_color, "color");
-    glBindAttribLocation(program, mesh_state::attribute_uv, "uv");
+    glBindAttribLocation(program, attribute_pos, "pos");
+    glBindAttribLocation(program, attribute_normal, "normal");
+    glBindAttribLocation(program, attribute_tangent, "tangent");
+    glBindAttribLocation(program, attribute_bitangent, "bitangent");
+    glBindAttribLocation(program, attribute_blendweight, "blendweight");
+    glBindAttribLocation(program, attribute_blendindices, "blendindices");
+    glBindAttribLocation(program, attribute_color, "color");
+    glBindAttribLocation(program, attribute_uv, "uv");
     glLinkProgram(program);
     program_ = program;
     glGetProgramInfoLog(program, sizeof(buf), &length, buf);

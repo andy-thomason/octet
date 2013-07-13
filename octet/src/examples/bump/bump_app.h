@@ -57,12 +57,12 @@ public:
     mesh tmp;
     tmp.make_sphere(2, 64, 64);
     cube_mesh.add_3d_normals(tmp);
-    //cube_mesh_normals.make_normal_visualizer(cube_mesh, 0.1f, mesh_state::attribute_bitangent);
+    //cube_mesh_normals.make_normal_visualizer(cube_mesh, 0.1f, attribute_bitangent);
 
-    diffuse = ambient = resource_manager::get_texture_handle(GL_RGB, "!bricks");
-    emission = resource_manager::get_texture_handle(GL_RGB, "#000000");
-    specular = resource_manager::get_texture_handle(GL_RGB, "#ffffff");
-    bump = resource_manager::get_texture_handle(GL_RGB, "!bump");
+    diffuse = ambient = resources::get_texture_handle(GL_RGB, "!bricks");
+    emission = resources::get_texture_handle(GL_RGB, "#000000");
+    specular = resources::get_texture_handle(GL_RGB, "#ffffff");
+    bump = resources::get_texture_handle(GL_RGB, "!bump");
   }
 
   // this is called to draw the world
