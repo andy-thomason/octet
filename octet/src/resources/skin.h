@@ -11,7 +11,7 @@ class skin : public resource {
   // the original transform of the skin to world space (bind space)
   mat4t modelToBind;
 
-  // for each node, map from world space (bind space) to model space
+  // for each scene_node, map from world space (bind space) to model space
   dynarray<mat4t> bindToModel;
 
   // a name for each joint (sid)

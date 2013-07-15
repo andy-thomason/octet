@@ -7,9 +7,9 @@
 // raw 3D mesh container
 //
 
-class mesh_instance : public resource {
-  // which node (model to world matrix) to use in the scene
-  int node;
+class mesh_instance : public resource, public animation_target {
+  // which scene_node (model to world matrix) to use in the scene
+  ref<scene_node> node_;
 
   // which mesh to render
   ref<mesh_state> mesh;
@@ -26,18 +26,33 @@ class mesh_instance : public resource {
 public:
   RESOURCE_META(mesh_instance)
 
-  mesh_instance(int node, mesh_state *mesh, bump_material *mat, skin *skn=0, skeleton *skel=0) {
-    this->node = node;
+  mesh_instance(scene_node *node_, mesh_state *mesh, bump_material *mat, skin *skn=0, skeleton *skel=0) {
+    this->node_ = node_;
     this->mesh = mesh;
     this->mat = mat;
     this->skn = skn;
     this->skel = skel;
   }
 
-  int get_node() const { return node; }
-  const mesh_state *get_mesh() const { return mesh; }
-  const bump_material *get_material() const { return mat; }
-  const skin *get_skin() const { return skn; }
-  const skeleton *get_skeleton() const { return skel; }
+  //////////////////////////////
+  //
+  // animation_target
+
+  void add_ref() {
+    resource::add_ref();
+  }
+
+  void release() {
+    resource::release();
+  }
+
+  void set_value(atom_t sid, float *value) {
+  }
+
+  scene_node *get_node() const { return node_; }
+  mesh_state *get_mesh() const { return mesh; }
+  bump_material *get_material() const { return mat; }
+  skin *get_skin() const { return skn; }
+  skeleton *get_skeleton() const { return skel; }
 };
 

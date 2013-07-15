@@ -7,31 +7,13 @@
 // Scene Node heirachy
 //
 
-class scene : public resource {
-  ///////////////////////////////////////////
-  //
-  // node heirachy
-  //
-
-  // array of relative transforms (indexed by node index)
-  dynarray<mat4t> modelToParent;
-
-  // a sid is a local name for a node which may be repeated (indexed by node index)
-  // eg. the bones for multiple skeletons
-  dynarray<atom_t> sids;
-
-  // every node has a parent node except the roots with -1 (indexed by node index)
-  dynarray<int> parentNodes;
-
-  // convert a string to a node index
-  dictionary<int> nodeNamesToNodes;
-
+class scene : public scene_node {
   ///////////////////////////////////////////
   //
   // rendering information
   //
 
-  // each of these is a set of (node, mesh, material)
+  // each of these is a set of (scene_node, mesh, material)
   dynarray<ref<mesh_instance>> mesh_instances;
 
   // animations playing at the moment
@@ -59,54 +41,40 @@ class scene : public resource {
   }*/
 
   void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
-    mat4t cameraToWorld = calcModelToWorld(cam.node());
+    mat4t cameraToWorld = cam.get_node()->calcModelToWorld();
 
     mat4t worldToCamera;
     cameraToWorld.invertQuick(worldToCamera);
     lighting_set.compute(worldToCamera);
     cam.set_cameraToWorld(cameraToWorld);
+    mat4t cameraToProjection = cam.get_cameraToProjection();
 
     for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
       mesh_instance *mi = mesh_instances[mesh_index];
-      const mesh_state *mesh = mi->get_mesh();
-      const skin *skn = mi->get_skin();
-      const skeleton *skel = mi->get_skeleton();
-      const bump_material *mat = mi->get_material();
+      mesh_state *mesh = mi->get_mesh();
+      skin *skn = mi->get_skin();
+      skeleton *skel = mi->get_skeleton();
+      bump_material *mat = mi->get_material();
 
       /*if (frame_number == 1) {
         printf("!! %d %s\n", i, modelToWorld.toString());
       }*/
 
+      mat4t modelToWorld = mi->get_node()->calcModelToWorld();
+      mat4t modelToCamera;
+      mat4t modelToProjection;
+      cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
+
       if (!skel || !skn) {
         // normal rendering for single matrix objects
         // build a projection matrix: model -> world -> camera_instance -> projection
         // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-        mat4t modelToWorld = calcModelToWorld(mi->get_node());
-        mat4t modelToCamera;
-        mat4t modelToProjection;
-        cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
         mat->render(object_shader, modelToProjection, modelToCamera, lighting_set.data());
       } else {
-        // multi-matrix rendering for characters
-        mat4t modelToCamera[32];
-        mat4t modelToProjection;
-        mat4t cameraToProjection = cam.get_cameraToProjection();
+        // multi-matrix rendering
+        mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
         int num_bones = skel->get_num_bones();
-        num_bones = num_bones < 32 ? num_bones : 32;
-        for (int bi = 0; bi != num_bones; ++bi) {
-          int src_node = skel->get_bone(bi);
-          mat4t modelToWorld = calcModelToWorld(src_node);
-          mat4t bindToModel = skn->get_bindToModel(bi);
-          mat4t meshToBind = skn->get_modelToBind();
-          modelToCamera[bi] = meshToBind * bindToModel * modelToWorld * worldToCamera;
-          if (frame_number == 1) {
-            const char *name = node_name(src_node);
-            mat4t z = bindToModel * modelToWorld;
-            //printf("mi=%d node=%d name=%s mx=%s\n", mesh_index, src_node, name, modelToCamera[di].toString());
-            printf("mi=%d node=%d name=%s z=%s\n", mesh_index, src_node, name, z.toString());
-          }
-        }
-        mat->render_skinned(skin_shader, cameraToProjection, modelToCamera, num_bones, lighting_set.data());
+        mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, lighting_set.data());
       }
       mesh->render();
     }
@@ -126,10 +94,10 @@ public:
       m.loadIdentity();
       m.rotateX(90);
       m.translate(0.0, 1.0f, 1.5f);
-      int node = add_node(-1, m, "default_cam", "");
+      scene_node *node_ = add_root_node(m, 0);
       camera_instance *cam = new camera_instance();
       float n = 0.1f, f = 1000.0f;
-      cam->set_params(node, -n, n, -n, n, n, f, false);
+      cam->set_params(node_, -n, n, -n, n, n, f, false);
       camera_instances.push_back(cam);
     }
 
@@ -140,10 +108,10 @@ public:
     lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
   }
 
-  int add_node(const mat4t &modelToParent, int parent, atom_t sid) {
-    this->modelToParent.push_back(modelToParent);
-    this->parentNodes.push_back(parent);
-    this->sids.push_back(sid);
+  scene_node *add_root_node(const mat4t &modelToParent, atom_t sid) {
+    scene_node *new_node = new scene_node(modelToParent, sid);
+    scene_node::add_child(new_node);
+    return new_node;
   }
 
   void add_mesh_instance(mesh_instance *inst) {
@@ -162,11 +130,6 @@ public:
     light_instances.push_back(inst);
   }
 
-  // how many nodes do we have?
-  int num_nodes() {
-    return (int)modelToParent.size();
-  }
-
   // how many mesh instances do we have?
   int num_mesh_instances() {
     return (int)mesh_instances.size();
@@ -182,83 +145,13 @@ public:
     return (int)light_instances.size();
   }
 
-  // 
-  int add_node(int parent, const mat4t &modelToParent_, const char *id, const char *sid) {
-    int node_index = (int)modelToParent.size();
-    modelToParent.push_back(modelToParent_);
-    parentNodes.push_back(parent);
-    sids.push_back(resources::get_atom(sid));
-    nodeNamesToNodes[id] = node_index;
-    return node_index;
-  }
-
-  // compute the node to world matrix for an individual node;
-  mat4t calcModelToWorld(int node) {
-    mat4t result = modelToParent[node];
-    node = parentNodes[node];
-    while (node != -1) {
-      //result = modelToParent[node] * result;
-      result = result * modelToParent[node];
-      node = parentNodes[node];
-    }
-    return result;
-  }
-
-  void calcRelativeMatrices(mat4t *modelToCamera, int node, int num_nodes) {
-    /*for (int i = 0; i != parentNodes.size(); ++i) {
-      printf("%d ", parentNodes[i]);
-    }
-    printf(" [%d]\n", node);*/
-    for (int rel_node = 1; rel_node < num_nodes; ++rel_node) {
-      int abs_node = node + rel_node;
-      int abs_parent = parentNodes[abs_node];
-      int rel_parent = abs_parent - node;
-      if (rel_parent >= 0 && rel_parent < num_nodes) {
-        // use the parent transform to make a new matrix from an earlier one.
-        modelToCamera[rel_node] = modelToParent[abs_node] * modelToCamera[rel_parent];
-      } else {
-        // rel_parent out of range: play safe and return the original matrix
-        modelToCamera[rel_node] = modelToCamera[0];
-      }
-    }
+  scene_node *get_root_node() {
+    return (scene_node*)this;
   }
 
   // access camera_instance information
   camera_instance *get_camera_instance(int index) {
     return camera_instances[index];
-  }
-
-  // access the relative matrix for a specific node
-  mat4t &get_modelToParent(int node) {
-    return modelToParent[node];
-  }
-
-  int get_num_nodes() {
-    return modelToParent.size();
-  }
-
-  int get_parent(int node_index) const {
-    return parentNodes[node_index];
-  }
-
-  // get an index for a named node.
-  int get_node_index(const char *name) {
-    if (nodeNamesToNodes.contains(name)) {
-      return nodeNamesToNodes[name];
-    } else {
-      return -1;
-    }
-  }
-
-  // convert index to name (slow)
-  const char *node_name(int index) {
-    const char *name = "??";
-    for (int i = 0; i != nodeNamesToNodes.num_indices(); ++i) {
-      if (nodeNamesToNodes.value(i) == index) {
-        name = nodeNamesToNodes.key(i);
-      }
-    }
-    return name;
   }
 
   // advance all the animation instances
@@ -284,15 +177,24 @@ public:
     }
   }
 
-  // call OpenGL to draw all the mesh instances (node + mesh + material)
+  // call OpenGL to draw all the mesh instances (scene_node + mesh + material)
   void render(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
     render_impl(object_shader, skin_shader, cam);
   }
 
-  // play an animation on a node
-  void play(animation *anim, int node_index, bool is_looping) {
-    animation_instance *inst = new animation_instance(anim, node_index, is_looping);
+  // play an animation on a mesh instance or other target
+  void play(animation *anim, animation_target *target, bool is_looping) {
+    animation_instance *inst = new animation_instance(anim, target, is_looping);
     animation_instances.push_back(inst);
+  }
+
+  mesh_instance *get_first_mesh_instance(scene_node *node_) {
+    for (int i = 0; i != mesh_instances.size(); ++i) {
+      if (mesh_instances[i]->get_node() == node_) {
+        return mesh_instances[i];
+      }
+    }
+    return NULL;
   }
 };
 

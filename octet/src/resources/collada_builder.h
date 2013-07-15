@@ -449,7 +449,7 @@ private:
     }
   }
 
-  void add_mesh_instances(TiXmlElement *technique_common, const char *url, int node_index, skeleton *skel, skin *skn, resources &dict, scene &s) {
+  void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node_, skeleton *skel, skin *skn, resources &dict, scene &s) {
     if (!url) return;
 
     url += url[0] == '#';
@@ -463,7 +463,7 @@ private:
         const char *symbol = instance->Attribute("symbol");
         const char *target = instance->Attribute("target");
         if (target && target[0] == '#') target++;
-        // add a node/mesh/material combination to the mesh_instance
+        // add a scene_node/mesh/material combination to the mesh_instance
         if (symbol && url) {
           string new_url;
           new_url.format("%s+%s", new_url, symbol);
@@ -471,7 +471,7 @@ private:
           bump_material *mat = dict.get_bump_material(target);
           if (!mat) mat = dict.get_bump_material("default_material");
           if (mesh) {
-            mesh_instance *mi = new mesh_instance(node_index, mesh, mat, skn, skel);
+            mesh_instance *mi = new mesh_instance(node_, mesh, mat, skn, skel);
             s.add_mesh_instance(mi);
           }
         }
@@ -480,24 +480,24 @@ private:
       mesh_state *mesh = dict.get_mesh_state(url);
       bump_material *mat = dict.get_bump_material("default_material");
       if (mesh) {
-        mesh_instance *mi = new mesh_instance(node_index, mesh, mat, skn, skel);
+        mesh_instance *mi = new mesh_instance(node_, mesh, mat, skn, skel);
         s.add_mesh_instance(mi);
       }
     }
   }
 
   // add an <instance_geometry> mesh instance
-  void add_instance_geometry(TiXmlElement *element, int node_index, resources &dict, scene &s) {
+  void add_instance_geometry(TiXmlElement *element, scene_node *node_, resources &dict, scene &s) {
     const char *url = element->Attribute("url");
     url += url[0] == '#';
     TiXmlElement *bind_material = child(element, "bind_material");
     TiXmlElement *technique_common = child(bind_material, "technique_common");
 
-    add_mesh_instances(technique_common, url, node_index, 0, 0, dict, s);
+    add_mesh_instances(technique_common, url, node_, 0, 0, dict, s);
   }
 
   // add an <instance_controller> skin instance
-  void add_instance_controller(TiXmlElement *element, int node_index, resources &dict, scene &s) {
+  void add_instance_controller(TiXmlElement *element, scene_node *node_, resources &dict, scene &s) {
     const char *controller_url = attr(element, "url");
     TiXmlElement *bind_material = child(element, "bind_material");
     TiXmlElement *technique_common = child(bind_material, "technique_common");
@@ -513,32 +513,26 @@ private:
 
     skeleton *skel = new skeleton();
     TiXmlElement *skel_elem = child(element, "skeleton");
-    int num_nodes = s.get_num_nodes();
+    //int num_nodes = s.get_num_nodes();
     dictionary<int> skin_joints;
     while (skel_elem) {
       const char *skeleton_id = text(skel_elem);
-      if (skeleton_id[0] == '#') skeleton_id++;
-      int skel_node = s.get_node_index(skeleton_id);
-      if (skel_node == -1) {
-        printf("warning: skeleton node not found\n");
-        return;
+      TiXmlElement *node_elem = find_id(skeleton_id);
+      scene_node *node_ = (scene_node*)node_elem->GetUserData();
+      if (node_) {
+        dynarray<scene_node*> nodes;
+        dynarray<int> parents;
+        node_->get_all_child_nodes(nodes, parents);
+        for (int i = 0; i != nodes.size(); ++i) {
+          scene_node *node_ = nodes[i];
+          skel->add_bone(node_->get_modelToParent(), node_->get_sid(), parents[i]);
+        }
       }
-      int i = skel_node + 1;
-
-      // todo: sort and filter bones by skin joint sids.
-      skel->add_bone(skel_node);
-      while (i < num_nodes && s.get_parent(i) >= node_index) {
-        skel->add_bone(i);
-        ++i;
-      }
-      /*for (int j = node_index; j != i; ++j) {
-        printf("n%d %s %s\n", j, attr(s.nodes[j], "id"), attr(s.nodes[j], "sid"));
-      }*/
       skel_elem = sibling(skel_elem, "skeleton");
     }
 
     //const char *url = skin->Attribute("source");
-    add_mesh_instances(technique_common, controller_url, node_index, skel, skn, dict, s);
+    add_mesh_instances(technique_common, controller_url, node_, skel, skn, dict, s);
   }
 
   float quick_float(TiXmlElement *parent, const char *name) {
@@ -547,7 +541,7 @@ private:
   }
 
   // add a camera to the scene
-  void add_instance_camera(TiXmlElement *elem, int node_index, resources &dict, scene &s) {
+  void add_instance_camera(TiXmlElement *elem, scene_node *node_, resources &dict, scene &s) {
     const char *url = elem->Attribute("url");
     TiXmlElement *cam = find_id(url);
     if (!cam) return;
@@ -566,17 +560,17 @@ private:
       if (perspective) {
         float xfov = quick_float(params, "xfov");
         float yfov = quick_float(params, "yfov");
-        c->set_perspective(node_index, xfov, yfov, aspect_ratio, n, f);
+        c->set_perspective(node_, xfov, yfov, aspect_ratio, n, f);
       } else {
         float xmag = quick_float(params, "xmag");
         float ymag = quick_float(params, "ymag");
-        c->set_ortho(node_index, xmag, ymag, aspect_ratio, n, f);
+        c->set_ortho(node_, xmag, ymag, aspect_ratio, n, f);
       }
     }
   }
 
   // add a light to the scene
-  void add_instance_light(TiXmlElement *elem, int node_index, resources &dict, scene &s) {
+  void add_instance_light(TiXmlElement *elem, scene_node *node_, resources &dict, scene &s) {
     const char *url = elem->Attribute("url");
     TiXmlElement *light = find_id(url);
     if (!light) return;
@@ -715,44 +709,48 @@ private:
     }
   }
 
-  // build the node heirachy
-  void build_heirachy(dynarray<TiXmlElement *> &nodes, TiXmlElement *scene_element, resources &dict, scene &s) {
+  // build the scene_node heirachy
+  void build_heirachy(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, TiXmlElement *scene_element, resources &dict, scene &s) {
     // create a stack to avoid recursion (a bad thing in games)
     dynarray<TiXmlElement *> stack;
-    dynarray<int> index_stack;
+    dynarray<scene_node *> node_stack;
     stack.reserve(64);
-    index_stack.reserve(64);
+    node_stack.reserve(64);
 
-    index_stack.push_back(-1);
+    node_stack.push_back(s.get_root_node());
     stack.push_back(scene_element);
     while (!stack.is_empty()) {
-      TiXmlElement *parent = stack.back();
-      int parent_index = index_stack.back();
+      TiXmlElement *parent_elem = stack.back();
+      scene_node *parent = node_stack.back();
       stack.pop_back();
-      index_stack.pop_back();
-      TiXmlElement *node = child(parent, "node");
-      while (node) {
-        const char *id = node->Attribute("id");
+      node_stack.pop_back();
+      TiXmlElement *node_elem = child(parent_elem, "scene_node");
+      while (node_elem) {
+        //const char *id = node_elem->Attribute("id");
         mat4t modelToParent;
         modelToParent.loadIdentity();
-        int node_index = s.add_node(parent_index, modelToParent, attr(node, "id"), attr(node, "sid"));
-        stack.push_back(node);
-        index_stack.push_back(node_index);
-        nodes.push_back(node);
-        node = sibling(node, "node");
+        scene_node *new_node = new scene_node(modelToParent, resources::get_atom(attr(node_elem, "sid")));
+        dict.set_resource(attr(node_elem, "id"), new_node);
+        parent->add_child(new_node);
+        stack.push_back(node_elem);
+        node_stack.push_back(new_node);
+        nodes.push_back(new_node);
+        node_elems.push_back(node_elem);
+        node_elem->SetUserData(new_node);
+        node_elem = sibling(node_elem, "scene_node");
       }
     }
   }
 
   // add matrices and instances
-  void build_matrices(dynarray<TiXmlElement *> &nodes, resources &dict, scene &s) {
-    int num_nodes = s.get_num_nodes();
-    for (int node_index = 0; node_index != num_nodes; ++node_index) {
-      TiXmlElement *node = nodes[node_index];
-      mat4t &matrix = s.get_modelToParent(node_index);
+  void build_matrices(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, resources &dict, scene &s) {
+    for (int ni = 0; ni != node_elems.size(); ++ni) {
+      TiXmlElement *node_elem = node_elems[ni];
+      scene_node *node_ = nodes[ni];
+      mat4t &matrix = node_->get_modelToParent();
       matrix.loadIdentity();
 
-      for (TiXmlElement *child = node->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
+      for (TiXmlElement *child = node_elem->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
         const char *value = child->Value();
         if (!strcmp(value, "matrix")) {
           atofv(temp_floats, child->GetText());
@@ -784,14 +782,27 @@ private:
           if (temp_floats.size() >= 3) {
             matrix.translate(temp_floats[0], temp_floats[1], temp_floats[2]);
           }
-        } else if (!strcmp(value, "instance_geometry")) {
-          add_instance_geometry(child, node_index, dict, s);
+        }
+      }
+    }
+  }
+
+  // add instances
+  void build_instances(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, resources &dict, scene &s) {
+    for (int ni = 0; ni != node_elems.size(); ++ni) {
+      TiXmlElement *node_elem = node_elems[ni];
+      scene_node *node_ = nodes[ni];
+
+      for (TiXmlElement *child = node_elem->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
+        const char *value = child->Value();
+        if (!strcmp(value, "instance_geometry")) {
+          add_instance_geometry(child, node_, dict, s);
         } else if (!strcmp(value, "instance_controller")) {
-          add_instance_controller(child, node_index, dict, s);
+          add_instance_controller(child, node_, dict, s);
         } else if (!strcmp(value, "instance_camera")) {
-          add_instance_camera(child, node_index, dict, s);
+          add_instance_camera(child, node_, dict, s);
         } else if (!strcmp(value, "instance_light")) {
-          add_instance_light(child, node_index, dict, s);
+          add_instance_light(child, node_, dict, s);
         }
       }
     }
@@ -1071,11 +1082,13 @@ private:
     if (!lib) return;
 
     for (TiXmlElement *elem = lib->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {
-      dynarray<TiXmlElement *> nodes;
+      dynarray<TiXmlElement *> node_elems;
+      dynarray<scene_node *> nodes;
       scene *scn = new scene();
       dict.set_resource(attr(elem, "id"), scn);
-      build_heirachy(nodes, elem, dict, *scn);
-      build_matrices(nodes, dict, *scn);
+      build_heirachy(node_elems, nodes, elem, dict, *scn);
+      build_matrices(node_elems, nodes, dict, *scn);
+      build_instances(node_elems, nodes, dict, *scn);
     }
 
   }

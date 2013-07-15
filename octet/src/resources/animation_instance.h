@@ -9,15 +9,15 @@
 
 class animation_instance : public resource {
   ref<animation> anim;
-  int node_index;
+  ref<animation_target> target;
   float time;
   bool is_looping;
   bool is_paused;
 public:
   RESOURCE_META(animation_instance)
 
-  animation_instance(animation *anim, int node_index, bool is_looping) {
-    this->node_index = node_index;
+  animation_instance(animation *anim, animation_target *target, bool is_looping) {
+    this->target = target;
     this->anim = anim;
     this->time = 0;
     this->is_looping = is_looping;

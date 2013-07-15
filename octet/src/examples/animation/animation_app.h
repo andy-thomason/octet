@@ -45,7 +45,8 @@ public:
     app_scene->create_default_camera_and_lights();
 
     animation *anim = dict.get_animation("Armature_radius_pose_matrix");
-    app_scene->play(anim, app_scene->get_node_index("Armature"), true);
+    scene_node *node_ = dict.get_node("Cube");
+    app_scene->play(anim, app_scene->get_first_mesh_instance(node_), true);
   }
 
   // this is called to draw the world

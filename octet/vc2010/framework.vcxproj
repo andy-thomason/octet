@@ -105,6 +105,7 @@
     <ClInclude Include="..\src\platform\windows_specific.h" />
     <ClInclude Include="..\src\resources\animation.h" />
     <ClInclude Include="..\src\resources\animation_instance.h" />
+    <ClInclude Include="..\src\resources\animation_target.h" />
     <ClInclude Include="..\src\resources\app_utils.h" />
     <ClInclude Include="..\src\resources\bump_material.h" />
     <ClInclude Include="..\src\resources\camera_instance.h" />

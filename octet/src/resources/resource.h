@@ -20,6 +20,7 @@ class light_instance;
 class mesh_instance;
 class animation_instance;
 class scene;
+class scene_node;
 
 #define RESOURCE_META(classname) classname *get_##classname() { return this; }
 
@@ -52,6 +53,7 @@ public:
   virtual mesh_instance *get_mesh_instance() { return 0; }
   virtual animation_instance *get_animation_instance() { return 0; }
   virtual scene *get_scene() { return 0; }
+  virtual scene_node *get_node() { return 0; }
 
 };
 

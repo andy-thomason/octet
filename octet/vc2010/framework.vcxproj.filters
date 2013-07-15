@@ -207,6 +207,9 @@
     <ClInclude Include="..\src\resources\camera_instance.h">
       <Filter>resources</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\resources\animation_target.h">
+      <Filter>resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp">
