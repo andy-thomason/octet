@@ -31,7 +31,7 @@ class scene : public scene_node {
   int frame_number;
 
   /*void metadata(meta &m) {
-    m.visit(modelToParent);
+    m.visit(nodeToParent);
     m.visit(sids);
     m.visit(parentNodes);
     m.visit(mesh_instances);
@@ -94,10 +94,10 @@ public:
       m.loadIdentity();
       m.rotateX(90);
       m.translate(0.0, 1.0f, 1.5f);
-      scene_node *node_ = add_root_node(m, 0);
+      scene_node *node = add_root_node(m, 0);
       camera_instance *cam = new camera_instance();
       float n = 0.1f, f = 1000.0f;
-      cam->set_params(node_, -n, n, -n, n, n, f, false);
+      cam->set_params(node, -n, n, -n, n, n, f, false);
       camera_instances.push_back(cam);
     }
 
@@ -108,8 +108,8 @@ public:
     lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
   }
 
-  scene_node *add_root_node(const mat4t &modelToParent, atom_t sid) {
-    scene_node *new_node = new scene_node(modelToParent, sid);
+  scene_node *add_root_node(const mat4t &nodeToParent, atom_t sid) {
+    scene_node *new_node = new scene_node(nodeToParent, sid);
     scene_node::add_child(new_node);
     return new_node;
   }
@@ -188,13 +188,23 @@ public:
     animation_instances.push_back(inst);
   }
 
-  mesh_instance *get_first_mesh_instance(scene_node *node_) {
+  // find a mesh instance for a node
+  mesh_instance *get_first_mesh_instance(scene_node *node) {
     for (int i = 0; i != mesh_instances.size(); ++i) {
-      if (mesh_instances[i]->get_node() == node_) {
+      if (mesh_instances[i]->get_node() == node) {
         return mesh_instances[i];
       }
     }
     return NULL;
+  }
+
+  void dump(FILE *file) {
+    dynarray<scene_node*> nodes;
+    dynarray<int> parents;
+    scene_node::get_all_child_nodes(nodes, parents);
+    for (int i = 0; i != nodes.size(); ++i) {
+      fprintf(file, "%5d %p %5d %p\n", i, (scene_node*)nodes[i], parents[i], (scene_node*)nodes[i]->get_parent());
+    }
   }
 };
 

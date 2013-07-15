@@ -53,7 +53,7 @@ public:
   virtual mesh_instance *get_mesh_instance() { return 0; }
   virtual animation_instance *get_animation_instance() { return 0; }
   virtual scene *get_scene() { return 0; }
-  virtual scene_node *get_node() { return 0; }
+  virtual scene_node *get_scene_node() { return 0; }
 
 };
 

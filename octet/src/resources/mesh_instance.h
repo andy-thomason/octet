@@ -9,7 +9,7 @@
 
 class mesh_instance : public resource, public animation_target {
   // which scene_node (model to world matrix) to use in the scene
-  ref<scene_node> node_;
+  ref<scene_node> node;
 
   // which mesh to render
   ref<mesh_state> mesh;
@@ -26,8 +26,8 @@ class mesh_instance : public resource, public animation_target {
 public:
   RESOURCE_META(mesh_instance)
 
-  mesh_instance(scene_node *node_, mesh_state *mesh, bump_material *mat, skin *skn=0, skeleton *skel=0) {
-    this->node_ = node_;
+  mesh_instance(scene_node *node, mesh_state *mesh, bump_material *mat, skin *skn=0, skeleton *skel=0) {
+    this->node = node;
     this->mesh = mesh;
     this->mat = mat;
     this->skn = skn;
@@ -49,7 +49,7 @@ public:
   void set_value(atom_t sid, float *value) {
   }
 
-  scene_node *get_node() const { return node_; }
+  scene_node *get_node() const { return node; }
   mesh_state *get_mesh() const { return mesh; }
   bump_material *get_material() const { return mat; }
   skin *get_skin() const { return skn; }

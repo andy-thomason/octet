@@ -9,7 +9,7 @@
 
 class camera_instance : public resource {
   // camera parameters
-  ref<scene_node> node_;
+  ref<scene_node> node;
   bool is_ortho;
 
   // size (at near plane)
@@ -31,7 +31,7 @@ public:
   }
 
   // call this once to set up the camera
-  void set_params(scene_node *node_, float left, float right, float bottom, float top, float nearVal, float farVal, bool is_ortho) {
+  void set_params(scene_node *node, float left, float right, float bottom, float top, float nearVal, float farVal, bool is_ortho) {
     this->left = left;
     this->right = right;
     this->bottom = bottom;
@@ -39,11 +39,11 @@ public:
     this->nearVal = nearVal;
     this->farVal = farVal;
     this->is_ortho = is_ortho;
-    this->node_ = node_;
+    this->node = node;
   }
 
   // set the parameters as in the collada perspective element
-  void set_perspective(scene_node *node_, float xfov, float yfov, float aspect_ratio, float n, float f)
+  void set_perspective(scene_node *node, float xfov, float yfov, float aspect_ratio, float n, float f)
   {
     float xscale = 0.5f;
     float yscale = 0.5f;
@@ -58,12 +58,12 @@ public:
       yscale = xscale * aspect_ratio;
     }
     //printf("%f %f\n", xscale, yscale);
-    set_params(node_, -n * xscale, n * xscale, -n * yscale, n * yscale, n, f, false);
+    set_params(node, -n * xscale, n * xscale, -n * yscale, n * yscale, n, f, false);
   }
 
-  void set_ortho(scene_node *node_, float xmag, float ymag, float aspect_ratio, float n, float f)
+  void set_ortho(scene_node *node, float xmag, float ymag, float aspect_ratio, float n, float f)
   {
-    set_params(node_, -xmag, xmag, -ymag, ymag, n, f, true);
+    set_params(node, -xmag, xmag, -ymag, ymag, n, f, true);
   }
 
 
@@ -99,7 +99,7 @@ public:
 
   // use this to get the camera from the scene
   scene_node *get_node() const {
-    return node_;
+    return node;
   }
 };
 

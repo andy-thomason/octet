@@ -6,6 +6,7 @@
 //
 // scene-specific list of bones for skeletal animation
 //
+// A mini scene heirachy for one actor.
 
 class skeleton : public resource {
   dynarray<mat4t> nodeToParents;
@@ -29,6 +30,7 @@ public:
   int get_num_bones() const { return nodeToParents.size(); }
 
   mat4t *calc_transforms(const mat4t &worldToCamera, skin *skn) {
+    // compute matrix heirachy
     for (int i = 0; i != nodeToParents.size(); ++i) {
       int parent = parents[i];
       // scene_node -> parent -> parent -> world -> camera
@@ -39,6 +41,8 @@ public:
       }
       //app_utils::log("%d %s p=%d\n", i, nodeToCameras[i].toString(), parent);
     }
+
+    // premultiply by skin matrices
     for (int i = 0; i != nodeToParents.size(); ++i) {
       // mesh -> bind -> model -> scene_node -> parent -> parent -> world -> camera
       nodeToCameras[i] = skn->get_modelToBind() * skn->get_bindToModel(i) * nodeToCameras[i];

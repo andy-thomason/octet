@@ -86,7 +86,9 @@ public:
   }
 
   void set_resource(const char *name, resource *value) {
-    dict[name] = value;
+    if (name && name[0]) {
+      dict[name] = value;
+    }
   }
 
   // factory for textures
@@ -135,6 +137,6 @@ public:
   mesh_instance *get_mesh_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh_instance() : 0; }
   animation_instance *get_animation_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_instance() : 0; }
   scene *get_scene(const char *id) { resource *res = get_resource(id); return res ? res->get_scene() : 0; }
-  scene_node *get_node(const char *id) { resource *res = get_resource(id); return res ? res->get_node() : 0; }
+  scene_node *get_scene_node(const char *id) { resource *res = get_resource(id); return res ? res->get_scene_node() : 0; }
 };
 
