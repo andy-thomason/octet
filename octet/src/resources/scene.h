@@ -56,10 +56,6 @@ class scene : public scene_node {
       skeleton *skel = mi->get_skeleton();
       bump_material *mat = mi->get_material();
 
-      /*if (frame_number == 1) {
-        printf("!! %d %s\n", i, modelToWorld.toString());
-      }*/
-
       mat4t modelToWorld = mi->get_node()->calcModelToWorld();
       mat4t modelToCamera;
       mat4t modelToProjection;
@@ -74,6 +70,8 @@ class scene : public scene_node {
         // multi-matrix rendering
         mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
         int num_bones = skel->get_num_bones();
+        app_utils::log("%s 0\n", transforms[0].toString());
+        app_utils::log("%s 1\n", transforms[1].toString());
         mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, lighting_set.data());
       }
       mesh->render();
