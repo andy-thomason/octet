@@ -120,8 +120,10 @@ public:
 
     static atom_t num_atoms = 1;
     if (dict->contains(name)) {
+      app_utils::log("old atom %s %d\n", name, (*dict)[name]);
       return (*dict)[name];
     } else {
+      app_utils::log("new atom %s %d\n", name, num_atoms);
       return (*dict)[name] = num_atoms++;
     }
   }

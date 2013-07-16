@@ -35,7 +35,18 @@ public:
     skin_shader.init(true);
 
     collada_builder builder;
-    builder.load("assets/skinning/skin_unrot.dae");
+    const char *filename = 0;
+
+    int selector = 1;
+    switch (1) {
+      case 0: filename = "assets/duck_triangulate.dae"; break;
+      case 1: filename = "assets/skinning/skin_unrot.dae"; break;
+      case 2: filename = "assets/jenga.dae"; break;
+    }
+
+    if (!builder.load_xml(filename)) {
+      return;
+    }
 
     builder.get_resources(dict);
     app_scene = dict.get_scene(builder.get_default_scene());
@@ -46,9 +57,11 @@ public:
 
     //app_scene->dump(app_utils::log("scene\n"));
 
-    animation *anim = dict.get_animation("Armature_radius_pose_matrix");
-    scene_node *node = dict.get_scene_node("Cube");
-    app_scene->play(anim, app_scene->get_first_mesh_instance(node), true);
+    if (selector == 1) {
+      animation *anim = dict.get_animation("Armature_radius_pose_matrix");
+      scene_node *node = dict.get_scene_node("Cube");
+      app_scene->play(anim, app_scene->get_first_mesh_instance(node), true);
+    }
   }
 
   // this is called to draw the world

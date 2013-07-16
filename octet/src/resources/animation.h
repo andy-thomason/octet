@@ -20,7 +20,7 @@ private:
 
   /// one channel of an animation
   struct channel {
-    atom_t target;   /// atom for target
+    atom_t sid;      /// atom for sid on target
     chan_kind kind;  /// float or transform
     int offset;      /// where in data
     unsigned num_times;   /// how many time values
@@ -44,8 +44,8 @@ public:
     return channels[ch].kind;
   }
 
-  atom_t get_target(int ch) const {
-    return channels[ch].target;
+  atom_t get_sid(int ch) const {
+    return channels[ch].sid;
   }
 
   float get_end_time() const {
@@ -53,10 +53,11 @@ public:
   }
 
   // crude matrix based channel
-  void add_channel_from_matrices(int num_times, float *times, float *matrices) {
+  void add_channel_from_matrices(atom_t sid, int num_times, float *times, float *matrices) {
     channel ch;
     ch.kind = chan_matrix;
     ch.num_times = num_times;
+    ch.sid = sid;
     int offset = ch.offset = (int)data.size();
     int bytes = num_times * sizeof(unsigned short) + num_times * sizeof(mat4t);
     data.resize(ch.offset + bytes);
@@ -72,16 +73,18 @@ public:
       *((mat4t*)&data[offset]) = m;
       offset += sizeof(mat4t);
     }
+    channels.push_back(ch);
   }
 
   // evaluate one channel at one time - very inefficient.
   // time is in ms.
-  void eval_chan(int chan, float time, void *dest, size_t max_size) const {
-    int time_ms = int(time * 0.001f);
+  void eval_chan(int chan, float time, animation_target *target) const {
+    int time_ms = int(time * 1000);
     const channel &ch = channels[chan];
-    unsigned short *p = (unsigned short *)data[ch.offset];
+    unsigned short *p = (unsigned short *)&data[ch.offset];
     unsigned a = 0;
     unsigned b = ch.num_times - 1;
+    //app_utils::log("ec %f %d\n", time, time_ms);
 
     if (time_ms < p[0]) {
       time_ms = p[0];
@@ -104,12 +107,12 @@ public:
     switch( ch.kind ) {
       case chan_matrix: {
         float t = float(time_ms - p[a]) / (p[b] - p[a]);
-        assert(max_size >= sizeof(mat4t));
+        //app_utils::log("tms=%f t=%f\n", time_ms, t);
         mat4t ma, mb;
         memcpy(&ma, &data[data_offset + a * sizeof(mat4t)], sizeof(mat4t));
         memcpy(&mb, &data[data_offset + b * sizeof(mat4t)], sizeof(mat4t));
         mat4t m = ma * t + mb * (1-t);
-        memcpy(dest, &m, sizeof(mat4t));
+        target->set_value(ch.sid, m.get());
       } break;
     }
   }

@@ -60,7 +60,7 @@ public:
     cameraToWorld.translate(0, 0, 5);
 
     collada_builder builder;
-    builder.load("assets/duck_triangulate.dae");
+    builder.load_xml("assets/duck_triangulate.dae");
     duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
 
     // the original duck is a bit too big, shrink it with a matrix

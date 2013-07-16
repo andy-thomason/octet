@@ -81,7 +81,7 @@ public:
     //texture_handle_ = resources::get_texture_handle(GL_RGB, "assets/duckCM.gif");
 
     collada_builder builder;
-    builder.load("assets/duck_triangulate.dae");
+    builder.load_xml("assets/duck_triangulate.dae");
     duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
 
     mat4t mat;

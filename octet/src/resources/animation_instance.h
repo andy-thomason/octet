@@ -32,15 +32,28 @@ public:
     return time;
   }
 
-  bool update_time(float delta_time) {
-    time += delta_time;
-    if (time >= anim->get_end_time()) {
-      if (is_looping) {
-        time -= anim->get_end_time();
-      } else {
-        return true;
+  void update(float delta_time) {
+    if (target) {
+      for (int ch = 0; ch != anim->get_num_channels(); ++ch) {
+        animation::chan_kind kind = anim->get_chan_kind(ch);
+        if (kind == animation::chan_matrix) {
+          mat4t m;
+          anim->eval_chan(ch, time, target);
+        }
       }
     }
-    return false;
+
+    //app_utils::log("update %f\n", delta_time);
+    if (!is_paused) {
+      time += delta_time;
+      //app_utils::log("..update %f\n", time);
+      if (time >= anim->get_end_time()) {
+        if (is_looping) {
+          time -= anim->get_end_time();
+        } else {
+          is_paused = true;
+        }
+      }
+    }
   }
 };

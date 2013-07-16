@@ -50,5 +50,17 @@ public:
     }
     return &nodeToCameras[0];
   }
+
+  // convert an sid into an index. (should be cached!)
+  int get_bone_index(atom_t sid) {
+    for (int i = 0; i != sids.size(); ++i) {
+      if (sids[i] == sid) return i;
+    }
+    return -1;
+  }
+
+  void set_bone(int index, const mat4t &value) {
+    nodeToParents[index] = value;
+  }
 };
 

@@ -84,8 +84,8 @@ enum attribute {
 #include "../resources/app_utils.h"
 #include "../resources/resource.h"
 #include "../resources/resources.h"
-#include "../resources/animation.h"
 #include "../resources/animation_target.h"
+#include "../resources/animation.h"
 #include "../shaders/shader.h"
 #include "../shaders/color_shader.h"
 #include "../shaders/texture_shader.h"
@@ -105,6 +105,7 @@ enum attribute {
 #include "../resources/scene.h"
 
 #include "../resources/gif_decoder.h"
+#include "../resources/tga_decoder.h"
 #include "../resources/mesh_builder.h"
 #include "../resources/collada_builder.h"
 #include "../resources/mesh.h"

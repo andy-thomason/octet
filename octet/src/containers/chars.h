@@ -106,6 +106,7 @@ public:
     if (d) {
       return d - data_;
     }
+    return -1;
   }
 
   int extension_pos() const {

@@ -13,7 +13,7 @@
 //
 // COLLADA is notoriously complex, with large amounts of redundancy that needs to be skipped.
 // On the surface it looks like a GL model, but adds many unresolvable abstractions.
-// A new standard glTF looks more tractable with a more GL-like model. Unfortunately,
+// A new standard, glTF looks more tractable with a more GL-like model. Unfortunately,
 // there are very few direct exporters as yet.
 
 // mesh builder class for standard meshes.
@@ -206,7 +206,7 @@ private:
       return;
     }
 
-    TiXmlElement *input2 = source_elem->FirstChildElement("input");
+    TiXmlElement *input2 = child(source_elem, "input");
     if (input2) {
       // recursive <input> tag:; includes other inputs
       for (;input2 != 0; input2 = input2->NextSiblingElement("input")) {
@@ -220,13 +220,13 @@ private:
       return;
     }
 
-    TiXmlElement *tc = source_elem->FirstChildElement("technique_common");
+    TiXmlElement *tc = child(source_elem, "technique_common");
     if (!tc) {
       printf("warning: no technique_common\n");
       return;
     }
 
-    TiXmlElement *accessor = tc->FirstChildElement("accessor");
+    TiXmlElement *accessor = child(tc, "accessor");
     if (!accessor) {
       printf("warning: no accessor\n");
       return;
@@ -247,7 +247,7 @@ private:
     unsigned size = 0;
     const char *param_type = 0;
     for (
-      TiXmlElement *param = accessor->FirstChildElement("param");
+      TiXmlElement *param = child(accessor, "param");
       param != 0;
       param = param->NextSiblingElement("param")
     ) {
@@ -343,7 +343,7 @@ private:
     if (!sid) return NULL;
 
     for (
-      TiXmlElement *new_param = profile_COMMON->FirstChildElement("newparam");
+      TiXmlElement *new_param = child(profile_COMMON, "newparam");
       new_param; new_param = new_param->NextSiblingElement("newparam")
     ) {
       const char *sid_param = new_param->Attribute("sid");
@@ -399,20 +399,20 @@ private:
     return resources::get_texture_handle(GL_RGBA, deflt);
   }
 
-  float get_float(TiXmlElement *shader, const char *value) {
-    TiXmlElement *section = shader->FirstChildElement(value);
-    TiXmlElement *child = section ? section->FirstChildElement("float") : 0;
-    if (child) {
-      atofv(temp_floats, child->GetText());
+  float get_float(TiXmlElement *shader, const char *value, float deflt) {
+    TiXmlElement *section = child(shader, value);
+    TiXmlElement *float_ = child(section, "float");
+    if (float_) {
+      atofv(temp_floats, float_->GetText());
       if (temp_floats.size() >= 1) {
         return temp_floats[0];
       }
     }
-    return 0;
+    return deflt;
   }
 
   void add_materials(resources &dict) {
-    TiXmlElement *lib_mat = doc.RootElement()->FirstChildElement("library_materials");
+    TiXmlElement *lib_mat = child(doc.RootElement(), "library_materials");
 
     if (!dict.has_resource("default_material")) {
       bump_material *defmat = new bump_material();
@@ -423,21 +423,23 @@ private:
     if (!lib_mat) return;
 
     for (TiXmlElement *material = lib_mat->FirstChildElement(); material != NULL; material = material->NextSiblingElement()) {
-      TiXmlElement *ieffect = material->FirstChildElement("instance_effect");
-      const char *url = ieffect ? ieffect->Attribute("url") : 0;
+      TiXmlElement *ieffect = child(material, "instance_effect");
+      const char *url = attr(ieffect, "url");
       TiXmlElement *effect = find_id(url);
-      TiXmlElement *profile_COMMON = effect ? effect->FirstChildElement("profile_COMMON") : 0;
-      TiXmlElement *technique = profile_COMMON ? profile_COMMON->FirstChildElement("technique") : 0;
-      TiXmlElement *phong = technique ? technique->FirstChildElement("phong") : 0;
-      TiXmlElement *shader = phong ? phong : technique ? technique->FirstChildElement("lambert") : 0;
+      TiXmlElement *profile_COMMON = child(effect, "profile_COMMON");
+      TiXmlElement *technique = child(profile_COMMON, "technique");
+      TiXmlElement *phong = child(technique, "phong");
+      TiXmlElement *blinn = child(technique, "blinn");
+      TiXmlElement *lambert = child(technique, "lambert");
+      TiXmlElement *shader = phong ? phong : blinn ? blinn : lambert;
       if (shader) {
         url += url[0] == '#';
-        GLuint emission = get_texture(shader, profile_COMMON, "emission", "#808080ff");
+        GLuint emission = get_texture(shader, profile_COMMON, "emission", "#00000000");
         GLuint ambient = get_texture(shader, profile_COMMON, "ambient", "#808080ff");
         GLuint diffuse = get_texture(shader, profile_COMMON, "diffuse", "#808080ff");
-        GLuint specular = get_texture(shader, profile_COMMON, "specular", "#808080ff");
+        GLuint specular = get_texture(shader, profile_COMMON, "specular", "#00000000");
         GLuint bump = get_texture(shader, profile_COMMON, "bump", "#808080ff");
-        float shininess = get_float(shader, "shininess");
+        float shininess = get_float(shader, "shininess", 0);
         bump_material *mat = new bump_material();
         mat->init(diffuse, ambient, emission, specular, bump, shininess);
         dict.set_resource(attr(material, "id"), mat);
@@ -452,21 +454,19 @@ private:
   void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, skin *skn, resources &dict, scene &s) {
     if (!url) return;
 
-    url += url[0] == '#';
-
     if (technique_common) {
       for (
-        TiXmlElement *instance = technique_common->FirstChildElement("instance_material");
+        TiXmlElement *instance = child(technique_common, "instance_material");
         instance != NULL;
         instance = instance->NextSiblingElement("instance_material")
       ) {
         const char *symbol = instance->Attribute("symbol");
         const char *target = instance->Attribute("target");
-        if (target && target[0] == '#') target++;
         // add a scene_node/mesh/material combination to the mesh_instance
         if (symbol && url) {
           string new_url;
-          new_url.format("%s+%s", new_url, symbol);
+          new_url.format("%s+%s", url, symbol);
+          //app_utils::log("ami %s\n", new_url.c_str());
           mesh_state *mesh = dict.get_mesh_state(new_url);
           bump_material *mat = dict.get_bump_material(target);
           if (!mat) mat = dict.get_bump_material("default_material");
@@ -579,8 +579,10 @@ private:
   // add a geometry element to the list of mesh states
   void add_geometry(resources &dict) {
     TiXmlElement *lib_geom = doc.RootElement()->FirstChildElement("library_geometries");
+    if (!lib_geom) return;
+
     for (TiXmlElement *geometry = lib_geom->FirstChildElement(); geometry != NULL; geometry = geometry->NextSiblingElement()) {
-      TiXmlElement *mesh = geometry->FirstChildElement("mesh");
+      TiXmlElement *mesh = child(geometry, "mesh");
       const char *id = geometry->Attribute("id");
 
       for (TiXmlElement *mesh_child = mesh ? mesh->FirstChildElement() : 0;
@@ -598,8 +600,10 @@ private:
   // add a geometry element to the list of mesh states
   void add_controllers(resources &dict) {
     TiXmlElement *lib_ctrl = doc.RootElement()->FirstChildElement("library_controllers");
+    if (!lib_ctrl) return;
+
     for (TiXmlElement *controller = lib_ctrl->FirstChildElement(); controller != NULL; controller = controller->NextSiblingElement()) {
-      TiXmlElement *skin_elem = controller->FirstChildElement("skin");
+      TiXmlElement *skin_elem = child(controller, "skin");
       const char *controller_id = controller->Attribute("id");
       TiXmlElement *geometry = find_id(attr(skin_elem, "source"));
       TiXmlElement *bind_shape_matrix = child(skin_elem, "bind_shape_matrix");
@@ -628,10 +632,10 @@ private:
         }
       }
 
-      TiXmlElement *vertex_weights = skin_elem ? skin_elem->FirstChildElement("vertex_weights") : 0;
+      TiXmlElement *vertex_weights = child(skin_elem, "vertex_weights");
       if (vertex_weights && geometry) {
         get_skin(controller, vertex_weights, &skinst);
-        TiXmlElement *mesh = geometry->FirstChildElement("mesh");
+        TiXmlElement *mesh = child(geometry, "mesh");
         const char *id = geometry->Attribute("id");
 
         for (TiXmlElement *mesh_child = mesh ? mesh->FirstChildElement() : 0;
@@ -667,14 +671,43 @@ private:
     }
   }
 
+  // add <library_images> to the scene
+  void add_textures(resources &dict) {
+    TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_images");
+    if (!lib_anim) return;
+
+    /*for (TiXmlElement *elem = child(lib_anim, "image"); elem != NULL; elem = sibling(elem, "image")) {
+      texture *tex = new texture();
+      dict.set_resource(attr(elem, "id"), tex);
+      const char *url_attr = text(child(elem, "init_from"));
+      if (url_attr) {
+        string new_path = doc_path;
+        string url = url_attr;
+        int extension_pos = url.extension_pos();
+        if (extension_pos != -1) {
+          // at present we only accept gifs. Use image alchemy to convert files.
+          url.truncate(extension_pos);
+          url += ".gif";
+        }
+        new_path += url;
+        GLuint handle = resources::get_texture_handle(GL_RGBA, new_path);
+      }
+    }*/
+  }
+
   // add <library_animations> to the scene
   void add_animations(resources &dict) {
     TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_animations");
+    if (!lib_anim) return;
+
     for (TiXmlElement *anim_elem = child(lib_anim, "animation"); anim_elem != NULL; anim_elem = sibling(anim_elem, "animation")) {
       animation *anim = new animation();
       dict.set_resource(attr(anim_elem, "id"), anim);
       for (TiXmlElement *channel_elem = child(anim_elem, "channel"); channel_elem != NULL; channel_elem = sibling(channel_elem, "channel")) {
         string target = attr(channel_elem, "target");
+        int slash = target.find("/");
+        target.truncate(slash);
+        atom_t sid = resources::get_atom(target);
         TiXmlElement *sampler_elem = find_id(attr(channel_elem, "source"));
         if (sampler_elem) {
           dynarray<float> times;
@@ -702,7 +735,7 @@ private:
 
           if (times.size() && transforms.size() == times.size()*16 && interpolation.size() == times.size()) {
             int num_times = (int)times.size();
-            anim->add_channel_from_matrices(num_times, &times[0], &transforms[0]);
+            anim->add_channel_from_matrices(sid, num_times, &times[0], &transforms[0]);
           }
         }
       }
@@ -802,6 +835,8 @@ private:
           add_instance_camera(child, node, dict, s);
         } else if (!strcmp(value, "instance_light")) {
           add_instance_light(child, node, dict, s);
+        } else if (!strcmp(value, "instance_mesh")) {
+          // we do not support instance_mesh yet as this requires a DAG
         }
       }
     }
@@ -835,7 +870,7 @@ private:
   int get_input_stride(TiXmlElement *mesh_child) {
     int input_stride = 1;
     int implicit_offset = 0;
-    for (TiXmlElement *input_elem = mesh_child->FirstChildElement("input");
+    for (TiXmlElement *input_elem = child(mesh_child, "input");
       input_elem != NULL;
       input_elem = input_elem->NextSiblingElement("input")
     ) {
@@ -857,13 +892,14 @@ private:
       return;
     }
 
-    const char *symbol = attr(mesh_child, "symbol");
+    const char *symbol = attr(mesh_child, "material");
     if (symbol) {
       string new_url;
       new_url.format("%s+%s", id, symbol);
+      //app_utils::log("gmc %s\n", new_url.c_str());
       dict.set_resource(new_url, mesh);
     } else {
-      printf("add mesh resource %s\n", id);
+      //app_utils::log("gmc %s\n", id);
       dict.set_resource(id, mesh);
     }
 
@@ -885,7 +921,7 @@ private:
     unsigned num_vertices = p_size / state.input_stride;
 
     // find the output size
-    for (TiXmlElement *input = mesh_child->FirstChildElement("input");
+    for (TiXmlElement *input = child(mesh_child, "input");
       input != NULL;
       input = input->NextSiblingElement("input")
     ) {
@@ -919,7 +955,7 @@ private:
     state.vertex_input_offset = 0;
 
     // build the attributes
-    for (TiXmlElement *input = mesh_child->FirstChildElement("input");
+    for (TiXmlElement *input = child(mesh_child, "input");
       input != NULL;
       input = input->NextSiblingElement("input")
     ) {
@@ -951,7 +987,7 @@ private:
       }
     }
 
-    TiXmlElement *vcount_elem = mesh_child->FirstChildElement("vcount");
+    TiXmlElement *vcount_elem = child(mesh_child, "vcount");
 
     // build an initial index based on the mesh_child value
     // todo: optimise the mesh.
@@ -993,7 +1029,7 @@ private:
       return;
     }
 
-    TiXmlElement *vcount_elem = mesh_child->FirstChildElement("vcount");
+    TiXmlElement *vcount_elem = child(mesh_child, "vcount");
     if (!vcount_elem) {
       printf("warning: no vcount element in skin\n");
     }
@@ -1019,7 +1055,7 @@ private:
     state.input_offset = 0;
 
     // build the raw skin paramerters
-    for (TiXmlElement *input = mesh_child->FirstChildElement("input");
+    for (TiXmlElement *input = child(mesh_child, "input");
       input != NULL;
       input = input->NextSiblingElement("input")
     ) {
@@ -1097,16 +1133,17 @@ public:
   }
 
   // public function to load a collada file
-  void load(const char *url) {
+  bool load_xml(const char *url) {
     doc_path = url;
     doc_path.truncate(doc_path.filename_pos());
     doc.LoadFile(app_utils::get_path(url));
     TiXmlElement *top = doc.RootElement();
     if (!top || strcmp(top->Value(), "COLLADA")) {
       printf("warning: not a collada file");
-      return;
+      return false;
     }
     find_ids(top);
+    return true;
   }
 
   // once loaded, use this to access the first component in the mesh
@@ -1119,7 +1156,7 @@ public:
       return;
     }
 
-    TiXmlElement *mesh = geometry->FirstChildElement("mesh");
+    TiXmlElement *mesh = child(geometry, "mesh");
     if (!mesh) {
       printf("warning: geometry %s has no mesh\n", id);
       return;
@@ -1139,12 +1176,14 @@ public:
   // get the url from the default visual scene
   const char *get_default_scene() {
     TiXmlElement *scene = doc.RootElement()->FirstChildElement("scene");
-    TiXmlElement *ivs = scene ? scene->FirstChildElement("instance_visual_scene") : 0;
+    TiXmlElement *ivs = child(scene, "instance_visual_scene");
     return ivs ? ivs->Attribute("url") : 0;
   }
 
   // extract resources from the collada file into a collection.
   void get_resources(resources &dict) {
+    add_textures(dict);
+
     add_materials(dict);
 
     add_geometry(dict);

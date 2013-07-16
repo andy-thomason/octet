@@ -5,7 +5,7 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 //
-// gif file decoder
+// gif file decoder - only the most common variants
 // 
 class gif_decoder {
   unsigned short lzw_head[0x1001];
@@ -114,8 +114,8 @@ class gif_decoder {
   }
 
 public:
-  // get an opengl texture of gl_kind from a gif file in memory
-  GLuint get_texture(unsigned gl_kind, const unsigned char *src, const unsigned char *src_max) {
+  // get an opengl texture from a file in memory
+  GLuint get_texture(const unsigned char *src, const unsigned char *src_max) {
     unsigned width = src[6] + src[7]*256;
     unsigned height = src[8] + src[9]*256;
     unsigned flags = src[10];
@@ -198,7 +198,7 @@ public:
       }
     }
   fail:;
-    return app_utils::make_texture(gl_kind, texture, width, height);
+    return app_utils::make_texture(transparency_index == 0x100 ? GL_RGB : GL_RGBA, texture, width, height);
   }
 };
 

@@ -30,14 +30,14 @@ class scene : public scene_node {
 
   int frame_number;
 
-  /*void metadata(meta &m) {
-    m.visit(nodeToParent);
-    m.visit(sids);
-    m.visit(parentNodes);
-    m.visit(mesh_instances);
-    m.visit(animation_instances);
-    m.visit(camera_instances);
-    m.visit(light_instances);
+  /*void visit(visitor &v) {
+    v.visit(nodeToParent);
+    v.visit(sids);
+    v.visit(parentNodes);
+    v.visit(mesh_instances);
+    v.visit(animation_instances);
+    v.visit(camera_instances);
+    v.visit(light_instances);
   }*/
 
   void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
@@ -70,8 +70,6 @@ class scene : public scene_node {
         // multi-matrix rendering
         mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
         int num_bones = skel->get_num_bones();
-        app_utils::log("%s 0\n", transforms[0].toString());
-        app_utils::log("%s 1\n", transforms[1].toString());
         mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, lighting_set.data());
       }
       mesh->render();
@@ -156,22 +154,7 @@ public:
   void update(float delta_time) {
     for (int ai = 0; ai != animation_instances.size(); ++ai) {
       animation_instance *inst = animation_instances[ai];
-      if (inst) {
-        const animation *anim = inst->get_anim();
-        for (int ch = 0; ch != anim->get_num_channels(); ++ch) {
-          animation::chan_kind kind = anim->get_chan_kind(ch);
-          if (kind == animation::chan_matrix) {
-            mat4t m;
-            anim->eval_chan(ch, inst->get_time(), &m, sizeof(m));
-          }
-        }
-
-        // update the instance by the frame rate
-        if (inst->update_time(delta_time)) {
-          // instance is dead, stop playing
-          animation_instances[ai] = NULL;
-        }
-      }
+      inst->update(delta_time);
     }
   }
 

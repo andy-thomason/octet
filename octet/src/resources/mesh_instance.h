@@ -47,6 +47,13 @@ public:
   }
 
   void set_value(atom_t sid, float *value) {
+    if (skel) {
+      // todo: cache the index
+      int index = skel->get_bone_index(sid);
+      if (index != -1) {
+        skel->set_bone(index, (mat4t&)*value);
+      }
+    }
   }
 
   scene_node *get_node() const { return node; }
