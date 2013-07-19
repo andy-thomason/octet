@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -30,7 +30,7 @@ class raytrace_app : public app {
   dynarray<mesh*> meshes;
 
   // materials for our objects
-  dynarray<bump_material*> materials;
+  dynarray<material*> materials;
 
   // array of lights
   lighting lights;
@@ -46,7 +46,7 @@ class raytrace_app : public app {
   mesh duck_mesh;
 
   // material for duck.
-  bump_material duck_material;
+  material duck_material;
 
   // texture for our frame buffer
   GLuint texture_handle_;
@@ -82,7 +82,8 @@ public:
 
     collada_builder builder;
     builder.load_xml("assets/duck_triangulate.dae");
-    duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
+    //duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
+    builder.get_mesh(duck_mesh, "LOD3spShape-lib", dict);
 
     mat4t mat;
     mat.loadIdentity();

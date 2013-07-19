@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -175,10 +175,10 @@ private:
 
   // a structure to keep track of the complex COLLADA <input> tags
   struct parse_input_state {
-    mesh_state *s;
+    mesh *s;
     dynarray<int> p;
     dynarray<float> vertices;
-    dynarray<unsigned short> indices;
+    dynarray<unsigned> indices;
     unsigned attr_offset;
     unsigned attr_stride;
     unsigned input_offset;
@@ -415,15 +415,15 @@ private:
     TiXmlElement *lib_mat = child(doc.RootElement(), "library_materials");
 
     if (!dict.has_resource("default_material")) {
-      bump_material *defmat = new bump_material();
+      material *defmat = new material();
       defmat->make_color(vec4(0.5, 0.5, 0.5, 1), false, false);
       dict.set_resource("default_material", defmat);
     }
 
     if (!lib_mat) return;
 
-    for (TiXmlElement *material = lib_mat->FirstChildElement(); material != NULL; material = material->NextSiblingElement()) {
-      TiXmlElement *ieffect = child(material, "instance_effect");
+    for (TiXmlElement *mat_elem = lib_mat->FirstChildElement(); mat_elem != NULL; mat_elem = mat_elem->NextSiblingElement()) {
+      TiXmlElement *ieffect = child(mat_elem, "instance_effect");
       const char *url = attr(ieffect, "url");
       TiXmlElement *effect = find_id(url);
       TiXmlElement *profile_COMMON = child(effect, "profile_COMMON");
@@ -440,13 +440,13 @@ private:
         GLuint specular = get_texture(shader, profile_COMMON, "specular", "#00000000");
         GLuint bump = get_texture(shader, profile_COMMON, "bump", "#808080ff");
         float shininess = get_float(shader, "shininess", 0);
-        bump_material *mat = new bump_material();
+        material *mat = new material();
         mat->init(diffuse, ambient, emission, specular, bump, shininess);
-        dict.set_resource(attr(material, "id"), mat);
+        dict.set_resource(attr(mat_elem, "id"), mat);
       } else {
-        bump_material *mat = new bump_material();
+        material *mat = new material();
         mat->make_color(vec4(0.5, 0.5, 0.5, 0), false, false);
-        dict.set_resource(attr(material, "id"), mat);
+        dict.set_resource(attr(mat_elem, "id"), mat);
       }
     }
   }
@@ -454,12 +454,9 @@ private:
   void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, skin *skn, resources &dict, scene &s) {
     if (!url) return;
 
-    if (technique_common) {
-      for (
-        TiXmlElement *instance = child(technique_common, "instance_material");
-        instance != NULL;
-        instance = instance->NextSiblingElement("instance_material")
-      ) {
+    TiXmlElement *instance = child(technique_common, "instance_material");
+    if (instance) {
+      for (; instance != NULL; instance = instance->NextSiblingElement("instance_material")) {
         const char *symbol = instance->Attribute("symbol");
         const char *target = instance->Attribute("target");
         // add a scene_node/mesh/material combination to the mesh_instance
@@ -467,18 +464,18 @@ private:
           string new_url;
           new_url.format("%s+%s", url, symbol);
           //app_utils::log("ami %s\n", new_url.c_str());
-          mesh_state *mesh = dict.get_mesh_state(new_url);
-          bump_material *mat = dict.get_bump_material(target);
-          if (!mat) mat = dict.get_bump_material("default_material");
-          if (mesh) {
-            mesh_instance *mi = new mesh_instance(node, mesh, mat, skn, skel);
+          mesh *msh = dict.get_mesh(new_url);
+          material *mat = dict.get_material(target);
+          if (!mat) mat = dict.get_material("default_material");
+          if (msh) {
+            mesh_instance *mi = new mesh_instance(node, msh, mat, skn, skel);
             s.add_mesh_instance(mi);
           }
         }
       }
     } else {
-      mesh_state *mesh = dict.get_mesh_state(url);
-      bump_material *mat = dict.get_bump_material("default_material");
+      mesh *mesh = dict.get_mesh(url);
+      material *mat = dict.get_material("default_material");
       if (mesh) {
         mesh_instance *mi = new mesh_instance(node, mesh, mat, skn, skel);
         s.add_mesh_instance(mi);
@@ -507,7 +504,7 @@ private:
       num_bones++;
     }
 
-    mesh_state *mesh = dict.get_mesh_state(controller_url);
+    mesh *mesh = dict.get_mesh(controller_url);
     if (!mesh || !mesh->get_skin()) return;
     skin *skn = mesh->get_skin();
 
@@ -582,16 +579,16 @@ private:
     if (!lib_geom) return;
 
     for (TiXmlElement *geometry = lib_geom->FirstChildElement(); geometry != NULL; geometry = geometry->NextSiblingElement()) {
-      TiXmlElement *mesh = child(geometry, "mesh");
+      TiXmlElement *mesh_elem = child(geometry, "mesh");
       const char *id = geometry->Attribute("id");
 
-      for (TiXmlElement *mesh_child = mesh ? mesh->FirstChildElement() : 0;
+      for (TiXmlElement *mesh_child = mesh_elem ? mesh_elem->FirstChildElement() : 0;
         mesh_child != NULL;
         mesh_child = mesh_child->NextSiblingElement()
       ) {
         if (is_mesh_component(mesh_child->Value())) {
-          mesh_state *mesh = new mesh_state();
-          get_mesh_component(mesh, id, mesh_child, NULL, dict);
+          mesh *msh = new mesh();
+          get_mesh_component(msh, id, mesh_child, NULL, dict);
         }
       }
     }
@@ -635,10 +632,10 @@ private:
       TiXmlElement *vertex_weights = child(skin_elem, "vertex_weights");
       if (vertex_weights && geometry) {
         get_skin(controller, vertex_weights, &skinst);
-        TiXmlElement *mesh = child(geometry, "mesh");
+        TiXmlElement *mesh_elem = child(geometry, "mesh");
         const char *id = geometry->Attribute("id");
 
-        for (TiXmlElement *mesh_child = mesh ? mesh->FirstChildElement() : 0;
+        for (TiXmlElement *mesh_child = mesh_elem ? mesh_elem->FirstChildElement() : 0;
           mesh_child != NULL;
           mesh_child = mesh_child->NextSiblingElement()
         ) {
@@ -663,8 +660,8 @@ private:
               mesh_skin->add_joint(bindToModel, resources::get_atom(joints[i]));
             }
 
-            mesh_state *mesh = new mesh_state(mesh_skin);
-            get_mesh_component(mesh, controller_id, mesh_child, &skinst, dict);
+            mesh *msh = new mesh(mesh_skin);
+            get_mesh_component(msh, controller_id, mesh_child, &skinst, dict);
           }
         }
       }
@@ -884,7 +881,7 @@ private:
   }
 
   // get triangles from a trilist or polylist
-  void get_mesh_component(mesh_state *mesh, const char *id, TiXmlElement *mesh_child, skin_state *skinst, resources &dict) {
+  void get_mesh_component(mesh *mesh, const char *id, TiXmlElement *mesh_child, skin_state *skinst, resources &dict) {
     TiXmlElement *pelem = child(mesh_child, "p");
 
     if (!pelem) {
@@ -1011,7 +1008,7 @@ private:
 
     mesh->allocate(vsize, isize, app_common::can_use_vbos());
     mesh->assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
-    mesh->set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_SHORT);
+    mesh->set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_INT);
     if (0) {
       FILE *file = app_utils::log("mesh skinst=%p\n", skinst);
       mesh->dump(file);
@@ -1147,7 +1144,7 @@ public:
   }
 
   // once loaded, use this to access the first component in the mesh
-  void get_mesh_state(mesh_state &s, const char *id, resources &dict) {
+  void get_mesh(mesh &s, const char *id, resources &dict) {
     TiXmlElement *geometry = find_id(id);
     s.init();
 

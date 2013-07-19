@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -37,11 +37,13 @@ public:
     collada_builder builder;
     const char *filename = 0;
 
-    int selector = 1;
-    switch (1) {
+    int selector = 0;
+    switch (selector) {
       case 0: filename = "assets/duck_triangulate.dae"; break;
       case 1: filename = "assets/skinning/skin_unrot.dae"; break;
       case 2: filename = "assets/jenga.dae"; break;
+      case 3: filename = "assets/duck_ambient.dae"; break;
+      case 4: filename = "assets/Laurana50k.dae"; break;
     }
 
     if (!builder.load_xml(filename)) {
@@ -76,16 +78,18 @@ public:
     // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
     glEnable(GL_DEPTH_TEST);
 
-    if (app_scene->num_camera_instances() == 0) {
-      return;
+    if (app_scene) {
+      if (app_scene->num_camera_instances() == 0) {
+        return;
+      }
+
+      mat4t cameraToWorld;
+      camera_instance *cam = app_scene->get_camera_instance(0);
+
+      // update matrices. assume 30 fps.
+      app_scene->update(1.0f/30);
+
+      app_scene->render(object_shader, skin_shader, *cam);
     }
-
-    mat4t cameraToWorld;
-    camera_instance *cam = app_scene->get_camera_instance(0);
-
-    // update matrices. assume 30 fps.
-    app_scene->update(1.0f/30);
-
-    app_scene->render(object_shader, skin_shader, *cam);
   }
 };

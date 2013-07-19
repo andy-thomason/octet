@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -22,6 +22,9 @@ public:
 
   skin(const mat4t &modelToBind) {
     this->modelToBind = modelToBind;
+  }
+
+  void visit(visitor &v) {
   }
 
   void add_joint(const mat4t &bindToModel, atom_t sid) {

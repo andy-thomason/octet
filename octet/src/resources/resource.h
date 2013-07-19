@@ -1,19 +1,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // generalised resource: materials, scenes, cameras, meshes etc.
 //
 
-typedef int atom_t;
+enum atom_t {
+  atom__null,
+  atom__first,
+};
 
 class skin;
 class skeleton;
-class mesh_state;
+class mesh;
 class material;
-class bump_material;
+class material;
 class animation;
 class camera_instance;
 class light_instance;
@@ -22,7 +25,9 @@ class animation_instance;
 class scene;
 class scene_node;
 
-#define RESOURCE_META(classname) classname *get_##classname() { return this; }
+#define RESOURCE_META(classname) \
+  classname *get_##classname() { return this; } \
+  static const char *get_type() { return #classname; }
 
 class resource {
   int ref_count;
@@ -42,11 +47,13 @@ public:
     }
   }
 
+  void *operator new (size_t size) { return allocator::malloc(size); }
+  void operator delete (void *ptr, size_t size) { return allocator::free(ptr, size); }
+
   virtual skin *get_skin() { return 0; }
   virtual skeleton *get_skeleton() { return 0; }
-  virtual mesh_state *get_mesh_state() { return 0; }
+  virtual mesh *get_mesh() { return 0; }
   virtual material *get_material() { return 0; }
-  virtual bump_material *get_bump_material() { return 0; }
   virtual animation *get_animation() { return 0; }
   virtual camera_instance *get_camera_instance() { return 0; }
   virtual light_instance *get_light_instance() { return 0; }
@@ -54,6 +61,5 @@ public:
   virtual animation_instance *get_animation_instance() { return 0; }
   virtual scene *get_scene() { return 0; }
   virtual scene_node *get_scene_node() { return 0; }
-
 };
 

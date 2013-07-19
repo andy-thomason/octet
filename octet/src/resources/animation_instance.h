@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -22,6 +22,9 @@ public:
     this->time = 0;
     this->is_looping = is_looping;
     this->is_paused = false;
+  }
+
+  void visit(visitor &v) {
   }
 
   const animation *get_anim() const {

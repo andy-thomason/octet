@@ -80,6 +80,7 @@
     <ClInclude Include="..\src\containers\dictionary.h" />
     <ClInclude Include="..\src\containers\double_list.h" />
     <ClInclude Include="..\src\containers\dynarray.h" />
+    <ClInclude Include="..\src\containers\hash_map.h" />
     <ClInclude Include="..\src\containers\ptr.h" />
     <ClInclude Include="..\src\containers\ref.h" />
     <ClInclude Include="..\src\examples\animation\animation_app.h" />
@@ -130,9 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\resources\material.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

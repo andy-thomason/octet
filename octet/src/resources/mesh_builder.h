@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -189,19 +189,8 @@ public:
     add_cone_or_sphere(radius, height, slices, stacks, uvscale, false);
   }
 
-  // get a mesh mesh_state from the builder either as VBOs or allocated memory.
-  void get_mesh_state(mesh_state &s) {
-    unsigned isize = indices.size() * sizeof(indices[0]);
-    unsigned vsize = vertices.size() * sizeof(vertices[0]);
-    s.init();
-    s.allocate(vsize, isize, app_common::can_use_vbos());
-    s.assign(vsize, isize, (unsigned char*)&vertices[0], (unsigned char*)&indices[0]);
-    s.set_params(sizeof(vertex), indices.size(), vertices.size(), GL_TRIANGLES, GL_UNSIGNED_SHORT);
-
-    s.add_attribute(attribute_pos, 3, GL_FLOAT, 0);
-    s.add_attribute(attribute_normal, 3, GL_FLOAT, 12);
-    s.add_attribute(attribute_uv, 2, GL_FLOAT, 24);
-  }
+  // get a mesh mesh from the builder either as VBOs or allocated memory.
+  void get_mesh(mesh &s);
 
   void scale(float x, float y, float z) {
     matrix.scale(x, y, z);

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -8,6 +8,12 @@
 //
 // this is a placeholder for a game-style memory allocator
 // using malloc and free is frowned upon in grown-up circles.
+//
+// these functions are poor for the following reasons:
+//
+// 1) free() has to compute the size of the block to free
+// 2) these functions use heavy weight locks to guard the heap.
+// 3) implementations are quite variable
 
 class allocator {
   // singleton state, a bit like an old-world global variable
@@ -50,10 +56,3 @@ public:
   }
 };
 
-inline void *operator new(size_t size, allocator &alloc) {
-  return alloc.malloc(size);
-}
-
-inline void operator delete(void *ptr, size_t size, allocator &alloc) {
-  return alloc.free(ptr, size);
-}

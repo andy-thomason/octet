@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -28,18 +28,6 @@ class scene : public scene_node {
   // compiled set of active lights
   lighting lighting_set;
 
-  int frame_number;
-
-  /*void visit(visitor &v) {
-    v.visit(nodeToParent);
-    v.visit(sids);
-    v.visit(parentNodes);
-    v.visit(mesh_instances);
-    v.visit(animation_instances);
-    v.visit(camera_instances);
-    v.visit(light_instances);
-  }*/
-
   void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
     mat4t cameraToWorld = cam.get_node()->calcModelToWorld();
 
@@ -51,10 +39,10 @@ class scene : public scene_node {
 
     for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
       mesh_instance *mi = mesh_instances[mesh_index];
-      mesh_state *mesh = mi->get_mesh();
+      mesh *msh = mi->get_mesh();
       skin *skn = mi->get_skin();
       skeleton *skel = mi->get_skeleton();
-      bump_material *mat = mi->get_material();
+      material *mat = mi->get_material();
 
       mat4t modelToWorld = mi->get_node()->calcModelToWorld();
       mat4t modelToCamera;
@@ -72,7 +60,7 @@ class scene : public scene_node {
         int num_bones = skel->get_num_bones();
         mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, lighting_set.data());
       }
-      mesh->render();
+      msh->render();
     }
   }
 public:
@@ -80,7 +68,14 @@ public:
 
   // create an empty scene
   scene() {
-    frame_number = 0;
+  }
+
+  void visit(visitor &v) {
+    scene_node::visit(v);
+    v.visit(mesh_instances, "mesh_instances");
+    v.visit(animation_instances, "animation_instances");
+    v.visit(camera_instances, "camera_instances");
+    v.visit(light_instances, "light_instances");
   }
 
   void create_default_camera_and_lights() {
@@ -88,11 +83,11 @@ public:
     if (camera_instances.size() == 0) {
       mat4t m;
       m.loadIdentity();
-      m.rotateX(90);
-      m.translate(0.0, 1.0f, 1.5f);
-      scene_node *node = add_root_node(m, 0);
+      //m.rotateX(90);
+      m.translate(0.0, 0.0f, 200.0f);
+      scene_node *node = add_root_node(m, atom__null);
       camera_instance *cam = new camera_instance();
-      float n = 0.1f, f = 1000.0f;
+      float n = 0.1f, f = 5000.0f;
       cam->set_params(node, -n, n, -n, n, n, f, false);
       camera_instances.push_back(cam);
     }
@@ -180,12 +175,8 @@ public:
   }
 
   void dump(FILE *file) {
-    dynarray<scene_node*> nodes;
-    dynarray<int> parents;
-    scene_node::get_all_child_nodes(nodes, parents);
-    for (int i = 0; i != nodes.size(); ++i) {
-      fprintf(file, "%5d %p %5d %p\n", i, (scene_node*)nodes[i], parents[i], (scene_node*)nodes[i]->get_parent());
-    }
+    xml_writer xml(file);
+    visit(xml);
   }
 };
 
