@@ -56,6 +56,8 @@
 #include "../math/matrix.h"
 #include "../math/random.h"
 
+#include "mouse_ball.h"
+
 #include "../resources/tinyxml/tinystr.cpp"
 #include "../resources/tinyxml/tinyxml.cpp"
 #include "../resources/tinyxml/tinyxmlerror.cpp"

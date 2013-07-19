@@ -122,7 +122,20 @@ public:
   }
   
   // generalized single axis rotate
-  mat4t &rotate(float cosAngle, float sinAngle, int a, int b) {
+  mat4t &rotate(float x, float y, float z, float angle) {
+    float c = cosf(angle * (3.14159265f/180));
+    float s = sinf(angle * (3.14159265f/180));
+    mat4t r(
+      vec4(x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0),
+      vec4(x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0),
+      vec4(x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0),
+      vec4(          0,               0,             0, 1)
+    );
+    return multMatrix(r);
+  }
+
+  // specialised xyz axis rotate
+  mat4t &rotateSpecial(float cosAngle, float sinAngle, int a, int b) {
     vec4 t = v[a] * cosAngle + v[b] * sinAngle;
     v[b] = v[b] * cosAngle - v[a] * sinAngle;
     v[a] = t;
@@ -130,19 +143,19 @@ public:
   }
 
   // rotate by angle in degrees
-  mat4t &rotateX(float angle) { return rotate(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 1, 2); }
-  mat4t &rotateY(float angle) { return rotate(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 2, 0); }
-  mat4t &rotateZ(float angle) { return rotate(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 0, 1); }
+  mat4t &rotateX(float angle) { return rotateSpecial(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 1, 2); }
+  mat4t &rotateY(float angle) { return rotateSpecial(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 2, 0); }
+  mat4t &rotateZ(float angle) { return rotateSpecial(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 0, 1); }
 
   // accurate rotate by 90
-  mat4t &rotateX90() { return rotate(0, 1, 1, 2); }
-  mat4t &rotateY90() { return rotate(0, 1, 2, 0); }
-  mat4t &rotateZ90() { return rotate(0, 1, 0, 1); }
+  mat4t &rotateX90() { return rotateSpecial(0, 1, 1, 2); }
+  mat4t &rotateY90() { return rotateSpecial(0, 1, 2, 0); }
+  mat4t &rotateZ90() { return rotateSpecial(0, 1, 0, 1); }
 
   // accurate rotate by 180
-  mat4t &rotateX180() { return rotate(-1, 0, 1, 2); }
-  mat4t &rotateY180() { return rotate(-1, 0, 2, 0); }
-  mat4t &rotateZ180() { return rotate(-1, 0, 0, 1); }
+  mat4t &rotateX180() { return rotateSpecial(-1, 0, 1, 2); }
+  mat4t &rotateY180() { return rotateSpecial(-1, 0, 2, 0); }
+  mat4t &rotateZ180() { return rotateSpecial(-1, 0, 0, 1); }
 
   // multiply by vector on the left
   // [l[0],l[1],l[2],l[3]] * [v[0],v[1],v[2],v[3]]

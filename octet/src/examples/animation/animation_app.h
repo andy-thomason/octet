@@ -22,10 +22,12 @@ class animation_app : public app {
   bump_shader object_shader;
   bump_shader skin_shader;
 
+  mouse_ball ball;
+
 public:
 
   // this is called when we construct the class
-  animation_app(int argc, char **argv) : app(argc, argv) {
+  animation_app(int argc, char **argv) : app(argc, argv), ball(this) {
   }
 
   // this is called once OpenGL is initialized
@@ -37,7 +39,7 @@ public:
     collada_builder builder;
     const char *filename = 0;
 
-    int selector = 0;
+    int selector = 2;
     switch (selector) {
       case 0: filename = "assets/duck_triangulate.dae"; break;
       case 1: filename = "assets/skinning/skin_unrot.dae"; break;
@@ -64,6 +66,13 @@ public:
       scene_node *node = dict.get_scene_node("Cube");
       app_scene->play(anim, app_scene->get_first_mesh_instance(node), true);
     }
+
+    if (app_scene->num_camera_instances() != 0) {
+      camera_instance *cam = app_scene->get_camera_instance(0);
+      scene_node *node = cam->get_node();
+      mat4t cameraToWorld = node->get_nodeToParent();
+      ball.init(cameraToWorld.w().length(), 360.0f);
+    }
   }
 
   // this is called to draw the world
@@ -83,8 +92,10 @@ public:
         return;
       }
 
-      mat4t cameraToWorld;
       camera_instance *cam = app_scene->get_camera_instance(0);
+      scene_node *node = cam->get_node();
+      mat4t &cameraToWorld = node->access_nodeToParent();
+      ball.update(cameraToWorld);
 
       // update matrices. assume 30 fps.
       app_scene->update(1.0f/30);

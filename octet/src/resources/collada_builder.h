@@ -776,7 +776,7 @@ private:
     for (int ni = 0; ni != node_elems.size(); ++ni) {
       TiXmlElement *node_elem = node_elems[ni];
       scene_node *node = nodes[ni];
-      mat4t &matrix = node->get_nodeToParent();
+      mat4t &matrix = node->access_nodeToParent();
       matrix.loadIdentity();
 
       for (TiXmlElement *child = node_elem->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
@@ -795,11 +795,7 @@ private:
         } else if (!strcmp(value, "rotate")) {
           atofv(temp_floats, child->GetText());
           if (temp_floats.size() >= 4) {
-            // not a precise definition of collada rotate, but works in most cases
-            if (temp_floats[0] == 1) matrix.rotateX(temp_floats[3]);
-            else if (temp_floats[1] == 1) matrix.rotateY(temp_floats[3]);
-            else if (temp_floats[2] == 1) matrix.rotateZ(temp_floats[3]);
-            else printf("strange file\n");
+            matrix.rotate(temp_floats[0], temp_floats[1], temp_floats[2], temp_floats[3]);
           }
         } else if (!strcmp(value, "scale")) {
           atofv(temp_floats, child->GetText());

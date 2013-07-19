@@ -8,11 +8,16 @@
 
 class app_common {
   unsigned char keys[256];
+  int mouse_x;
+  int mouse_y;
+  int viewport_x;
+  int viewport_y;
 
 public:
   app_common() {
     // this memset writes 0 to every byte of keys[]
     memset(keys, 0, sizeof(keys));
+    mouse_x = mouse_y = 0;
   }
 
   enum {
@@ -48,6 +53,11 @@ public:
     key_shift,
     key_ctrl,
     key_alt,
+
+    // mouse buttons
+    key_lmb,
+    key_mmb,
+    key_rmb,
   };
 
   virtual void draw_world(int x, int y, int w, int h) = 0;
@@ -58,9 +68,30 @@ public:
     return keys[key & 0xff] == 1;
   }
 
+  void get_mouse_pos(int &x, int &y) {
+    x = mouse_x;
+    y = mouse_y;
+  }
+
+  void get_viewport_size(int &x, int &y) {
+    x = viewport_x;
+    y = viewport_y;
+  }
+
   // used by the platform to set a key
   void set_key(unsigned key, bool is_down) {
     keys[key & 0xff] = is_down ? 1 : 0;
+  }
+
+  // used by the platform to set a key
+  void set_mouse_pos(unsigned x, unsigned y) {
+    mouse_x = x;
+    mouse_y = y;
+  }
+
+  void set_viewport_size(unsigned x, unsigned y) {
+    viewport_x = x;
+    viewport_y = y;
   }
 
   static bool can_use_vbos() {

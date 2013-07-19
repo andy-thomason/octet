@@ -66,7 +66,11 @@ public:
     return result;
   }
 
-  mat4t &get_nodeToParent() {
+  const mat4t &get_nodeToParent() const {
+    return nodeToParent;
+  }
+
+  mat4t &access_nodeToParent() {
     return nodeToParent;
   }
 

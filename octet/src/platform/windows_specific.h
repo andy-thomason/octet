@@ -121,6 +121,10 @@ public:
 
     init_gl_context(GetDC(window_handle));
 
+    RECT rect;
+    GetClientRect(window_handle, &rect);
+    set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
+
     app_init();
 
     ShowWindow (window_handle, SW_SHOW);
@@ -133,6 +137,7 @@ public:
 
     RECT rect;
     GetClientRect(window_handle, &rect);
+    set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
     draw_world(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 
@@ -202,10 +207,18 @@ public:
       // todo: get notification when the windows close.
       while (PeekMessage(&msg, 0, 0, 0, TRUE)) {
         //printf("msg=%04x %02x\n", msg.message, msg.wParam);
-        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-          app *app = map()[msg.hwnd];
-          if (app) {
+        app *app = map()[msg.hwnd];
+        if (app) {
+          if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
             app->set_key(app::translate(msg.wParam), msg.message == WM_KEYDOWN);
+          } else if (msg.message == WM_MOUSEMOVE) {
+            app->set_mouse_pos(msg.lParam & 0xffff, msg.lParam >> 16);
+          } else if (msg.message == WM_LBUTTONDOWN || msg.message == WM_LBUTTONUP) {
+            app->set_key(app_common::key_lmb, msg.message == WM_LBUTTONDOWN);
+          } else if (msg.message == WM_MBUTTONDOWN || msg.message == WM_MBUTTONUP) {
+            app->set_key(app_common::key_mmb, msg.message == WM_MBUTTONDOWN);
+          } else if (msg.message == WM_RBUTTONDOWN || msg.message == WM_RBUTTONUP) {
+            app->set_key(app_common::key_mmb, msg.message == WM_RBUTTONDOWN);
           }
         }
         DispatchMessage (&msg);
