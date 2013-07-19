@@ -20,6 +20,9 @@ http://software.intel.com/en-us/vcsource/tools/opencl-sdk-2013
 
 You may also need to install OpenAL
 
+"oalinst" from
+http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx
+
 I may get the time to make this optional.
 
 
