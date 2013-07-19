@@ -115,11 +115,11 @@ public:
 
     size_t log_size = 0;
     clGetProgramBuildInfo(prog, device, CL_PROGRAM_BUILD_LOG, 0, 0, &log_size);
-    dynarray<char> log(log_size+1);
+    dynarray<char> log((int)log_size+1);
 
     clGetProgramBuildInfo(prog, device, CL_PROGRAM_BUILD_LOG, log_size, &log[0], &log_size);
     if (log_size) {
-      log[log_size] = 0;
+      log[(int)log_size] = 0;
       printf("log: %s\n", &log[0]);
       fflush(stdout);
     }

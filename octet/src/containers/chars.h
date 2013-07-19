@@ -110,7 +110,7 @@ public:
   int find(const char *rhs) const {
     char *d = strstr(data_, rhs);
     if (d) {
-      return d - data_;
+      return (int)(d - data_);
     }
     return -1;
   }
@@ -122,7 +122,7 @@ public:
       if (chr == '/' || chr == '\\') {
         res = -1;  // note  /usr/fred.jim/harry   has no extension
       } else if (chr == '.') {
-        res = p - data_;
+        res = (int)(p - data_);
       }
     }
     return res;
@@ -133,13 +133,13 @@ public:
     for (const char *p = data_; *p; ++p) {
       char chr = *p;
       if (chr == '/' || chr == '\\') {
-        res = p - data_ + 1;
+        res = (int)(p - data_ + 1);
       }
     }
     return res;
   }
 
-  int size() { return strlen(data_); }
+  int size() { return (int)strlen(data_); }
 
   const char *c_str() const { return data_; }
   operator const char *() { return data_; }

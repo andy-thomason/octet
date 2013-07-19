@@ -114,6 +114,8 @@ public:
         mat4t m = ma * t + mb * (1-t);
         target->set_value(ch.sid, m.get());
       } break;
+      default: {
+      } break;
     }
   }
 };
