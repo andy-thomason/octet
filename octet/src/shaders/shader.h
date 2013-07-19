@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -41,7 +41,7 @@ public:
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
 
-    // standardize the attribute slots    
+    // standardize the attribute slots (in NVidia's CG you can do this in the shader)
     glBindAttribLocation(program, attribute_pos, "pos");
     glBindAttribLocation(program, attribute_normal, "normal");
     glBindAttribLocation(program, attribute_tangent, "tangent");
@@ -51,6 +51,7 @@ public:
     glBindAttribLocation(program, attribute_color, "color");
     glBindAttribLocation(program, attribute_uv, "uv");
     glLinkProgram(program);
+
     program_ = program;
     glGetProgramInfoLog(program, sizeof(buf), &length, buf);
     puts(buf);

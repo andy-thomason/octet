@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -28,6 +28,9 @@ public:
   RESOURCE_META(camera_instance)
 
   camera_instance() {
+  }
+
+  void visit(visitor &v) {
   }
 
   // call this once to set up the camera

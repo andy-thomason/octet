@@ -210,15 +210,13 @@
     <ClInclude Include="..\src\resources\animation_target.h">
       <Filter>resources</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\containers\hash_map.h">
+      <Filter>containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp">
       <Filter>examples</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\resources\material.inl">
-      <Filter>resources</Filter>
-    </None>
   </ItemGroup>
 </Project>

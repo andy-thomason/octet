@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -19,7 +19,7 @@
 class mat4t {
   // these vectors are the x, y, z, w components. w is the translation.
   vec4 v[4];
-  static const char *Copyright() { return "Copyright(C) Andy Thomason 2012"; }
+  static const char *Copyright() { return "Copyright(C) Andy Thomason 2012, 2013"; }
 public:
   mat4t() {}
   mat4t(const vec4 &x, const vec4 &y, const vec4 &z, const vec4 &w)

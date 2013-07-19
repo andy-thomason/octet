@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -11,7 +11,7 @@ class mat4t;
 
 #if defined( USE_SSE )
 class vec4 {
-  static const char *Copyright() { return "Copyright(C) Andy Thomason 2012"; }
+  static const char *Copyright() { return "Copyright(C) Andy Thomason 2012, 2013"; }
   __m128 v128;
 public:
   vec4() {}

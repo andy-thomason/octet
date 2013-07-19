@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Ray tracing renderer
 //
@@ -24,7 +24,7 @@ public:
     int num_objects;
     mat4t *modelToWorld;
     mesh **meshes;
-    bump_material **materials;
+    material **materials;
   };
 
   struct tri_context {

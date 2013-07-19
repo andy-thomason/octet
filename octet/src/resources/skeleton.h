@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -17,6 +17,9 @@ public:
   RESOURCE_META(skeleton)
 
   skeleton() {
+  }
+
+  void visit(visitor &v) {
   }
 
   void add_bone(const mat4t &nodeToParent, atom_t sid, int parent) {

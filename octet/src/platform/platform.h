@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013 (MIT license)
+// (C) Andy Thomason 2012, 2013 (MIT license)
 //
 // Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -81,22 +81,29 @@ enum attribute {
   attribute_binormal = 15,
 };
 
+// resources
 #include "../resources/app_utils.h"
 #include "../resources/resource.h"
 #include "../resources/resources.h"
+#include "../resources/visitor.h"
+#include "../resources/xml_writer.h"
+#include "../resources/mesh_builder.h"
 #include "../resources/animation_target.h"
-#include "../resources/animation.h"
+
+// shaders
 #include "../shaders/shader.h"
 #include "../shaders/color_shader.h"
 #include "../shaders/texture_shader.h"
 #include "../shaders/phong_shader.h"
 #include "../shaders/bump_shader.h"
+
+// scene
 #include "../resources/scene_node.h"
 #include "../resources/skin.h"
 #include "../resources/skeleton.h"
-#include "../resources/mesh_state.h"
+#include "../resources/animation.h"
+#include "../resources/mesh.h"
 #include "../resources/material.h"
-#include "../resources/bump_material.h"
 #include "../resources/lighting.h"
 #include "../resources/camera_instance.h"
 #include "../resources/light_instance.h"
@@ -104,15 +111,14 @@ enum attribute {
 #include "../resources/animation_instance.h"
 #include "../resources/scene.h"
 
+// loaders
 #include "../resources/gif_decoder.h"
 #include "../resources/tga_decoder.h"
-#include "../resources/mesh_builder.h"
 #include "../resources/collada_builder.h"
-#include "../resources/mesh.h"
 
 // forward references
-#include "../resources/material.inl"
 #include "../resources/resources.inl"
+#include "../resources/mesh_builder.inl"
 
 #include "../physics/physics.h"
 

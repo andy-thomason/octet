@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -12,10 +12,10 @@ class mesh_instance : public resource, public animation_target {
   ref<scene_node> node;
 
   // which mesh to render
-  ref<mesh_state> mesh;
+  ref<mesh> msh;
 
   // what material to use
-  ref<bump_material> mat;
+  ref<material> mat;
 
   // for characters, which skin to use
   ref<skin> skn;
@@ -26,12 +26,20 @@ class mesh_instance : public resource, public animation_target {
 public:
   RESOURCE_META(mesh_instance)
 
-  mesh_instance(scene_node *node, mesh_state *mesh, bump_material *mat, skin *skn=0, skeleton *skel=0) {
+  mesh_instance(scene_node *node, mesh *msh, material *mat, skin *skn=0, skeleton *skel=0) {
     this->node = node;
-    this->mesh = mesh;
+    this->msh = msh;
     this->mat = mat;
     this->skn = skn;
     this->skel = skel;
+  }
+
+  void visit(visitor &v) {
+    v.visit(node, "node");
+    v.visit(msh, "msh");
+    v.visit(mat, "mat");
+    v.visit(skn, "skn");
+    v.visit(skel, "skel");
   }
 
   //////////////////////////////
@@ -57,8 +65,8 @@ public:
   }
 
   scene_node *get_node() const { return node; }
-  mesh_state *get_mesh() const { return mesh; }
-  bump_material *get_material() const { return mat; }
+  mesh *get_mesh() const { return msh; }
+  material *get_material() const { return mat; }
   skin *get_skin() const { return skn; }
   skeleton *get_skeleton() const { return skel; }
 };

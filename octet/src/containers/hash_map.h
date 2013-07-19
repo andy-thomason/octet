@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -31,7 +31,7 @@ template <typename key_t, typename value_t, class allocator_t=allocator> class h
     unsigned mask = max_entries - 1;
     for (unsigned i = 0; i != max_entries; ++i) {
       entry_t *entry = &entries[ ( i + hash ) & mask ];
-      if (is_empty(entry->key)) {
+      if (!entry->key) {
         return entry;
       }
       if (entry->hash == hash && entry->key == key) {
@@ -51,7 +51,7 @@ template <typename key_t, typename value_t, class allocator_t=allocator> class h
     max_entries *= 2;
     for (unsigned i = 0; i != old_max_entries; ++i) {
       entry_t *old_entry = &old_entries[i];
-      if (!is_empty(old_entry->key)) {
+      if (old_entry->key) {
         entry_t *new_entry = find(old_entry->key, old_entry->hash);
         *new_entry = *old_entry;
       }
@@ -72,7 +72,7 @@ public:
   value_t &operator[]( const key_t &key ) {
     unsigned hash = calc_hash(key);
     entry_t *entry = find( key, hash );
-    if (is_empty(entry->key)) {
+    if (!entry->key) {
       // reducing this ratio decreases hot search time at the
       // expense of size (cold search time).
       if (num_entries > max_entries * 3 / 4) {

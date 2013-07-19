@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2013
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -17,15 +17,15 @@
 //
 
 class physics_box {
-  bump_material *material;
+  material *mat;
   mesh *box_mesh;
   int physics_index;
 public:
   physics_box() {
   }
 
-  void init(bump_material *_material, mesh *_box_mesh, int _physics_index) {
-    material = _material;
+  void init(material *_material, mesh *_box_mesh, int _physics_index) {
+    mat = _material;
     box_mesh = _box_mesh;
     physics_index = _physics_index;
   }
@@ -36,7 +36,7 @@ public:
     mat4t modelToCamera = modelToWorld * worldToCamera;
     mat4t modelToProjection = modelToCamera * cameraToProjection;
     vec4 *light_uniforms = lights.data();
-    material->render(shader, modelToProjection, modelToCamera, light_uniforms);
+    mat->render(shader, modelToProjection, modelToCamera, light_uniforms);
     box_mesh->render();
   }
 
@@ -69,13 +69,13 @@ class physics_app : public app {
   bump_shader bump_shader_;
   
   // material for boxes
-  bump_material box_mat;
+  material box_mat;
   
   // mesh for boxes
   mesh box_mesh;
   
   // material for boxes
-  bump_material floor_mat;
+  material floor_mat;
   
   // mesh for boxes
   mesh floor_mesh;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012
+// (C) Andy Thomason 2012, 2013
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -26,9 +26,9 @@ class resources {
 
   static GLuint get_texture_handle_internal(unsigned gl_kind, const char *name);
 
-  static dictionary<int> *get_atom_dict() {
-    static dictionary<int> *dict;
-    if (!dict) dict = new dictionary<int>();
+  static dictionary<atom_t> *get_atom_dict() {
+    static dictionary<atom_t> *dict;
+    if (!dict) dict = new dictionary<atom_t>();
     return dict;
   }
 
@@ -77,7 +77,6 @@ public:
     }
     if (name[0] == '#') name++;
 
-    static atom_t num_atoms = 1;
     if (!dict.contains(name)) {
       return NULL;
     } else {
@@ -113,26 +112,25 @@ public:
   static atom_t get_atom(const char *name) {
     // the null name is 0
     if (name == 0 || name[0] == 0) {
-      return 0;
+      return atom__null;
     }
 
-    dictionary<int> *dict = get_atom_dict();
+    dictionary<atom_t> *dict = get_atom_dict();
 
-    static atom_t num_atoms = 1;
+    static int num_atoms = (int)atom__first;
     if (dict->contains(name)) {
       app_utils::log("old atom %s %d\n", name, (*dict)[name]);
       return (*dict)[name];
     } else {
       app_utils::log("new atom %s %d\n", name, num_atoms);
-      return (*dict)[name] = num_atoms++;
+      return (*dict)[name] = (atom_t)num_atoms++;
     }
   }
 
   skin *get_skin(const char *id) { resource *res = get_resource(id); return res ? res->get_skin() : 0; }
   skeleton *get_skeleton(const char *id) { resource *res = get_resource(id); return res ? res->get_skeleton() : 0; }
-  mesh_state *get_mesh_state(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh_state() : 0; }
+  mesh *get_mesh(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh() : 0; }
   material *get_material(const char *id) { resource *res = get_resource(id); return res ? res->get_material() : 0; }
-  bump_material *get_bump_material(const char *id) { resource *res = get_resource(id); return res ? res->get_bump_material() : 0; }
   animation *get_animation(const char *id) { resource *res = get_resource(id); return res ? res->get_animation() : 0; }
   camera_instance *get_camera_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_camera_instance() : 0; }
   light_instance *get_light_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_light_instance() : 0; }
