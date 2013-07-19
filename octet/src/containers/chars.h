@@ -35,11 +35,17 @@ public:
     release();
     va_list v;
     va_start(v, fmt);
-    int len = _vscprintf(fmt, v);
-    if (len) {
-      data_ = (char*)allocator_t::malloc(len+1);
-      vsprintf_s(data_, len+1, fmt, v);
-    }
+    #ifdef WIN32
+      int len = _vscprintf(fmt, v);
+      if (len) {
+        data_ = (char*)allocator_t::malloc(len+1);
+        vsprintf_s(data_, len+1, fmt, v);
+      }
+    #else
+      char tmp[1024];
+      vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
+      *this = tmp;
+    #endif
     return *this;
   }
 
