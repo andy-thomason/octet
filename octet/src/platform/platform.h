@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#define OCTET_OPENCL 1
+#define OCTET_OPENCL 0
 
 // use <> to include from standard directories
 #include <stdio.h>
@@ -34,6 +34,21 @@
 
 // some standard c++ definitions
 #include <map>
+
+// xml library
+#include "../tinyxml/tinystr.cpp"
+#include "../tinyxml/tinyxml.cpp"
+#include "../tinyxml/tinyxmlerror.cpp"
+#include "../tinyxml/tinyxmlparser.cpp"
+
+// this is a dummy class used to customise the placement new and delete
+struct dynarray_dummy_t {};
+
+// placement new operator, allows construction in-place at "place"
+void *operator new(size_t size, void *place, dynarray_dummy_t x) { return place; }
+
+// dummy placement delete operator, allows destruction at "place"
+void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 #include "../containers/allocator.h"
 #include "../containers/chars.h"
@@ -55,33 +70,6 @@
 #include "../math/vector.h"
 #include "../math/matrix.h"
 #include "../math/random.h"
-
-#include "mouse_ball.h"
-
-#include "../tinyxml/tinystr.cpp"
-#include "../tinyxml/tinyxml.cpp"
-#include "../tinyxml/tinyxmlerror.cpp"
-#include "../tinyxml/tinyxmlparser.cpp"
-
-// standard attribute names
-enum attribute {
-  attribute_position = 0,
-  attribute_pos = 0,
-  attribute_blendweight = 1,
-  attribute_normal = 2,
-  attribute_diffuse = 3,
-  attribute_color = 3,
-  attribute_specular = 4,
-  attribute_tessfactor = 5,
-  attribute_fogcoord = 5,
-  attribute_psize = 6,
-  attribute_blendindices = 7,
-  attribute_texcoord = 8,
-  attribute_uv = 8,
-  attribute_tangent = 14,
-  attribute_bitangent = 15,
-  attribute_binormal = 15,
-};
 
 // resources
 #include "../resources/app_utils.h"
@@ -113,7 +101,11 @@ enum attribute {
 #include "../scene/animation_instance.h"
 #include "../scene/scene.h"
 
-// loaders
+// high level helpers
+#include "../helpers/mouse_ball.h"
+#include "../helpers/text_overlay.h"
+
+// asset loaders
 #include "../loaders/gif_decoder.h"
 #include "../loaders/tga_decoder.h"
 #include "../loaders/collada_builder.h"
@@ -124,4 +116,4 @@ enum attribute {
 
 #include "../physics/physics.h"
 
-#include "../raytracer/raytracer.h"
+//#include "../raytracer/raytracer.h"

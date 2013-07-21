@@ -14,6 +14,6 @@
 // argc is the number of arguments with argv[0] set to the command name.
 //
 int main(int argc, char **argv) {
-  run_examples(argc, argv);
+  octet::run_examples(argc, argv);
 }
 

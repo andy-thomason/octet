@@ -7,10 +7,11 @@
 // Light in a scene. Note that for shadow maps, lights are cameras.
 //
 
-class light_instance : public camera_instance {
-public:
-  RESOURCE_META(light_instance)
-  light_instance() {
-  }
-};
-
+namespace octet {
+  class light_instance : public camera_instance {
+  public:
+    RESOURCE_META(light_instance)
+    light_instance() {
+    }
+  };
+}

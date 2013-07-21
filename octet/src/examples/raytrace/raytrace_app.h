@@ -15,7 +15,7 @@
 //   Raytracing using CPU
 //
 
-class raytrace_app : public app {
+class raytrace_app : public octet::app {
   // ray tracing renderer
   raytracer renderer;
 

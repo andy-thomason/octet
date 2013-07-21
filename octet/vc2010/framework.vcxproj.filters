@@ -25,9 +25,6 @@
     <Filter Include="examples\cube">
       <UniqueIdentifier>{816a8f12-3fd8-4d7b-815e-a52b66d108b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="containers">
-      <UniqueIdentifier>{c41f517a-aed7-4ced-a38b-021e1dbd5bb8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="resources">
       <UniqueIdentifier>{132a4a63-46dc-4d77-a15f-7217c4d5a9dd}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="scene">
       <UniqueIdentifier>{8258a6e0-70bb-42d9-9ef6-218bb314004f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="containers">
+      <UniqueIdentifier>{c41f517a-aed7-4ced-a38b-021e1dbd5bb8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,16 +120,7 @@
     <ClInclude Include="..\src\examples\duck\duck_app.h">
       <Filter>examples\duck</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\mesh_builder.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\collada_builder.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\resources\app_utils.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\gif_decoder.h">
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\math\random.h">
@@ -180,43 +171,63 @@
     <ClInclude Include="..\src\containers\hash_map.h">
       <Filter>containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\animation.h">
+    <ClInclude Include="..\src\resources\mesh_builder.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\animation.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\animation_instance.h">
+    <ClInclude Include="..\src\scene\animation_instance.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\bump_material.h">
+    <ClInclude Include="..\src\scene\camera_instance.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\camera_instance.h">
+    <ClInclude Include="..\src\scene\light_instance.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\lighting.h">
+    <ClInclude Include="..\src\scene\lighting.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\material.h">
+    <ClInclude Include="..\src\scene\material.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\mesh.h">
+    <ClInclude Include="..\src\scene\mesh.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\mesh_instance.h">
+    <ClInclude Include="..\src\scene\mesh_instance.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\scene.h">
+    <ClInclude Include="..\src\scene\scene.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\skeleton.h">
+    <ClInclude Include="..\src\scene\scene_node.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\skin.h">
+    <ClInclude Include="..\src\scene\skeleton.h">
       <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\skin.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\visitor.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\xml_writer.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp">
       <Filter>examples</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\resources\mesh_builder.inl">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\src\resources\resources.inl">
+      <Filter>resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

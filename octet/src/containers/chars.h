@@ -12,137 +12,139 @@
 //   printf("%s\n", my_string.c_str());
 //
 
-template <typename allocator_t=allocator> class chars {
-  char *data_;
+namespace octet {
+  template <typename allocator_t=allocator> class chars {
+    char *data_;
 
-  static char *null_string() { static char c; return &c; }
+    static char *null_string() { static char c; return &c; }
 
-  void release() {
-    if (data_ != null_string()) {
-      allocator_t::free((void*)data_, size() + 1);
-      data_ = null_string();
-    }
-  }
-public:
-  chars() { data_ = null_string(); }
-
-  chars(const char *value) { data_ = null_string(); *this = value; }
-  chars(const chars& rhs) { data_ = null_string(); *this = rhs.c_str(); }
-
-  ~chars() { release(); }
-
-  chars &format(const char *fmt, ...) {
-    release();
-    va_list v;
-    va_start(v, fmt);
-    #ifdef WIN32
-      int len = _vscprintf(fmt, v);
-      if (len) {
-        data_ = (char*)allocator_t::malloc(len+1);
-        vsprintf_s(data_, len+1, fmt, v);
-      }
-    #else
-      char tmp[1024];
-      vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
-      *this = tmp;
-    #endif
-    return *this;
-  }
-
-  chars &operator=(const char *value) {
-    release();
-    if (value) {
-      size_t size = strlen(value);
-      if (size) {
-        data_ = (char*)allocator_t::malloc(size+1);
-        memcpy((char*)data_, value, size+1);
+    void release() {
+      if (data_ != null_string()) {
+        allocator_t::free((void*)data_, size() + 1);
+        data_ = null_string();
       }
     }
-    return *this;
-  }
+  public:
+    chars() { data_ = null_string(); }
 
-  chars &truncate(int new_len) {
-    int size = (int)strlen(data_);
-    if (new_len < size) {
-      if (data_ == null_string()) {
-        data_ = (char*)allocator_t::malloc(new_len+1);
-      } else {
-        data_ = (char*)allocator_t::realloc((void*)data_, size+1, new_len+1);
-      }
-      data_[new_len] = 0;
-    }
-    return *this;
-  }
+    chars(const char *value) { data_ = null_string(); *this = value; }
+    chars(const chars& rhs) { data_ = null_string(); *this = rhs.c_str(); }
 
-  bool operator==(const char *rhs) const { return strcmp(data_, rhs) == 0; }
-  bool operator!=(const char *rhs) const { return strcmp(data_, rhs) != 0; }
-  bool operator<(const char *rhs) const { return strcmp(data_, rhs) < 0; }
-  bool operator>(const char *rhs) const { return strcmp(data_, rhs) > 0; }
+    ~chars() { release(); }
 
-  chars &operator+=(const char *rhs) {
-    if (rhs) {
-      size_t data_size = strlen(data_);
-      size_t rhs_size = strlen(rhs);
-      if (data_ == null_string()) {
-        data_ = (char*)allocator_t::malloc(data_size+rhs_size+1);
-      } else {
-        data_ = (char*)allocator_t::realloc(data_, data_size + 1, data_size+rhs_size+1);
-      }
-      memcpy(data_ + data_size, rhs, rhs_size+1);
-    }
-    return *this;
-  }
-
-  chars &insert(unsigned pos, const char *rhs) {
-    if (rhs) {
-      size_t data_size = strlen(data_);
-      size_t rhs_size = strlen(rhs);
-      char *new_data = (char*)allocator_t::malloc(data_, data_size+rhs_size+1);
-      memcpy(new_data, data_, pos);
-      memcpy(new_data + pos, rhs, rhs_size);
-      memcpy(new_data + pos + rhs_size, data_, data_size - pos + 1);
+    chars &format(const char *fmt, ...) {
       release();
-      data_ = new_data;
+      va_list v;
+      va_start(v, fmt);
+      #ifdef WIN32
+        int len = _vscprintf(fmt, v);
+        if (len) {
+          data_ = (char*)allocator_t::malloc(len+1);
+          vsprintf_s(data_, len+1, fmt, v);
+        }
+      #else
+        char tmp[1024];
+        vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
+        *this = tmp;
+      #endif
+      return *this;
     }
-    return *this;
-  }
 
-  int find(const char *rhs) const {
-    char *d = strstr(data_, rhs);
-    if (d) {
-      return (int)(d - data_);
-    }
-    return -1;
-  }
-
-  int extension_pos() const {
-    int res = -1;
-    for (const char *p = data_; *p; ++p) {
-      char chr = *p;
-      if (chr == '/' || chr == '\\') {
-        res = -1;  // note  /usr/fred.jim/harry   has no extension
-      } else if (chr == '.') {
-        res = (int)(p - data_);
+    chars &operator=(const char *value) {
+      release();
+      if (value) {
+        size_t size = strlen(value);
+        if (size) {
+          data_ = (char*)allocator_t::malloc(size+1);
+          memcpy((char*)data_, value, size+1);
+        }
       }
+      return *this;
     }
-    return res;
-  }
 
-  int filename_pos() const  {
-    int res = 0;
-    for (const char *p = data_; *p; ++p) {
-      char chr = *p;
-      if (chr == '/' || chr == '\\') {
-        res = (int)(p - data_ + 1);
+    chars &truncate(int new_len) {
+      int size = (int)strlen(data_);
+      if (new_len < size) {
+        if (data_ == null_string()) {
+          data_ = (char*)allocator_t::malloc(new_len+1);
+        } else {
+          data_ = (char*)allocator_t::realloc((void*)data_, size+1, new_len+1);
+        }
+        data_[new_len] = 0;
       }
+      return *this;
     }
-    return res;
-  }
 
-  int size() { return (int)strlen(data_); }
+    bool operator==(const char *rhs) const { return strcmp(data_, rhs) == 0; }
+    bool operator!=(const char *rhs) const { return strcmp(data_, rhs) != 0; }
+    bool operator<(const char *rhs) const { return strcmp(data_, rhs) < 0; }
+    bool operator>(const char *rhs) const { return strcmp(data_, rhs) > 0; }
 
-  const char *c_str() const { return data_; }
-  operator const char *() { return data_; }
-};
+    chars &operator+=(const char *rhs) {
+      if (rhs) {
+        size_t data_size = strlen(data_);
+        size_t rhs_size = strlen(rhs);
+        if (data_ == null_string()) {
+          data_ = (char*)allocator_t::malloc(data_size+rhs_size+1);
+        } else {
+          data_ = (char*)allocator_t::realloc(data_, data_size + 1, data_size+rhs_size+1);
+        }
+        memcpy(data_ + data_size, rhs, rhs_size+1);
+      }
+      return *this;
+    }
 
-typedef chars<allocator> string;
+    chars &insert(unsigned pos, const char *rhs) {
+      if (rhs) {
+        size_t data_size = strlen(data_);
+        size_t rhs_size = strlen(rhs);
+        char *new_data = (char*)allocator_t::malloc(data_, data_size+rhs_size+1);
+        memcpy(new_data, data_, pos);
+        memcpy(new_data + pos, rhs, rhs_size);
+        memcpy(new_data + pos + rhs_size, data_, data_size - pos + 1);
+        release();
+        data_ = new_data;
+      }
+      return *this;
+    }
+
+    int find(const char *rhs) const {
+      char *d = strstr(data_, rhs);
+      if (d) {
+        return (int)(d - data_);
+      }
+      return -1;
+    }
+
+    int extension_pos() const {
+      int res = -1;
+      for (const char *p = data_; *p; ++p) {
+        char chr = *p;
+        if (chr == '/' || chr == '\\') {
+          res = -1;  // note  /usr/fred.jim/harry   has no extension
+        } else if (chr == '.') {
+          res = (int)(p - data_);
+        }
+      }
+      return res;
+    }
+
+    int filename_pos() const  {
+      int res = 0;
+      for (const char *p = data_; *p; ++p) {
+        char chr = *p;
+        if (chr == '/' || chr == '\\') {
+          res = (int)(p - data_ + 1);
+        }
+      }
+      return res;
+    }
+
+    int size() { return (int)strlen(data_); }
+
+    const char *c_str() const { return data_; }
+    operator const char *() { return data_; }
+  };
+
+  typedef chars<allocator> string;
+}
