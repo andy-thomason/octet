@@ -440,6 +440,8 @@ private:
         GLuint specular = get_texture(shader, profile_COMMON, "specular", "#00000000");
         GLuint bump = get_texture(shader, profile_COMMON, "bump", "#808080ff");
         float shininess = get_float(shader, "shininess", 0);
+        // this is not strictly correct, but fixes some issues
+        if (shininess < 1) shininess *= 100;
         material *mat = new material();
         mat->init(diffuse, ambient, emission, specular, bump, shininess);
         dict.set_resource(attr(mat_elem, "id"), mat);
@@ -669,7 +671,7 @@ private:
   }
 
   // add <library_images> to the scene
-  void add_textures(resources &dict) {
+  void add_images(resources &dict) {
     TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_images");
     if (!lib_anim) return;
 
@@ -1175,7 +1177,7 @@ public:
 
   // extract resources from the collada file into a collection.
   void get_resources(resources &dict) {
-    add_textures(dict);
+    add_images(dict);
 
     add_materials(dict);
 

@@ -109,6 +109,7 @@ public:
   }
 
   // get a unique int for a string.
+  // these values are much cheaper to work with than strings.
   static atom_t get_atom(const char *name) {
     // the null name is 0
     if (name == 0 || name[0] == 0) {
@@ -119,10 +120,10 @@ public:
 
     static int num_atoms = (int)atom__first;
     if (dict->contains(name)) {
-      app_utils::log("old atom %s %d\n", name, (*dict)[name]);
+      //app_utils::log("old atom %s %d\n", name, (*dict)[name]);
       return (*dict)[name];
     } else {
-      app_utils::log("new atom %s %d\n", name, num_atoms);
+      //app_utils::log("new atom %s %d\n", name, num_atoms);
       return (*dict)[name] = (atom_t)num_atoms++;
     }
   }

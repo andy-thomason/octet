@@ -14,6 +14,36 @@
 //   Collada animation
 //
 
+class text_overlay {
+  ref<scene> text_scene;
+  ref<scene_node> cam_node;
+  ref<camera_instance> cam;
+  ref<mesh> msh;
+  ref<material> mat;
+  ref<mesh_instance> msh_inst;
+
+public:
+  void init() {
+    // Make a scene for the text overlay using an ortho camera
+    // that works in screen pixels.
+    text_scene = new scene();
+    cam_node = text_scene->add_scene_node();
+    cam = new camera_instance();
+    text_scene->add_camera_instance(cam);
+
+    scene_node *msh_node = text_scene->add_scene_node();
+    msh = new mesh();
+    mat = new material("assets/courier_18_0.gif");
+    msh_inst = new mesh_instance(msh_node, msh, mat);
+  }
+
+  void render(bump_shader &object_shader, bump_shader &skin_shader, int vx, int vy) {
+    cam->set_ortho(cam_node, (float)vx, (float)vy, 1, 0, 1);
+    camera_instance *cam = text_scene->get_camera_instance(0);
+    text_scene->render(object_shader, skin_shader, *cam);
+  }
+};
+
 class animation_app : public app {
   ref<scene> app_scene;
   resources dict;
@@ -24,10 +54,12 @@ class animation_app : public app {
 
   mouse_ball ball;
 
+  text_overlay overlay;
+
 public:
 
   // this is called when we construct the class
-  animation_app(int argc, char **argv) : app(argc, argv), ball(this) {
+  animation_app(int argc, char **argv) : app(argc, argv), ball() {
   }
 
   // this is called once OpenGL is initialized
@@ -71,8 +103,10 @@ public:
       camera_instance *cam = app_scene->get_camera_instance(0);
       scene_node *node = cam->get_node();
       mat4t cameraToWorld = node->get_nodeToParent();
-      ball.init(cameraToWorld.w().length(), 360.0f);
+      ball.init(this, cameraToWorld.w().length(), 360.0f);
     }
+
+    overlay.init();
   }
 
   // this is called to draw the world
@@ -92,15 +126,24 @@ public:
         return;
       }
 
-      camera_instance *cam = app_scene->get_camera_instance(0);
-      scene_node *node = cam->get_node();
-      mat4t &cameraToWorld = node->access_nodeToParent();
-      ball.update(cameraToWorld);
+      {
+        camera_instance *cam = app_scene->get_camera_instance(0);
+        scene_node *node = cam->get_node();
+        mat4t &cameraToWorld = node->access_nodeToParent();
+        ball.update(cameraToWorld);
 
-      // update matrices. assume 30 fps.
-      app_scene->update(1.0f/30);
+        // update matrices. assume 30 fps.
+        app_scene->update(1.0f/30);
 
-      app_scene->render(object_shader, skin_shader, *cam);
+        app_scene->render(object_shader, skin_shader, *cam);
+      }
+
+      {
+        camera_instance *cam = app_scene->get_camera_instance(0);
+        int vx = 0, vy = 0;
+        get_viewport_size(vx, vy);
+        overlay.render(object_shader, skin_shader, vx, vy);
+      }
     }
   }
 };

@@ -81,11 +81,7 @@ public:
   void create_default_camera_and_lights() {
     // default camera_instance
     if (camera_instances.size() == 0) {
-      mat4t m;
-      m.loadIdentity();
-      //m.rotateX(90);
-      m.translate(0.0, 0.0f, 200.0f);
-      scene_node *node = add_root_node(m, atom__null);
+      scene_node *node = add_scene_node();
       camera_instance *cam = new camera_instance();
       float n = 0.1f, f = 5000.0f;
       cam->set_params(node, -n, n, -n, n, n, f, false);
@@ -99,13 +95,13 @@ public:
     lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
   }
 
-  scene_node *add_root_node(const mat4t &nodeToParent, atom_t sid) {
-    scene_node *new_node = new scene_node(nodeToParent, sid);
+  scene_node *add_scene_node() {
+    scene_node *new_node = new scene_node();
     scene_node::add_child(new_node);
     return new_node;
   }
 
-  void add_mesh_instance(mesh_instance *inst) {
+  void add_mesh_instance(mesh_instance *inst=0) {
     mesh_instances.push_back(inst);
   }
 

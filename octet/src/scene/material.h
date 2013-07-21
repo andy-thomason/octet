@@ -6,6 +6,10 @@
 //
 // Material 
 //
+//
+// Materials are represented as GL textures with solid colours as single pixel textures.
+// This simplifies shader design.
+//
 
 class material : public resource {
   // material
@@ -16,6 +20,21 @@ class material : public resource {
   GLuint bump;
 
   float shininess;
+
+  void bind_textures() const {
+    // set textures 0, 1, 2, 3 to their respective values
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ambient);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, emission);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, specular);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, bump);
+    glActiveTexture(GL_TEXTURE0);
+  }
 
 public:
   RESOURCE_META(material)
@@ -28,6 +47,13 @@ public:
     specular = 0;
     bump = 0;
     shininess = 0;
+  }
+
+  material(const char *texture) {
+    specular = diffuse = ambient = resources::get_texture_handle(GL_RGBA, "#00000000");
+    emission = resources::get_texture_handle(GL_RGBA, texture);
+    bump = resources::get_texture_handle(GL_RGBA, "#8080ff00");
+    shininess = 30.0f;
   }
 
   void visit(visitor &v) {
@@ -49,7 +75,7 @@ public:
     diffuse = ambient = resources::get_texture_handle(GL_RGBA, name);
     emission = resources::get_texture_handle(GL_RGBA, "#00000000");
     specular = resources::get_texture_handle(GL_RGBA, shiny ? "#80808000" : "#00000000");
-    bump = resources::get_texture_handle(GL_RGBA, bumpy ? "!bump" : "#0000ff00");
+    bump = resources::get_texture_handle(GL_RGBA, bumpy ? "!bump" : "#8080ff00");
     shininess = 30.0f;
   }
 
@@ -61,19 +87,7 @@ public:
     vec4 &light_diffuse = lights[3];
     vec4 &light_specular = lights[4];
     shader.render(modelToProjection, modelToCamera, light_direction, shininess, light_ambient, light_diffuse, light_specular);
-    
-    // set textures 0, 1, 2, 3 to their respective values
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuse);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, ambient);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, emission);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, specular);
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, bump);
-    glActiveTexture(GL_TEXTURE0);
+    bind_textures();
   }
 
   void render_skinned(bump_shader &shader, const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_nodes, vec4 *lights) const {
@@ -84,19 +98,7 @@ public:
     vec4 &light_diffuse = lights[3];
     vec4 &light_specular = lights[4];
     shader.render_skinned(cameraToProjection, modelToCamera, num_nodes, light_direction, shininess, light_ambient, light_diffuse, light_specular);
-    
-    // set textures 0, 1, 2, 3 to their respective values
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuse);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, ambient);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, emission);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, specular);
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, bump);
-    glActiveTexture(GL_TEXTURE0);
+    bind_textures();
   }
 
   //void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, const vec4 &light_direction, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular);

@@ -48,8 +48,6 @@ public:
     // extract the indices of the uniforms to use later
     modelToProjectionIndex_ = glGetUniformLocation(program(), "modelToProjection");
     samplerIndex_ = glGetUniformLocation(program(), "sampler");
-    //printf("modelToProjectionIndex_=%d\n", modelToProjectionIndex_);
-    //printf("samplerIndex_=%d\n", samplerIndex_);
   }
 
   void render(const mat4t &modelToProjection, int sampler) {

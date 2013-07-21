@@ -52,6 +52,9 @@
     <Filter Include="examples\animation">
       <UniqueIdentifier>{31031b39-f071-4db0-838b-69d4cad71958}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{8258a6e0-70bb-42d9-9ef6-218bb314004f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\shaders\color_shader.h">
@@ -108,9 +111,6 @@
     <ClInclude Include="..\src\containers\double_list.h">
       <Filter>containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\mesh.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\containers\allocator.h">
       <Filter>containers</Filter>
     </ClInclude>
@@ -121,9 +121,6 @@
       <Filter>examples\duck</Filter>
     </ClInclude>
     <ClInclude Include="..\src\resources\mesh_builder.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\mesh_state.h">
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\resources\collada_builder.h">
@@ -156,15 +153,6 @@
     <ClInclude Include="..\src\containers\ptr.h">
       <Filter>containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\bump_material.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\lighting.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\material.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\platform\glut_specific.h">
       <Filter>platform</Filter>
     </ClInclude>
@@ -177,34 +165,13 @@
     <ClInclude Include="..\src\examples\animation\animation_app.h">
       <Filter>examples\animation</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\scene.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\resources\resource.h">
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\containers\ref.h">
       <Filter>containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\resources\animation.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\animation_instance.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\mesh_instance.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\resources\resources.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\skeleton.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\skin.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\resources\camera_instance.h">
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\resources\animation_target.h">
@@ -212,6 +179,39 @@
     </ClInclude>
     <ClInclude Include="..\src\containers\hash_map.h">
       <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\animation.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\animation_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\bump_material.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\camera_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\lighting.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\material.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\mesh.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\mesh_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\scene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\skeleton.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\skin.h">
+      <Filter>scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -109,7 +109,8 @@ public:
           diffuse * light_diffuse * diffuse_factor +
           emission +
           specular * light_specular * specular_factor;
-      //  gl_FragColor = vec4(normal_, 1);
+        //gl_FragColor = vec4(normal_, 1);
+        //gl_FragColor = vec4(normal_, 1);
       }
     );
     

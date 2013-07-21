@@ -58,10 +58,10 @@
 
 #include "mouse_ball.h"
 
-#include "../resources/tinyxml/tinystr.cpp"
-#include "../resources/tinyxml/tinyxml.cpp"
-#include "../resources/tinyxml/tinyxmlerror.cpp"
-#include "../resources/tinyxml/tinyxmlparser.cpp"
+#include "../tinyxml/tinystr.cpp"
+#include "../tinyxml/tinyxml.cpp"
+#include "../tinyxml/tinyxmlerror.cpp"
+#include "../tinyxml/tinyxmlparser.cpp"
 
 // standard attribute names
 enum attribute {
@@ -100,23 +100,23 @@ enum attribute {
 #include "../shaders/bump_shader.h"
 
 // scene
-#include "../resources/scene_node.h"
-#include "../resources/skin.h"
-#include "../resources/skeleton.h"
-#include "../resources/animation.h"
-#include "../resources/mesh.h"
-#include "../resources/material.h"
-#include "../resources/lighting.h"
-#include "../resources/camera_instance.h"
-#include "../resources/light_instance.h"
-#include "../resources/mesh_instance.h"
-#include "../resources/animation_instance.h"
-#include "../resources/scene.h"
+#include "../scene/scene_node.h"
+#include "../scene/skin.h"
+#include "../scene/skeleton.h"
+#include "../scene/animation.h"
+#include "../scene/mesh.h"
+#include "../scene/material.h"
+#include "../scene/lighting.h"
+#include "../scene/camera_instance.h"
+#include "../scene/light_instance.h"
+#include "../scene/mesh_instance.h"
+#include "../scene/animation_instance.h"
+#include "../scene/scene.h"
 
 // loaders
-#include "../resources/gif_decoder.h"
-#include "../resources/tga_decoder.h"
-#include "../resources/collada_builder.h"
+#include "../loaders/gif_decoder.h"
+#include "../loaders/tga_decoder.h"
+#include "../loaders/collada_builder.h"
 
 // forward references
 #include "../resources/resources.inl"

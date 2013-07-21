@@ -117,7 +117,6 @@
     <ClInclude Include="..\src\resources\mesh.h" />
     <ClInclude Include="..\src\resources\mesh_builder.h" />
     <ClInclude Include="..\src\resources\mesh_instance.h" />
-    <ClInclude Include="..\src\resources\mesh_state.h" />
     <ClInclude Include="..\src\resources\resource.h" />
     <ClInclude Include="..\src\resources\resources.h" />
     <ClInclude Include="..\src\resources\scene.h" />
