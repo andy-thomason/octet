@@ -15,75 +15,80 @@
 //
 //
 
-class triangle_app : public app {
-  // Matrix to transform points on our triangle to the world space
-  // This allows us to move and rotate our triangle
-  mat4t modelToWorld;
+// namespace help us to group classes and avoid clashes
+namespace octet {
 
-  // Matrix to transform points in our camera space to the world.
-  // This lets us move our camera
-  mat4t cameraToWorld;
+  // this is an app to draw a triangle, it takes some of its workings from the class "app"
+  class triangle_app : public app {
+    // Matrix to transform points on our triangle to the world space
+    // This allows us to move and rotate our triangle
+    mat4t modelToWorld;
 
-  // shader to draw a solid color
-  color_shader color_shader_;
+    // Matrix to transform points in our camera space to the world.
+    // This lets us move our camera
+    mat4t cameraToWorld;
 
-public:
+    // shader to draw a solid color
+    color_shader color_shader_;
 
-  // this is called when we construct the class
-  triangle_app(int argc, char **argv) : app(argc, argv) {
-  }
+  public:
 
-  // this is called once OpenGL is initialized
-  void app_init() {
-    // initialize the shader
-    color_shader_.init();
+    // this is called when we construct the class
+    triangle_app(int argc, char **argv) : app(argc, argv) {
+    }
 
-    // put the triangle at the center of the world
-    modelToWorld.loadIdentity();
+    // this is called once OpenGL is initialized
+    void app_init() {
+      // initialize the shader
+      color_shader_.init();
 
-    // put the camera a short distance from the center, looking towards the triangle
-    cameraToWorld.loadIdentity();
-    cameraToWorld.translate(0, 0, 5);
-  }
+      // put the triangle at the center of the world
+      modelToWorld.loadIdentity();
 
-  // this is called to draw the world
-  void draw_world(int x, int y, int w, int h) {
-    // set a viewport - includes whole window area
-    glViewport(x, y, w, h);
+      // put the camera a short distance from the center, looking towards the triangle
+      cameraToWorld.loadIdentity();
+      cameraToWorld.translate(0, 0, 5);
+    }
 
-    // clear the background to black
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // this is called to draw the world
+    void draw_world(int x, int y, int w, int h) {
+      // set a viewport - includes whole window area
+      glViewport(x, y, w, h);
 
-    // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
-    glEnable(GL_DEPTH_TEST);
+      // clear the background to black
+      glClearColor(0, 0, 0, 1);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // build a projection matrix: model -> world -> camera -> projection
-    // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-    mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
+      // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
+      glEnable(GL_DEPTH_TEST);
 
-    // spin the triangle by rotating about Z (the view direction)
-    modelToWorld.rotateZ(1);
+      // build a projection matrix: model -> world -> camera -> projection
+      // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
+      mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
 
-    // set up opengl to draw flat shaded triangles of a fixed color
-    vec4 color(0, 0, 1, 1);
-    color_shader_.render(modelToProjection, color);
+      // spin the triangle by rotating about Z (the view direction)
+      modelToWorld.rotateZ(1);
 
-    // this is an array of the positions of the corners of the triangle in 3D
-    // static const means that it is created at compile time
-    static const float vertices[] = {
-      -2, -2, 0,
-       2, -2, 0,
-       2,  2, 0,
-    };
+      // set up opengl to draw flat shaded triangles of a fixed color
+      vec4 color(0, 0, 1, 1);
+      color_shader_.render(modelToProjection, color);
 
-    // attribute_pos (=0) is position of each corner
-    // each corner has 3 floats (x, y, z)
-    // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-    glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
-    glEnableVertexAttribArray(attribute_pos);
+      // this is an array of the positions of the corners of the triangle in 3D
+      // static const means that it is created at compile time
+      static const float vertices[] = {
+        -2, -2, 0,
+         2, -2, 0,
+         2,  2, 0,
+      };
+
+      // attribute_pos (=0) is position of each corner
+      // each corner has 3 floats (x, y, z)
+      // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
+      glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)vertices );
+      glEnableVertexAttribArray(attribute_pos);
     
-    // finally, draw the triangle (3 vertices)
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-  }
-};
+      // finally, draw the triangle (3 vertices)
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+  };
+}

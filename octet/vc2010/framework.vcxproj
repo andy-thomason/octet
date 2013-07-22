@@ -94,6 +94,11 @@
     <ClInclude Include="..\src\examples\ping\ping_app.h" />
     <ClInclude Include="..\src\examples\texture\texture_app.h" />
     <ClInclude Include="..\src\examples\triangle\triangle_app.h" />
+    <ClInclude Include="..\src\helpers\mouse_ball.h" />
+    <ClInclude Include="..\src\helpers\text_overlay.h" />
+    <ClInclude Include="..\src\loaders\collada_builder.h" />
+    <ClInclude Include="..\src\loaders\gif_decoder.h" />
+    <ClInclude Include="..\src\loaders\tga_decoder.h" />
     <ClInclude Include="..\src\math\matrix.h" />
     <ClInclude Include="..\src\math\random.h" />
     <ClInclude Include="..\src\math\vector.h" />
@@ -104,25 +109,26 @@
     <ClInclude Include="..\src\platform\gl_defs.h" />
     <ClInclude Include="..\src\platform\platform.h" />
     <ClInclude Include="..\src\platform\windows_specific.h" />
-    <ClInclude Include="..\src\resources\animation.h" />
-    <ClInclude Include="..\src\resources\animation_instance.h" />
     <ClInclude Include="..\src\resources\animation_target.h" />
     <ClInclude Include="..\src\resources\app_utils.h" />
-    <ClInclude Include="..\src\resources\bump_material.h" />
-    <ClInclude Include="..\src\resources\camera_instance.h" />
-    <ClInclude Include="..\src\resources\collada_builder.h" />
-    <ClInclude Include="..\src\resources\gif_decoder.h" />
-    <ClInclude Include="..\src\resources\lighting.h" />
-    <ClInclude Include="..\src\resources\material.h" />
-    <ClInclude Include="..\src\resources\mesh.h" />
+    <ClInclude Include="..\src\resources\gl_resource.h" />
     <ClInclude Include="..\src\resources\mesh_builder.h" />
-    <ClInclude Include="..\src\resources\mesh_instance.h" />
-    <ClInclude Include="..\src\resources\mesh_state.h" />
     <ClInclude Include="..\src\resources\resource.h" />
     <ClInclude Include="..\src\resources\resources.h" />
-    <ClInclude Include="..\src\resources\scene.h" />
-    <ClInclude Include="..\src\resources\skeleton.h" />
-    <ClInclude Include="..\src\resources\skin.h" />
+    <ClInclude Include="..\src\resources\visitor.h" />
+    <ClInclude Include="..\src\resources\xml_writer.h" />
+    <ClInclude Include="..\src\scene\animation.h" />
+    <ClInclude Include="..\src\scene\animation_instance.h" />
+    <ClInclude Include="..\src\scene\camera_instance.h" />
+    <ClInclude Include="..\src\scene\lighting.h" />
+    <ClInclude Include="..\src\scene\light_instance.h" />
+    <ClInclude Include="..\src\scene\material.h" />
+    <ClInclude Include="..\src\scene\mesh.h" />
+    <ClInclude Include="..\src\scene\mesh_instance.h" />
+    <ClInclude Include="..\src\scene\scene.h" />
+    <ClInclude Include="..\src\scene\scene_node.h" />
+    <ClInclude Include="..\src\scene\skeleton.h" />
+    <ClInclude Include="..\src\scene\skin.h" />
     <ClInclude Include="..\src\shaders\bump_shader.h" />
     <ClInclude Include="..\src\shaders\color_shader.h" />
     <ClInclude Include="..\src\shaders\phong_shader.h" />
@@ -131,6 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\examples\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\resources\mesh_builder.inl" />
+    <None Include="..\src\resources\resources.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

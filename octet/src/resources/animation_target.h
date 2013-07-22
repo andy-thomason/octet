@@ -13,12 +13,14 @@
 // C++ works best if multiple inheiritance only uses these kinds of interface otherwise
 // we are into the world of "thunks" which gets messy fast!
 //
-class animation_target {
-public:
-  // for ref<> containers
-  virtual void add_ref() = 0;
-  virtual void release() = 0;
+namespace octet {
+  class animation_target {
+  public:
+    // for ref<> containers
+    virtual void add_ref() = 0;
+    virtual void release() = 0;
 
-  // called by the animation, script or RPC.
-  virtual void set_value(atom_t sid, float *value) = 0;
-};
+    // called by the animation, script or RPC.
+    virtual void set_value(atom_t sid, float *value) = 0;
+  };
+}

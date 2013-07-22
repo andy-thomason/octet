@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#define OCTET_OPENCL 1
+#define OCTET_OPENCL 0
 
 // use <> to include from standard directories
 #include <stdio.h>
@@ -34,6 +34,21 @@
 
 // some standard c++ definitions
 #include <map>
+
+// xml library
+#include "../tinyxml/tinystr.cpp"
+#include "../tinyxml/tinyxml.cpp"
+#include "../tinyxml/tinyxmlerror.cpp"
+#include "../tinyxml/tinyxmlparser.cpp"
+
+// this is a dummy class used to customise the placement new and delete
+struct dynarray_dummy_t {};
+
+// placement new operator, allows construction in-place at "place"
+void *operator new(size_t size, void *place, dynarray_dummy_t x) { return place; }
+
+// dummy placement delete operator, allows destruction at "place"
+void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 #include "../containers/allocator.h"
 #include "../containers/chars.h"
@@ -56,39 +71,13 @@
 #include "../math/matrix.h"
 #include "../math/random.h"
 
-#include "mouse_ball.h"
-
-#include "../resources/tinyxml/tinystr.cpp"
-#include "../resources/tinyxml/tinyxml.cpp"
-#include "../resources/tinyxml/tinyxmlerror.cpp"
-#include "../resources/tinyxml/tinyxmlparser.cpp"
-
-// standard attribute names
-enum attribute {
-  attribute_position = 0,
-  attribute_pos = 0,
-  attribute_blendweight = 1,
-  attribute_normal = 2,
-  attribute_diffuse = 3,
-  attribute_color = 3,
-  attribute_specular = 4,
-  attribute_tessfactor = 5,
-  attribute_fogcoord = 5,
-  attribute_psize = 6,
-  attribute_blendindices = 7,
-  attribute_texcoord = 8,
-  attribute_uv = 8,
-  attribute_tangent = 14,
-  attribute_bitangent = 15,
-  attribute_binormal = 15,
-};
-
 // resources
 #include "../resources/app_utils.h"
 #include "../resources/resource.h"
 #include "../resources/resources.h"
 #include "../resources/visitor.h"
 #include "../resources/xml_writer.h"
+#include "../resources/gl_resource.h"
 #include "../resources/mesh_builder.h"
 #include "../resources/animation_target.h"
 
@@ -100,23 +89,27 @@ enum attribute {
 #include "../shaders/bump_shader.h"
 
 // scene
-#include "../resources/scene_node.h"
-#include "../resources/skin.h"
-#include "../resources/skeleton.h"
-#include "../resources/animation.h"
-#include "../resources/mesh.h"
-#include "../resources/material.h"
-#include "../resources/lighting.h"
-#include "../resources/camera_instance.h"
-#include "../resources/light_instance.h"
-#include "../resources/mesh_instance.h"
-#include "../resources/animation_instance.h"
-#include "../resources/scene.h"
+#include "../scene/scene_node.h"
+#include "../scene/skin.h"
+#include "../scene/skeleton.h"
+#include "../scene/animation.h"
+#include "../scene/mesh.h"
+#include "../scene/material.h"
+#include "../scene/lighting.h"
+#include "../scene/camera_instance.h"
+#include "../scene/light_instance.h"
+#include "../scene/mesh_instance.h"
+#include "../scene/animation_instance.h"
+#include "../scene/scene.h"
 
-// loaders
-#include "../resources/gif_decoder.h"
-#include "../resources/tga_decoder.h"
-#include "../resources/collada_builder.h"
+// high level helpers
+#include "../helpers/mouse_ball.h"
+#include "../helpers/text_overlay.h"
+
+// asset loaders
+#include "../loaders/gif_decoder.h"
+#include "../loaders/tga_decoder.h"
+#include "../loaders/collada_builder.h"
 
 // forward references
 #include "../resources/resources.inl"
@@ -124,4 +117,4 @@ enum attribute {
 
 #include "../physics/physics.h"
 
-#include "../raytracer/raytracer.h"
+//#include "../raytracer/raytracer.h"
