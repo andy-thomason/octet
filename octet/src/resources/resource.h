@@ -9,9 +9,32 @@
 
 namespace octet {
   enum atom_t {
-    atom__null,
-    atom__first,
+    atom_,
+
+    // animation-relate atoms
+    atom_transform,
+    atom_translate,
+    atom_rotateX,
+    atom_rotateY,
+    atom_rotateZ,
+    atom_scale
   };
+  
+  inline static const char *predefined_atom(int i) {
+    static const char *names[] = {
+      "",
+
+      // animation-relate atoms
+      "transform",
+      "translate",
+      "rotateX",
+      "rotateY",
+      "rotateZ",
+      "scale",
+      NULL
+    };
+    return names[i];
+  }
 
   class skin;
   class skeleton;

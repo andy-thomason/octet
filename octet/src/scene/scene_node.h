@@ -26,7 +26,7 @@ namespace octet {
 
     scene_node() {
       nodeToParent.loadIdentity();
-      sid = atom__null;
+      sid = atom_;
     }
 
     scene_node(const mat4t &nodeToParent, atom_t sid) {

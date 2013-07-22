@@ -9,24 +9,21 @@
 
 namespace octet {
   class animation : public resource {
-  public:
-    enum chan_kind {
-      chan_float,
-      chan_matrix,
-    };
-  private:
 
     // todo: this could be a GL/CL buffer
     dynarray<unsigned char> data;
 
     /// one channel of an animation
     struct channel {
-      atom_t sid;      /// atom for sid on target
-      chan_kind kind;  /// float or transform
-      int offset;      /// where in data
-      unsigned num_times;   /// how many time values
+      atom_t sid;          /// atom for sid on target (eg. node22)
+      atom_t sub_target;   /// sub target (eg. rotateX)
+      atom_t component;    /// component (eg. ANGLE)
+      int offset;          /// where in data
+      unsigned num_times;  /// how many time values
+      unsigned component_size; /// number of bytes per component
     };
 
+    // format and component of channels
     dynarray<channel> channels;
 
     float end_time;
@@ -41,26 +38,38 @@ namespace octet {
       return (int)channels.size();
     }
 
-    chan_kind get_chan_kind(int ch) const {
-      return channels[ch].kind;
-    }
-
     atom_t get_sid(int ch) const {
       return channels[ch].sid;
+    }
+
+    atom_t get_sub_target(int ch) const {
+      return channels[ch].sub_target;
+    }
+
+    atom_t get_component(int ch) const {
+      return channels[ch].component;
     }
 
     float get_end_time() const {
       return end_time;
     }
 
-    // crude matrix based channel
-    void add_channel_from_matrices(atom_t sid, int num_times, float *times, float *matrices) {
+    // just store the floats in the channel for now.
+    // todo: optimise animation data
+    void add_channel(atom_t sid, atom_t sub_target, atom_t component, dynarray<float> &times, dynarray<float> &values) {
+      int num_times = (int)times.size();
+      int num_values = (int)values.size();
+      int component_size = (num_values / num_times) * sizeof(float);
+
       channel ch;
-      ch.kind = chan_matrix;
       ch.num_times = num_times;
       ch.sid = sid;
+      ch.sub_target = sub_target;
+      ch.component = component;
+      ch.component_size = component_size;
+
       int offset = ch.offset = (int)data.size();
-      int bytes = num_times * sizeof(unsigned short) + num_times * sizeof(mat4t);
+      int bytes = num_times * sizeof(unsigned short) + component_size * num_times;
       data.resize(ch.offset + bytes);
       end_time = times[num_times-1] > end_time ? times[num_times-1] : end_time;
       for (int i = 0; i != num_times; ++i) {
@@ -68,12 +77,8 @@ namespace octet {
         *((unsigned short*)&data[offset]) = it;
         offset += sizeof(unsigned short);
       }
-      for (int i = 0; i != num_times; ++i) {
-        mat4t m;
-        m.init_row_major(matrices + i*16);
-        *((mat4t*)&data[offset]) = m;
-        offset += sizeof(mat4t);
-      }
+      
+      memcpy(&data[offset], &values[0], component_size * num_times);
       channels.push_back(ch);
     }
 
@@ -85,6 +90,7 @@ namespace octet {
       unsigned short *p = (unsigned short *)&data[ch.offset];
       unsigned a = 0;
       unsigned b = ch.num_times - 1;
+      unsigned component_size = ch.component_size;
       //app_utils::log("ec %f %d\n", time, time_ms);
 
       if (time_ms < p[0]) {
@@ -105,18 +111,16 @@ namespace octet {
 
       unsigned data_offset = ch.offset + ch.num_times * sizeof(unsigned short);
 
-      switch( ch.kind ) {
-        case chan_matrix: {
-          float t = float(time_ms - p[a]) / (p[b] - p[a]);
-          //app_utils::log("tms=%f t=%f\n", time_ms, t);
-          mat4t ma, mb;
-          memcpy(&ma, &data[data_offset + a * sizeof(mat4t)], sizeof(mat4t));
-          memcpy(&mb, &data[data_offset + b * sizeof(mat4t)], sizeof(mat4t));
-          mat4t m = ma * t + mb * (1-t);
-          target->set_value(ch.sid, m.get());
-        } break;
-        default: {
-        } break;
+      float t = float(time_ms - p[a]) / (p[b] - p[a]);
+      float tmp1[16];
+      float tmp2[16];
+      if (component_size < sizeof(tmp1)) {
+        memcpy(tmp1, &data[data_offset + a * component_size], component_size);
+        memcpy(tmp2, &data[data_offset + b * component_size], component_size);
+        for (int i = 0; i != component_size/16; ++i) {
+          tmp1[i] = tmp1[i] * (1-t) + tmp2[i] * t;
+        }
+        target->set_value(ch.sid, ch.sub_target, ch.component, tmp1);
       }
     }
   };

@@ -29,6 +29,9 @@ namespace octet {
 
     // optional skin
     ref<skin> skin_;
+    
+    vec4 aabb_centre;
+    vec4 aabb_half_extent;
 
     mesh(mesh &rhs);
 
@@ -143,6 +146,18 @@ namespace octet {
     void set_skin(skin *value) {
       skin_ = value;
     }
+    
+    // set the axis aligned bounding box of the untransformed mesh
+    void set_aabb(const vec4 &centre, const vec4 &half_extent) {
+      aabb_centre = centre;
+      aabb_half_extent = half_extent;
+    }
+
+    // get the axis aligned bounding box of the untransformed mesh
+    void get_aabb(vec4 &centre, vec4 &half_extent) {
+      centre = aabb_centre;
+      half_extent = aabb_half_extent;
+    }
 
     // return true if this mesh has a particular attribute
     bool has_attribute(unsigned attr) {
@@ -160,6 +175,7 @@ namespace octet {
     size_t get_vertices_size() const { return vertices.get_size(); }
     size_t get_indices_size() const { return indices.get_size(); }
 
+    // get which slot a particular attribute is in
     unsigned get_slot(unsigned attr) const {
       for (unsigned i = 0; i != max_slots; ++i) {
         if (!format[i]) break;
@@ -170,6 +186,7 @@ namespace octet {
       return ~0;
     }
 
+    // get a vec4 value of an attribute (only when not in a vbo)
     vec4 get_value(unsigned slot, unsigned index) const {
       if (get_kind(slot) == GL_FLOAT) {
         const float *src = (float*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
@@ -191,6 +208,7 @@ namespace octet {
       return vec4(0, 0, 0, 0);
     }
 
+    // set a vec4 value of an attribute (only when not in a vbo)
     void set_value(unsigned slot, unsigned index, vec4 value) {
       if (get_kind(slot) == GL_FLOAT) {
         float *src = (float*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
@@ -363,10 +381,6 @@ namespace octet {
       b.add_cone(radius, height, slices, stacks);
       b.get_mesh(*this);
     }
-
-    /*void make_collada_mesh(collada_builder &builder, const char *id, resources &dict) {
-      builder.get_mesh(*this, id, dict);
-    }*/
 
     // make a bunch of lines to show normals.
     // render this with GL_LINES
@@ -570,7 +584,7 @@ namespace octet {
     }
 
     // get the axis aligned bounding box (ie. the min and max of x, y, z)
-    void get_aabb(const mat4t &modelToWorld, vec4 &min, vec4 &max) {
+    /*void get_aabb(const mat4t &modelToWorld, vec4 &min, vec4 &max) {
       unsigned pos_slot = get_slot(attribute_pos);
 
       {
@@ -584,12 +598,14 @@ namespace octet {
         min = min.min(v);
         max = max.max(v);
       }
-    }
+    }*/
 
+    // access the vbo or memory buffer
     gl_resource &get_vertices() {
       return vertices;
     }
 
+    // access the index buffer or memory buffer
     gl_resource &get_indices() {
       return indices;
     }

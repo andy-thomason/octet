@@ -46,13 +46,14 @@ namespace octet {
       collada_builder builder;
       const char *filename = 0;
 
-      int selector = 2;
+      int selector = 5;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;
         case 2: filename = "assets/jenga.dae"; break;
         case 3: filename = "assets/duck_ambient.dae"; break;
         case 4: filename = "assets/Laurana50k.dae"; break;
+        case 5: filename = "assets/Arteria3dElvenMaleFREE/ElevenMaleKnight_blender.dae"; break;
       }
 
       if (!builder.load_xml(filename)) {
@@ -90,7 +91,7 @@ namespace octet {
       glViewport(x, y, w, h);
 
       // clear the background to black
-      glClearColor(0, 0, 0, 1);
+      glClearColor(0.5f, 0.5f, 0.5f, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       // allow Z buffer depth testing (closer objects are always drawn in front of far ones)

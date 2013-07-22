@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "81105D8C1684E62100D624ED"
-               BuildableName = "xcode"
+               BuildableName = "octet"
                BlueprintName = "xcode"
-               ReferencedContainer = "container:xcode.xcodeproj">
+               ReferencedContainer = "container:octet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81105D8C1684E62100D624ED"
-            BuildableName = "xcode"
+            BuildableName = "octet"
             BlueprintName = "xcode"
-            ReferencedContainer = "container:xcode.xcodeproj">
+            ReferencedContainer = "container:octet.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -53,9 +53,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81105D8C1684E62100D624ED"
-            BuildableName = "xcode"
+            BuildableName = "octet"
             BlueprintName = "xcode"
-            ReferencedContainer = "container:xcode.xcodeproj">
+            ReferencedContainer = "container:octet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -77,9 +77,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81105D8C1684E62100D624ED"
-            BuildableName = "xcode"
+            BuildableName = "octet"
             BlueprintName = "xcode"
-            ReferencedContainer = "container:xcode.xcodeproj">
+            ReferencedContainer = "container:octet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

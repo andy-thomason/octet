@@ -114,12 +114,17 @@ namespace octet {
     static atom_t get_atom(const char *name) {
       // the null name is 0
       if (name == 0 || name[0] == 0) {
-        return atom__null;
+        return atom_;
       }
 
       dictionary<atom_t> *dict = get_atom_dict();
 
-      static int num_atoms = (int)atom__first;
+      static int num_atoms = 0;
+      if (num_atoms == 0) {
+        for (++num_atoms; predefined_atom(num_atoms); num_atoms++) {
+          (*dict)[predefined_atom(num_atoms)] = (atom_t)num_atoms;
+        }
+      }
       if (dict->contains(name)) {
         //app_utils::log("old atom %s %d\n", name, (*dict)[name]);
         return (*dict)[name];

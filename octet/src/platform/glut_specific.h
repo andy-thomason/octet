@@ -45,8 +45,6 @@ namespace octet {
   // this is the class that all apps are derived from.
   class app : public app_common {
     int window_handle;
-    int viewport_w;
-    int viewport_h;
 
     typedef std::map<int, app*> map_t;
 
@@ -74,7 +72,9 @@ namespace octet {
 
     void render() {
       //printf("render %d\n", glutGetWindow());
-      draw_world(0, 0, viewport_w, viewport_h);
+      int vx, vy;
+      get_viewport_size(vx, vy);
+      draw_world(0, 0, vx, vy);
       glutSwapBuffers();
     }
 
@@ -113,18 +113,22 @@ namespace octet {
     ~app() {
     }
 
-    void set_viewport(int w, int h) {
-      viewport_w = w;
-      viewport_h = h;
-    }
-
     // interface from GLUT
-    static void reshape(int w, int h) { map()[glutGetWindow()]->set_viewport(w, h); }
+    static void reshape(int w, int h) { map()[glutGetWindow()]->set_viewport_size(w, h); }
     static void display() { map()[glutGetWindow()]->render(); }
     static void do_key_down( unsigned char key, int x, int y) { map()[glutGetWindow()]->set_key(app::translate_key(key), 1); }
     static void do_key_up( unsigned char key, int x, int y) { map()[glutGetWindow()]->set_key(app::translate_key(key), 0); }
     static void do_special_down( int key, int x, int y) { map()[glutGetWindow()]->set_key(app::translate_special(key), 1); }
     static void do_special_up( int key, int x, int y) { map()[glutGetWindow()]->set_key(app::translate_special(key), 0); }
+    static void do_mouse_button(int button, int state, int x, int y) {
+      //printf("%d %d %d %d\n", button, state, x, y);
+      map()[glutGetWindow()]->set_key(key_lmb + (button - GLUT_LEFT_BUTTON), state == GLUT_DOWN);
+      map()[glutGetWindow()]->set_mouse_pos(x, y);
+    }
+    static void do_mouse(int x, int y) {
+      //printf("%d %d\n", x, y);
+      map()[glutGetWindow()]->set_mouse_pos(x, y);
+    }
 
     static void timer(int value) {
       glutTimerFunc(16, timer, 1);
@@ -158,6 +162,9 @@ namespace octet {
         glutKeyboardUpFunc(do_key_up);
         glutSpecialFunc(do_special_down);
         glutSpecialUpFunc(do_special_up);
+        glutMouseFunc(do_mouse_button);
+        glutMotionFunc(do_mouse);
+        glutPassiveMotionFunc(do_mouse);
       }
       glutTimerFunc(16, timer, 1);
       glutMainLoop();

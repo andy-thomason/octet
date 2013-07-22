@@ -39,11 +39,7 @@ namespace octet {
     void update(float delta_time) {
       if (target) {
         for (int ch = 0; ch != anim->get_num_channels(); ++ch) {
-          animation::chan_kind kind = anim->get_chan_kind(ch);
-          if (kind == animation::chan_matrix) {
-            mat4t m;
-            anim->eval_chan(ch, time, target);
-          }
+          anim->eval_chan(ch, time, target);
         }
       }
 

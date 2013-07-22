@@ -340,6 +340,7 @@ namespace octet {
       }
     }
 
+    // effects use "newparam" tags to store samplers and textures
     TiXmlElement *find_param(TiXmlElement *profile_COMMON, const char *sid, const char *child_name) {
       if (!sid) return NULL;
 
@@ -355,6 +356,7 @@ namespace octet {
       return NULL;
     }
 
+    // get a texture or a solid colour
     GLuint get_texture(TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const char *deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *color = child(section, "color");
@@ -400,6 +402,7 @@ namespace octet {
       return resources::get_texture_handle(GL_RGBA, deflt);
     }
 
+    // get a floating point number (or the default)
     float get_float(TiXmlElement *shader, const char *value, float deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *float_ = child(section, "float");
@@ -412,6 +415,7 @@ namespace octet {
       return deflt;
     }
 
+    // add all the materials from the collada file to the resources collection
     void add_materials(resources &dict) {
       TiXmlElement *lib_mat = child(doc.RootElement(), "library_materials");
 
@@ -454,6 +458,7 @@ namespace octet {
       }
     }
 
+    // add geometry and skins from the collada file to the resources collection
     void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, skin *skn, resources &dict, scene &s) {
       if (!url) return;
 
@@ -535,6 +540,7 @@ namespace octet {
       add_mesh_instances(technique_common, controller_url, node, skel, skn, dict, s);
     }
 
+    // utility to get a float
     float quick_float(TiXmlElement *parent, const char *name) {
       TiXmlElement *child = parent->FirstChildElement(name);
       return child ? (float)atof(child->GetText()) : 0;
@@ -574,6 +580,8 @@ namespace octet {
       const char *url = elem->Attribute("url");
       TiXmlElement *light = find_id(url);
       if (!light) return;
+      
+      // todo:
     }
 
     // add a geometry element to the list of mesh states
@@ -696,6 +704,7 @@ namespace octet {
     }
 
     // add <library_animations> to the scene
+    // collada animations range from sensible (array of matrices) to crazy (complex rotations and translations)
     void add_animations(resources &dict) {
       TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_animations");
       if (!lib_anim) return;
@@ -704,15 +713,32 @@ namespace octet {
         animation *anim = new animation();
         dict.set_resource(attr(anim_elem, "id"), anim);
         for (TiXmlElement *channel_elem = child(anim_elem, "channel"); channel_elem != NULL; channel_elem = sibling(channel_elem, "channel")) {
-          string target = attr(channel_elem, "target");
-          int slash = target.find("/");
-          target.truncate(slash);
-          atom_t sid = resources::get_atom(target);
+          const char *target = attr(channel_elem, "target");
+          string node_name = target;
+          string sub_target_name;
+          string component_name;
+
+          int slash = node_name.find("/");
+          if (slash != -1) {
+            node_name.truncate(slash);
+            sub_target_name = target + slash + 1;
+            int dot = sub_target_name.find(".");
+            if (dot != -1) {
+              sub_target_name.truncate(dot);
+              component_name = target + slash + 1 + dot + 1;
+            }
+          }
+          
+          atom_t node_sid = resources::get_atom(node_name);
+          atom_t sub_target_sid = resources::get_atom(sub_target_name);
+          atom_t component_sid = resources::get_atom(component_name);
+          
+          //app_utils::log("%s %s %s\n", node_name.c_str(), sub_target_name.c_str(), component_name.c_str());
           TiXmlElement *sampler_elem = find_id(attr(channel_elem, "source"));
           if (sampler_elem) {
             dynarray<float> times;
-            dynarray<float> transforms;
-            dynarray<string> interpolation;
+            dynarray<float> values;
+            //dynarray<string> interpolation;
 
             TiXmlElement *input = child(sampler_elem, "input");
             while (input) {
@@ -723,20 +749,17 @@ namespace octet {
                 atofv(times, text(float_array));
               } else if (!strcmp(semantic, "OUTPUT")) {
                 TiXmlElement *float_array = child(find_id(source_id), "float_array");
-                atofv(transforms, text(float_array));
+                atofv(values, text(float_array));
               } else if (!strcmp(semantic, "INTERPOLATION")) {
-                TiXmlElement *name_array = child(find_id(source_id), "Name_array");
+                /*TiXmlElement *name_array = child(find_id(source_id), "Name_array");
                 if (name_array) {
                   atonv(interpolation, text(name_array));
-                }
+                }*/
               }
               input = sibling(input, "input");
             }
 
-            if (times.size() && transforms.size() == times.size()*16 && interpolation.size() == times.size()) {
-              int num_times = (int)times.size();
-              anim->add_channel_from_matrices(sid, num_times, &times[0], &transforms[0]);
-            }
+            anim->add_channel(node_sid, sub_target_sid, component_sid, times, values);
           }
         }
       }
@@ -888,6 +911,9 @@ namespace octet {
         return;
       }
 
+      // a geometry or controller is split up into its material groups
+      // with a name of "geometry+material"
+      // each requires a separate mesh instance to render
       const char *symbol = attr(mesh_child, "material");
       if (symbol) {
         string new_url;
@@ -964,9 +990,9 @@ namespace octet {
         }
       }
 
+      // skins need extra parameters for indices and weights
+      // copy the processed blend vertices to the gl attributes using indices from the <p> array
       if (skinst) {
-        // skins need extra parameters for indices and weights
-        // copy the processed blend vertices to the gl attributes using indices from the <p> array
         unsigned p_size = state.p.size();
         unsigned num_vertices = p_size / state.input_stride;
         for (unsigned i = 0; i != num_vertices; ++i) {
@@ -1001,9 +1027,34 @@ namespace octet {
           state.indices[i] = i;
         }
       }
-
+      
       unsigned isize = state.indices.size() * sizeof(state.indices[0]);
       unsigned vsize = state.vertices.size() * sizeof(state.vertices[0]);
+      
+      unsigned pos_slot = mesh->get_slot(attribute_pos);
+      unsigned offset = mesh->get_offset(pos_slot);
+      if (mesh->get_size(pos_slot) == 3 && num_vertices != 0) {
+        unsigned stride = state.attr_stride * 4;
+        float *vtx = (float*)((unsigned char*)&state.vertices[0] + offset);
+        float min[3] = { vtx[0], vtx[1], vtx[2] };
+        float max[3] = { vtx[0], vtx[1], vtx[2] };
+        vtx += state.attr_stride;
+        for (unsigned i = 1; i < num_vertices; ++i) {
+          min[0] = min[0] < vtx[0] ? min[0] : vtx[0];
+          max[0] = max[0] > vtx[0] ? max[0] : vtx[0];
+          min[1] = min[1] < vtx[1] ? min[1] : vtx[1];
+          max[1] = max[1] > vtx[1] ? max[1] : vtx[1];
+          min[2] = min[2] < vtx[2] ? min[2] : vtx[2];
+          max[2] = max[2] > vtx[2] ? max[2] : vtx[2];
+          vtx += state.attr_stride;
+        }
+        printf("%s\n", id);
+        printf("%f %f %f\n", min[0], min[1], min[2]);
+        printf("%f %f %f\n", max[0], max[1], max[2]);
+        vec4 vmin(min[0], min[1], min[2], 0);
+        vec4 vmax(max[0], max[1], max[2], 0);
+        mesh->set_aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f);
+      }
 
       mesh->allocate(vsize, isize, true);
       mesh->assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
@@ -1107,6 +1158,7 @@ namespace octet {
       );
     }
 
+    // add all the scenes from the collada file to the resources collection
     void add_scenes(resources  &dict) {
       TiXmlElement *lib = doc.RootElement()->FirstChildElement("library_visual_scenes");
 

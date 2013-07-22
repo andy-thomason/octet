@@ -105,12 +105,12 @@ namespace octet {
     }
 
     // used by the platform to set a key
-    void set_mouse_pos(unsigned x, unsigned y) {
+    void set_mouse_pos(int x, int y) {
       mouse_x = x;
       mouse_y = y;
     }
 
-    void set_viewport_size(unsigned x, unsigned y) {
+    void set_viewport_size(int x, int y) {
       viewport_x = x;
       viewport_y = y;
     }
