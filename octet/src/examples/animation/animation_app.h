@@ -16,19 +16,23 @@
 
 namespace octet {
   class animation_app : public octet::app {
-    ref<scene> app_scene;
+    // named resources loaded from collada file
     resources dict;
 
-    // shader to draw a shaded, textured triangle
+    // scene used to draw 3d objects
+    ref<scene> app_scene;
+
+    // shaders to draw triangles
     bump_shader object_shader;
     bump_shader skin_shader;
 
+    // helper to rotate camera about scene
     mouse_ball ball;
 
+    // helper for drawing text
     text_overlay overlay;
 
   public:
-
     // this is called when we construct the class
     animation_app(int argc, char **argv) : app(argc, argv), ball() {
     }

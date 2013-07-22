@@ -1005,7 +1005,7 @@ namespace octet {
       unsigned isize = state.indices.size() * sizeof(state.indices[0]);
       unsigned vsize = state.vertices.size() * sizeof(state.vertices[0]);
 
-      mesh->allocate(vsize, isize, app_common::can_use_vbos());
+      mesh->allocate(vsize, isize, true);
       mesh->assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
       mesh->set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_INT);
       if (0) {

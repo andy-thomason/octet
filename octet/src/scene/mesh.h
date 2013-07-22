@@ -9,29 +9,22 @@
 
 namespace octet {
   class mesh : public resource {
-  public:
-    // a gl_resource can be stored in a gl buffer or memory
-    struct gl_resource {
-      unsigned char *ptr;
-      GLuint buffer;
-    };
-
   private:
     // todo: make this private
     gl_resource vertices;
     gl_resource indices;
 
-    // compressed format: aaaassttt
+    // attribute formats
     enum { max_slots = 16 };
-    unsigned short format[max_slots];
+    unsigned format[max_slots];
 
     unsigned num_indices;
     unsigned num_vertices;
     unsigned short stride;
     unsigned short mode;
     unsigned short index_type;
+    unsigned short normalized;
 
-    unsigned char use_vbo;
     unsigned char num_slots;
 
     // optional skin
@@ -61,8 +54,8 @@ namespace octet {
       stride = 0;
       mode = 0;
       index_type = 0;
+      normalized = 0;
 
-      use_vbo = 0;
       num_slots = 0;
       index_type = GL_UNSIGNED_SHORT;
       mode = GL_TRIANGLES;
@@ -71,26 +64,15 @@ namespace octet {
     }
 
     void release() {
-      if (use_vbo) {
-        glDeleteBuffers(1, &vertices.buffer);
-        glDeleteBuffers(1, &indices.buffer);
-        vertices.buffer = 0;
-        indices.buffer = 0;
-        use_vbo = 0;
-      } else if (index_type && num_vertices) {
-        unsigned vsize = stride * num_vertices;
-        unsigned isize = mesh::kind_size(index_type) * num_indices;
-        allocator::free(vertices.ptr, vsize);
-        allocator::free(indices.ptr, isize);
-        vertices.ptr = 0;
-        indices.ptr = 0;
-      }
+      vertices.release();
+      indices.release();
     }
 
-    // eg. add_attribute(attribute_pos, 3, GL_FLOAT)
-    unsigned add_attribute(unsigned attr, unsigned size, unsigned kind, unsigned offset) {
+    // eg. add_attribute(attribute_pos, 3, GL_FLOAT, 0)
+    unsigned add_attribute(unsigned attr, unsigned size, unsigned kind, unsigned offset, unsigned norm=0) {
       assert(num_slots < max_slots);
       format[num_slots] = (offset << 9) + (attr << 5) + ((size-1) << 3) + (kind - GL_BYTE);
+      if (norm) normalized |= 1 << num_slots;
       return num_slots++;
     }
 
@@ -135,12 +117,20 @@ namespace octet {
       return index_type;
     }
 
-    unsigned get_use_vbo() const {
-      return use_vbo;
-    }
-
     unsigned get_num_slots() const {
       return num_slots;
+    }
+
+    bool get_use_vbo() const {
+      return vertices.get_use_vbo();
+    }
+
+    void set_num_vertices(unsigned value) {
+      num_vertices = value;
+    }
+
+    void set_num_indices(unsigned value) {
+      num_indices = value;
     }
 
     // get the optional skin data
@@ -165,10 +155,10 @@ namespace octet {
     }
 
     // avoid using these, please! Just for testing
-    const void *get_vertices() const { return vertices.ptr; }
-    const void *get_indices() const { return indices.ptr; }
-    unsigned get_vertices_size() const { return num_vertices * stride; }
-    unsigned get_indices_size() const { return num_indices * kind_size(index_type); }
+    const void *get_vertices() const { return vertices.get_ptr(); }
+    const void *get_indices() const { return indices.get_ptr(); }
+    unsigned get_vertices_size() const { return vertices.get_size(); }
+    unsigned get_indices_size() const { return indices.get_size(); }
 
     unsigned get_slot(unsigned attr) const {
       for (unsigned i = 0; i != max_slots; ++i) {
@@ -181,26 +171,41 @@ namespace octet {
     }
 
     vec4 get_value(unsigned slot, unsigned index) const {
-      if (!use_vbo && get_kind(slot) == GL_FLOAT) {
-        const float *src = (float*)(vertices.ptr + stride * index + get_offset(slot));
+      if (get_kind(slot) == GL_FLOAT) {
+        const float *src = (float*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         float x = src[0];
         float y = size > 1 ? src[1] : 0;
         float z = size > 2 ? src[2] : 0;
         float w = size > 3 ? src[3] : 1;
         return vec4(x, y, z, w);
+	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
+        const unsigned char *src = (unsigned char*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
+        unsigned size = get_size(slot);
+        float x = src[0]*(1.0f/255);
+        float y = size > 1 ? src[1]*(1.0f/255) : 0;
+        float z = size > 2 ? src[2]*(1.0f/255) : 0;
+        float w = size > 3 ? src[3]*(1.0f/255) : 1;
+        return vec4(x, y, z, w);
       }
       return vec4(0, 0, 0, 0);
     }
 
     void set_value(unsigned slot, unsigned index, vec4 value) {
-      if (!use_vbo && get_kind(slot) == GL_FLOAT) {
-        float *src = (float*)(vertices.ptr + stride * index + get_offset(slot));
+      if (get_kind(slot) == GL_FLOAT) {
+        float *src = (float*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         src[0] = value[0];
         if (size > 1) src[1] = value[1];
         if (size > 2) src[2] = value[2];
         if (size > 3) src[3] = value[3];
+	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
+        unsigned char *src = (unsigned char*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
+        unsigned size = get_size(slot);
+        src[0] = (unsigned char)( value[0] * 255.0f );
+        if (size > 1) src[1] = (unsigned char)( value[1] * 255.0f );
+        if (size > 2) src[2] = (unsigned char)( value[2] * 255.0f );
+        if (size > 3) src[3] = (unsigned char)( value[3] * 255.0f );
       }
     }
 
@@ -209,47 +214,29 @@ namespace octet {
     }
 
     unsigned get_index(unsigned index) const {
-      if (!use_vbo && index_type == GL_UNSIGNED_SHORT) {
-        unsigned short *src = (unsigned short*)(indices.ptr + index*2);
+      if (index_type == GL_UNSIGNED_SHORT) {
+        unsigned short *src = (unsigned short*)((unsigned char*)indices.get_ptr() + index*2);
+        return *src;
+      } else if (index_type == GL_UNSIGNED_INT) {
+        unsigned int *src = (unsigned int*)((unsigned char*)indices.get_ptr() + index*4);
         return *src;
       }
       return 0;
     }
 
     void begin_render(unsigned char **base, unsigned char **index_base) const {
-      if (use_vbo) {
-        glBindBuffer(GL_ARRAY_BUFFER, vertices.buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices.buffer);
-        *base = 0;
-        *index_base = 0;
-      } else {
-        *base = vertices.ptr;
-        *index_base = indices.ptr;
-      }
+      *base = (unsigned char *)vertices.bind();
+      *index_base = (unsigned char *)indices.bind();
     }
 
     void allocate(size_t vsize, size_t isize, bool use_vbo_) {
-      if (use_vbo_) {
-        glGenBuffers(1, &vertices.buffer);
-        glGenBuffers(1, &indices.buffer);
-        use_vbo = 1;
-      } else {
-        vertices.ptr = (unsigned char*)allocator::malloc(vsize);
-        indices.ptr = (unsigned char*)allocator::malloc(isize);
-        use_vbo = 0;
-      }
+      vertices.allocate(GL_ARRAY_BUFFER, vsize, use_vbo_);
+      indices.allocate(GL_ELEMENT_ARRAY_BUFFER, isize, use_vbo_);
     }
 
     void assign(unsigned vsize, unsigned isize, unsigned char *vsrc, unsigned char *isrc) {
-      if (use_vbo) {
-        glBindBuffer(GL_ARRAY_BUFFER, vertices.buffer);
-        glBufferData(GL_ARRAY_BUFFER, vsize, vsrc, GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices.buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, isize, isrc, GL_STATIC_DRAW);
-      } else {
-        memcpy(vertices.ptr, vsrc, vsize);
-        memcpy(indices.ptr, isrc, isize);
-      }
+      vertices.assign(vsrc, 0, vsize);
+      indices.assign(isrc, 0, isize);
     }
 
     void copy_format(const mesh &src) {
@@ -263,16 +250,15 @@ namespace octet {
       mode = src.mode;
       index_type = src.index_type;
 
-      use_vbo = src.use_vbo;
       num_slots = src.num_slots;
     }
 
     void copy_indices(const mesh &src) {
-      memcpy(indices.ptr, src.indices.ptr, src.num_indices * kind_size(index_type));
+      indices.copy(src.indices);
     }
 
     void copy_vertices(const mesh &src) {
-      memcpy(vertices.ptr, src.vertices.ptr, src.num_vertices * src.stride);
+      vertices.copy(src.vertices);
     }
 
     void set_params(unsigned stride_, unsigned num_indices_, unsigned num_vertices_, unsigned mode_, unsigned index_type_) {
@@ -295,8 +281,9 @@ namespace octet {
         fprintf(file, "  </slot>\n");
       }
       fprintf(file, "  <indices>\n    ");
+      void *ptr = indices.get_ptr();
       for (unsigned i = 0; i != num_indices; ++i) {
-        fprintf(file, "%d ", ((short*)indices.ptr)[i]);
+        fprintf(file, "%d ", ((short*)ptr)[i]);
       }
       fprintf(file, "\n  </indices>\n");
       fprintf(file, "</model>\n");
@@ -309,13 +296,15 @@ namespace octet {
       unsigned char *index_base = 0;
       begin_render(&base, &index_base);
 
+      unsigned n = normalized;
       for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
         unsigned size = get_size(slot);
         unsigned kind = get_kind(slot);
         unsigned attr = get_attr(slot);
         unsigned offset = get_offset(slot);
-        glVertexAttribPointer(attr, size, kind, GL_FALSE, get_stride(), (void*)(base + offset));
+        glVertexAttribPointer(attr, size, kind, n & 1, get_stride(), (void*)(base + offset));
         glEnableVertexAttribArray(attr);
+        n >>= 1;
       }
 
       glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)index_base);
@@ -597,22 +586,12 @@ namespace octet {
       }
     }
 
-    /*template <class T > void get_triangles(const mat4t &modelToWorld, int max_depth, T &out) {
-      unsigned pos_slot = get_slot(attribute_pos);
+    gl_resource &get_vertices() {
+      return vertices;
+    }
 
-      for (unsigned i = 0; i != get_num_indices(); i += 3) {
-        unsigned idx[3] = {
-          get_index(i),
-          get_index(i+1),
-          get_index(i+2)
-        };
-
-        vec4 p0 = get_value(pos_slot, idx[0]) * modelToWorld;
-        vec4 p1 = get_value(pos_slot, idx[1]) * modelToWorld;
-        vec4 p2 = get_value(pos_slot, idx[2]) * modelToWorld;
-        out.triangle(i, p0, p1, p2);
-      }
-    }*/
-
+    gl_resource &get_indices() {
+      return indices;
+    }
   };
 }

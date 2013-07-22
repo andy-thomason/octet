@@ -15,7 +15,10 @@
 //
 //
 
+// namespace help us to group classes and avoid clashes
 namespace octet {
+
+  // this is an app to draw a triangle, it takes some of its workings from the class "app"
   class triangle_app : public app {
     // Matrix to transform points on our triangle to the world space
     // This allows us to move and rotate our triangle

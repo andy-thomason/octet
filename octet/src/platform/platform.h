@@ -77,6 +77,7 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../resources/resources.h"
 #include "../resources/visitor.h"
 #include "../resources/xml_writer.h"
+#include "../resources/gl_resource.h"
 #include "../resources/mesh_builder.h"
 #include "../resources/animation_target.h"
 

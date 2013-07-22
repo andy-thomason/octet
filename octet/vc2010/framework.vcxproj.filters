@@ -55,6 +55,12 @@
     <Filter Include="containers">
       <UniqueIdentifier>{c41f517a-aed7-4ced-a38b-021e1dbd5bb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="loaders">
+      <UniqueIdentifier>{5985a343-9062-47cb-bad4-14c9a0368791}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helpers">
+      <UniqueIdentifier>{48f3bd32-676a-459a-919a-91c71b7018c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\shaders\color_shader.h">
@@ -214,6 +220,24 @@
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\src\resources\xml_writer.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\loaders\collada_builder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\loaders\gif_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\loaders\tga_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\helpers\mouse_ball.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\helpers\text_overlay.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\gl_resource.h">
       <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>

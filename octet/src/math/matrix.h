@@ -127,12 +127,23 @@ namespace octet {
       float c = cosf(angle * (3.14159265f/180));
       float s = sinf(angle * (3.14159265f/180));
       mat4t r(
-        vec4(x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0),
+        vec4(x*x*(1-c)+c,   x*y*(1-c)+z*s, x*z*(1-c)-y*s, 0),
         vec4(x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0),
         vec4(x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0),
         vec4(          0,               0,             0, 1)
       );
-      return multMatrix(r);
+      *this = r * *this;
+
+      /*
+      // faster
+      float x1c = x * (1-c), y1c = y * (1-c), z1c = z * (1-c);
+      vec4 v0 = v[0], v1 = v[1], v2 = v[2];
+      v[0] = v0 * (x*x1c+c) + v1 * (x*y1c+z*s) + v2 * (x*z1c-y*s);
+      v[1] = v0 * (x*y1c-z*s) + v1 * (y*y1c+c) + v2 * (y*z1c+x*s);
+      v[2] = v0 * (x*z1c+y*s) + v1 * (y*z1c-x*s) + v2 * (z*z1c+c);
+      */
+
+      return *this;
     }
 
     // specialised xyz axis rotate
