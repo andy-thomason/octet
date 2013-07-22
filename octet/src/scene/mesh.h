@@ -157,8 +157,8 @@ namespace octet {
     // avoid using these, please! Just for testing
     const void *get_vertices() const { return vertices.get_ptr(); }
     const void *get_indices() const { return indices.get_ptr(); }
-    unsigned get_vertices_size() const { return vertices.get_size(); }
-    unsigned get_indices_size() const { return indices.get_size(); }
+    size_t get_vertices_size() const { return vertices.get_size(); }
+    size_t get_indices_size() const { return indices.get_size(); }
 
     unsigned get_slot(unsigned attr) const {
       for (unsigned i = 0; i != max_slots; ++i) {

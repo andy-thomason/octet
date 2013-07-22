@@ -10,7 +10,7 @@
 namespace octet {
   class gl_resource {
     void *ptr;
-    unsigned size;
+    size_t size;
     GLuint buffer;
     GLuint target;
 
@@ -21,7 +21,7 @@ namespace octet {
       buffer = 0;
     }
 
-    void allocate(GLuint target, unsigned size, bool use_vbo) {
+    void allocate(GLuint target, size_t size, bool use_vbo) {
       release();
       if (use_vbo) {
         glGenBuffers(1, &buffer);
@@ -51,7 +51,7 @@ namespace octet {
       release();
     }
 
-    unsigned get_size() const {
+    size_t get_size() const {
       return size;
     }
 
@@ -68,7 +68,7 @@ namespace octet {
       }
     }
 
-    void assign(void *ptr, unsigned offset, unsigned size) {
+    void assign(void *ptr, unsigned offset, size_t size) {
       if (buffer) {
         glBindBuffer(target, buffer);
         glBufferSubData(target, offset, size, ptr);
@@ -83,8 +83,8 @@ namespace octet {
       release();
       if (rhs.buffer) {
         glBindBuffer(target, buffer);
-        glBindBuffer(GL_COPY_READ_BUFFER, rhs.buffer);
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, target, 0, 0, size);
+        //glBindBuffer(GL_COPY_READ_BUFFER, rhs.buffer);
+        //glCopyBufferSubData(GL_COPY_READ_BUFFER, target, 0, 0, size);
       } else {
         assign(rhs.ptr, 0, rhs.size);
       }

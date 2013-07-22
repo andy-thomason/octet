@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8111244A179D46D800CAA337 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81F56250179922EC00729531 /* main.cpp */; };
 		814C3AF716B5450900910C5D /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 814C3AF616B5450900910C5D /* OpenAL.framework */; };
 		8153DFA61684F05300A7DA33 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8153DFA51684F05300A7DA33 /* OpenGL.framework */; };
 		81AB65B716E6ACB800AB99C9 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AB65B616E6ACB800AB99C9 /* OpenCL.framework */; };
@@ -1099,6 +1100,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8111244A179D46D800CAA337 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
