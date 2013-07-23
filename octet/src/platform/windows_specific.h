@@ -18,19 +18,20 @@
 // avoid irritating security warnings
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4345)
+#pragma warning(disable : 4530)
 
 // graphics - opengl
 #pragma comment(lib, "OpenGL32.Lib")
 #include <gl/GL.h>
 
 // audio - openal
-#pragma comment(lib, "../lib/OpenAL32.lib")
+#pragma comment(lib, "OpenAL32.lib")
 #include "AL/alc.h"
 #include "AL/AL.h"
 
 // compute - opencl
 #if OCTET_OPENCL
-  #pragma comment(lib, "../lib/OpenCL.lib")
+  #pragma comment(lib, "OpenCL.lib")
   #include "CL/cl.h"
   #include "CL/cl_gl.h"
 #endif

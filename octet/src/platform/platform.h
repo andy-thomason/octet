@@ -22,7 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#define OCTET_OPENCL 0
+#ifndef OCTET_OPENCL
+  #define OCTET_OPENCL 0
+#endif
 
 // use <> to include from standard directories
 #include <stdio.h>
@@ -31,9 +33,6 @@
 #include <stdarg.h>
 #include <math.h>
 #include <assert.h>
-
-// some standard c++ definitions
-#include <map>
 
 // xml library
 #include "../tinyxml/tinystr.cpp"
@@ -116,5 +115,3 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../resources/mesh_builder.inl"
 
 #include "../physics/physics.h"
-
-//#include "../raytracer/raytracer.h"

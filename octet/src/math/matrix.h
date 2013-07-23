@@ -14,6 +14,11 @@
 //
 // In this framework, matrices are all written "spaceToSpace" to show that they
 // go from one space to another. eg. modelToWorld.
+//
+// Examples are cameraToArm = cameraToWorld * worldToHip * hipToArm
+//
+// note that the spaces go together like dominos.
+//
 // The inverse of the matrix transforms the other way. so inverse4x4(modelToWorld) == worldToModel
 //
 namespace octet {
@@ -135,7 +140,7 @@ namespace octet {
       *this = r * *this;
 
       /*
-      // faster
+      // this may be faster
       float x1c = x * (1-c), y1c = y * (1-c), z1c = z * (1-c);
       vec4 v0 = v[0], v1 = v[1], v2 = v[2];
       v[0] = v0 * (x*x1c+c) + v1 * (x*y1c+z*s) + v2 * (x*z1c-y*s);
