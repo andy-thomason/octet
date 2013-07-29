@@ -26,6 +26,9 @@ namespace octet {
     }
 
     void visit(visitor &v) {
+      v.visit(modelToBind, atom_modelToBind);
+      v.visit(bindToModel, atom_bindToModel);
+      v.visit(joints, atom_joints);
     }
 
     void add_joint(const mat4t &bindToModel, atom_t sid) {

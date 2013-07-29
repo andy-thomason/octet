@@ -58,7 +58,7 @@ public:
       case 2: filename = "assets/jenga.dae"; break;
       case 3: filename = "assets/duck_ambient.dae"; break;
       case 4: filename = "assets/Laurana50k.dae"; break;
-      case 5: filename = "assets/Arteria3dElvenMaleFREE/ElevenMaleKnight_blender.dae"; break;
+      case 5: filename = "external/Arteria3d/ElvenMale/ElevenMaleKnight_blender.dae"; break;
     }
 
     if (!builder.load_xml(filename)) {
@@ -71,6 +71,21 @@ public:
     assert(app_scene);
 
     app_scene->create_default_camera_and_lights();
+
+    {
+      // save the resources as an xml file
+      TiXmlDocument doc;
+      TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "utf-8", "");
+      doc.LinkEndChild(decl);
+      TiXmlElement *root = new TiXmlElement("octet");
+      doc.LinkEndChild(root);
+
+      octet::xml_writer xml(root);
+
+      dict.visit(xml);
+
+      doc.SaveFile("animation.xml");
+    }
 
     app_scene->play_all_anims(dict);
 

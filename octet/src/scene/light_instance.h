@@ -30,6 +30,21 @@ namespace octet {
       farVal = 1000.0f;
     }
 
+    void visit(visitor &v) {
+      v.visit(node, atom_node);
+
+      v.visit(kind, atom_kind);
+      v.visit(color, atom_color);
+      v.visit(constant_attenuation, atom_constant_attenuation);
+      v.visit(linear_attenuation, atom_linear_attenuation);
+      v.visit(quadratic_attenuation, atom_quadratic_attenuation);
+      v.visit(falloff_angle, atom_falloff_angle);
+      v.visit(falloff_exponent, atom_falloff_exponent);
+
+      v.visit(nearVal, atom_nearVal);
+      v.visit(farVal, atom_farVal);
+    }
+
     void set_node(scene_node *node) {
       this->node = node;
     }
@@ -64,9 +79,6 @@ namespace octet {
 
     vec4 get_color() {
       return color;
-    }
-
-    void visit(visitor &v) {
     }
 
     // in the fragment shader, we give the position and direction for diffuse and specular calculation

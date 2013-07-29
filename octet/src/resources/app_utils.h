@@ -7,6 +7,14 @@
 //
 
 namespace octet {
+  enum atom_t {
+    atom_, // null atom
+    
+    #define OCTET_ATOM(X) atom_##X,
+    #include "atoms.h"
+    #undef OCTET_ATOM
+  };
+  
   class app_utils {
   public:
     static const char *prefix(const char *new_prefix=NULL) {
@@ -149,5 +157,68 @@ namespace octet {
       fflush(file);
       return file;
     }
+
+    static dictionary<atom_t> *get_atom_dict() {
+      static dictionary<atom_t> *dict;
+      if (!dict) dict = new dictionary<atom_t>();
+      return dict;
+    }
+
+    // get a unique int for a string.
+    // these values are much cheaper to work with than strings.
+    static atom_t get_atom(const char *name) {
+      // the null name is 0
+      if (name == 0 || name[0] == 0) {
+        return atom_;
+      }
+
+      dictionary<atom_t> *dict = get_atom_dict();
+
+      static int num_atoms = 0;
+      if (num_atoms == 0) {
+        for (++num_atoms; predefined_atom(num_atoms); num_atoms++) {
+          (*dict)[predefined_atom(num_atoms)] = (atom_t)num_atoms;
+        }
+      }
+      if (dict->contains(name)) {
+        //app_utils::log("old atom %s %d\n", name, (*dict)[name]);
+        return (*dict)[name];
+      } else {
+        //app_utils::log("new atom %s %d\n", name, num_atoms);
+        return (*dict)[name] = (atom_t)num_atoms++;
+      }
+    }
+
+    static const char *predefined_atom(unsigned i) {
+      static const char *names[] = {
+        "",
+
+        #define OCTET_ATOM(X) #X,
+        #include "atoms.h"
+        #undef OCTET_ATOM
+        NULL
+      };
+      if (i < sizeof(names)/sizeof(names[0])-1) {
+        return names[i];
+      } else {
+        return NULL;
+      }
+    }
+
+    static const char *get_atom_name(atom_t atom) {
+      const char *name = predefined_atom((unsigned)atom);
+      if (name) return name;
+
+      // slow!
+      dictionary<atom_t> *dict = get_atom_dict();
+      unsigned num_indices = dict->get_num_indices();
+      for (unsigned i = 0; i != num_indices; ++i) {
+        if (dict->get_value(i) == atom) {
+          return dict->get_key(i);
+        }
+      }
+      return "???";
+    }
+
   };
 }

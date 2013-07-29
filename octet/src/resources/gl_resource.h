@@ -8,17 +8,21 @@
 //
 
 namespace octet {
-  class gl_resource {
-    void *ptr;
-    size_t size;
+  class gl_resource : public visitable {
+    dynarray<uint8_t> bytes;
     GLuint buffer;
     GLuint target;
 
   public:
+    RESOURCE_META(gl_resource)
+
     gl_resource() {
-      ptr = 0;
-      size = 0;
       buffer = 0;
+    }
+
+    void visit(visitor &v) {
+      v.visit(bytes, atom_bytes);
+      v.visit(target, atom_target);
     }
 
     void allocate(GLuint target, size_t size, bool use_vbo) {
@@ -27,23 +31,16 @@ namespace octet {
         glGenBuffers(1, &buffer);
         glBindBuffer(target, buffer);
         glBufferData(target, size, NULL, GL_STATIC_DRAW);
-      } else {
-        ptr = allocator::malloc(size);
       }
-      this->size = size;
+      bytes.resize(size);
       this->target = target;
     }
 
     void release() {
       if (buffer != 0) {
         glDeleteBuffers(1, &buffer);
-      } else {
-        if (ptr) {
-          allocator::free(ptr, size);
-        }
       }
-      ptr = 0;
-      size = 0;
+      bytes.reset();
       buffer = 0;
     }
 
@@ -52,11 +49,11 @@ namespace octet {
     }
 
     size_t get_size() const {
-      return size;
+      return bytes.size();
     }
 
     void *get_ptr() const {
-      return buffer != 0 ? 0 : ptr;
+      return (void*)&bytes[0];
     }
 
     void *bind() const {
@@ -64,7 +61,7 @@ namespace octet {
         glBindBuffer(target, buffer);
         return 0;
       } else {
-        return ptr;
+        return get_ptr();
       }
     }
 
@@ -72,21 +69,13 @@ namespace octet {
       if (buffer) {
         glBindBuffer(target, buffer);
         glBufferSubData(target, offset, size, ptr);
-      } else {
-        assert(offset + size <= this->size);
-        memcpy((void*)((char*)this->ptr + offset), ptr, size);
       }
+      assert(offset + size <= this->get_size());
+      memcpy((void*)((char*)get_ptr() + offset), ptr, size);
     }
 
     void copy(const gl_resource &rhs) {
-      assert(!get_use_vbo() && !rhs.get_use_vbo());
-      if (rhs.buffer) {
-        glBindBuffer(target, buffer);
-        //glBindBuffer(GL_COPY_READ_BUFFER, rhs.buffer);
-        //glCopyBufferSubData(GL_COPY_READ_BUFFER, target, 0, 0, size);
-      } else {
-        assign(rhs.ptr, 0, rhs.size);
-      }
+      assign(rhs.get_ptr(), 0, rhs.get_size());
     }
 
     bool get_use_vbo() const {

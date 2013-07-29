@@ -38,7 +38,7 @@ namespace octet {
           return entry;
         }
       }
-      assert(0 && "hash_map: this should not happen");
+      assert(0 && "hash_map: all entries are used. expand() did not get called");
       return 0;
     }
   
@@ -75,7 +75,7 @@ namespace octet {
       if (!entry->key) {
         // reducing this ratio decreases hot search time at the
         // expense of size (cold search time).
-        if (num_entries > max_entries * 3 / 4) {
+        if (num_entries >= max_entries * 3 / 4) {
           expand();
           entry = find(key, hash);
         }

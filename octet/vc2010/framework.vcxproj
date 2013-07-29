@@ -125,7 +125,6 @@
     <ClInclude Include="..\src\scene\animation.h" />
     <ClInclude Include="..\src\scene\animation_instance.h" />
     <ClInclude Include="..\src\scene\camera_instance.h" />
-    <ClInclude Include="..\src\scene\lighting.h" />
     <ClInclude Include="..\src\scene\light_instance.h" />
     <ClInclude Include="..\src\scene\material.h" />
     <ClInclude Include="..\src\scene\mesh.h" />

@@ -9,8 +9,6 @@
 
 namespace octet {
   class mesh : public resource {
-  private:
-    // todo: make this private
     gl_resource vertices;
     gl_resource indices;
 
@@ -43,6 +41,19 @@ namespace octet {
     }
 
     void visit(visitor &v) {
+      v.visit_agg(vertices, atom_vertices);
+      v.visit_agg(indices, atom_indices);
+      v.visit(format, atom_format);
+      v.visit(num_indices, atom_num_indices);
+      v.visit(num_vertices, atom_num_vertices);
+      v.visit(stride, atom_stride);
+      v.visit(mode, atom_mode);
+      v.visit(index_type, atom_index_type);
+      v.visit(normalized, atom_normalized);
+      v.visit(num_slots, atom_num_slots);
+      v.visit(skin_, atom_skin_);
+      v.visit(aabb_centre, atom_aabb_centre);
+      v.visit(aabb_half_extent, atom_aabb_half_extent);
     }
 
     ~mesh() {

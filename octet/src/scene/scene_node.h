@@ -57,10 +57,10 @@ namespace octet {
     // visitor pattern used for game saves/loads (serialisation)
     //
     void visit(visitor &v) {
-      v.visit(parent, "parent");
-      v.visit(children, "children");
-      v.visit(nodeToParent, "nodeToParent");
-      v.visit(sid, "sid");
+      v.visit(parent, atom_parent);
+      v.visit(children, atom_children);
+      v.visit(nodeToParent, atom_nodeToParent);
+      v.visit(sid, atom_sid);
     }
 
     void add_child(scene_node *new_node) {

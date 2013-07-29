@@ -38,6 +38,13 @@ namespace octet {
       end_time = 0;
     }
 
+    void visit(visitor &v) {
+      v.visit(data, atom_data);
+      v.visit(channels, atom_channels);
+      v.visit(targets, atom_targets);
+      v.visit(end_time, atom_end_time);
+    }
+
     int get_num_channels() const {
       return (int)channels.size();
     }

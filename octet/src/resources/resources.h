@@ -8,7 +8,7 @@
 //
 
 namespace octet {
-  class resources {
+  class resources : public resource {
     dictionary<ref<resource>> dict;
 
     #ifdef WIN32
@@ -26,12 +26,6 @@ namespace octet {
     static sounds_t &sounds() { static sounds_t instance;  return instance; }
 
     static GLuint get_texture_handle_internal(unsigned gl_kind, const char *name);
-
-    static dictionary<atom_t> *get_atom_dict() {
-      static dictionary<atom_t> *dict;
-      if (!dict) dict = new dictionary<atom_t>();
-      return dict;
-    }
 
     static unsigned u4(unsigned char *src) {
       return src[0] + src[1] * 256 + src[2] * 65536 + src[3] * 0x1000000;
@@ -65,6 +59,10 @@ namespace octet {
     }
   public:
     resources() {
+    }
+
+    virtual void visit(visitor &v) {
+      v.visit(dict, atom_dict);
     }
 
     bool has_resource(const char *name) {
@@ -109,31 +107,6 @@ namespace octet {
       return result;
     }
 
-    // get a unique int for a string.
-    // these values are much cheaper to work with than strings.
-    static atom_t get_atom(const char *name) {
-      // the null name is 0
-      if (name == 0 || name[0] == 0) {
-        return atom_;
-      }
-
-      dictionary<atom_t> *dict = get_atom_dict();
-
-      static int num_atoms = 0;
-      if (num_atoms == 0) {
-        for (++num_atoms; predefined_atom(num_atoms); num_atoms++) {
-          (*dict)[predefined_atom(num_atoms)] = (atom_t)num_atoms;
-        }
-      }
-      if (dict->contains(name)) {
-        //app_utils::log("old atom %s %d\n", name, (*dict)[name]);
-        return (*dict)[name];
-      } else {
-        //app_utils::log("new atom %s %d\n", name, num_atoms);
-        return (*dict)[name] = (atom_t)num_atoms++;
-      }
-    }
-
     skin *get_skin(const char *id) { resource *res = get_resource(id); return res ? res->get_skin() : 0; }
     skeleton *get_skeleton(const char *id) { resource *res = get_resource(id); return res ? res->get_skeleton() : 0; }
     mesh *get_mesh(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh() : 0; }
@@ -156,6 +129,17 @@ namespace octet {
           if (res->get_type() == type) {
             result.push_back(res);
           }
+        }
+      }
+    }
+
+    void visit(visitor &v, atom_t sid) {
+      unsigned num_indices = dict.get_num_indices();
+      for (unsigned i = 0; i != num_indices; ++i) {
+        const char *key = dict.get_key(i);
+        resource *res = dict.get_value(i);
+        if (key && res) {
+          res->visit(v);
         }
       }
     }

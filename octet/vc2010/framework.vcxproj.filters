@@ -186,9 +186,6 @@
     <ClInclude Include="..\src\scene\light_instance.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\scene\lighting.h">
-      <Filter>scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\scene\material.h">
       <Filter>scene</Filter>
     </ClInclude>

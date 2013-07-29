@@ -58,6 +58,13 @@ namespace octet {
     }
 
     void visit(visitor &v) {
+      v.visit(diffuse, atom_diffuse);
+      v.visit(ambient, atom_ambient);
+      v.visit(emission, atom_emission);
+      v.visit(specular, atom_specular);
+      v.visit(bump, atom_bump);
+
+      v.visit(shininess, atom_shininess);
     }
 
     void init(GLuint diffuse, GLuint ambient, GLuint emission, GLuint specular, GLuint bump, float shininess) {

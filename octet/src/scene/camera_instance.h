@@ -37,6 +37,26 @@ namespace octet {
     }
 
     void visit(visitor &v) {
+    // camera parameters
+    ref<scene_node> node;
+      v.visit(is_ortho, atom_is_ortho);
+
+      // common to all cameras
+      v.visit(nearVal, atom_nearVal);
+      v.visit(farVal, atom_farVal);
+
+      // perspective camera
+      v.visit(xfov, atom_xfov);
+      v.visit(yfov, atom_yfov);
+      v.visit(aspect_ratio, atom_aspect_ratio);
+
+      // ortho camera
+      v.visit(xmag, atom_xmag);
+      v.visit(ymag, atom_ymag);
+
+      // generated matrices
+      v.visit(worldToCamera, atom_worldToCamera);
+      v.visit(cameraToProjection, atom_cameraToProjection);
     }
 
     // set the parameters as in the collada perspective element

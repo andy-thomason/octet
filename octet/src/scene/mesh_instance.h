@@ -34,10 +34,10 @@ namespace octet {
 
     // metadata visitor. Used for serialisation and script interface.
     void visit(visitor &v) {
-      v.visit(node, "node");
-      v.visit(msh, "msh");
-      v.visit(mat, "mat");
-      v.visit(skel, "skel");
+      v.visit(node, atom_node);
+      v.visit(msh, atom_msh);
+      v.visit(mat, atom_mat);
+      v.visit(skel, atom_skel);
     }
 
     //////////////////////////////

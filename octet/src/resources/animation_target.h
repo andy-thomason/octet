@@ -24,5 +24,8 @@ namespace octet {
 
     // called by the animation, script or RPC.
     virtual void set_value(atom_t sid, atom_t sub_target, atom_t component, float *value) = 0;
+
+    // must be able to visit the target
+    virtual void visit(visitor &v) = 0;
   };
 }

@@ -26,6 +26,11 @@ namespace octet {
     }
 
     void visit(visitor &v) {
+      v.visit(anim, atom_anim);
+      v.visit(target, atom_target);
+      v.visit(time, atom_time);
+      v.visit(is_looping, atom_is_looping);
+      v.visit(is_paused, atom_is_paused);
     }
 
     const animation *get_anim() const {

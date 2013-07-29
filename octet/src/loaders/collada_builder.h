@@ -694,12 +694,10 @@ namespace octet {
         dynarray<string> joints;
         atonv(joints, skinst.joints);
 
-        //mesh_skin->bindToModel.resize(skinst.inv_bind_matrices.size()/16);
-
         for (unsigned i = 0; i != joints.size(); ++i) {
           mat4t bindToModel;
           bindToModel.init_transpose(&skinst.inv_bind_matrices[i*16]);
-          mesh_skin->add_joint(bindToModel, resources::get_atom(joints[i]));
+          mesh_skin->add_joint(bindToModel, app_utils::get_atom(joints[i]));
         }
 
         TiXmlElement *vertex_weights = child(skin_elem, "vertex_weights");
@@ -773,9 +771,9 @@ namespace octet {
             }
           }
           
-          atom_t node_sid = resources::get_atom(node_name);
-          atom_t sub_target_sid = resources::get_atom(sub_target_name);
-          atom_t component_sid = resources::get_atom(component_name);
+          atom_t node_sid = app_utils::get_atom(node_name);
+          atom_t sub_target_sid = app_utils::get_atom(sub_target_name);
+          atom_t component_sid = app_utils::get_atom(component_name);
           
           app_utils::log("  channel target %s %s %s\n", node_name.c_str(), sub_target_name.c_str(), component_name.c_str());
           TiXmlElement *sampler_elem = find_id(attr(channel_elem, "source"));
@@ -831,7 +829,7 @@ namespace octet {
           nodeToParent.loadIdentity();
           const char *sid = attr(node_elem, "sid");
           const char *id = attr(node_elem, "id");
-          scene_node *new_node = new scene_node(nodeToParent, resources::get_atom(sid));
+          scene_node *new_node = new scene_node(nodeToParent, app_utils::get_atom(sid));
           app_utils::log("add scene_node id=%s sid=%s\n", id, sid);
           dict.set_resource(id, new_node);
           parent->add_child(new_node);

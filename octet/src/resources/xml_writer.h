@@ -9,81 +9,109 @@
 
 namespace octet {
   class xml_writer : public visitor {
-    int depth;
-    FILE *file;
-
+    dynarray<TiXmlElement *> stack;
+    TiXmlElement *root;
     hash_map<void *, int> refs;
-    int id;
+    int next_id;
+
+    char hex_digit(unsigned i) {
+      return i < 10 ? i + '0' : i + 'a' - 10;
+    }
+
+    const char *to_hex(void *data, size_t size) {
+      static char tmp[128 + 1];
+      assert(size*2 < sizeof(tmp));
+      for (size_t i = 0; i != size; ++i) {
+        tmp[i*2+0 ] = hex_digit(((uint8_t*)data)[i] >> 4);
+        tmp[i*2+1 ] = hex_digit(((uint8_t*)data)[i] & 0x0f);
+      }
+      tmp[size*2] = 0;
+      return tmp;
+    }
   public:
-    xml_writer(FILE *file) {
-      depth = 0;
-      this->file = file;
-      id = 1;
+    xml_writer(TiXmlElement *root) {
+      next_id = 1;
+      stack.push_back(root);
+      this->root = root;
     }
 
     bool begin_ref(void *ref, const char *sid, atom_t type) {
-      int &prev = refs[ref];
-      if (!prev) {
-        fprintf(file, "%*s<%s sid=%s id=%d>\n", depth*2, "", predefined_atom(type), sid, id);
-        depth++;
-        prev = id++;
-        return true;
-      } else {
-        fprintf(file, "%*s<%s sid=%s id=%d/>\n", depth*2, "", predefined_atom(type), sid, prev);
-        return false;
+      TiXmlElement *parent = stack.back();
+
+      int &id = refs[ref];
+      bool is_new = id == 0;
+
+      if (is_new) {
+        id = next_id++;
+        TiXmlElement *child = new TiXmlElement(app_utils::get_atom_name(type));
+        child->SetAttribute("id", id);
+        root->LinkEndChild(child);
+        stack.push_back(child);
       }
+
+      parent->SetAttribute(sid, id);
+      return is_new;
     }
 
-    void end_ref(const char *sid, atom_t type) {
-      depth--;
-      fprintf(file, "%*s</%s>\n", depth*2, "", predefined_atom(type));
+    bool begin_ref(void *ref, atom_t sid, atom_t type) {
+      return begin_ref(ref, app_utils::get_atom_name(sid), type);
     }
 
     bool begin_ref(void *ref, int index, atom_t type) {
-      int &prev = refs[ref];
-      const char *sid = "";
-      if (!prev) {
-        fprintf(file, "%*s<%s sid=%s id=%d>\n", depth*2, "", predefined_atom(type), sid, id);
-        depth++;
-        prev = id++;
-        return true;
+      char tmp[32];
+      sprintf(tmp, "i%d", index);
+      return begin_ref(ref, tmp, type);
+    }
+
+    void end_ref() {
+      stack.pop_back();
+    }
+
+    void begin_refs(atom_t sid, int number) {
+      TiXmlElement *child = new TiXmlElement("refs");
+      stack.back()->LinkEndChild(child);
+      stack.push_back(child);
+      child->SetAttribute("count", number);
+      child->SetAttribute("sid", app_utils::get_atom_name(sid));
+    }
+
+    void end_refs() {
+      stack.pop_back();
+    }
+
+    void visit_bin(void *value, size_t size, atom_t sid) {
+      if (size <= 16) {
+        stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(value, size));
       } else {
-        fprintf(file, "%*s<%s sid=%s id=%d/>\n", depth*2, "", predefined_atom(type), sid, prev);
-        return false;
+        TiXmlElement *child = new TiXmlElement("data");
+        stack.back()->LinkEndChild(child);
+        dynarray<char> data;
+        data.resize(size*2+1);
+        for (size_t i = 0; i != size; ++i) {
+          data[i*2+0 ] = hex_digit(((uint8_t*)value)[i] >> 4);
+          data[i*2+1 ] = hex_digit(((uint8_t*)value)[i] & 0x0f);
+        }
+        data[size*2] = 0;
+        TiXmlText *text = new TiXmlText(&data[0]);
+        child->LinkEndChild(text);
+        child->SetAttribute("sid", app_utils::get_atom_name(sid));
       }
     }
 
-    void end_ref(int index, atom_t type) {
-      depth--;
-      fprintf(file, "%*s</%s>\n", depth*2, "", predefined_atom(type));
+    /*void visit(mat4t &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(&value, sizeof(value)));
     }
 
+    void visit(float &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(&value, sizeof(value)));
+    }*/
 
-    void begin_refs(const char *sid, atom_t type, int number) {
-      fprintf(file, "%*s<%s>\n", depth*2, "", predefined_atom(type));
-      depth++;
+    void visit(int &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value);
     }
 
-    void end_refs(const char *sid, atom_t type, int number) {
-      depth--;
-      fprintf(file, "%*s</%s>\n", depth*2, "", predefined_atom(type));
-    }
-
-
-    void visit(mat4t &value, const char *sid) {
-      fprintf(file, "%*s<mat4t sid=%s value=\"%s\"/>\n", depth*2, "", sid, value.toString());
-    }
-
-    void visit(float &value, const char *sid) {
-      fprintf(file, "%*s<float sid=%s value=\"%f\"/>\n", depth*2, "", sid, value);
-    }
-
-    void visit(int &value, const char *sid) {
-      fprintf(file, "%*s<int sid=%s value=\"%d\"/>\n", depth*2, "", sid, value);
-    }
-
-    void visit(atom_t &value, const char *sid) {
-      fprintf(file, "%*s<int sid=%s value=\"%d\"/>\n", depth*2, "", sid, (int)value);
+    void visit(atom_t &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), app_utils::get_atom_name(value));
     }
   };
 }

@@ -13,7 +13,7 @@ namespace octet {
     // skeleton components
     dynarray<mat4t> nodeToParents;
     dynarray<atom_t> joints;
-    dynarray<scene_node*> nodes;
+    dynarray<ref<scene_node>> nodes;
     dynarray<int> parents;
     dynarray<mat4t> boneToNode;
 
@@ -27,6 +27,13 @@ namespace octet {
     }
 
     void visit(visitor &v) {
+      v.visit(nodeToParents, atom_nodeToParents);
+      v.visit(joints, atom_joints);
+      v.visit(nodes, atom_nodes);
+      v.visit(parents, atom_parents);
+      v.visit(boneToNode, atom_boneToNode);
+      v.visit(result, atom_result);  /// uniforms to shader
+      v.visit(indices, atom_indices);   /// map skeleton to skin indices
     }
 
     void add_bone(scene_node *node, int parent) {
@@ -52,7 +59,6 @@ namespace octet {
       //static bool first_frame = true;
       if (boneToNode.size() < nodeToParents.size()) {
         boneToNode.resize(nodeToParents.size());
-
       }
 
       // todo: optionally drive animation directly to the skeleton.
@@ -94,13 +100,6 @@ namespace octet {
         //if (first_frame) app_utils::log("%d %d [%s]\n", i, index, result[i].toString());
       }
 
-      /*
-      // for testing, we can just use the instance node's matrix
-      for (int i = 0; i != nodeToParents.size(); ++i) {
-        //result[i] = worldToCamera;
-      }
-      first_frame = false;
-      */
       return &result[0];
     }
 

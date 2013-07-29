@@ -26,19 +26,6 @@ namespace octet {
     int_size_t capacity_;
     enum { min_capacity = 8 };
 
-    void reset() {
-      if (use_new_delete) {
-        for (int_size_t i = 0; i != size_; ++i) {
-          data_[i].~item_t();
-        }
-      }
-      if (data_) {
-        allocator_t::free(data_, capacity_ * sizeof(item_t));
-      }
-      data_ = 0;
-      size_ = 0;
-      capacity_ = 0;
-    }
   public:
     dynarray() {
       data_ = 0;
@@ -186,6 +173,20 @@ namespace octet {
     void pop_back() {
       //assert(size_ != 0);
       size_--;
+    }
+
+    void reset() {
+      if (use_new_delete) {
+        for (int_size_t i = 0; i != size_; ++i) {
+          data_[i].~item_t();
+        }
+      }
+      if (data_) {
+        allocator_t::free(data_, capacity_ * sizeof(item_t));
+      }
+      data_ = 0;
+      size_ = 0;
+      capacity_ = 0;
     }
   };
 

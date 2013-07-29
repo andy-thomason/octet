@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include <math.h>
 #include <assert.h>
@@ -72,10 +73,10 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 // resources
 #include "../resources/app_utils.h"
-#include "../resources/resource.h"
-#include "../resources/resources.h"
 #include "../resources/visitor.h"
 #include "../resources/xml_writer.h"
+#include "../resources/resource.h"
+#include "../resources/resources.h"
 #include "../resources/gl_resource.h"
 #include "../resources/mesh_builder.h"
 #include "../resources/animation_target.h"

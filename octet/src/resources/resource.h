@@ -8,72 +8,6 @@
 //
 
 namespace octet {
-  enum atom_t {
-    atom_,
-
-    // animation-relate atoms
-    atom_transform,
-    atom_translate,
-    atom_rotateX,
-    atom_rotateY,
-    atom_rotateZ,
-    atom_scale,
-
-    // classes
-    atom_skin,
-    atom_skeleton,
-    atom_mesh,
-    atom_material,
-    atom_animation,
-    atom_camera_instance,
-    atom_light_instance,
-    atom_mesh_instance,
-    atom_animation_instance,
-    atom_scene,
-    atom_scene_node,
-    atom_animation_target,
-
-    // lights
-    atom_ambient,
-    atom_directional,
-    atom_spot,
-    atom_point,
-  };
-  
-  inline static const char *predefined_atom(int i) {
-    static const char *names[] = {
-      "",
-
-      // animation-relate atoms
-      "transform",
-      "translate",
-      "rotateX",
-      "rotateY",
-      "rotateZ",
-      "scale",
-
-      "skin",
-      "skeleton",
-      "mesh",
-      "material",
-      "animation",
-      "camera_instance",
-      "light_instance",
-      "mesh_instance",
-      "animation_instance",
-      "scene",
-      "scene_node",
-      "animation_target",
-
-      "ambient",
-      "directional",
-      "spot",
-      "point",
-      NULL
-    };
-    return names[i];
-  }
-
   class skin;
   class skeleton;
   class mesh;
@@ -99,6 +33,9 @@ namespace octet {
   public:
     resource() {
       ref_count = 0;
+    }
+
+    virtual void visit(visitor &v) {
     }
 
     virtual atom_t get_type() {

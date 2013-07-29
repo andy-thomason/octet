@@ -105,10 +105,10 @@ namespace octet {
 
     void visit(visitor &v) {
       scene_node::visit(v);
-      v.visit(mesh_instances, "mesh_instances");
-      v.visit(animation_instances, "animation_instances");
-      v.visit(camera_instances, "camera_instances");
-      v.visit(light_instances, "light_instances");
+      v.visit(mesh_instances, atom_mesh_instances);
+      v.visit(animation_instances, atom_animation_instances);
+      v.visit(camera_instances, atom_camera_instances);
+      v.visit(light_instances, atom_light_instances);
     }
 
     void create_default_camera_and_lights() {
@@ -234,11 +234,6 @@ namespace octet {
         }
       }
       return NULL;
-    }
-
-    void dump(FILE *file) {
-      xml_writer xml(file);
-      visit(xml);
     }
   };
 }
