@@ -54,7 +54,7 @@ namespace octet {
       float u = 0;
       for (unsigned i = 0; i <= num_vertices; ++i) {
         add_vertex(vec4(radius, 0, 0, 1), normal, u, v);
-        matrix.rotate(delta_c, delta_s, 0, 1);
+        matrix.rotateSpecial(delta_c, delta_s, 0, 1);
         u += rnv * uvscale;
       }
       matrix = save_matrix;

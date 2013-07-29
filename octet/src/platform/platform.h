@@ -94,7 +94,6 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../scene/animation.h"
 #include "../scene/mesh.h"
 #include "../scene/material.h"
-#include "../scene/lighting.h"
 #include "../scene/camera_instance.h"
 #include "../scene/light_instance.h"
 #include "../scene/mesh_instance.h"

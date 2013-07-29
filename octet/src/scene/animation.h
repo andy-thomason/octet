@@ -9,7 +9,6 @@
 
 namespace octet {
   class animation : public resource {
-
     // todo: this could be a GL/CL buffer
     dynarray<unsigned char> data;
 
@@ -25,6 +24,11 @@ namespace octet {
 
     // format and component of channels
     dynarray<channel> channels;
+
+    // if we are targeting a specific node or component
+    // note that we keep this separate because arrays of refs have special significance
+    // and we want to keep channel as a "POD" type (plain old data).
+    dynarray<ref<animation_target>> targets;
 
     float end_time;
   public:
@@ -50,13 +54,17 @@ namespace octet {
       return channels[ch].component;
     }
 
+    animation_target *get_target(int ch) const {
+      return targets[ch];
+    }
+
     float get_end_time() const {
       return end_time;
     }
 
     // just store the floats in the channel for now.
     // todo: optimise animation data
-    void add_channel(atom_t sid, atom_t sub_target, atom_t component, dynarray<float> &times, dynarray<float> &values) {
+    void add_channel(animation_target *target, atom_t sid, atom_t sub_target, atom_t component, dynarray<float> &times, dynarray<float> &values) {
       int num_times = (int)times.size();
       int num_values = (int)values.size();
       int component_size = (num_values / num_times) * sizeof(float);
@@ -80,6 +88,7 @@ namespace octet {
       
       memcpy(&data[offset], &values[0], component_size * num_times);
       channels.push_back(ch);
+      targets.push_back(target);
     }
 
     // evaluate one channel at one time - very inefficient.
@@ -109,17 +118,20 @@ namespace octet {
         }
       }
 
+      //app_utils::log("t=%d a=%d b=%d p[a]=%d p[b]=%d\n", time_ms, a, b, p[a], p[b]);
+
       unsigned data_offset = ch.offset + ch.num_times * sizeof(unsigned short);
 
       float t = float(time_ms - p[a]) / (p[b] - p[a]);
       float tmp1[16];
       float tmp2[16];
-      if (component_size < sizeof(tmp1)) {
+      if (component_size <= sizeof(tmp1)) {
         memcpy(tmp1, &data[data_offset + a * component_size], component_size);
         memcpy(tmp2, &data[data_offset + b * component_size], component_size);
-        for (int i = 0; i != component_size/16; ++i) {
+        for (int i = 0; i != component_size/4; ++i) {
           tmp1[i] = tmp1[i] * (1-t) + tmp2[i] * t;
         }
+        //app_utils::log("  t=%f %f %f %f\n", t, tmp1[0], tmp1[1], tmp1[2]);
         target->set_value(ch.sid, ch.sub_target, ch.component, tmp1);
       }
     }

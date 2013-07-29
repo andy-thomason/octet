@@ -90,11 +90,8 @@ namespace octet {
       init_wgl();
     }
 
-    typedef std::map<HWND, app*> map_t;
-    //typedef dynarray<dynarray<unsigned char>> audio_t;
-
+    typedef hash_map<HWND, app*> map_t;
     static map_t &map() { static map_t instance; return instance; }
-    //static audio_t &audio() { static audio_t instance; return instance; }
 
   public:
     app(int argc, char **argv) {
@@ -204,12 +201,13 @@ namespace octet {
     }
 
     static void run_all_apps() {
+      map_t &m = map();
       MSG msg;     
       for(;;) {
         // todo: get notification when the windows close.
         while (PeekMessage(&msg, 0, 0, 0, TRUE)) {
           //printf("msg=%04x %02x\n", msg.message, msg.wParam);
-          app *app = map()[msg.hwnd];
+          app *app = m[msg.hwnd];
           if (app) {
             if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
               app->set_key(app::translate(msg.wParam), msg.message == WM_KEYDOWN);
@@ -227,11 +225,10 @@ namespace octet {
         }
 
         // waste some time. (do not do this in real games!)
-        Sleep(16);
+        Sleep(1000/30);
 
-        // render each window in turn
-        for (map_t::iterator i = map().begin(); i != map().end(); ++i) {
-          i->second->render();
+        for (int i = 0; i != m.size(); ++i) {
+          if (m.key(i)) m.value(i)->render();
         }
       }
     }

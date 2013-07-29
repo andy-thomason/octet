@@ -80,25 +80,13 @@ namespace octet {
       shininess = 30.0f;
     }
 
-    void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, vec4 *lights) const {
-      // todo: pass lights directly to shader
-      //vec4 &position = lights[0];
-      vec4 &light_direction = lights[1];
-      vec4 &light_ambient = lights[2];
-      vec4 &light_diffuse = lights[3];
-      vec4 &light_specular = lights[4];
-      shader.render(modelToProjection, modelToCamera, light_direction, shininess, light_ambient, light_diffuse, light_specular);
+    void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, vec4 *light_uniforms, int num_light_uniforms, int num_lights) const {
+      shader.render(modelToProjection, modelToCamera, light_uniforms, num_light_uniforms, num_lights);
       bind_textures();
     }
 
-    void render_skinned(bump_shader &shader, const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_nodes, vec4 *lights) const {
-      // todo: pass lights directly to shader
-      //vec4 &position = lights[0];
-      vec4 &light_direction = lights[1];
-      vec4 &light_ambient = lights[2];
-      vec4 &light_diffuse = lights[3];
-      vec4 &light_specular = lights[4];
-      shader.render_skinned(cameraToProjection, modelToCamera, num_nodes, light_direction, shininess, light_ambient, light_diffuse, light_specular);
+    void render_skinned(bump_shader &shader, const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_nodes, vec4 *light_uniforms, int num_light_uniforms, int num_lights) const {
+      shader.render_skinned(cameraToProjection, modelToCamera, num_nodes, light_uniforms, num_light_uniforms, num_lights);
       bind_textures();
     }
 

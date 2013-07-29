@@ -21,12 +21,11 @@ namespace octet {
   template <typename key_t, typename value_t, class allocator_t=allocator> class hash_map {
     // internal gubbins to implement the hash map
     struct entry_t { key_t key; unsigned hash; value_t value; };
+
     entry_t *entries;
     unsigned num_entries;
     unsigned max_entries;
-    bool is_entry(const key_t &key);
-    unsigned calc_hash(const key_t &key);
-  
+
     // internal method to find an existing key in the map
     entry_t *find( const key_t &key, unsigned hash ) {
       unsigned mask = max_entries - 1;
@@ -71,7 +70,7 @@ namespace octet {
     // access the 
     // eg. my_map["fred"]
     value_t &operator[]( const key_t &key ) {
-      unsigned hash = calc_hash(key);
+      unsigned hash = unsigned(key);
       entry_t *entry = find( key, hash );
       if (!entry->key) {
         // reducing this ratio decreases hot search time at the
@@ -95,8 +94,9 @@ namespace octet {
       max_entries = 0;
     }
 
-    // get the number of used entries in the map
-    int size() { return num_entries; }
-    entry_t *get_entries() { return entries; }
+    // stl-style iterators are bloated. This is a simpler iterator scheme
+    unsigned size() { return max_entries; }
+    key_t key(unsigned i) { return entries[i].key; }
+    value_t value(unsigned i) { return entries[i].value; }
   };
 }

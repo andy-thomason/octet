@@ -31,10 +31,22 @@ namespace octet {
     void add_joint(const mat4t &bindToModel, atom_t sid) {
       this->bindToModel.push_back(bindToModel);
       joints.push_back(sid);
+      app_utils::log("skin: add_joint %d\n", sid);
+    }
+
+    int find_joint(atom_t sid) {
+      for (unsigned i = 0; i != joints.size(); ++i) {
+        if (joints[i] == sid) {
+          return i;
+        }
+      }
+      return -1;
     }
 
     const mat4t &get_bindToModel(int i) const { return bindToModel[i]; }
     const mat4t &get_modelToBind() const { return modelToBind; }
+    atom_t get_joint(int i) const { return joints[i]; }
+    unsigned get_num_joints() const { return joints.size(); }
   };
 
 }

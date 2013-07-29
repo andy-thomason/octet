@@ -8,7 +8,7 @@
 //
 
 namespace octet {
-  class scene_node : public resource {
+  class scene_node : public resource, public animation_target {
     // every scene_node has a parent scene_node except the roots (NULL)
     // todo: support DAGs with multiple node parents
     ref<scene_node> parent;
@@ -24,6 +24,8 @@ namespace octet {
   public:
     RESOURCE_META(scene_node)
 
+    animation_target *get_animation_target() { return (animation_target*)this; }
+
     scene_node() {
       nodeToParent.loadIdentity();
       sid = atom_;
@@ -34,6 +36,26 @@ namespace octet {
       this->sid = sid;
     }
 
+    // the virtual add_ref on animation_target gets passed to here and we pass iton (delegate it) to the resource
+    void add_ref() {
+      resource::add_ref();
+    }
+
+    // the virtual release on animation_target gets passed to here and we pass iton (delegate it) to the resource
+    void release() {
+      resource::release();
+    }
+
+    // animation input: for now, we only support skeleton animation
+    void set_value(atom_t sid, atom_t sub_target, atom_t component, float *value) {
+      if (sub_target == atom_transform) {
+        nodeToParent.init_transpose(value);
+      }
+    }
+
+    //
+    // visitor pattern used for game saves/loads (serialisation)
+    //
     void visit(visitor &v) {
       v.visit(parent, "parent");
       v.visit(children, "children");

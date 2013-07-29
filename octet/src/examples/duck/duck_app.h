@@ -58,22 +58,12 @@ namespace octet {
       // set up the matrices with a camera 5 units from the origin
       modelToWorld.loadIdentity();
       cameraToWorld.loadIdentity();
-      cameraToWorld.translate(0, 0, 5);
+      cameraToWorld.translate(0, 0, 200);
 
       collada_builder builder;
       builder.load_xml("assets/duck_triangulate.dae");
       //duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
       builder.get_mesh(duck_mesh, "LOD3spShape-lib", dict);
-
-
-      // the original duck is a bit too big, shrink it with a matrix
-      mat4t shrink;
-      shrink.loadIdentity();
-      shrink.translate(0, -50, 0);
-      shrink.scale(0.03f, 0.03f, 0.03f);
-      duck_mesh.transform(attribute_pos, shrink);
-
-      //duck_normals.make_normal_visualizer(duck_mesh, 0.1f);
 
       diffuse = ambient = resources::get_texture_handle(GL_RGB, "assets/duckCM.gif");
       //diffuse = ambient = resources::get_texture_handle(GL_RGB, "!bump");

@@ -88,12 +88,15 @@ namespace octet {
       mat4t modelToCamera;
       mat4t worldToCamera;
       mat4t modelToProjection = mat4t::build_camera_matrices(modelToCamera, worldToCamera, modelToWorld, cameraToWorld);
-      float shininess = 30.0f;
-      vec4 light_dir = vec4(1, 1, 1, 0).normalize() * worldToCamera;
-      vec4 light_ambient = vec4(0.3f, 0.3f, 0.3f, 1);
-      vec4 light_diffuse = vec4(1, 1, 1, 1);
-      vec4 light_specular = vec4(1, 1, 1, 1);
-      bump_shader_.render(modelToProjection, modelToCamera, light_dir, shininess, light_ambient, light_diffuse, light_specular);
+
+      vec4 lights[5];
+      memset(lights, 0, sizeof(lights));
+      lights[0] = vec4(0.3f, 0.3f, 0.3f, 50);
+      lights[2] = vec4(0.707f, 0, 0.707f, 0) * worldToCamera;
+      lights[3] = vec4(1, 1, 1, 1);
+      lights[4] = vec4(1, 0, 0, 1);
+
+      bump_shader_.render(modelToProjection, modelToCamera, lights, 5, 1);
 
       // spin the cube by rotating about X, Y and Z
       modelToWorld.rotateY(1);

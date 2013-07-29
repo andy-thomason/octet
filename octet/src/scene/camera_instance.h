@@ -13,13 +13,18 @@ namespace octet {
     ref<scene_node> node;
     bool is_ortho;
 
-    // size (at near plane)
-    float left;
-    float right;
-    float bottom;
-    float top;
+    // common to all cameras
     float nearVal;
     float farVal;
+
+    // perspective camera
+    float xfov;
+    float yfov;
+    float aspect_ratio;
+
+    // ortho camera
+    float xmag;
+    float ymag;
 
     // generated matrices
     mat4t worldToCamera;
@@ -34,54 +39,49 @@ namespace octet {
     void visit(visitor &v) {
     }
 
-    // call this once to set up the camera
-    void set_params(scene_node *node, float left, float right, float bottom, float top, float nearVal, float farVal, bool is_ortho) {
-      this->left = left;
-      this->right = right;
-      this->bottom = bottom;
-      this->top = top;
-      this->nearVal = nearVal;
-      this->farVal = farVal;
-      this->is_ortho = is_ortho;
+    // set the parameters as in the collada perspective element
+    void set_perspective(float xfov, float yfov, float aspect_ratio, float n, float f)
+    {
+      this->xfov = xfov;
+      this->yfov = yfov;
+      this->nearVal = n;
+      this->farVal = f;
+      is_ortho = false;
+    }
+
+    void set_ortho(float xmag, float ymag, float aspect_ratio, float n, float f)
+    {
+      this->xmag = xmag;
+      this->ymag = ymag;
+      this->nearVal = n;
+      this->farVal = f;
+      is_ortho = true;
+    }
+
+    void set_node(scene_node *node) {
       this->node = node;
     }
 
-    // set the parameters as in the collada perspective element
-    void set_perspective(scene_node *node, float xfov, float yfov, float aspect_ratio, float n, float f)
-    {
-      float xscale = 0.5f;
-      float yscale = 0.5f;
-      if (xfov && yfov) {
-        xscale = tanf(xfov * (3.14159f/180/2));
-        yscale = tanf(yfov * (3.14159f/180/2));
-      } else if (yfov && aspect_ratio) {
-        yscale = tanf(yfov * (3.14159f/180/2));
-        xscale = yscale / aspect_ratio;
-      } else if (xfov && aspect_ratio) {
-        xscale = tanf(xfov * (3.14159f/180/2));
-        yscale = xscale * aspect_ratio;
-      }
-      //printf("%f %f\n", xscale, yscale);
-      set_params(node, -n * xscale, n * xscale, -n * yscale, n * yscale, n, f, false);
-    }
-
-    void set_ortho(scene_node *node, float xmag, float ymag, float aspect_ratio, float n, float f)
-    {
-      set_params(node, -xmag, xmag, -ymag, ymag, n, f, true);
-    }
-
-
-    // call this once a frame to set up the camera position
-    void set_cameraToWorld(const mat4t &cameraToWorld) {
-      // flip it around to transform from world to camera
+    // call this once a frame to get the camera position
+    void set_cameraToWorld(const mat4t &cameraToWorld, float aspect_ratio) {
+      // flip cameraToWorld around to transform from world to camera
       cameraToWorld.invertQuick(worldToCamera);
 
       // build a projection matrix to add perspective
       cameraToProjection.loadIdentity();
       if (is_ortho) {
-        cameraToProjection.ortho(left, right, bottom, top, nearVal, farVal);
+        cameraToProjection.ortho(-xmag, xmag, -ymag, ymag, nearVal, farVal);
       } else {
-        cameraToProjection.frustum(left, right, bottom, top, nearVal, farVal);
+        float xscale = 0.5f;
+        float yscale = 0.5f;
+        if (yfov) {
+          yscale = 1.0f / tanf(yfov * (3.14159f/180/2));
+          xscale = yscale * aspect_ratio;
+        } else if (xfov) {
+          xscale = 1.0f / tanf(xfov * (3.14159f/180/2));
+          yscale = xscale / aspect_ratio;
+        }
+        cameraToProjection.frustum(-nearVal * xscale, nearVal * xscale, -nearVal * yscale, nearVal * yscale, nearVal, farVal);
       }
     }
 

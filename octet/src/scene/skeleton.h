@@ -10,10 +10,16 @@
 
 namespace octet {
   class skeleton : public resource {
+    // skeleton components
     dynarray<mat4t> nodeToParents;
-    dynarray<mat4t> nodeToCameras;
-    dynarray<atom_t> sids;
+    dynarray<atom_t> joints;
+    dynarray<scene_node*> nodes;
     dynarray<int> parents;
+    dynarray<mat4t> boneToNode;
+
+    // cached skin components
+    dynarray<mat4t> result;  /// uniforms to shader
+    dynarray<int> indices;   /// map skeleton to skin indices
   public:
     RESOURCE_META(skeleton)
 
@@ -23,42 +29,85 @@ namespace octet {
     void visit(visitor &v) {
     }
 
-    void add_bone(const mat4t &nodeToParent, atom_t sid, int parent) {
-      nodeToCameras.push_back(nodeToParent);
-      nodeToParents.push_back(nodeToParent);
-      sids.push_back(sid);
+    void add_bone(scene_node *node, int parent) {
+      nodes.push_back(node);
+      nodeToParents.push_back(node->get_nodeToParent());
+      joints.push_back(node->get_sid());
       parents.push_back(parent);
-      //app_utils::log("add_bone [%s]\n", nodeToParent.toString());
+      app_utils::log("skeleton: add_bone %d [%s]\n", node->get_sid(), node->access_nodeToParent().toString());
     }
 
     int get_num_bones() const { return nodeToParents.size(); }
 
+    int find_joint(atom_t sid) {
+      for (unsigned i = 0; i != joints.size(); ++i) {
+        if (joints[i] == sid) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
     mat4t *calc_transforms(const mat4t &worldToCamera, skin *skn) {
+      //static bool first_frame = true;
+      if (boneToNode.size() < nodeToParents.size()) {
+        boneToNode.resize(nodeToParents.size());
+
+      }
+
+      // todo: optionally drive animation directly to the skeleton.
+      for (int i = 0; i != nodes.size(); ++i) {
+        nodeToParents[i] = nodes[i]->access_nodeToParent();
+      }
+
       // compute matrix heirachy
       for (int i = 0; i != nodeToParents.size(); ++i) {
         int parent = parents[i];
-        // scene_node -> parent -> parent -> world -> camera
+        // skeleton -> parent -> parent -> world -> camera
         if (parent == -1) {
-          nodeToCameras[i] = nodeToParents[i] * worldToCamera;
+          boneToNode[i] = nodeToParents[i] * worldToCamera;
         } else {
-          nodeToCameras[i] = nodeToParents[i] * nodeToCameras[parent];
+          boneToNode[i] = nodeToParents[i] * boneToNode[parent];
         }
-        //app_utils::log("%d %s p=%d\n", i, nodeToCameras[i].toString(), parent);
+        //app_utils::log("%d %s p=%d\n", i, result[i].toString(), parent);
+      }
+
+      unsigned num_joints = skn->get_num_joints();
+      if (result.size() < num_joints) {
+        result.resize(num_joints);
+        indices.resize(num_joints);
+        for (int i = 0; i != num_joints; ++i) {
+          // skin -> bind space -> skeleton -> parent -> parent -> world -> camera
+          indices[i] = find_joint(skn->get_joint(i));
+        }
       }
 
       // premultiply by skin matrices
-      for (int i = 0; i != nodeToParents.size(); ++i) {
-        // mesh -> bind -> model -> scene_node -> parent -> parent -> world -> camera
-        nodeToCameras[i] = skn->get_modelToBind() * skn->get_bindToModel(i) * nodeToCameras[i];
-        //app_utils::log("%d [%s]\n", i, nodeToCameras[i].toString());
+      for (int i = 0; i != num_joints; ++i) {
+        // skin -> bind space -> skeleton -> parent -> parent -> world -> camera
+        int index = indices[i];
+        if (index != -1) {
+          result[i] = skn->get_modelToBind() * skn->get_bindToModel(i) * boneToNode[index];
+        } else {
+          result[i] = worldToCamera;
+        }
+        //if (first_frame) app_utils::log("%d %d [%s]\n", i, index, result[i].toString());
       }
-      return &nodeToCameras[0];
+
+      /*
+      // for testing, we can just use the instance node's matrix
+      for (int i = 0; i != nodeToParents.size(); ++i) {
+        //result[i] = worldToCamera;
+      }
+      first_frame = false;
+      */
+      return &result[0];
     }
 
     // convert an sid into an index. (should be cached!)
     int get_bone_index(atom_t sid) {
-      for (int i = 0; i != sids.size(); ++i) {
-        if (sids[i] == sid) return i;
+      for (int i = 0; i != joints.size(); ++i) {
+        if (joints[i] == sid) return i;
       }
       return -1;
     }

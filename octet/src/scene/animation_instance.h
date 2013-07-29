@@ -41,6 +41,11 @@ namespace octet {
         for (int ch = 0; ch != anim->get_num_channels(); ++ch) {
           anim->eval_chan(ch, time, target);
         }
+      } else {
+        for (int ch = 0; ch != anim->get_num_channels(); ++ch) {
+          animation_target *anim_target = anim->get_target(ch);
+          anim->eval_chan(ch, time, anim_target);
+        }
       }
 
       //app_utils::log("update %f\n", delta_time);

@@ -421,7 +421,7 @@ namespace octet {
       unsigned bitangent_slot = add_attribute(attribute_bitangent, 3, GL_FLOAT, stride + 12);
 
       unsigned vsize = (stride + 24) * source.get_num_vertices();
-      unsigned isize = mesh::kind_size(get_index_type()) * source.get_num_indices();
+      unsigned isize = source.get_indices_size(); //mesh::kind_size(get_index_type()) * source.get_num_indices();
       allocate(vsize, isize, false);
       set_params(stride + 24, source.get_num_indices(), source.get_num_vertices(), source.get_mode(), source.get_index_type());
       copy_indices(source);

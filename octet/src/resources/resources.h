@@ -145,5 +145,19 @@ namespace octet {
     animation_instance *get_animation_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_instance() : 0; }
     scene *get_scene(const char *id) { resource *res = get_resource(id); return res ? res->get_scene() : 0; }
     scene_node *get_scene_node(const char *id) { resource *res = get_resource(id); return res ? res->get_scene_node() : 0; }
+    animation_target *get_animation_target(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_target() : 0; }
+
+    void find_all(dynarray<resource*> &result, atom_t type) {
+      unsigned num_indices = dict.get_num_indices();
+      for (unsigned i = 0; i != num_indices; ++i) {
+        const char *key = dict.get_key(i);
+        if (key) {
+          resource *res = dict.get_value(i);
+          if (res->get_type() == type) {
+            result.push_back(res);
+          }
+        }
+      }
+    }
   };
 }

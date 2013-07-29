@@ -26,22 +26,51 @@ namespace octet {
     // lights available
     dynarray<ref<light_instance>> light_instances;
 
-    // compiled set of active lights
-    lighting lighting_set;
+    enum { max_lights = 4, light_size = 4 };
+    int num_light_uniforms;
+    int num_lights;
+    vec4 light_uniforms[1 + max_lights * light_size ];
 
-    void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
+    int frame_number;
+
+    void calc_lighting(const mat4t &worldToCamera) {
+      vec4 &ambient = light_uniforms[0];
+      ambient = vec4(0, 0, 0, 1);
+      num_lights = 0;
+      int num_ambient = 0;
+      for (unsigned i = 0; i != light_instances.size() && num_lights != max_lights; ++i) {
+        light_instance *li = light_instances[i];
+        scene_node *node = li->get_scene_node();
+        atom_t kind = li->get_kind();
+        if (kind == atom_ambient) {
+          ambient += li->get_color();
+          num_ambient++;
+        } else {
+          li->get_fragment_uniforms(&light_uniforms[1+num_lights*light_size], worldToCamera);
+          num_lights++;
+        }
+      }
+      if (num_ambient == 0) {
+        ambient = vec4(0.5f, 0.5f, 0.5f, 1);
+      }
+      num_light_uniforms = 1 + num_lights * light_size;
+    }
+
+    void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam, float aspect_ratio) {
       mat4t cameraToWorld = cam.get_node()->calcModelToWorld();
 
       mat4t worldToCamera;
       cameraToWorld.invertQuick(worldToCamera);
-      lighting_set.compute(worldToCamera);
-      cam.set_cameraToWorld(cameraToWorld);
+
+      calc_lighting(worldToCamera);
+
+      cam.set_cameraToWorld(cameraToWorld, aspect_ratio);
       mat4t cameraToProjection = cam.get_cameraToProjection();
 
       for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
         mesh_instance *mi = mesh_instances[mesh_index];
         mesh *msh = mi->get_mesh();
-        skin *skn = mi->get_skin();
+        skin *skn = msh->get_skin();
         skeleton *skel = mi->get_skeleton();
         material *mat = mi->get_material();
 
@@ -54,21 +83,24 @@ namespace octet {
           // normal rendering for single matrix objects
           // build a projection matrix: model -> world -> camera_instance -> projection
           // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-          mat->render(object_shader, modelToProjection, modelToCamera, lighting_set.data());
+          mat->render(object_shader, modelToProjection, modelToCamera, light_uniforms, num_light_uniforms, num_lights);
         } else {
           // multi-matrix rendering
           mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
           int num_bones = skel->get_num_bones();
-          mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, lighting_set.data());
+          assert(num_bones < 64);
+          mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, light_uniforms, num_light_uniforms, num_lights);
         }
         msh->render();
       }
+      frame_number++;
     }
   public:
     RESOURCE_META(scene)
 
     // create an empty scene
     scene() {
+      frame_number = 0;
     }
 
     void visit(visitor &v) {
@@ -84,16 +116,37 @@ namespace octet {
       if (camera_instances.size() == 0) {
         scene_node *node = add_scene_node();
         camera_instance *cam = new camera_instance();
+        node->access_nodeToParent().translate(0, 0, 100);
         float n = 0.1f, f = 5000.0f;
-        cam->set_params(node, -n, n, -n, n, n, f, false);
+        cam->set_node(node);
+        cam->set_perspective(1, 1, 1, n, f);
         camera_instances.push_back(cam);
       }
 
-      vec4 light_dir = vec4(-1, -1, -1, 0).normalize();
-      vec4 light_ambient = vec4(0.3f, 0.3f, 0.3f, 1);
-      vec4 light_diffuse = vec4(1, 1, 1, 1);
-      vec4 light_specular = vec4(1, 1, 1, 1);
-      lighting_set.add_light(vec4(0, 0, 0, 1), light_dir, light_ambient, light_diffuse, light_specular);
+      // default light instance
+      if (light_instances.size() == 0) {
+        scene_node *node = add_scene_node();
+        light_instance *li = new light_instance();
+        node->access_nodeToParent().translate(100, 100, 100);
+        node->access_nodeToParent().rotateX(45);
+        node->access_nodeToParent().rotateY(45);
+        float n = 0.1f, f = 5000.0f;
+        li->set_kind(atom_directional);
+        li->set_node(node);
+        light_instances.push_back(li);
+      }
+    }
+
+    void play_all_anims(resources &dict) {
+      dynarray<resource*> anims;
+      dict.find_all(anims, atom_animation);
+
+      for (unsigned i = 0; i != anims.size(); ++i) {
+        animation *anim = anims[i]->get_animation();
+        if (anim) {
+          play(anim, true);
+        }
+      }
     }
 
     scene_node *add_scene_node() {
@@ -143,21 +196,33 @@ namespace octet {
     }
 
     // advance all the animation instances
+    // note that we want to update before rendering or doing physics and AI actions.
     void update(float delta_time) {
-      for (int ai = 0; ai != animation_instances.size(); ++ai) {
-        animation_instance *inst = animation_instances[ai];
+      for (int idx = 0; idx != animation_instances.size(); ++idx) {
+        animation_instance *inst = animation_instances[idx];
+        inst->update(delta_time);
+      }
+
+      for (int idx = 0; idx != mesh_instances.size(); ++idx) {
+        mesh_instance *inst = mesh_instances[idx];
         inst->update(delta_time);
       }
     }
 
     // call OpenGL to draw all the mesh instances (scene_node + mesh + material)
-    void render(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam) {
-      render_impl(object_shader, skin_shader, cam);
+    void render(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam, float aspect_ratio) {
+      render_impl(object_shader, skin_shader, cam, aspect_ratio);
     }
 
-    // play an animation on a mesh instance or other target
+    // play an animation on another target (not the same one as in the collada file)
     void play(animation *anim, animation_target *target, bool is_looping) {
       animation_instance *inst = new animation_instance(anim, target, is_looping);
+      animation_instances.push_back(inst);
+    }
+
+    // play an animation with built-in targets (as in the collada file)
+    void play(animation *anim, bool is_looping) {
+      animation_instance *inst = new animation_instance(anim, NULL, is_looping);
       animation_instances.push_back(inst);
     }
 

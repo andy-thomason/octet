@@ -103,18 +103,18 @@ namespace octet {
     }
 
     // allow iteration over keys and values
-    int num_indices() const {
+    unsigned get_num_indices() const {
       return max_entries;
     }
 
     // get a specific key
-    const char *key(unsigned index) const {
+    const char *get_key(unsigned index) const {
       assert(index < max_entries);
       return entries[index].key;
     }
 
     // access a specific value
-    value_t &value(unsigned index) {
+    value_t &get_value(unsigned index) {
       assert(index < max_entries);
       return entries[index].value;
     }

@@ -18,9 +18,6 @@ namespace octet {
     // what material to use
     ref<material> mat;
 
-    // for characters, which skin to use
-    ref<skin> skn;
-
     // for characters, which skeleton to use
     ref<skeleton> skel;
     
@@ -28,11 +25,10 @@ namespace octet {
   public:
     RESOURCE_META(mesh_instance)
 
-    mesh_instance(scene_node *node, mesh *msh, material *mat, skin *skn=0, skeleton *skel=0) {
+    mesh_instance(scene_node *node, mesh *msh, material *mat, skeleton *skel=0) {
       this->node = node;
       this->msh = msh;
       this->mat = mat;
-      this->skn = skn;
       this->skel = skel;
     }
 
@@ -41,18 +37,20 @@ namespace octet {
       v.visit(node, "node");
       v.visit(msh, "msh");
       v.visit(mat, "mat");
-      v.visit(skn, "skn");
       v.visit(skel, "skel");
     }
 
     //////////////////////////////
     //
-    // animation_target
+    // animation_target interface
+    //
 
+    // the virtual add_ref on animation_target gets passed to here and we pass iton (delegate it) to the resource
     void add_ref() {
       resource::add_ref();
     }
 
+    // the virtual release on animation_target gets passed to here and we pass iton (delegate it) to the resource
     void release() {
       resource::release();
     }
@@ -71,7 +69,7 @@ namespace octet {
           switch (sub_target) {
             case atom_transform: {
               mat4t m;
-              m.init_row_major(value);
+              m.init_transpose(value);
               skel->set_bone(index, m);
             } break;
             case atom_rotateX: euler[0] = *value; break;
@@ -85,11 +83,22 @@ namespace octet {
       }
     }
 
+    //////////////////////////////
+    //
     // accessor methods
+    //
+
+    void update(float delta_time) {
+    }
+
+    //////////////////////////////
+    //
+    // accessor methods
+    //
+
     scene_node *get_node() const { return node; }
     mesh *get_mesh() const { return msh; }
     material *get_material() const { return mat; }
-    skin *get_skin() const { return skn; }
     skeleton *get_skeleton() const { return skel; }
   };
 }

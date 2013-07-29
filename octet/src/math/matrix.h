@@ -58,8 +58,8 @@ namespace octet {
       v[0] = x; v[1] = y; v[2] = z; v[3] = w;
     }
 
-    // initialise the matrix one row at a time
-    void init_row_major(const float *f)
+    // initialise the matrix from a collada matrix, for example.
+    void init_transpose(const float *f)
     {
       init(
         vec4(f[0], f[4], f[8], f[12]),
@@ -69,8 +69,8 @@ namespace octet {
       );
     }
 
-    // initialise the matrix one column at a time
-    void init_col_major(const float *f)
+    // initialise the matrix from a C-style matrix
+    void init_c_style(const float *f)
     {
       init(
         vec4(f[0], f[1], f[2], f[3]),
@@ -127,8 +127,8 @@ namespace octet {
       );
     }
   
-    // generalized single axis rotate
-    mat4t &rotate(float x, float y, float z, float angle) {
+    // generalized single axis rotate in degrees (like old glRotate)
+    mat4t &rotate(float angle, float x, float y, float z) {
       float c = cosf(angle * (3.14159265f/180));
       float s = sinf(angle * (3.14159265f/180));
       mat4t r(
@@ -148,6 +148,22 @@ namespace octet {
       v[2] = v0 * (x*z1c+y*s) + v1 * (y*z1c-x*s) + v2 * (z*z1c+c);
       */
 
+      return *this;
+    }
+
+    mat4t &skew(float angle, float x1, float y1, float z1, float x2, float y2, float z2) {
+      float t = tanf(angle * (3.14159265f/180));
+      vec4 v(x1, y1, z1, 0);
+      vec4 w(x2, y2, z2, 0);
+      v = v.normalize() * t;
+      w = w.normalize();
+      mat4t r(
+        vec4( 1 + v.x() * w.x(),     v.x() * w.y(),     v.x() * w.z(), 0 ), 
+        vec4(     v.y() * w.x(), 1 + v.y() * w.y(),     v.y() * w.z(), 0 ), 
+        vec4(     v.z() * w.x(),     v.z() * w.y(), 1 + v.z() * w.z(), 0 ), 
+        vec4(             0,             0,             0,             1 ) 
+      );
+      *this = r * *this;
       return *this;
     }
 
@@ -324,7 +340,8 @@ namespace octet {
       // if z == -f: zd = ( (f+n) - 2*n ) / (f-n) = 1    (zp=-f)
       // if z == -infinity: zd = (f+n) / (f-n)
 
-      // important: we get more z values closer to the camera, so choose f and n with care!
+      // important: we get more z values closer to the camera,
+      // so choose f and especially n with care!
 
       mat4t mul(
         vec4( X, 0, 0,  0 ),

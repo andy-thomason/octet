@@ -11,6 +11,7 @@ namespace octet {
   class xml_writer : public visitor {
     int depth;
     FILE *file;
+
     hash_map<void *, int> refs;
     int id;
   public:
@@ -20,52 +21,52 @@ namespace octet {
       id = 1;
     }
 
-    bool begin_ref(void *ref, const char *sid, const char *type) {
+    bool begin_ref(void *ref, const char *sid, atom_t type) {
       int &prev = refs[ref];
       if (!prev) {
-        fprintf(file, "%*s<%s sid=%s id=%d>\n", depth*2, "", type, sid, id);
+        fprintf(file, "%*s<%s sid=%s id=%d>\n", depth*2, "", predefined_atom(type), sid, id);
         depth++;
         prev = id++;
         return true;
       } else {
-        fprintf(file, "%*s<%s sid=%s id=%d/>\n", depth*2, "", type, sid, prev);
+        fprintf(file, "%*s<%s sid=%s id=%d/>\n", depth*2, "", predefined_atom(type), sid, prev);
         return false;
       }
     }
 
-    void end_ref(const char *sid, const char *type) {
+    void end_ref(const char *sid, atom_t type) {
       depth--;
-      fprintf(file, "%*s</%s>\n", depth*2, "", type);
+      fprintf(file, "%*s</%s>\n", depth*2, "", predefined_atom(type));
     }
 
-    bool begin_ref(void *ref, int index, const char *type) {
+    bool begin_ref(void *ref, int index, atom_t type) {
       int &prev = refs[ref];
       const char *sid = "";
       if (!prev) {
-        fprintf(file, "%*s<%s sid=%s id=%d>\n", depth*2, "", type, sid, id);
+        fprintf(file, "%*s<%s sid=%s id=%d>\n", depth*2, "", predefined_atom(type), sid, id);
         depth++;
         prev = id++;
         return true;
       } else {
-        fprintf(file, "%*s<%s sid=%s id=%d/>\n", depth*2, "", type, sid, prev);
+        fprintf(file, "%*s<%s sid=%s id=%d/>\n", depth*2, "", predefined_atom(type), sid, prev);
         return false;
       }
     }
 
-    void end_ref(int index, const char *type) {
+    void end_ref(int index, atom_t type) {
       depth--;
-      fprintf(file, "%*s</%s>\n", depth*2, "", type);
+      fprintf(file, "%*s</%s>\n", depth*2, "", predefined_atom(type));
     }
 
 
-    void begin_refs(const char *sid, const char *type, int number) {
-      fprintf(file, "%*s<%s>\n", depth*2, "", type);
+    void begin_refs(const char *sid, atom_t type, int number) {
+      fprintf(file, "%*s<%s>\n", depth*2, "", predefined_atom(type));
       depth++;
     }
 
-    void end_refs(const char *sid, const char *type, int number) {
+    void end_refs(const char *sid, atom_t type, int number) {
       depth--;
-      fprintf(file, "%*s</%s>\n", depth*2, "", type);
+      fprintf(file, "%*s</%s>\n", depth*2, "", predefined_atom(type));
     }
 
 

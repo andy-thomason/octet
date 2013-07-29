@@ -17,7 +17,27 @@ namespace octet {
     atom_rotateX,
     atom_rotateY,
     atom_rotateZ,
-    atom_scale
+    atom_scale,
+
+    // classes
+    atom_skin,
+    atom_skeleton,
+    atom_mesh,
+    atom_material,
+    atom_animation,
+    atom_camera_instance,
+    atom_light_instance,
+    atom_mesh_instance,
+    atom_animation_instance,
+    atom_scene,
+    atom_scene_node,
+    atom_animation_target,
+
+    // lights
+    atom_ambient,
+    atom_directional,
+    atom_spot,
+    atom_point,
   };
   
   inline static const char *predefined_atom(int i) {
@@ -31,6 +51,24 @@ namespace octet {
       "rotateY",
       "rotateZ",
       "scale",
+
+      "skin",
+      "skeleton",
+      "mesh",
+      "material",
+      "animation",
+      "camera_instance",
+      "light_instance",
+      "mesh_instance",
+      "animation_instance",
+      "scene",
+      "scene_node",
+      "animation_target",
+
+      "ambient",
+      "directional",
+      "spot",
+      "point",
       NULL
     };
     return names[i];
@@ -40,7 +78,6 @@ namespace octet {
   class skeleton;
   class mesh;
   class material;
-  class material;
   class animation;
   class camera_instance;
   class light_instance;
@@ -48,10 +85,13 @@ namespace octet {
   class animation_instance;
   class scene;
   class scene_node;
+  class animation_target;
 
+  // this macro implements standard functions for each class
   #define RESOURCE_META(classname) \
     classname *get_##classname() { return this; } \
-    static const char *get_type() { return #classname; }
+    atom_t get_type() { return atom_##classname; } \
+    static atom_t get_type_static() { return atom_##classname; }
 
   class resource {
     int ref_count;
@@ -59,6 +99,13 @@ namespace octet {
   public:
     resource() {
       ref_count = 0;
+    }
+
+    virtual atom_t get_type() {
+      return atom_;
+    }
+
+    virtual ~resource() {
     }
 
     void add_ref() {
@@ -74,6 +121,7 @@ namespace octet {
     void *operator new (size_t size) { return allocator::malloc(size); }
     void operator delete (void *ptr, size_t size) { return allocator::free(ptr, size); }
 
+    // casting and aggregation
     virtual skin *get_skin() { return 0; }
     virtual skeleton *get_skeleton() { return 0; }
     virtual mesh *get_mesh() { return 0; }
@@ -85,6 +133,7 @@ namespace octet {
     virtual animation_instance *get_animation_instance() { return 0; }
     virtual scene *get_scene() { return 0; }
     virtual scene_node *get_scene_node() { return 0; }
+    virtual animation_target *get_animation_target() { return 0; }
   };
 }
 

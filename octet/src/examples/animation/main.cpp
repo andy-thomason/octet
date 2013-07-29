@@ -17,6 +17,7 @@
 // argc is the number of arguments with argv[0] set to the command name.
 //
 int main(int argc, char **argv) {
+  octet::app_utils::prefix("../../");
   octet::app::init_all(argc, argv);
   animation_app app(argc, argv);
   app.init();

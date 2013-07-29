@@ -72,13 +72,7 @@ public:
 
     app_scene->create_default_camera_and_lights();
 
-    //app_scene->dump(app_utils::log("scene\n"));
-
-    if (selector == 1) {
-      animation *anim = dict.get_animation("Armature_radius_pose_matrix");
-      scene_node *node = dict.get_scene_node("Cube");
-      app_scene->play(anim, app_scene->get_first_mesh_instance(node), true);
-    }
+    app_scene->play_all_anims(dict);
 
     if (app_scene->num_camera_instances() != 0) {
       octet::camera_instance *cam = app_scene->get_camera_instance(0);
@@ -102,28 +96,21 @@ public:
     // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
     glEnable(GL_DEPTH_TEST);
 
-    if (app_scene) {
-      if (app_scene->num_camera_instances() == 0) {
-        return;
-      }
+    if (app_scene && app_scene->num_camera_instances()) {
+      int vx = 0, vy = 0;
+      get_viewport_size(vx, vy);
 
-      {
-        octet::camera_instance *cam = app_scene->get_camera_instance(0);
-        scene_node *node = cam->get_node();
-        mat4t &cameraToWorld = node->access_nodeToParent();
-        ball.update(cameraToWorld);
+      octet::camera_instance *cam = app_scene->get_camera_instance(0);
+      scene_node *node = cam->get_node();
+      mat4t &cameraToWorld = node->access_nodeToParent();
+      ball.update(cameraToWorld);
 
-        // update matrices. assume 30 fps.
-        app_scene->update(1.0f/30);
+      // update matrices. assume 30 fps.
+      app_scene->update(1.0f/30);
 
-        app_scene->render(object_shader, skin_shader, *cam);
-      }
+      app_scene->render(object_shader, skin_shader, *cam, (float)vx / vy);
 
-      {
-        int vx = 0, vy = 0;
-        get_viewport_size(vx, vy);
-        overlay.render(object_shader, skin_shader, vx, vy);
-      }
+      overlay.render(object_shader, skin_shader, vx, vy);
     }
   }
 };

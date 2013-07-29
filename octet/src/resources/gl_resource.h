@@ -29,8 +29,8 @@ namespace octet {
         glBufferData(target, size, NULL, GL_STATIC_DRAW);
       } else {
         ptr = allocator::malloc(size);
-        this->size = size;
       }
+      this->size = size;
       this->target = target;
     }
 
@@ -79,8 +79,7 @@ namespace octet {
     }
 
     void copy(const gl_resource &rhs) {
-      allocate(rhs.target, rhs.size, rhs.buffer != 0);
-      release();
+      assert(!get_use_vbo() && !rhs.get_use_vbo());
       if (rhs.buffer) {
         glBindBuffer(target, buffer);
         //glBindBuffer(GL_COPY_READ_BUFFER, rhs.buffer);

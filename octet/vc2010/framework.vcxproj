@@ -14,7 +14,7 @@
     <ProjectGuid>{0D5E21BA-86C8-4A17-B9A1-4D905592CD6B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>framework</RootNamespace>
-    <ProjectName>octet</ProjectName>
+    <ProjectName>octet-layer1</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

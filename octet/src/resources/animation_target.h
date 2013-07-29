@@ -16,6 +16,8 @@
 namespace octet {
   class animation_target {
   public:
+    RESOURCE_META(animation_target)
+
     // for ref<> containers
     virtual void add_ref() = 0;
     virtual void release() = 0;

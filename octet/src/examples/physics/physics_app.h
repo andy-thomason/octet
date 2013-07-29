@@ -31,13 +31,12 @@ namespace octet {
       physics_index = _physics_index;
     }
 
-    void render(physics_world &world, bump_shader &shader, const mat4t &worldToCamera, const mat4t &cameraToProjection, lighting &lights) {
+    void render(physics_world &world, bump_shader &shader, const mat4t &worldToCamera, const mat4t &cameraToProjection, vec4 *light_uniforms, int num_light_uniforms, int num_lights) {
       mat4t modelToWorld;
       world.get_modelToWorld(modelToWorld, physics_index);
       mat4t modelToCamera = modelToWorld * worldToCamera;
       mat4t modelToProjection = modelToCamera * cameraToProjection;
-      vec4 *light_uniforms = lights.data();
-      mat->render(shader, modelToProjection, modelToCamera, light_uniforms);
+      mat->render(shader, modelToProjection, modelToCamera, light_uniforms, num_light_uniforms, num_lights);
       box_mesh->render();
     }
 
@@ -81,9 +80,6 @@ namespace octet {
     // mesh for boxes
     mesh floor_mesh;
 
-    // array of lights
-    lighting lights;
-  
     // storage for boxes
     dynarray<physics_box> boxes;
 
@@ -100,14 +96,11 @@ namespace octet {
 
     
       // make a mesh to share amoungst all boxes
-      mesh tmp;
-      tmp.make_cube(0.5f);
-      box_mesh.add_3d_normals(tmp);
+      box_mesh.make_cube(0.5f);
       box_mat.make_color(vec4(1, 0, 0, 1), false, false);
 
       float floor_size = 50.0f;
-      tmp.make_aa_box(floor_size, 0.5f, floor_size);
-      floor_mesh.add_3d_normals(tmp);
+      floor_mesh.make_aa_box(floor_size, 0.5f, floor_size);
       floor_mat.make_color(vec4(0.3f, 1, 0.1f, 1), true, false);
 
       // make some boxes in the physics world with meshes for drawing.
@@ -132,7 +125,7 @@ namespace octet {
         boxes[num_boxes].init(&floor_mat, &floor_mesh, body);
       }
 
-      lights.add_light(vec4(10, 10, 10, 1), vec4(0, 0, 1, 0).normalize(), vec4(0.3f, 0.3f, 0.3f, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1));
+      //lights.add_light(vec4(10, 10, 10, 1), vec4(0, 0, 1, 0).normalize(), vec4(0.3f, 0.3f, 0.3f, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1));
     }
 
     // this is called to draw the world
@@ -167,10 +160,16 @@ namespace octet {
       cameraToProjection.frustum(-n, n, -n, n, n, f);
 
       // the lights are in camera space
-      lights.compute(worldToCamera);
+      //lights.compute(worldToCamera);
+      vec4 lights[5];
+      memset(lights, 0, sizeof(lights));
+      lights[0] = vec4(0.3f, 0.3f, 0.3f, 50);
+      lights[2] = vec4(0.707f, 0, 0.707f, 0) * worldToCamera;
+      lights[3] = vec4(1, 1, 1, 1);
+      lights[4] = vec4(1, 0, 0, 1);
 
       for (unsigned i = 0; i != boxes.size(); ++i) {
-        boxes[i].render(world, bump_shader_, worldToCamera, cameraToProjection, lights);
+        boxes[i].render(world, bump_shader_, worldToCamera, cameraToProjection, lights, 5, 1);
       }
 
       if (is_key_down('W')) {

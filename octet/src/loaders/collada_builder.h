@@ -459,7 +459,7 @@ namespace octet {
     }
 
     // add geometry and skins from the collada file to the resources collection
-    void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, skin *skn, resources &dict, scene &s) {
+    void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, resources &dict, scene &s) {
       if (!url) return;
 
       TiXmlElement *instance = child(technique_common, "instance_material");
@@ -467,25 +467,32 @@ namespace octet {
         for (; instance != NULL; instance = instance->NextSiblingElement("instance_material")) {
           const char *symbol = instance->Attribute("symbol");
           const char *target = instance->Attribute("target");
+          material *mat = dict.get_material(target);
+          if (!mat) mat = dict.get_material("default_material");
+          const char *mesh_url = url;
+          string new_url;
+
           // add a scene_node/mesh/material combination to the mesh_instance
-          if (symbol && url) {
-            string new_url;
+          if (symbol) {
             new_url.format("%s+%s", url, symbol);
-            //app_utils::log("ami %s\n", new_url.c_str());
-            mesh *msh = dict.get_mesh(new_url);
-            material *mat = dict.get_material(target);
-            if (!mat) mat = dict.get_material("default_material");
-            if (msh) {
-              mesh_instance *mi = new mesh_instance(node, msh, mat, skn, skel);
-              s.add_mesh_instance(mi);
-            }
+            mesh_url = new_url.c_str();
+          }
+
+          app_utils::log("add mesh instance %s\n", mesh_url);
+
+          mesh *msh = dict.get_mesh(mesh_url);
+          if (msh) {
+            mesh_instance *mi = new mesh_instance(node, msh, mat, skel);
+            s.add_mesh_instance(mi);
+          } else {
+            app_utils::log("warning: missing mesh %s\n", mesh_url);
           }
         }
       } else {
         mesh *mesh = dict.get_mesh(url);
         material *mat = dict.get_material("default_material");
         if (mesh) {
-          mesh_instance *mi = new mesh_instance(node, mesh, mat, skn, skel);
+          mesh_instance *mi = new mesh_instance(node, mesh, mat, skel);
           s.add_mesh_instance(mi);
         }
       }
@@ -498,7 +505,7 @@ namespace octet {
       TiXmlElement *bind_material = child(element, "bind_material");
       TiXmlElement *technique_common = child(bind_material, "technique_common");
 
-      add_mesh_instances(technique_common, url, node, 0, 0, dict, s);
+      add_mesh_instances(technique_common, url, node, 0, dict, s);
     }
 
     // add an <instance_controller> skin instance
@@ -512,13 +519,12 @@ namespace octet {
         num_bones++;
       }
 
-      mesh *mesh = dict.get_mesh(controller_url);
-      if (!mesh || !mesh->get_skin()) return;
-      skin *skn = mesh->get_skin();
+      //mesh *mesh = dict.get_mesh(controller_url);
+      //if (!mesh || !mesh->get_skin()) return;
+      //skin *skn = mesh->get_skin();
 
       skeleton *skel = new skeleton();
       TiXmlElement *skel_elem = child(element, "skeleton");
-      //int num_nodes = s.get_num_nodes();
       dictionary<int> skin_joints;
       while (skel_elem) {
         const char *skeleton_id = text(skel_elem);
@@ -530,20 +536,29 @@ namespace octet {
           node->get_all_child_nodes(nodes, parents);
           for (int i = 0; i != nodes.size(); ++i) {
             scene_node *node = nodes[i];
-            skel->add_bone(node->get_nodeToParent(), node->get_sid(), parents[i]);
+            skel->add_bone(node, parents[i]);
           }
         }
         skel_elem = sibling(skel_elem, "skeleton");
       }
 
       //const char *url = skin->Attribute("source");
-      add_mesh_instances(technique_common, controller_url, node, skel, skn, dict, s);
+      add_mesh_instances(technique_common, controller_url, node, skel, dict, s);
     }
 
     // utility to get a float
-    float quick_float(TiXmlElement *parent, const char *name) {
+    float quick_float(TiXmlElement *parent, const char *name, float deflt=0) {
       TiXmlElement *child = parent->FirstChildElement(name);
-      return child ? (float)atof(child->GetText()) : 0;
+      return child ? (float)atof(child->GetText()) : deflt;
+    }
+
+    // utility to get a float
+    vec4 quick_vec(TiXmlElement *parent, const char *name) {
+      TiXmlElement *child = parent->FirstChildElement(name);
+      dynarray<float> v;
+      if (child) atofv(v, child->GetText());
+      unsigned s = v.size();
+      return vec4(v[0], s > 1 ? v[1] : 0, s > 2 ? v[2] : 0, s > 3 ? v[3] : 1);
     }
 
     // add a camera to the scene
@@ -563,14 +578,15 @@ namespace octet {
         float aspect_ratio = quick_float(params, "aspect_ratio");
         camera_instance *c = new camera_instance();
         s.add_camera_instance(c);
+        c->set_node(node);
         if (perspective) {
           float xfov = quick_float(params, "xfov");
           float yfov = quick_float(params, "yfov");
-          c->set_perspective(node, xfov, yfov, aspect_ratio, n, f);
+          c->set_perspective(xfov, yfov, aspect_ratio, n, f);
         } else {
           float xmag = quick_float(params, "xmag");
           float ymag = quick_float(params, "ymag");
-          c->set_ortho(node, xmag, ymag, aspect_ratio, n, f);
+          c->set_ortho(xmag, ymag, aspect_ratio, n, f);
         }
       }
     }
@@ -580,8 +596,33 @@ namespace octet {
       const char *url = elem->Attribute("url");
       TiXmlElement *light = find_id(url);
       if (!light) return;
+
+      light_instance *il = new light_instance();
+      il->set_node(node);
+      s.add_light_instance(il);
       
-      // todo:
+      TiXmlElement *technique_common = child(light, "technique_common");
+      TiXmlElement *ambient = child(technique_common, "ambient");
+      TiXmlElement *directional = child(technique_common, "directional");
+      TiXmlElement *spot = child(technique_common, "spot");
+      TiXmlElement *point = child(technique_common, "point");
+      TiXmlElement *params = ambient ? ambient : directional ? directional : spot ? spot : point;
+
+      il->set_color(vec4(1, 1, 1, 1));
+      if (params) {
+        vec4 color = quick_vec(params, "color");
+        il->set_color(color);
+      }
+
+      if (directional || spot || point) {
+        float constant_attenuation = quick_float(params, "constant_attenuation", 1);
+        float linear_attenuation = quick_float(params, "linear_attenuation", 0);
+        float quadratic_attenuation = quick_float(params, "quadratic_attenuation", 0);
+        float falloff_angle = quick_float(params, "falloff_angle", 180);
+        float falloff_exponent = quick_float(params, "falloff_exponent", 0);
+        il->set_attenuation(constant_attenuation, linear_attenuation, quadratic_attenuation);
+        il->set_falloff(falloff_angle, falloff_exponent);
+      }
     }
 
     // add a geometry element to the list of mesh states
@@ -640,6 +681,27 @@ namespace octet {
           }
         }
 
+        mat4t modelToBind;
+
+        if (skinst.bind_shape_matrix.size() >= 16) {
+          modelToBind.init_transpose(&skinst.bind_shape_matrix[0]);
+        } else {
+          modelToBind.loadIdentity();
+        }
+
+        skin *mesh_skin = new skin(modelToBind);
+
+        dynarray<string> joints;
+        atonv(joints, skinst.joints);
+
+        //mesh_skin->bindToModel.resize(skinst.inv_bind_matrices.size()/16);
+
+        for (unsigned i = 0; i != joints.size(); ++i) {
+          mat4t bindToModel;
+          bindToModel.init_transpose(&skinst.inv_bind_matrices[i*16]);
+          mesh_skin->add_joint(bindToModel, resources::get_atom(joints[i]));
+        }
+
         TiXmlElement *vertex_weights = child(skin_elem, "vertex_weights");
         if (vertex_weights && geometry) {
           get_skin(controller, vertex_weights, &skinst);
@@ -651,26 +713,6 @@ namespace octet {
             mesh_child = mesh_child->NextSiblingElement()
           ) {
             if (is_mesh_component(mesh_child->Value())) {
-              mat4t modelToBind;
-
-              if (skinst.bind_shape_matrix.size() >= 16) {
-                modelToBind.init_row_major(&skinst.bind_shape_matrix[0]);
-              } else {
-                modelToBind.loadIdentity();
-              }
-
-              skin *mesh_skin = new skin(modelToBind);
-              dynarray<string> joints;
-              atonv(joints, skinst.joints);
-
-              //mesh_skin->bindToModel.resize(skinst.inv_bind_matrices.size()/16);
-
-              for (unsigned i = 0; i != joints.size(); ++i) {
-                mat4t bindToModel;
-                bindToModel.init_row_major(&skinst.inv_bind_matrices[i*16]);
-                mesh_skin->add_joint(bindToModel, resources::get_atom(joints[i]));
-              }
-
               mesh *msh = new mesh(mesh_skin);
               get_mesh_component(msh, controller_id, mesh_child, &skinst, dict);
             }
@@ -711,7 +753,9 @@ namespace octet {
 
       for (TiXmlElement *anim_elem = child(lib_anim, "animation"); anim_elem != NULL; anim_elem = sibling(anim_elem, "animation")) {
         animation *anim = new animation();
-        dict.set_resource(attr(anim_elem, "id"), anim);
+        const char *id = attr(anim_elem, "id");
+        dict.set_resource(id, anim);
+        app_utils::log("animation %s\n", id);
         for (TiXmlElement *channel_elem = child(anim_elem, "channel"); channel_elem != NULL; channel_elem = sibling(channel_elem, "channel")) {
           const char *target = attr(channel_elem, "target");
           string node_name = target;
@@ -733,7 +777,7 @@ namespace octet {
           atom_t sub_target_sid = resources::get_atom(sub_target_name);
           atom_t component_sid = resources::get_atom(component_name);
           
-          //app_utils::log("%s %s %s\n", node_name.c_str(), sub_target_name.c_str(), component_name.c_str());
+          app_utils::log("  channel target %s %s %s\n", node_name.c_str(), sub_target_name.c_str(), component_name.c_str());
           TiXmlElement *sampler_elem = find_id(attr(channel_elem, "source"));
           if (sampler_elem) {
             dynarray<float> times;
@@ -759,7 +803,8 @@ namespace octet {
               input = sibling(input, "input");
             }
 
-            anim->add_channel(node_sid, sub_target_sid, component_sid, times, values);
+            animation_target *target = dict.get_animation_target(node_name);
+            anim->add_channel(target, node_sid, sub_target_sid, component_sid, times, values);
           }
         }
       }
@@ -784,8 +829,11 @@ namespace octet {
         while (node_elem) {
           mat4t nodeToParent;
           nodeToParent.loadIdentity();
-          scene_node *new_node = new scene_node(nodeToParent, resources::get_atom(attr(node_elem, "sid")));
-          dict.set_resource(attr(node_elem, "id"), new_node);
+          const char *sid = attr(node_elem, "sid");
+          const char *id = attr(node_elem, "id");
+          scene_node *new_node = new scene_node(nodeToParent, resources::get_atom(sid));
+          app_utils::log("add scene_node id=%s sid=%s\n", id, sid);
+          dict.set_resource(id, new_node);
           parent->add_child(new_node);
           stack.push_back(node_elem);
           node_stack.push_back(new_node);
@@ -821,7 +869,7 @@ namespace octet {
           } else if (!strcmp(value, "rotate")) {
             atofv(temp_floats, child->GetText());
             if (temp_floats.size() >= 4) {
-              matrix.rotate(temp_floats[0], temp_floats[1], temp_floats[2], temp_floats[3]);
+              matrix.rotate(temp_floats[3], temp_floats[0], temp_floats[1], temp_floats[2]);
             }
           } else if (!strcmp(value, "scale")) {
             atofv(temp_floats, child->GetText());
@@ -915,15 +963,14 @@ namespace octet {
       // with a name of "geometry+material"
       // each requires a separate mesh instance to render
       const char *symbol = attr(mesh_child, "material");
+      string new_url;
+      const char *mesh_url = id;
       if (symbol) {
-        string new_url;
         new_url.format("%s+%s", id, symbol);
-        //app_utils::log("gmc %s\n", new_url.c_str());
-        dict.set_resource(new_url, mesh);
-      } else {
-        //app_utils::log("gmc %s\n", id);
-        dict.set_resource(id, mesh);
+        mesh_url = new_url;
       }
+      app_utils::log("created mesh %s\n", id);
+      dict.set_resource(mesh_url, mesh);
 
       parse_input_state state;
       state.s = mesh;
@@ -1048,9 +1095,9 @@ namespace octet {
           max[2] = max[2] > vtx[2] ? max[2] : vtx[2];
           vtx += state.attr_stride;
         }
-        printf("%s\n", id);
-        printf("%f %f %f\n", min[0], min[1], min[2]);
-        printf("%f %f %f\n", max[0], max[1], max[2]);
+        //printf("%s\n", id);
+        //printf("%f %f %f\n", min[0], min[1], min[2]);
+        //printf("%f %f %f\n", max[0], max[1], max[2]);
         vec4 vmin(min[0], min[1], min[2], 0);
         vec4 vmax(max[0], max[1], max[2], 0);
         mesh->set_aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f);
@@ -1238,9 +1285,11 @@ namespace octet {
 
       add_controllers(dict);
 
-      add_animations(dict);
-
+      // scenes refer to all the above
       add_scenes(dict);
+
+      // animations refer to all other objects
+      add_animations(dict);
     }
   };
 }

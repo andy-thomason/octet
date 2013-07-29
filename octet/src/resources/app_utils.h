@@ -8,15 +8,15 @@
 
 namespace octet {
   class app_utils {
-    #ifdef WIN32
-      // vc2010/../
-      static const char *prefix() { return "../"; }
-    #else
-      // xcode/../
-      static const char *prefix() { return "../"; }
-    #endif
-  
   public:
+    static const char *prefix(const char *new_prefix=NULL) {
+      static const char *value = "../";
+      if (new_prefix) {
+        value = new_prefix;
+      }
+      return value;
+    }
+  
     static void setrgb(dynarray<unsigned char> &buffer, int size, int x, int y, unsigned rgb, unsigned a = 0xff) {
       buffer[(y*size+x)*4+0] = rgb >> 16;
       buffer[(y*size+x)*4+1] = rgb >> 8;
