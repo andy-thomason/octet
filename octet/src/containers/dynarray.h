@@ -81,6 +81,13 @@ namespace octet {
       return it;
     }
   
+    void erase(unsigned elem) {
+      for (int_size_t i = elem; i < size_-1; ++i) {
+        data_[i] = data_[i+1];
+      }
+      resize(size_-1);
+    }
+  
     void push_back(const item_t &new_item) {
       int_size_t old_length = size_;
       resize(size_+1);

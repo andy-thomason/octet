@@ -149,10 +149,10 @@ namespace octet {
 
     const char *toString() const
     {
-      static char buf[4][64];
+      static char buf[4][128];
       static int i = 0;
       char *dest = buf[i++&3];
-      sprintf(dest, "{%.3f, %.3f, %.3f, %.3f}", v[0], v[1], v[2], v[3]);
+      sprintf(dest, "[%f, %f, %f, %f]", v[0], v[1], v[2], v[3]);
       return dest;
     }
   };

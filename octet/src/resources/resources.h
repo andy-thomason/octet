@@ -132,16 +132,5 @@ namespace octet {
         }
       }
     }
-
-    void visit(visitor &v, atom_t sid) {
-      unsigned num_indices = dict.get_num_indices();
-      for (unsigned i = 0; i != num_indices; ++i) {
-        const char *key = dict.get_key(i);
-        resource *res = dict.get_value(i);
-        if (key && res) {
-          res->visit(v);
-        }
-      }
-    }
   };
 }

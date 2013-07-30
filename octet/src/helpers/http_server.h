@@ -1,0 +1,138 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// (C) Andy Thomason 2012, 2013
+//
+// Modular Framework for OpenGLES2 rendering on multiple platforms.
+//
+//
+// HTTP server for debugging game code and building game editors.
+
+namespace octet {
+  class http_server {
+    enum { port = 8888 };
+    int listen_socket;
+
+    struct session {
+      int client_socket;
+    };
+
+    // The information we are serving. ie. the game data.
+    ref<resources> dict;
+
+    // client sessions active
+    dynarray<session> sessions;
+
+    // temporary buffer used for send/recieve
+    dynarray<char> buf;
+
+    void set_non_blocking(int socket) {
+      u_long mode = 1;
+      ioctlsocket(socket, FIONBIO, &mode);
+    }
+
+    void parse_http_request(session &s, char *p) {
+      string header(p);
+
+      dynarray<string> lines;
+      lines.reserve(32);
+      header.split(lines, "\n");
+      if (lines.size() == 0) return;
+
+      dynarray<string> line0;
+      lines[0].split(line0, " ");
+      if (line0.size() < 3) return;
+      if (line0[0] != "GET") return;
+
+      app_utils::log("http get from: %s\n", line0[1].c_str());
+
+      dynarray<string> url;
+      url.reserve(16);
+      line0[1].split(url, "/");
+      if (url.size() < 2 || url[0] != "") return;
+
+      dynarray<string> response;
+      response.reserve(64);
+      int max_depth = url[url.size()-1] == "" ? url.size()-1 : url.size();
+      http_writer writer(1, max_depth, url, response);
+      dict->visit(writer);
+
+      // With HTTP 1.1 we can keep the connection open and respond to more
+      // feeds without the overhead of a new connection.
+      unsigned num_bytes = 0;
+      for (unsigned i = 0; i != response.size(); ++i) {
+        num_bytes += response[i].size();
+      }
+
+      string response_header;
+      response_header.format(
+        "HTTP/1.1 200 OK\n"
+        "Content-Type: text/plain; charset=UTF-8\n"
+        "Content-Length: %d\n"
+        "\n",
+        num_bytes
+      );
+
+      send(s.client_socket, response_header.c_str(), response_header.size(), 0);
+
+      for (unsigned i = 0; i != response.size(); ++i) {
+        send(s.client_socket, response[i].c_str(), response[i].size(), 0);
+      }
+    }
+
+  public:
+    void init(resources *dict_) {
+      dict = dict_;
+
+      // create a socket to listen for connections
+      listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+      // bind the socket to a specific port
+      sockaddr_in addr;
+      memset(&addr, 0, sizeof(addr));
+      addr.sin_family = AF_INET;
+      addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      addr.sin_port = htons(port);
+      bind(listen_socket, (sockaddr *)&addr, sizeof(addr));
+
+      // start listening for connections (only one connection at a time)
+      listen(listen_socket, 1);
+
+      // set the socket to non-blocking so we don't need to use a thread
+      set_non_blocking(listen_socket);
+
+      // 64k buffer
+      buf.resize(0x10000);
+
+      printf("connect a web browser to localhost:8888\n");
+    }
+
+    // called once per frame
+    void update() {
+      // establish new sessions
+      int client_socket = accept(listen_socket, 0, 0);
+      if (client_socket >= 0) {
+        app_utils::log("http: new connection socket %d\n", client_socket);
+        set_non_blocking(client_socket);
+        session s;
+        s.client_socket = client_socket;
+        sessions.push_back(s);
+      }
+
+      // poll the sessions
+      for (unsigned i = 0; i < sessions.size(); ++i) {
+        session &s = sessions[i];
+        int bytes = recv(s.client_socket, &buf[0], buf.size()-1, 0);
+        if (bytes > 0) {
+          app_utils::log("http: recieved from %d\n", s.client_socket);
+          buf[bytes] = 0;
+          parse_http_request(s, &buf[0]);
+        } else if (bytes == 0) {
+          app_utils::log("http: close connection %d\n", s.client_socket);
+          closesocket(s.client_socket); 
+          sessions.erase(i);
+        }
+      }
+    }
+  };
+}
+

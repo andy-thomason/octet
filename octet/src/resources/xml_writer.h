@@ -67,19 +67,20 @@ namespace octet {
       stack.pop_back();
     }
 
-    void begin_refs(atom_t sid, int number) {
+    bool begin_refs(atom_t sid, int number) {
       TiXmlElement *child = new TiXmlElement("refs");
       stack.back()->LinkEndChild(child);
       stack.push_back(child);
       child->SetAttribute("count", number);
       child->SetAttribute("sid", app_utils::get_atom_name(sid));
+      return true;
     }
 
     void end_refs() {
       stack.pop_back();
     }
 
-    void visit_bin(void *value, size_t size, atom_t sid) {
+    void visit_bin(void *value, size_t size, atom_t sid, atom_t type) {
       if (size <= 16) {
         stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(value, size));
       } else {
@@ -98,20 +99,24 @@ namespace octet {
       }
     }
 
-    /*void visit(mat4t &value, atom_t sid) {
-      stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(&value, sizeof(value)));
+    void visit(int &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value);
     }
 
-    void visit(float &value, atom_t sid) {
-      stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(&value, sizeof(value)));
-    }*/
-
-    void visit(int &value, atom_t sid) {
+    void visit(unsigned &value, atom_t sid) {
       stack.back()->SetAttribute(app_utils::get_atom_name(sid), value);
     }
 
     void visit(atom_t &value, atom_t sid) {
       stack.back()->SetAttribute(app_utils::get_atom_name(sid), app_utils::get_atom_name(value));
+    }
+
+    void visit(vec4 &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString());
+    }
+
+    void visit(mat4t &value, atom_t sid) {
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString());
     }
   };
 }

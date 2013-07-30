@@ -51,11 +51,11 @@ void *operator new(size_t size, void *place, dynarray_dummy_t x) { return place;
 void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 #include "../containers/allocator.h"
-#include "../containers/chars.h"
 #include "../containers/dictionary.h"
 #include "../containers/hash_map.h"
 #include "../containers/double_list.h"
 #include "../containers/dynarray.h"
+#include "../containers/string.h"
 #include "../containers/ptr.h"
 #include "../containers/ref.h"
 
@@ -75,6 +75,7 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../resources/app_utils.h"
 #include "../resources/visitor.h"
 #include "../resources/xml_writer.h"
+#include "../resources/http_writer.h"
 #include "../resources/resource.h"
 #include "../resources/resources.h"
 #include "../resources/gl_resource.h"
@@ -103,6 +104,7 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 // high level helpers
 #include "../helpers/mouse_ball.h"
+#include "../helpers/http_server.h"
 #include "../helpers/text_overlay.h"
 
 // asset loaders

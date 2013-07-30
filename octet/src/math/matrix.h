@@ -219,6 +219,10 @@ namespace octet {
       d[3] = d.lmul(vec4(-v[3][0], -v[3][1], -v[3][2], 1));
     }
 
+    mat4t transpose4x4() const {
+      return mat4t( colx(), coly(), colz(), colw() );
+    }
+
     mat4t inverse4x4() const {
       vec4 v0 = v[0];
       vec4 v1 = v[1];
@@ -419,7 +423,7 @@ namespace octet {
       static char buf[4][256];
       static int i = 0;
       char *dest = buf[i++&3];
-      sprintf(dest, "{%s %s %s %s}", v[0].toString(), v[1].toString(), v[2].toString(), v[3].toString());
+      sprintf(dest, "[%s, %s, %s, %s]", v[0].toString(), v[1].toString(), v[2].toString(), v[3].toString());
       return dest;
     }
 
@@ -459,13 +463,58 @@ namespace octet {
       return modelToCamera * cameraToProjection;
     }
 
-    mat4t xy() const { return mat4t(v[0], v[1], vec4(0, 0, 0, 0), vec4(0, 0, 0, 0)); }
-    mat4t xyz() const { return mat4t(v[0], v[1], v[2], vec4(0, 0, 0, 0)); }
-    mat4t xyz1() const { return mat4t(v[0], v[1], v[2], vec4(0, 0, 0, 1)); }
+    // Gram Schmidt orthogonalisation: make a pure rotation
+    mat4t normalize_3x3() {
+      // note: it may be best to normalize z first.
+      vec4 u0 = v[0];
+      vec4 u1 = v[1] - u0 * (u0.dot(v[1])/u0.squared());
+      vec4 u2 = v[2] - u0 * (u0.dot(v[2])/u0.squared()) - u1 * (u1.dot(v[2])/u1.squared());
+      return mat4t(u0.normalize(), u1.normalize(), u2.normalize(), vec4(0, 0, 0, 1));
+    }
+
+    // QR decomposition (after normalize_3x3)
+    // get R component (upper triangular)
+    mat4t get_skew(const mat4t &rotation) {
+      return xyz() * rotation.transpose4x4();
+    }
+
+    // Power method to find approximate pincipal axis
+    // only works for matrices where there is a single dominant eigenvalue.
+    // No good for rotations.
+    vec4 get_principal_axis(unsigned steps=5) {
+      vec4 t = v[2].normalize();
+      for (unsigned i = 0; i != 5; ++i) {
+        t = (t * *this).normalize();
+      }
+      return t;
+    }
+
+    // assuming this is a rotation matrix, get the axis and angle (in degrees).
+    vec4 get_rotation(float &angle) {
+      quat q = toQuaternion();
+
+      // for stability, use atan2
+      vec4 axis = q.xyz();
+      float length = axis.length();
+      angle = atan2f(length, q[3]) * (360.0f/3.14159265f);
+      return length > 0.000001f ? axis / length : vec4(0, 0, 1, 0);
+    }
+
+    // sub-matrices
+    mat4t xy() const { return mat4t(v[0].xy(), v[1].xy(), vec4(0, 0, 1, 0), vec4(0, 0, 0, 1)); }
+    mat4t xyz() const { return mat4t(v[0].xyz(), v[1].xyz(), v[2].xyz(), vec4(0, 0, 0, 1)); }
+
+    // rows
     vec4 &x() { return v[0]; }
     vec4 &y() { return v[1]; }
     vec4 &z() { return v[2]; }
     vec4 &w() { return v[3]; }
+
+    // columns
+    vec4 colx() const { return vec4( v[0][0], v[1][0], v[2][0], v[3][0] ); }
+    vec4 coly() const { return vec4( v[0][1], v[1][1], v[2][1], v[3][1] ); }
+    vec4 colz() const { return vec4( v[0][2], v[1][2], v[2][2], v[3][2] ); }
+    vec4 colw() const { return vec4( v[0][3], v[1][3], v[2][3], v[3][3] ); }
   };
 
   // vector times a matrix (premultiplication)

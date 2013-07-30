@@ -9,6 +9,7 @@
 // windows.h contains all the windows-specific definitions such as CreateWindow
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
+#include <windows.h>
 //#include <mmsystem.h>
 
 // undo unwanted definitions that Microsoft make in windows.h
@@ -36,6 +37,9 @@
   #include "CL/cl_gl.h"
 #endif
 
+// windows sockets (a BSD socket clone)
+#pragma comment(lib, "Ws2_32.lib")
+#include <winsock2.h>
 
 // some standard c++ definitions
 #include <map>
@@ -98,6 +102,9 @@ namespace octet {
     }
 
     void init() {
+      WSADATA wsa;
+      WSAStartup(MAKEWORD(2,2), &wsa);
+
       HINSTANCE instance = (HINSTANCE)GetModuleHandle(0);
       HBRUSH brush = (HBRUSH) GetStockObject(NULL_BRUSH);
       HICON icon = LoadIcon(0, IDI_ASTERISK);

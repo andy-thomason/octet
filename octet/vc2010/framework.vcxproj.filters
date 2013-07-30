@@ -105,9 +105,6 @@
     <ClInclude Include="..\src\containers\dynarray.h">
       <Filter>containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\containers\chars.h">
-      <Filter>containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\containers\dictionary.h">
       <Filter>containers</Filter>
     </ClInclude>
@@ -230,6 +227,9 @@
     </ClInclude>
     <ClInclude Include="..\src\resources\gl_resource.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\containers\string.h">
+      <Filter>containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

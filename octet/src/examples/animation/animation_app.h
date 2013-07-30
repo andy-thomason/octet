@@ -18,6 +18,7 @@
 
 class animation_app : public octet::app {
   typedef octet::mat4t mat4t;
+  typedef octet::vec4 vec4;
   typedef octet::animation animation;
   typedef octet::scene_node scene_node;
 
@@ -37,6 +38,9 @@ class animation_app : public octet::app {
   // helper for drawing text
   octet::text_overlay overlay;
 
+  // helper for debugging by web browser
+  octet::http_server server;
+
 public:
   // this is called when we construct the class
   animation_app(int argc, char **argv) : app(argc, argv), ball() {
@@ -51,7 +55,7 @@ public:
     octet::collada_builder builder;
     const char *filename = 0;
 
-    int selector = 5;
+    int selector = 0;
     switch (selector) {
       case 0: filename = "assets/duck_triangulate.dae"; break;
       case 1: filename = "assets/skinning/skin_unrot.dae"; break;
@@ -72,7 +76,7 @@ public:
 
     app_scene->create_default_camera_and_lights();
 
-    {
+    /*{
       // save the resources as an xml file
       TiXmlDocument doc;
       TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "utf-8", "");
@@ -85,7 +89,7 @@ public:
       dict.visit(xml);
 
       doc.SaveFile("animation.xml");
-    }
+    }*/
 
     app_scene->play_all_anims(dict);
 
@@ -97,6 +101,7 @@ public:
     }
 
     overlay.init();
+    server.init(&dict);
   }
 
   // this is called to draw the world
@@ -110,6 +115,9 @@ public:
 
     // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
     glEnable(GL_DEPTH_TEST);
+
+    // poll web server
+    server.update();
 
     if (app_scene && app_scene->num_camera_instances()) {
       int vx = 0, vy = 0;
