@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>Octet Game Framework</title>
+  </head>
+  <body>
+    <img src="logo.gif"/><br/>
+    <a href="index.html">contents</a><br/>
+    <h1>Getting started with Octet</h1>
+    <h2>Windows</h2>
+    <p>On Windows, we can build with most flavours of visual studio, but I reccomend
+    visual studio 2010 express as it is small and free</p>
+    <p>The VC2010 directory contains a .sln file which you can click on.</p>
+    <p>If this does not work with your version of visual studio, click on the .vcprojx
+    file and it will create a solution.</p>
+    <p>You can then build with ctrl-shift-B and run with F5.</p>
+    <p>To build just the engine demo (animation) or the layer-1 samples (octet),
+    right click on the solution explorer and select "build".</p>
+    <h2>Mac OSX</h2>
+    <p>On the Mac. Go into the xcode directory and clock on the xcode project.</p>
+    <p>You may need to navigate to "product -> edit scheme -> run -> options" and
+    select the xcode directory as the working directory. But I think this is now taken
+    care of with an environment variable. (feedback, please).<p>
+    <p>To build use (apple) B and use (apple) R to run.
+    <h2>Project Layout</h2>
+    <pre>
+octet\assets                   images, sounds and meshes for projects
+octet\doc                      this documentation
+octet\external                 non-free assets and code
+octet\lib                      libraries for OpenAL, OpenCL and OpenGL
+octet\packaging                scripts for building distribution zip files
+octet\src                      source code for the project
+octet\webui                    web user interface for engine
+octet\xcode                    Mac OSX build
+octet\vc2010                   Visual studio build
+    </pre>
+    <p>The project is in two parts. The basic opengl part is for learning
+    how to draw triangles and basic geometry. The engine part is a basic
+    game engine with a scene, asset management and a myriad of other parts
+    </p>
+    <p>To understand the various examples, check out the walkthrough sections
+    on the <a href="index.html">contents page</a></p>
+  </body>
+</head>
