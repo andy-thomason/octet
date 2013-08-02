@@ -109,6 +109,7 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
 // asset loaders
 #include "../loaders/gif_decoder.h"
+#include "../loaders/jpeg_decoder.h"
 #include "../loaders/tga_decoder.h"
 #include "../loaders/collada_builder.h"
 

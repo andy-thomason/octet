@@ -131,7 +131,7 @@ namespace octet {
       // 64k buffer
       buf.resize(0x10000);
 
-      printf("connect a web browser to localhost:8888\n");
+      printf("connect a web browser to webui/index.html\n");
     }
 
     // called once per frame

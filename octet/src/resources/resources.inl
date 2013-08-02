@@ -21,6 +21,9 @@ namespace octet {
       if (buffer.size() >= 6 && !memcmp(&buffer[0], "GIF89a", 6)) {
         gif_decoder dec;
         return dec.get_texture(src, src_max);
+      } else if (buffer.size() >= 6 && buffer[0] == 0xff && buffer[1] == 0xd8) {
+        jpeg_decoder dec;
+        return dec.get_texture(src, src_max);
       } else if (buffer.size() >= 6 && buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 2) {
         tga_decoder dec;
         return dec.get_texture(src, src_max);

@@ -389,12 +389,12 @@ namespace octet {
         if (url_attr) {
           string new_path = doc_path;
           string url = url_attr;
-          int extension_pos = url.extension_pos();
+          /*int extension_pos = url.extension_pos();
           if (extension_pos != -1) {
             // at present we only accept gifs. Use image alchemy to convert files.
             url.truncate(extension_pos);
             url += ".gif";
-          }
+          }*/
           new_path += url;
           return resources::get_texture_handle(GL_RGBA, new_path);
         }

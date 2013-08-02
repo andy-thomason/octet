@@ -246,5 +246,17 @@ namespace octet {
     }
 
     static bool &sound_disabled() { static bool instance; return instance; }
+
   };
+
+  // platform specific intrinsics
+  static unsigned big_endian_load(const uint8_t *src) {
+    return _byteswap_ulong(*(unsigned*)src);
+    //__builtin_bswap32
+  }
+
+  static unsigned little_endian_load(const uint8_t *src) {
+    return *(unsigned*)src;
+    //__builtin_bswap32
+  }
 }
