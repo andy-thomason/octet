@@ -120,6 +120,7 @@ namespace octet {
     scene_node *get_scene_node(const char *id) { resource *res = get_resource(id); return res ? res->get_scene_node() : 0; }
     animation_target *get_animation_target(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_target() : 0; }
 
+    // find all resources of a certain type
     void find_all(dynarray<resource*> &result, atom_t type) {
       unsigned num_indices = dict.get_num_indices();
       for (unsigned i = 0; i != num_indices; ++i) {

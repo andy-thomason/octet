@@ -45,16 +45,43 @@ namespace octet {
 
       app_utils::log("http get from: %s\n", line0[1].c_str());
 
+      // /graph?operation=get_children&id=1
       dynarray<string> url;
-      url.reserve(16);
-      line0[1].split(url, "/");
-      if (url.size() < 2 || url[0] != "") return;
+      line0[1].split(url, "?");
+      if (url.size() < 2) return;
+
+      dynarray<string> ops;
+      url[1].split(ops, "&");
+      string id;
+      string callback;
+      bool get_children = false;
+      for (unsigned i = 0; i != ops.size(); ++i) {
+        dynarray<string> lhsrhs;
+        ops[i].split(lhsrhs, "=");
+        if (lhsrhs[0] == "operation") {
+          get_children = lhsrhs[1] == "get_children";
+        } else if (lhsrhs[0] == "id") {
+          id = lhsrhs[1];
+        } else if (lhsrhs[0] == "callback") {
+          callback = lhsrhs[1];
+        }
+        //app_utils::log("%s = %s\n", lhsrhs[0].c_str(), lhsrhs[1].c_str());
+      }
+
+      if (!get_children) return;
+
+      //dynarray<string> id_parts;
+      //id.split(id_parts, ".");
 
       dynarray<string> response;
       response.reserve(64);
-      int max_depth = url[url.size()-1] == "" ? url.size()-1 : url.size();
-      http_writer writer(1, max_depth, url, response);
+      int max_depth = 5;
+      http_writer writer(0, max_depth, response);
+      response.resize(response.size()+1);
+      response.back().format("%s([\n", callback.c_str());
       dict->visit(writer);
+      response.resize(response.size()+1);
+      response.back().format("])\n");
 
       // With HTTP 1.1 we can keep the connection open and respond to more
       // feeds without the overhead of a new connection.
@@ -66,7 +93,7 @@ namespace octet {
       string response_header;
       response_header.format(
         "HTTP/1.1 200 OK\n"
-        "Content-Type: text/plain; charset=UTF-8\n"
+        "Content-Type: application/json; charset=UTF-8\n"
         "Content-Length: %d\n"
         "\n",
         num_bytes
@@ -75,6 +102,7 @@ namespace octet {
       send(s.client_socket, response_header.c_str(), response_header.size(), 0);
 
       for (unsigned i = 0; i != response.size(); ++i) {
+        app_utils::log("send: %s", response[i].c_str());
         send(s.client_socket, response[i].c_str(), response[i].size(), 0);
       }
     }

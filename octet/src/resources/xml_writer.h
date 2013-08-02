@@ -67,16 +67,16 @@ namespace octet {
       stack.pop_back();
     }
 
-    bool begin_refs(atom_t sid, int number) {
+    bool begin_refs(atom_t sid, bool is_dict) {
       TiXmlElement *child = new TiXmlElement("refs");
       stack.back()->LinkEndChild(child);
       stack.push_back(child);
-      child->SetAttribute("count", number);
+      //child->SetAttribute("count", number);
       child->SetAttribute("sid", app_utils::get_atom_name(sid));
       return true;
     }
 
-    void end_refs() {
+    void end_refs(bool is_dict) {
       stack.pop_back();
     }
 

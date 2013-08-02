@@ -30,6 +30,7 @@ namespace octet {
     string(const char *value) { data_ = null_string(); *this = value; }
     string(const string& rhs) { data_ = null_string(); *this = rhs.c_str(); }
 
+
     ~string() { release(); }
 
     string &format(const char *fmt, ...) {
@@ -61,6 +62,8 @@ namespace octet {
       }
       return *this;
     }
+
+    string &operator=(const string& rhs) { data_ = null_string(); *this = rhs.c_str(); return *this; }
 
     string &set(const char *value, unsigned size) {
       release();

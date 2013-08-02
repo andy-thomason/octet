@@ -29,8 +29,8 @@ namespace octet {
     virtual void end_ref() = 0;
 
     // for arrays and dictionaries
-    virtual bool begin_refs(atom_t sid, int number) = 0;
-    virtual void end_refs() = 0;
+    virtual bool begin_refs(atom_t sid, bool is_dict) = 0;
+    virtual void end_refs(bool is_dict) = 0;
 
     // for "blobs" binary large objects
     virtual void visit_bin(void *value, size_t size, atom_t sid, atom_t type) = 0;
@@ -91,7 +91,7 @@ namespace octet {
 
     // arrays of references
     template <class type> void visit(dynarray<ref<type> > &value, atom_t sid) {
-      if (begin_refs(sid, value.size())) {
+      if (begin_refs(sid, false)) {
         for (int i = 0, nv = value.size(); i != nv; ++i) {
           if (value[i]) {
             if (begin_ref((type*)value[i], i, value[i]->get_type())) {
@@ -100,13 +100,13 @@ namespace octet {
             }
           }
         }
-        end_refs();
+        end_refs(false);
       }
     }
 
     // dictionaries of references
     template <class type> void visit(dictionary<ref<type> > &value, atom_t sid) {
-      if (begin_refs(sid, value.get_num_indices())) {
+      if (begin_refs(sid, true)) {
         for (unsigned i = 0, nv = value.get_num_indices(); i != nv; ++i) {
           const char *key = value.get_key(i);
           if (key) {
@@ -117,7 +117,7 @@ namespace octet {
             }
           }
         }
-        end_refs();
+        end_refs(true);
       }
     }
 
