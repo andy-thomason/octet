@@ -34,6 +34,20 @@ namespace octet {
     RESOURCE_META(camera_instance)
 
     camera_instance() {
+      is_ortho = 0;
+
+      // common to all cameras
+      nearVal = 0.1f;
+      farVal = 1000;
+
+      // perspective camera
+      xfov = 0;
+      yfov = 90;
+      aspect_ratio = 1;
+
+      // ortho camera
+      xmag = 1;
+      ymag = 1;
     }
 
     void visit(visitor &v) {
@@ -95,10 +109,10 @@ namespace octet {
         float xscale = 0.5f;
         float yscale = 0.5f;
         if (yfov) {
-          yscale = 1.0f / tanf(yfov * (3.14159f/180/2));
+          yscale = tanf(yfov * (3.14159f/180/2));
           xscale = yscale * aspect_ratio;
         } else if (xfov) {
-          xscale = 1.0f / tanf(xfov * (3.14159f/180/2));
+          xscale = tanf(xfov * (3.14159f/180/2));
           yscale = xscale / aspect_ratio;
         }
         cameraToProjection.frustum(-nearVal * xscale, nearVal * xscale, -nearVal * yscale, nearVal * yscale, nearVal, farVal);

@@ -129,7 +129,7 @@ namespace octet {
             vec3 half_direction = normalize(light_direction + vec3(0, 0, 1));
 
             float diffuse_factor = max(dot(light_direction, nnormal), 0.0);
-            float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess);
+            float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess) * diffuse_factor;
 
             diffuse_light += diffuse_factor * light_color;
             specular_light += specular_factor * light_color;
@@ -148,7 +148,6 @@ namespace octet {
             emission +
             vec4(specular_light, 1) * specular
           ;
-
           // how to debug your fragment shader: set gl_FragColor to the value you want to look at!
           //gl_FragColor = vec4(ambient_light, 1);
           //gl_FragColor = vec4(light_uniforms[2].xyz, 1);
