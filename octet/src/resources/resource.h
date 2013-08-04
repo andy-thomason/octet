@@ -12,6 +12,7 @@ namespace octet {
   class skeleton;
   class mesh;
   class material;
+  class image;
   class animation;
   class camera_instance;
   class light_instance;
@@ -63,6 +64,7 @@ namespace octet {
     virtual skeleton *get_skeleton() { return 0; }
     virtual mesh *get_mesh() { return 0; }
     virtual material *get_material() { return 0; }
+    virtual image *get_image() { return 0; }
     virtual animation *get_animation() { return 0; }
     virtual camera_instance *get_camera_instance() { return 0; }
     virtual light_instance *get_light_instance() { return 0; }

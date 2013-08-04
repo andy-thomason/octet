@@ -114,10 +114,10 @@ namespace octet {
 
         uniform vec4 light_uniforms[1+max_lights*4];
         uniform int num_lights;
-        uniform sampler2D samplers[5];
+        uniform sampler2D samplers[6];
       
         void main() {
-          float shininess = light_uniforms[0].w;
+          float shininess = texture2D(samplers[5], uv_).x * 255.0;
           vec3 bump = normalize(vec3(texture2D(samplers[4], uv_).xy-vec2(0.5, 0.5), 1));
           vec3 nnormal = normal_; //normalize(bump.x * tangent_ + bump.y * bitangent_ + bump.z * normal_);
           vec3 diffuse_light = vec3(0, 0, 0);
@@ -149,6 +149,8 @@ namespace octet {
             vec4(specular_light, 1) * specular
           ;
           // how to debug your fragment shader: set gl_FragColor to the value you want to look at!
+          //gl_FragColor = vec4(light_uniforms[3].xyz, 1);
+          //gl_FragColor = texture2D(samplers[5], uv_);
           //gl_FragColor = vec4(ambient_light, 1);
           //gl_FragColor = vec4(light_uniforms[2].xyz, 1);
           //gl_FragColor = vec4(diffuse_light, 1);
@@ -172,8 +174,8 @@ namespace octet {
       glUniform1i(num_lights_index, num_lights);
 
       // we use textures 0-3 for material properties.
-      static const GLint samplers[] = { 0, 1, 2, 3, 4 };
-      glUniform1iv(samplers_index, 5, samplers);
+      static const GLint samplers[] = { 0, 1, 2, 3, 4, 5 };
+      glUniform1iv(samplers_index, 6, samplers);
     }
 
     void render_skinned(const mat4t &cameraToProjection, const mat4t *modelToCamera, int num_matrices, const vec4 *light_uniforms, int num_light_uniforms, int num_lights) {

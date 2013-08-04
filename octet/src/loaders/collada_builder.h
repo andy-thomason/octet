@@ -357,7 +357,7 @@ namespace octet {
     }
 
     // get a texture or a solid colour
-    GLuint get_texture(TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const char *deflt) {
+    param *get_param(resources &dict, TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const vec4 &deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *color = child(section, "color");
       TiXmlElement *texture = child(section, "texture");
@@ -366,7 +366,9 @@ namespace octet {
         if (temp_floats.size() == 3) {
           temp_floats.push_back(1);
         }
-        if (temp_floats.size() >= 4) {
+        return new param(vec4(temp_floats[0], temp_floats[1], temp_floats[2], temp_floats[3]));
+
+        /*if (temp_floats.size() >= 4) {
           char name[16];
           sprintf(
             name, "#%02x%02x%02x%02x",
@@ -374,7 +376,7 @@ namespace octet {
             (int)(temp_floats[2]*255.0f+0.5f), (int)(temp_floats[3]*255.0f+0.5f)
           );
           return resources::get_texture_handle(GL_RGBA, name);
-        }
+        }*/
       } else if (texture) {
         // todo: handle multiple texcoords
         const char *texture_name = attr(texture, "texture");
@@ -384,35 +386,31 @@ namespace octet {
         TiXmlElement *surface = find_param(profile_COMMON, surface_name, "surface");
         TiXmlElement *init_from = child(surface, "init_from");
         const char *image_name = text(init_from);
-        TiXmlElement *image = find_id(image_name);
+        image *img = dict.get_image(image_name);
+        if (img) return new param(img);
+        /*TiXmlElement *image = find_id(image_name);
         const char *url_attr = text(child(image, "init_from"));
         if (url_attr) {
-          string new_path = doc_path;
-          string url = url_attr;
-          /*int extension_pos = url.extension_pos();
-          if (extension_pos != -1) {
-            // at present we only accept gifs. Use image alchemy to convert files.
-            url.truncate(extension_pos);
-            url += ".gif";
-          }*/
-          new_path += url;
+          string new_path;
+          new_path.format("%s%s", doc_path.c_str(), url_attr);
           return resources::get_texture_handle(GL_RGBA, new_path);
-        }
+        }*/
       }
-      return resources::get_texture_handle(GL_RGBA, deflt);
+      //return resources::get_texture_handle(GL_RGBA, deflt);
+      return new param(deflt);
     }
 
     // get a floating point number (or the default)
-    float get_float(TiXmlElement *shader, const char *value, float deflt) {
+    param *get_float(TiXmlElement *shader, const char *value, float deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *float_ = child(section, "float");
       if (float_) {
         atofv(temp_floats, float_->GetText());
         if (temp_floats.size() >= 1) {
-          return temp_floats[0];
+          return new param(vec4(temp_floats[0], 0, 0, 0));
         }
       }
-      return deflt;
+      return new param(vec4(deflt, 0, 0, 0));
     }
 
     // add all the materials from the collada file to the resources collection
@@ -439,14 +437,14 @@ namespace octet {
         TiXmlElement *shader = phong ? phong : blinn ? blinn : lambert;
         if (shader) {
           url += url[0] == '#';
-          GLuint emission = get_texture(shader, profile_COMMON, "emission", "#00000000");
-          GLuint ambient = get_texture(shader, profile_COMMON, "ambient", "#808080ff");
-          GLuint diffuse = get_texture(shader, profile_COMMON, "diffuse", "#808080ff");
-          GLuint specular = get_texture(shader, profile_COMMON, "specular", "#00000000");
-          GLuint bump = get_texture(shader, profile_COMMON, "bump", "#808080ff");
-          float shininess = get_float(shader, "shininess", 0);
+          param *emission = get_param(dict, shader, profile_COMMON, "emission", vec4(0, 0, 0, 0));
+          param *ambient = get_param(dict, shader, profile_COMMON, "ambient", vec4(0, 0, 0, 1));
+          param *diffuse = get_param(dict, shader, profile_COMMON, "diffuse", vec4(0.5f, 0.5f, 0.5f, 0));
+          param *specular = get_param(dict, shader, profile_COMMON, "specular", vec4(0, 0, 0, 0));
+          param *bump = get_param(dict, shader, profile_COMMON, "bump", vec4(0.5f, 0.5f, 1.0f, 0));
+          param *shininess = get_float(shader, "shininess", 0);
           // this is not strictly correct, but fixes some issues
-          if (shininess < 1) shininess *= 100;
+          if (shininess->get_color().x() >= 1) shininess->set_color(vec4(shininess->get_color() * 0.01f));
           material *mat = new material();
           mat->init(diffuse, ambient, emission, specular, bump, shininess);
           dict.set_resource(attr(mat_elem, "id"), mat);
@@ -724,23 +722,15 @@ namespace octet {
       TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_images");
       if (!lib_anim) return;
 
-      /*for (TiXmlElement *elem = child(lib_anim, "image"); elem != NULL; elem = sibling(elem, "image")) {
-        texture *tex = new texture();
-        dict.set_resource(attr(elem, "id"), tex);
+      for (TiXmlElement *elem = child(lib_anim, "image"); elem != NULL; elem = sibling(elem, "image")) {
         const char *url_attr = text(child(elem, "init_from"));
         if (url_attr) {
-          string new_path = doc_path;
-          string url = url_attr;
-          int extension_pos = url.extension_pos();
-          if (extension_pos != -1) {
-            // at present we only accept gifs. Use image alchemy to convert files.
-            url.truncate(extension_pos);
-            url += ".gif";
-          }
-          new_path += url;
-          GLuint handle = resources::get_texture_handle(GL_RGBA, new_path);
+          string new_path;
+          new_path.format("%s%s", doc_path.c_str(), url_attr);
+          image *img = new image(new_path);
+          dict.set_resource(attr(elem, "id"), img);
         }
-      }*/
+      }
     }
 
     // add <library_animations> to the scene
@@ -1098,7 +1088,7 @@ namespace octet {
         //printf("%f %f %f\n", max[0], max[1], max[2]);
         vec4 vmin(min[0], min[1], min[2], 0);
         vec4 vmax(max[0], max[1], max[2], 0);
-        mesh->set_aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f);
+        mesh->set_aabb(aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f));
       }
 
       mesh->allocate(vsize, isize, true);
@@ -1230,6 +1220,7 @@ namespace octet {
       doc_path = url;
       doc_path.truncate(doc_path.filename_pos());
       doc.LoadFile(app_utils::get_path(url));
+
       TiXmlElement *top = doc.RootElement();
       if (!top || strcmp(top->Value(), "COLLADA")) {
         printf("warning: not a collada file");

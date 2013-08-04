@@ -63,13 +63,24 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
   #include "windows_specific.h"
   //#include "glut_specific.h"
 #elif defined(__APPLE__)
+  #define OCTET_HOT __attribute__( ( always_inline ) )
   #include "glut_specific.h"
 #endif
 
 // use "" to include from our own project
-#include "../math/vector.h"
-#include "../math/matrix.h"
+#include "../math/vec4.h"
+#include "../math/ivec4.h"
+#include "../math/bvec4.h"
+#include "../math/quat.h"
+#include "../math/aabb.h"
+#include "../math/mat4t.h"
 #include "../math/random.h"
+
+// loaders (low dependency, so you can use them in other projects)
+#include "../loaders/gif_decoder.h"
+#include "../loaders/jpeg_decoder.h"
+#include "../loaders/tga_decoder.h"
+#include "../loaders/dds_decoder.h"
 
 // resources
 #include "../resources/app_utils.h"
@@ -95,6 +106,8 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../scene/skeleton.h"
 #include "../scene/animation.h"
 #include "../scene/mesh.h"
+#include "../scene/image.h"
+#include "../scene/param.h"
 #include "../scene/material.h"
 #include "../scene/camera_instance.h"
 #include "../scene/light_instance.h"
@@ -108,9 +121,6 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../helpers/text_overlay.h"
 
 // asset loaders
-#include "../loaders/gif_decoder.h"
-#include "../loaders/jpeg_decoder.h"
-#include "../loaders/tga_decoder.h"
 #include "../loaders/collada_builder.h"
 
 // forward references

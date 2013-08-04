@@ -7,10 +7,11 @@
 // Microsoft Windows specific information
 
 // windows.h contains all the windows-specific definitions such as CreateWindow
+
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
-#include <windows.h>
-//#include <mmsystem.h>
+
+#include <ShellAPI.h> // for DragAcceptFiles etc.
 
 // undo unwanted definitions that Microsoft make in windows.h
 #undef min // Yes, Microsoft really define min!
@@ -54,6 +55,12 @@
 
 // include cross platform app helpers, such as texture loaders
 #include "app_common.h"
+
+// Put this *only* on hot functions
+// the less you use it the better as large functions pollute icache
+// __forceinline causes functions to always inline, eliminating the call overhead.
+// A limited number uses per program is recommended.
+#define OCTET_HOT __forceinline
 
 namespace octet {
   // this is the class that all apps are derived from.
@@ -124,6 +131,9 @@ namespace octet {
       );
 
       map()[window_handle] = this;
+
+      // enable drag and drop of files
+      DragAcceptFiles(window_handle, TRUE);
 
       init_gl_context(GetDC(window_handle));
 
@@ -207,6 +217,17 @@ namespace octet {
       }
     }
 
+    static void handle_file_drop(app *app, HDROP drop) {
+      dynarray<string> &queue = app->access_load_queue();
+      unsigned num_files = DragQueryFileW(drop, 0xFFFFFFFF, 0, 0);
+      for (unsigned i = 0; i != num_files; ++i) {
+        TCHAR utf16_filename[MAX_PATH];
+        DragQueryFileW(drop, i, utf16_filename, sizeof(utf16_filename));
+        queue.push_back(utf16_filename);
+      }
+      DragFinish(drop);
+    }
+
     static void run_all_apps() {
       map_t &m = map();
       MSG msg;     
@@ -220,12 +241,16 @@ namespace octet {
               app->set_key(app::translate(msg.wParam), msg.message == WM_KEYDOWN);
             } else if (msg.message == WM_MOUSEMOVE) {
               app->set_mouse_pos(msg.lParam & 0xffff, msg.lParam >> 16);
+            } else if (msg.message == WM_MOUSEWHEEL) {
+              app->set_mouse_wheel(app->get_mouse_wheel() + (int)msg.wParam);
             } else if (msg.message == WM_LBUTTONDOWN || msg.message == WM_LBUTTONUP) {
               app->set_key(key_lmb, msg.message == WM_LBUTTONDOWN);
             } else if (msg.message == WM_MBUTTONDOWN || msg.message == WM_MBUTTONUP) {
               app->set_key(key_mmb, msg.message == WM_MBUTTONDOWN);
             } else if (msg.message == WM_RBUTTONDOWN || msg.message == WM_RBUTTONUP) {
               app->set_key(key_mmb, msg.message == WM_RBUTTONDOWN);
+            } else if (msg.message == WM_DROPFILES) {
+              handle_file_drop(app, (HDROP)msg.wParam);
             }
           }
           DispatchMessage (&msg);
@@ -249,14 +274,18 @@ namespace octet {
 
   };
 
+  //////////////////////////////////////
+  //
   // platform specific intrinsics
-  static unsigned big_endian_load(const uint8_t *src) {
+  //
+
+  // big endian unaligned load
+  static unsigned uint32_be(const uint8_t *src) {
     return _byteswap_ulong(*(unsigned*)src);
-    //__builtin_bswap32
   }
 
-  static unsigned little_endian_load(const uint8_t *src) {
+  // little endian unaligned load
+  static unsigned uint32_le(const uint8_t *src) {
     return *(unsigned*)src;
-    //__builtin_bswap32
   }
 }

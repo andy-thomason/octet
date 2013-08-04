@@ -41,30 +41,9 @@ class animation_app : public octet::app {
   // helper for debugging by web browser
   octet::http_server server;
 
-public:
-  // this is called when we construct the class
-  animation_app(int argc, char **argv) : app(argc, argv), ball() {
-  }
 
-  // this is called once OpenGL is initialized
-  void app_init() {
-    // set up the shaders
-    object_shader.init(false);
-    skin_shader.init(true);
-
+  void load_file(const char *filename) {
     octet::collada_builder builder;
-    const char *filename = 0;
-
-    int selector = 0;
-    switch (selector) {
-      case 0: filename = "assets/duck_triangulate.dae"; break;
-      case 1: filename = "assets/skinning/skin_unrot.dae"; break;
-      case 2: filename = "assets/jenga.dae"; break;
-      case 3: filename = "assets/duck_ambient.dae"; break;
-      case 4: filename = "assets/Laurana50k.dae"; break;
-      case 5: filename = "external/Arteria3d/ElvenMale/ElevenMaleKnight_blender.dae"; break;
-    }
-
     if (!builder.load_xml(filename)) {
       return;
     }
@@ -99,6 +78,33 @@ public:
       mat4t cameraToWorld = node->get_nodeToParent();
       ball.init(this, cameraToWorld.w().length(), 360.0f);
     }
+  }
+public:
+  // this is called when we construct the class
+  animation_app(int argc, char **argv) : app(argc, argv), ball() {
+  }
+
+  // this is called once OpenGL is initialized
+  void app_init() {
+    // set up the shaders
+    object_shader.init(false);
+    skin_shader.init(true);
+
+    const char *filename = 0;
+
+    int selector = 6;
+    switch (selector) {
+      case 0: filename = "assets/duck_triangulate.dae"; break;
+      case 1: filename = "assets/skinning/skin_unrot.dae"; break;
+      case 2: filename = "assets/jenga.dae"; break;
+      case 3: filename = "assets/duck_ambient.dae"; break;
+      case 4: filename = "assets/Laurana50k.dae"; break;
+      case 5: filename = "external/Arteria3d/ElvenMale/ElevenMaleKnight_blender.dae"; break;
+      case 6: filename = "external/Arteria3d/arteria3d_tropicalpack/flowers/flower%202.dae"; break;
+    }
+
+    load_file(filename);
+
 
     overlay.init();
     server.init(&dict);
@@ -116,8 +122,23 @@ public:
     // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
     glEnable(GL_DEPTH_TEST);
 
+    // allow alpha blend (transparency when alpha channel is 0)
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // poll web server
     server.update();
+
+    // drag and drop file loading
+    octet::dynarray<octet::string> &queue = access_load_queue();
+    if (queue.size()) {
+      // replace scene
+      dict.reset();
+      octet::string url;
+      url.urlencode(queue[0]);
+      load_file(url);
+      queue.resize(0);
+    }
 
     if (app_scene && app_scene->num_camera_instances()) {
       int vx = 0, vy = 0;

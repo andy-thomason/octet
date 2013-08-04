@@ -28,8 +28,7 @@ namespace octet {
     // optional skin
     ref<skin> skin_;
     
-    vec4 aabb_centre;
-    vec4 aabb_half_extent;
+    aabb mesh_aabb;
 
     mesh(mesh &rhs);
 
@@ -52,8 +51,7 @@ namespace octet {
       v.visit(normalized, atom_normalized);
       v.visit(num_slots, atom_num_slots);
       v.visit(skin_, atom_skin_);
-      v.visit(aabb_centre, atom_aabb_centre);
-      v.visit(aabb_half_extent, atom_aabb_half_extent);
+      //v.visit(mesh_aabb, atom_aabb_centre);
     }
 
     ~mesh() {
@@ -159,15 +157,13 @@ namespace octet {
     }
     
     // set the axis aligned bounding box of the untransformed mesh
-    void set_aabb(const vec4 &centre, const vec4 &half_extent) {
-      aabb_centre = centre;
-      aabb_half_extent = half_extent;
+    void set_aabb(const aabb &value) {
+      mesh_aabb = value;
     }
 
     // get the axis aligned bounding box of the untransformed mesh
-    void get_aabb(vec4 &centre, vec4 &half_extent) {
-      centre = aabb_centre;
-      half_extent = aabb_half_extent;
+    aabb get_aabb() {
+      return mesh_aabb;
     }
 
     // return true if this mesh has a particular attribute

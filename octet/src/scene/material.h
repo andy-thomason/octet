@@ -14,26 +14,27 @@
 namespace octet {
   class material : public resource {
     // material
-    GLuint diffuse;
-    GLuint ambient;
-    GLuint emission;
-    GLuint specular;
-    GLuint bump;
-
-    float shininess;
+    ref<param> diffuse;
+    ref<param> ambient;
+    ref<param> emission;
+    ref<param> specular;
+    ref<param> bump;
+    ref<param> shininess;
 
     void bind_textures() const {
       // set textures 0, 1, 2, 3 to their respective values
       glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, diffuse);
+      glBindTexture(GL_TEXTURE_2D, diffuse->get_gl_texture());
       glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_2D, ambient);
+      glBindTexture(GL_TEXTURE_2D, ambient->get_gl_texture());
       glActiveTexture(GL_TEXTURE2);
-      glBindTexture(GL_TEXTURE_2D, emission);
+      glBindTexture(GL_TEXTURE_2D, emission->get_gl_texture());
       glActiveTexture(GL_TEXTURE3);
-      glBindTexture(GL_TEXTURE_2D, specular);
+      glBindTexture(GL_TEXTURE_2D, specular->get_gl_texture());
       glActiveTexture(GL_TEXTURE4);
-      glBindTexture(GL_TEXTURE_2D, bump);
+      glBindTexture(GL_TEXTURE_2D, bump->get_gl_texture());
+      glActiveTexture(GL_TEXTURE5);
+      glBindTexture(GL_TEXTURE_2D, shininess->get_gl_texture());
       glActiveTexture(GL_TEXTURE0);
     }
 
@@ -50,11 +51,12 @@ namespace octet {
       shininess = 0;
     }
 
+    // don't use this too much, it creates a new image every time.
     material(const char *texture) {
-      specular = diffuse = ambient = resources::get_texture_handle(GL_RGBA, "#00000000");
-      emission = resources::get_texture_handle(GL_RGBA, texture);
-      bump = resources::get_texture_handle(GL_RGBA, "#8080ff00");
-      shininess = 30.0f;
+      specular = diffuse = ambient = new param(new image(texture));
+      emission = new param(vec4(0, 0, 0, 0));
+      bump = new param(vec4(0, 0, 0, 0));
+      shininess = new param(vec4(30.0f/255, 0, 0, 0));
     }
 
     void visit(visitor &v) {
@@ -63,11 +65,10 @@ namespace octet {
       v.visit(emission, atom_emission);
       v.visit(specular, atom_specular);
       v.visit(bump, atom_bump);
-
       v.visit(shininess, atom_shininess);
     }
 
-    void init(GLuint diffuse, GLuint ambient, GLuint emission, GLuint specular, GLuint bump, float shininess) {
+    void init(param *diffuse, param *ambient, param *emission, param *specular, param *bump, param *shininess) {
       this->diffuse = diffuse;
       this->ambient = ambient;
       this->emission = emission;
@@ -78,13 +79,11 @@ namespace octet {
 
     // make a solid color with a specular highlight
     void make_color(const vec4 &color, bool bumpy, bool shiny) {
-      char name[16];
-      sprintf(name, "#%02x%02x%02x%02x", (int)(color[0]*255.0f+0.5f), (int)(color[1]*255.0f+0.5f), (int)(color[2]*255.0f+0.5f), (int)(color[3]*255.0f+0.5f));
-      diffuse = ambient = resources::get_texture_handle(GL_RGBA, name);
-      emission = resources::get_texture_handle(GL_RGBA, "#00000000");
-      specular = resources::get_texture_handle(GL_RGBA, shiny ? "#80808000" : "#00000000");
-      bump = resources::get_texture_handle(GL_RGBA, bumpy ? "!bump" : "#8080ff00");
-      shininess = 30.0f;
+      diffuse = ambient = new param(color);
+      emission = new param(vec4(0, 0, 0, 0));
+      specular = shiny ? new param(vec4(1, 1, 1, 0)) : new param(vec4(0, 0, 0, 0));
+      bump = bumpy ? new param(new image("!bump")) : new param(vec4(0.5f, 0.5f, 1, 0));
+      shininess = new param(vec4(30.0f/255, 0, 0, 0));
     }
 
     void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, vec4 *light_uniforms, int num_light_uniforms, int num_lights) const {
@@ -96,8 +95,6 @@ namespace octet {
       shader.render_skinned(cameraToProjection, modelToCamera, num_nodes, light_uniforms, num_light_uniforms, num_lights);
       bind_textures();
     }
-
-    //void render(bump_shader &shader, const mat4t &modelToProjection, const mat4t &modelToCamera, const vec4 &light_direction, vec4 &light_ambient, vec4 &light_diffuse, vec4 &light_specular);
   };
 }
 

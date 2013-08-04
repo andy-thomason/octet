@@ -42,13 +42,13 @@ namespace octet {
     }
   public:
     // get an opengl texture from a file in memory
-    GLuint get_texture(const unsigned char *src, const unsigned char *src_max) {
+    void get_image(dynarray<uint8_t> &full_image, uint32_t &num_components, uint32_t &width, uint32_t &height, const uint8_t *src, const uint8_t *src_max) {
       // convert the data
       TgaHeader *header = (TgaHeader*)src;
       const uint8_t *data = (uint8_t *)src + sizeof(TgaHeader);
     
-      int width = le2(header->width);
-      int height = le2(header->height);
+      width = le2(header->width);
+      height = le2(header->height);
 
       // make sure this is the GIMP flavour  
       assert(header->identsize == 0);
@@ -57,16 +57,16 @@ namespace octet {
       //assert(header->descriptor == 0);
       assert(header->bits == 32 || header->bits == 24);
     
-      int bytes = header->bits / 8;
+      num_components = header->bits / 8;
       dynarray<unsigned char> buffer;
       buffer.resize(width * height * 4);
       uint8_t *dest = &buffer[0];
 
-      if (bytes == 4) {
+      if (num_components == 4) {
         // swap red and blue!
         for (int y = 0; y != height; ++y)
         {
-          const uint8_t *src = data + y * width * bytes;
+          const uint8_t *src = data + y * width * num_components;
           for (int x = 0; x != width; ++x)
           {
             uint8_t alpha = src[ x*4 + 3 ];
@@ -80,11 +80,10 @@ namespace octet {
             dest += 4;
           }
         }
-        return app_utils::make_texture(GL_RGBA, buffer, width, height);
       } else {
         for (int y = 0; y != height; ++y)
         {
-          const uint8_t *src = data + y * width * bytes;
+          const uint8_t *src = data + y * width * num_components;
           for (int x = 0; x != width; ++x)
           {
             uint8_t red = src[ x*3 + 2 ];
@@ -97,7 +96,6 @@ namespace octet {
             dest += 4;
           }
         }
-        return app_utils::make_texture(GL_RGB, buffer, width, height);
       }
     }
   };

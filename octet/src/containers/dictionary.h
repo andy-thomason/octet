@@ -67,15 +67,32 @@ namespace octet {
       }
       allocator_t::free(old_entries, sizeof(entry_t) * old_max_entries);
     }
-  public:
-    // make a new dictionary
-    dictionary() {
+
+    void release() {
+      for (unsigned i = 0; i != max_entries; ++i) {
+        entry_t *entry = &entries[i];
+        if (entry->key ) {
+          allocator_t::free((void*)entry->key, strlen(entry->key)+1);
+        }
+      }
+      allocator_t::free(entries, sizeof(entry_t) * max_entries);
+      entries = 0;
+      num_entries = 0;
+      max_entries = 0;
+    }
+
+    void init() {
       num_entries = 0;
       max_entries = 4;
       entries = (entry_t*)allocator_t::malloc(sizeof(entry_t) * max_entries);
       memset(entries, 0, sizeof(entry_t) * max_entries);
     }
-  
+  public:
+    // make a new dictionary
+    dictionary() {
+      init();
+    }
+
     // index the dictionary
     value_t &operator[]( const char *key ) {
       unsigned hash = calc_hash( key );
@@ -119,18 +136,15 @@ namespace octet {
       return entries[index].value;
     }
 
+    // free up the resources
+    void reset() {
+      release();
+      init();
+    }
+  
     // bye bye dictionary. Use the allocator to free up memory.
     ~dictionary() {
-      for (unsigned i = 0; i != max_entries; ++i) {
-        entry_t *entry = &entries[i];
-        if (entry->key ) {
-          allocator_t::free((void*)entry->key, strlen(entry->key)+1);
-        }
-      }
-      allocator_t::free(entries, sizeof(entry_t) * max_entries);
-      entries = 0;
-      num_entries = 0;
-      max_entries = 0;
+      reset();
     }
   };
 }

@@ -71,8 +71,12 @@ namespace octet {
     unsigned char keys[256];
     int mouse_x;
     int mouse_y;
+    int mouse_wheel;
     int viewport_x;
     int viewport_y;
+
+    // queue of files to load
+    dynarray<string> load_queue;
 
   public:
     app_common() {
@@ -94,9 +98,17 @@ namespace octet {
       y = mouse_y;
     }
 
+    int get_mouse_wheel() {
+      return mouse_wheel;
+    }
+
     void get_viewport_size(int &x, int &y) {
       x = viewport_x;
       y = viewport_y;
+    }
+
+    dynarray<string> &access_load_queue() {
+      return load_queue;
     }
 
     // used by the platform to set a key
@@ -104,10 +116,15 @@ namespace octet {
       keys[key & 0xff] = is_down ? 1 : 0;
     }
 
-    // used by the platform to set a key
+    // used by the platform to set mouse positions
     void set_mouse_pos(int x, int y) {
       mouse_x = x;
       mouse_y = y;
+    }
+
+    // used by the platform to set mouse wheel clicks
+    void set_mouse_wheel(int z) {
+      mouse_wheel = z;
     }
 
     void set_viewport_size(int x, int y) {

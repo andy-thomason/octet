@@ -101,6 +101,8 @@ namespace octet {
     // create an empty scene
     scene() {
       frame_number = 0;
+      num_light_uniforms = 0;
+      num_lights = 0;
     }
 
     void visit(visitor &v) {
@@ -111,15 +113,23 @@ namespace octet {
       v.visit(light_instances, atom_light_instances);
     }
 
+    static float max(float x, float y) {
+      return x > y ? x : y;
+    }
+
+    // scene often arrive with no camera of lights
     void create_default_camera_and_lights() {
       // default camera_instance
       if (camera_instances.size() == 0) {
+        aabb bb = get_world_aabb();
         scene_node *node = add_scene_node();
         camera_instance *cam = new camera_instance();
-        node->access_nodeToParent().translate(0, 0, 100);
-        float n = 0.1f, f = 5000.0f;
+        float bb_size = length(bb.get_half_extent()) * 2.0f;
+        float distance = max(bb.get_max().z(), bb_size) * 2;
+        node->access_nodeToParent().translate(0, 0, distance);
+        float f = distance * 2, n = f * 0.001f;
         cam->set_node(node);
-        cam->set_perspective(1, 1, 1, n, f);
+        cam->set_perspective(0, 45, 1, n, f);
         camera_instances.push_back(cam);
       }
 
@@ -130,7 +140,7 @@ namespace octet {
         node->access_nodeToParent().translate(100, 100, 100);
         node->access_nodeToParent().rotateX(45);
         node->access_nodeToParent().rotateY(45);
-        float n = 0.1f, f = 5000.0f;
+        li->set_color(vec4(1, 1, 1, 1));
         li->set_kind(atom_directional);
         li->set_node(node);
         light_instances.push_back(li);
@@ -229,11 +239,33 @@ namespace octet {
     // find a mesh instance for a node
     mesh_instance *get_first_mesh_instance(scene_node *node) {
       for (int i = 0; i != mesh_instances.size(); ++i) {
-        if (mesh_instances[i]->get_node() == node) {
-          return mesh_instances[i];
+        mesh_instance *mi = mesh_instances[i];
+        if (mi && mi->get_node() == node) {
+          return mi;
         }
       }
       return NULL;
+    }
+
+    // get the approximate size of the scene, not including lights or cameras
+    aabb get_world_aabb() {
+      aabb world_aabb;
+      bool first = true;
+      for (int i = 0; i != mesh_instances.size(); ++i) {
+        mesh_instance *mi = mesh_instances[i];
+        if (mi && mi->get_node()) {
+          mat4t nodeToWorld = mi->get_node()->calcModelToWorld();
+          aabb bb = mi->get_mesh()->get_aabb();
+          bb = bb.get_transform(nodeToWorld);
+          if (first) {
+            world_aabb = bb;
+            first = false;
+          } else {
+            world_aabb = world_aabb.get_union(bb);
+          }
+        }
+      }
+      return world_aabb;
     }
   };
 }

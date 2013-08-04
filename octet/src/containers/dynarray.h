@@ -26,6 +26,10 @@ namespace octet {
     int_size_t capacity_;
     enum { min_capacity = 8 };
 
+    dynarray(const dynarray &rhs) {
+      // you can't do this at the moment!
+    }
+
   public:
     dynarray() {
       data_ = 0;

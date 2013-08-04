@@ -65,6 +65,10 @@ namespace octet {
       v.visit(dict, atom_dict);
     }
 
+    void reset() {
+      dict.reset();
+    }
+
     bool has_resource(const char *name) {
       return dict.contains(name);
     }
@@ -111,6 +115,7 @@ namespace octet {
     skeleton *get_skeleton(const char *id) { resource *res = get_resource(id); return res ? res->get_skeleton() : 0; }
     mesh *get_mesh(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh() : 0; }
     material *get_material(const char *id) { resource *res = get_resource(id); return res ? res->get_material() : 0; }
+    image *get_image(const char *id) { resource *res = get_resource(id); return res ? res->get_image() : 0; }
     animation *get_animation(const char *id) { resource *res = get_resource(id); return res ? res->get_animation() : 0; }
     camera_instance *get_camera_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_camera_instance() : 0; }
     light_instance *get_light_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_light_instance() : 0; }

@@ -69,12 +69,6 @@
     <ClInclude Include="..\src\shaders\texture_shader.h">
       <Filter>shaders</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\math\matrix.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\math\vector.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\platform\platform.h">
       <Filter>platform</Filter>
     </ClInclude>
@@ -230,6 +224,36 @@
     </ClInclude>
     <ClInclude Include="..\src\containers\string.h">
       <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\image.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\param.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resources\atoms.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\aabb.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\quat.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\ivec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\bvec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\vec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\math\mat4t.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\loaders\dds_decoder.h">
+      <Filter>loaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

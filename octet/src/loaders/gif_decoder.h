@@ -9,21 +9,21 @@
 // 
 namespace octet {
   class gif_decoder {
-    unsigned short lzw_head[0x1001];
-    unsigned char lzw_tail[0x1001];
+    uint16_t lzw_head[0x1001];
+    uint8_t lzw_tail[0x1001];
     enum { debug_gif = 0 };
 
     // add a lzw string for a specific code.
     // all strings consist of a head and a single byte tail.
     // we follow the chains to get the whole string.
-    unsigned char add_lwz_string(unsigned code, unsigned char *&bytes, unsigned char *max_bytes, unsigned reset_code) {
+    uint8_t add_lwz_string(unsigned code, uint8_t *&bytes, uint8_t *max_bytes, unsigned reset_code) {
       unsigned i = code;
       unsigned num_bytes = 1;
       for (; i > reset_code; i = lzw_head[i]) {
         num_bytes++;
       }
 
-      unsigned char *dest = bytes += num_bytes;
+      uint8_t *dest = bytes += num_bytes;
       if (bytes > max_bytes) return 0;
       i = code;
       for (; i > reset_code; i = lzw_head[i]) {
@@ -40,8 +40,8 @@ namespace octet {
     }
 
     // decode image data from a gif file as a lzw coding of palette values
-    bool gif_decode_bytes(unsigned char *bytes, unsigned char *max_bytes, int min_lzw_size, const unsigned char *&srcref) {
-      const unsigned char *src = srcref;
+    bool gif_decode_bytes(uint8_t *bytes, uint8_t *max_bytes, int min_lzw_size, const uint8_t *&srcref) {
+      const uint8_t *src = srcref;
       unsigned lzw_size = min_lzw_size + 1;
       unsigned reset_code = ( 1 << min_lzw_size );
       unsigned mask = reset_code * 2 - 1;
@@ -81,7 +81,7 @@ namespace octet {
                 return true;
               }
 
-              unsigned char tail = 0;
+              uint8_t tail = 0;
               if (code == cur_code) {
                 *bytes++ = tail = add_lwz_string(prev_code, bytes, max_bytes-1, reset_code);
                 if (debug_gif) printf("out %02x\n", tail);
@@ -116,18 +116,18 @@ namespace octet {
 
   public:
     // get an opengl texture from a file in memory
-    GLuint get_texture(const unsigned char *src, const unsigned char *src_max) {
-      unsigned width = src[6] + src[7]*256;
-      unsigned height = src[8] + src[9]*256;
+    void get_image(dynarray<uint8_t> &full_image, uint32_t &num_components, uint32_t &width, uint32_t &height, const uint8_t *src, const uint8_t *src_max) {
+      width = src[6] + src[7]*256;
+      height = src[8] + src[9]*256;
       unsigned flags = src[10];
       unsigned gct_size = flags & 0x80 ? 1 << ((flags & 7)+1) : 0;
-      dynarray<unsigned char> texture(width*height*4);
       //unsigned background = src[11];
       //unsigned aspect = src[12];
       unsigned transparency_index = 0x100; // disable transparency
-      memset(texture.data(), 0xff, width*height*4);
+      full_image.resize(width * height * 4);
+      memset(full_image.data(), 0xff, width*height*4);
       src += 13;
-      const unsigned char *gct = src;
+      const uint8_t *gct = src;
       src += gct_size * 3;
       while (src < src_max) {
         unsigned code = *src++;
@@ -166,11 +166,11 @@ namespace octet {
           unsigned flags = src[8];
           unsigned lct_size = ( flags & 0x80 ) ? 1 << ((flags & 7)+1) : 0;
           src += 9;
-          const unsigned char *color_table = ( flags & 0x80 ) ? src : gct;
+          const uint8_t *color_table = ( flags & 0x80 ) ? src : gct;
           src += lct_size * 3;
           unsigned min_lzw_size = *src++;
 
-          dynarray<unsigned char> bytes(lwidth*lheight);
+          dynarray<uint8_t> bytes(lwidth*lheight);
           bool error = 
             left + lwidth > width ||
             top + lheight > height ||
@@ -180,9 +180,9 @@ namespace octet {
             printf("warning: gif_decode_bytes - broken gif file\n");
             goto fail;
           } else {
-            unsigned char *src = &bytes[0];
+            uint8_t *src = &bytes[0];
             for (unsigned j = 0; j != lheight; ++j) {
-              unsigned char *dest = &texture[((height - 1 - j - top) * width + left) * 4];
+              uint8_t *dest = &full_image[((height - 1 - j - top) * width + left) * 4];
               for (unsigned i = 0; i != lwidth; ++i) {
                 unsigned idx = *src++;
                 dest[0] = color_table[idx*3+0];
@@ -199,7 +199,7 @@ namespace octet {
         }
       }
     fail:;
-      return app_utils::make_texture(transparency_index == 0x100 ? GL_RGB : GL_RGBA, texture, width, height);
+      num_components = transparency_index == 0x100 ? 3 : 4;
     }
   };
 }

@@ -32,13 +32,21 @@ namespace octet {
       buffer[(y*size+x)*4+3] = a;
     }
   
+    // turn a url into a file path
     static const char *get_path(const char *url) {
-      static dynarray<char> path;
-      path.resize((unsigned)(strlen(prefix()) + strlen(url) + 1));
-      char *dest = &path[0];
-      strcpy(dest, prefix());
-      strcat(dest, url);
-      return dest;
+      if (url == NULL) return "";
+
+      string url_str;
+      url_str.urldecode(url);
+      static string path;
+
+      if (url[0] == '/' || url[0] >= 'A' && url[0] <= 'Z' && url[1] == ':') {
+        path = url_str;
+      } else {
+        // relative path
+        path.format("%s%s", prefix(), url_str.c_str());
+      }
+      return path;
     }
 
     static void get_url(dynarray<unsigned char> &buffer, const char *url) {
