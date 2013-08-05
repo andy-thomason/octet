@@ -18,7 +18,7 @@ namespace octet {
   class app_utils {
   public:
     static const char *prefix(const char *new_prefix=NULL) {
-      static const char *value = "../";
+      static const char *value = "../../";
       if (new_prefix) {
         value = new_prefix;
       }
@@ -40,7 +40,7 @@ namespace octet {
       url_str.urldecode(url);
       static string path;
 
-      if (url[0] == '/' || url[0] >= 'A' && url[0] <= 'Z' && url[1] == ':') {
+      if (url[0] == '/' || (url[0] >= 'A' && url[0] <= 'Z' && url[1] == ':')) {
         path = url_str;
       } else {
         // relative path

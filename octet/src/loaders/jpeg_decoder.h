@@ -475,7 +475,7 @@ namespace octet {
             }
           }
           skip_bits(shift, acc, src, shift);
-          length = src - src0;
+          length = (unsigned)(src - src0);
         } break;
 
         // quantisation tables (the lossy bit)

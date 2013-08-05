@@ -26,7 +26,7 @@ namespace octet {
     dynarray<char> buf;
 
     void set_non_blocking(int socket) {
-      u_long mode = 1;
+      unsigned long mode = 1;
       ioctlsocket(socket, FIONBIO, &mode);
     }
 
@@ -149,7 +149,7 @@ namespace octet {
       // poll the sessions
       for (unsigned i = 0; i < sessions.size(); ++i) {
         session &s = sessions[i];
-        int bytes = recv(s.client_socket, &buf[0], buf.size()-1, 0);
+        int bytes = (int)recv(s.client_socket, &buf[0], (size_t)buf.size()-1, 0);
         if (bytes > 0) {
           app_utils::log("http: recieved from %d\n", s.client_socket);
           buf[bytes] = 0;

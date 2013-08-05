@@ -10,7 +10,7 @@
 //
 
 #include "../../platform/platform.h"
-#include "animation_app.h"
+#include "engine.h"
 
 //
 // a C++ program starts here with the command line arguments in argv[]

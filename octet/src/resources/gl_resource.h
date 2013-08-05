@@ -25,7 +25,7 @@ namespace octet {
       v.visit(target, atom_target);
     }
 
-    void allocate(GLuint target, size_t size, bool use_vbo) {
+    void allocate(GLuint target, unsigned size, bool use_vbo) {
       release();
       if (use_vbo) {
         glGenBuffers(1, &buffer);
@@ -48,7 +48,7 @@ namespace octet {
       release();
     }
 
-    size_t get_size() const {
+    unsigned get_size() const {
       return bytes.size();
     }
 
@@ -65,7 +65,7 @@ namespace octet {
       }
     }
 
-    void assign(void *ptr, unsigned offset, size_t size) {
+    void assign(void *ptr, unsigned offset, unsigned size) {
       if (buffer) {
         glBindBuffer(target, buffer);
         glBufferSubData(target, offset, size, ptr);

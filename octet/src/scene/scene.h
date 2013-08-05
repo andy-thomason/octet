@@ -40,7 +40,6 @@ namespace octet {
       int num_ambient = 0;
       for (unsigned i = 0; i != light_instances.size() && num_lights != max_lights; ++i) {
         light_instance *li = light_instances[i];
-        scene_node *node = li->get_scene_node();
         atom_t kind = li->get_kind();
         if (kind == atom_ambient) {
           ambient += li->get_color();

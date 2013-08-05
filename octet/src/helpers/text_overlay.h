@@ -67,7 +67,7 @@ namespace octet {
 
     void render(bump_shader &object_shader, bump_shader &skin_shader, int vx, int vy) {
       cam->set_ortho((float)vx, (float)vy, 1, 0, 1);
-      camera_instance *cam = text_scene->get_camera_instance(0);
+      //camera_instance *cam = text_scene->get_camera_instance(0);
       //text_scene->render(object_shader, skin_shader, *cam);
     }
   };

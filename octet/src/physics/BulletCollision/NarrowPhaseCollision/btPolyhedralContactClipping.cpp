@@ -245,7 +245,7 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 	const btFace& polyA = hullA.m_faces[closestFaceA];
 
 		// clip polygon to back of planes of all faces of hull A that are adjacent to witness face
-	int numContacts = pVtxIn->size();
+	//int numContacts = pVtxIn->size();
 	int numVerticesA = polyA.m_indices.size();
 	for(int e0=0;e0<numVerticesA;e0++)
 	{
@@ -315,7 +315,7 @@ void	btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 void	btPolyhedralContactClipping::clipHullAgainstHull(const btVector3& separatingNormal, const btConvexPolyhedron& hullA, const btConvexPolyhedron& hullB, const btTransform& transA,const btTransform& transB, const btScalar minDist, btScalar maxDist,btDiscreteCollisionDetectorInterface::Result& resultOut)
 {
 
-	btScalar curMaxDist=maxDist;
+	//btScalar curMaxDist=maxDist;
 	int closestFaceB=-1;
 
 	{

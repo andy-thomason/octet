@@ -702,7 +702,7 @@ namespace octet {
         if (vertex_weights && geometry) {
           get_skin(controller, vertex_weights, &skinst);
           TiXmlElement *mesh_elem = child(geometry, "mesh");
-          const char *id = geometry->Attribute("id");
+          //const char *id = geometry->Attribute("id");
 
           for (TiXmlElement *mesh_child = mesh_elem ? mesh_elem->FirstChildElement() : 0;
             mesh_child != NULL;
@@ -964,7 +964,7 @@ namespace octet {
       state.s = mesh;
       atoiv(state.p, pelem->GetText());
       state.input_stride = get_input_stride(mesh_child);
-      unsigned implicit_offset = 0;
+      //unsigned implicit_offset = 0;
       state.slot = 0;
       state.attr_offset = 0;
       state.skinst = skinst;
@@ -1069,7 +1069,7 @@ namespace octet {
       unsigned pos_slot = mesh->get_slot(attribute_pos);
       unsigned offset = mesh->get_offset(pos_slot);
       if (mesh->get_size(pos_slot) == 3 && num_vertices != 0) {
-        unsigned stride = state.attr_stride * 4;
+        //unsigned stride = state.attr_stride * 4;
         float *vtx = (float*)((unsigned char*)&state.vertices[0] + offset);
         float min[3] = { vtx[0], vtx[1], vtx[2] };
         float max[3] = { vtx[0], vtx[1], vtx[2] };

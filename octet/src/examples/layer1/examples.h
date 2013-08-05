@@ -6,7 +6,7 @@
 //
 // include all examples
 
-#include "../platform/platform.h"
+#include "../../platform/platform.h"
 
 #include "triangle/triangle_app.h"
 #include "texture/texture_app.h"

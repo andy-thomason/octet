@@ -45,6 +45,7 @@ class animation_app : public octet::app {
   void load_file(const char *filename) {
     octet::collada_builder builder;
     if (!builder.load_xml(filename)) {
+      printf("\nERROR: could not open %s\nThis is likely a problem with paths.", filename);
       return;
     }
 
@@ -92,7 +93,7 @@ public:
 
     const char *filename = 0;
 
-    int selector = 6;
+    int selector = 0;
     switch (selector) {
       case 0: filename = "assets/duck_triangulate.dae"; break;
       case 1: filename = "assets/skinning/skin_unrot.dae"; break;

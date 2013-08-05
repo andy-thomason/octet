@@ -80,7 +80,7 @@ namespace octet {
       stack.pop_back();
     }
 
-    void visit_bin(void *value, size_t size, atom_t sid, atom_t type) {
+    void visit_bin(void *value, unsigned size, atom_t sid, atom_t type) {
       if (size <= 16) {
         stack.back()->SetAttribute(app_utils::get_atom_name(sid), to_hex(value, size));
       } else {
@@ -88,7 +88,7 @@ namespace octet {
         stack.back()->LinkEndChild(child);
         dynarray<char> data;
         data.resize(size*2+1);
-        for (size_t i = 0; i != size; ++i) {
+        for (unsigned i = 0; i != size; ++i) {
           data[i*2+0 ] = hex_digit(((uint8_t*)value)[i] >> 4);
           data[i*2+1 ] = hex_digit(((uint8_t*)value)[i] & 0x0f);
         }

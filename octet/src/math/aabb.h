@@ -54,6 +54,7 @@ namespace octet {
     const char *toString() const {
       static char tmp[256];
       sprintf(tmp, "[%s, %s]", center.toString(), half_extent.toString());
+      return tmp;
     }
 
     bool intersects(const aabb &rhs) const {

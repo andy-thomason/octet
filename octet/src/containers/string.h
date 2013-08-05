@@ -316,12 +316,12 @@ namespace octet {
     void split(dynarray<string> &result, const char *delimiter) {
       result.resize(0);
       char *cur = data_;
-      unsigned delim_len = strlen(delimiter);
+      unsigned delim_len = (unsigned)strlen(delimiter);
       for(;;) {
         char *next = strstr(cur, delimiter);
         if (!next) break;
         result.push_back(string());
-        result.back().set(cur, next - cur);
+        result.back().set(cur, (int)(next - cur));
         cur = next + delim_len;
       }
       result.push_back(string());

@@ -313,8 +313,8 @@ void btConvexConvexAlgorithm ::processCollision (btCollisionObject* body0,btColl
 	{
 		btCapsuleShape* capsuleA = (btCapsuleShape*) min0;
 		btCapsuleShape* capsuleB = (btCapsuleShape*) min1;
-		btVector3 localScalingA = capsuleA->getLocalScaling();
-		btVector3 localScalingB = capsuleB->getLocalScaling();
+		//btVector3 localScalingA = capsuleA->getLocalScaling();
+		//btVector3 localScalingB = capsuleB->getLocalScaling();
 		
 		btScalar threshold = m_manifoldPtr->getContactBreakingThreshold();
 
