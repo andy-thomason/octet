@@ -70,7 +70,7 @@ namespace octet {
     // access the 
     // eg. my_map["fred"]
     value_t &operator[]( const key_t &key ) {
-      unsigned hash = unsigned(key);
+      unsigned hash = (unsigned)(size_t)(key);
       entry_t *entry = find( key, hash );
       if (!entry->key) {
         // reducing this ratio decreases hot search time at the

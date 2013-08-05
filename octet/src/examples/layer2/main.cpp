@@ -10,7 +10,7 @@
 //
 
 #include "../../platform/platform.h"
-#include "engine_app.h"
+#include "engine.h"
 
 //
 // a C++ program starts here with the command line arguments in argv[]
@@ -19,7 +19,7 @@
 int main(int argc, char **argv) {
   octet::app_utils::prefix("../../");
   octet::app::init_all(argc, argv);
-  octet::engine_app app(argc, argv);
+  engine app(argc, argv);
   app.init();
   octet::app::run_all_apps();
 }

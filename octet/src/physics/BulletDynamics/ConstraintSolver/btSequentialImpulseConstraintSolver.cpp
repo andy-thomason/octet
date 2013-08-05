@@ -955,7 +955,7 @@ btScalar btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(btCol
 		}
 	}
 
-	btContactSolverInfo info = infoGlobal;
+	//btContactSolverInfo info = infoGlobal;
 
 
 

@@ -14,14 +14,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\examples\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\examples\examples.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\resources\animation_target.h">
       <Filter>octet</Filter>
     </ClInclude>
@@ -178,9 +170,6 @@
     <ClInclude Include="..\..\src\math\vec4.h">
       <Filter>octet</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\platform\AL\xram.h">
-      <Filter>octet</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\platform\app_common.h">
       <Filter>octet</Filter>
     </ClInclude>
@@ -205,6 +194,9 @@
     <ClInclude Include="..\..\src\platform\windows_specific.h">
       <Filter>octet</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\examples\layer1\examples.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\resources\mesh_builder.inl">
@@ -213,5 +205,10 @@
     <None Include="..\..\src\resources\resources.inl">
       <Filter>octet</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\examples\layer1\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

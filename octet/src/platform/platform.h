@@ -27,6 +27,7 @@
 #endif
 
 // use <> to include from standard directories
+// use "" to include from our own project
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -63,11 +64,17 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
   #include "windows_specific.h"
   //#include "glut_specific.h"
 #elif defined(__APPLE__)
+  #include <unistd.h>
+  #include <sys/socket.h>
+  #include <sys/ioctl.h>
+  #include <fcntl.h>
+  #include <netinet/in.h>
   #define OCTET_HOT __attribute__( ( always_inline ) )
+  #define ioctlsocket ioctl
+  #define closesocket close
   #include "glut_specific.h"
 #endif
 
-// use "" to include from our own project
 #include "../math/vec4.h"
 #include "../math/ivec4.h"
 #include "../math/bvec4.h"

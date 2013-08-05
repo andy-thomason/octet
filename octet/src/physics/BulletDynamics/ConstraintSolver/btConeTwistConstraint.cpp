@@ -506,7 +506,7 @@ void	btConeTwistConstraint::solveConstraintObsolete(btRigidBody& bodyA,btRigidBo
 				m_accTwistLimitImpulse = btMax(m_accTwistLimitImpulse + impulseMag, btScalar(0.0) );
 				impulseMag = m_accTwistLimitImpulse - temp;
 
-				btVector3 impulse = m_twistAxis * impulseMag;
+				//btVector3 impulse = m_twistAxis * impulseMag;
 
 				bodyA.internalApplyImpulse(btVector3(0,0,0), m_rbA.getInvInertiaTensorWorld()*m_twistAxis,impulseMag);
 				bodyB.internalApplyImpulse(btVector3(0,0,0), m_rbB.getInvInertiaTensorWorld()*m_twistAxis,-impulseMag);
@@ -971,10 +971,10 @@ void btConeTwistConstraint::setMotorTarget(const btQuaternion &q)
 {
 	btTransform trACur = m_rbA.getCenterOfMassTransform();
 	btTransform trBCur = m_rbB.getCenterOfMassTransform();
-	btTransform trABCur = trBCur.inverse() * trACur;
-	btQuaternion qABCur = trABCur.getRotation();
-	btTransform trConstraintCur = (trBCur * m_rbBFrame).inverse() * (trACur * m_rbAFrame);
-	btQuaternion qConstraintCur = trConstraintCur.getRotation();
+	//btTransform trABCur = trBCur.inverse() * trACur;
+	//btQuaternion qABCur = trABCur.getRotation();
+	//btTransform trConstraintCur = (trBCur * m_rbBFrame).inverse() * (trACur * m_rbAFrame);
+	//btQuaternion qConstraintCur = trConstraintCur.getRotation();
 
 	btQuaternion qConstraint = m_rbBFrame.getRotation().inverse() * q * m_rbAFrame.getRotation();
 	setMotorTargetInConstraintSpace(qConstraint);

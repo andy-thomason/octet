@@ -179,8 +179,8 @@ namespace octet {
     // avoid using these, please! Just for testing
     const void *get_vertices() const { return vertices.get_ptr(); }
     const void *get_indices() const { return indices.get_ptr(); }
-    size_t get_vertices_size() const { return vertices.get_size(); }
-    size_t get_indices_size() const { return indices.get_size(); }
+    unsigned get_vertices_size() const { return vertices.get_size(); }
+    unsigned get_indices_size() const { return indices.get_size(); }
 
     // get which slot a particular attribute is in
     unsigned get_slot(unsigned attr) const {
@@ -254,7 +254,7 @@ namespace octet {
       *index_base = (unsigned char *)indices.bind();
     }
 
-    void allocate(size_t vsize, size_t isize, bool use_vbo_) {
+    void allocate(unsigned vsize, unsigned isize, bool use_vbo_) {
       vertices.allocate(GL_ARRAY_BUFFER, vsize, use_vbo_);
       indices.allocate(GL_ELEMENT_ARRAY_BUFFER, isize, use_vbo_);
     }
@@ -525,8 +525,8 @@ namespace octet {
         return;
       }
 
-      size_t vsize = source.get_vertices_size();
-      size_t isize = source.get_indices_size();
+      unsigned vsize = source.get_vertices_size();
+      unsigned isize = source.get_indices_size();
       allocate(vsize, isize, false);
       copy_indices(source);
       copy_vertices(source);

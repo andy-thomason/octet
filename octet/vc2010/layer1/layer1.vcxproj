@@ -11,9 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\examples\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\src\containers\allocator.h" />
     <ClInclude Include="..\..\src\containers\dictionary.h" />
     <ClInclude Include="..\..\src\containers\double_list.h" />
@@ -22,7 +19,7 @@
     <ClInclude Include="..\..\src\containers\ptr.h" />
     <ClInclude Include="..\..\src\containers\ref.h" />
     <ClInclude Include="..\..\src\containers\string.h" />
-    <ClInclude Include="..\..\src\examples\examples.h" />
+    <ClInclude Include="..\..\src\examples\layer1\examples.h" />
     <ClInclude Include="..\..\src\helpers\http_server.h" />
     <ClInclude Include="..\..\src\helpers\mouse_ball.h" />
     <ClInclude Include="..\..\src\helpers\text_overlay.h" />
@@ -38,7 +35,6 @@
     <ClInclude Include="..\..\src\math\quat.h" />
     <ClInclude Include="..\..\src\math\random.h" />
     <ClInclude Include="..\..\src\math\vec4.h" />
-    <ClInclude Include="..\..\src\platform\AL\xram.h" />
     <ClInclude Include="..\..\src\platform\app_common.h" />
     <ClInclude Include="..\..\src\platform\CL\opencl.h" />
     <ClInclude Include="..\..\src\platform\glut_specific.h" />
@@ -80,6 +76,9 @@
   <ItemGroup>
     <None Include="..\..\src\resources\mesh_builder.inl" />
     <None Include="..\..\src\resources\resources.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\examples\layer1\main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3FF3B9ED-9989-4490-97C6-08B95C54DF6B}</ProjectGuid>

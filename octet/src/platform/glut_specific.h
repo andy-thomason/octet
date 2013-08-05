@@ -46,7 +46,7 @@ namespace octet {
   class app : public app_common {
     int window_handle;
 
-    typedef std::map<int, app*> map_t;
+    typedef hash_map<int, app*> map_t;
 
     static map_t &map() {
       static map_t instance;
@@ -132,9 +132,12 @@ namespace octet {
 
     static void timer(int value) {
       glutTimerFunc(16, timer, 1);
-      for (map_t::iterator i = map().begin(); i != map().end(); ++i) {
-        glutSetWindow(i->first);
-        glutPostRedisplay();
+      map_t &m = map();
+      for (int i = 0; i != m.size(); ++i) {
+        if (m.key(i)) {
+          glutSetWindow(m.key(i));
+          glutPostRedisplay();
+        }
       }
     }
   
@@ -154,17 +157,20 @@ namespace octet {
     }
 
     static void run_all_apps() {
-      for (map_t::iterator i = map().begin(); i != map().end(); ++i) {
-        glutSetWindow(i->first);
-        glutDisplayFunc(display);
-        glutReshapeFunc(reshape);
-        glutKeyboardFunc(do_key_down);
-        glutKeyboardUpFunc(do_key_up);
-        glutSpecialFunc(do_special_down);
-        glutSpecialUpFunc(do_special_up);
-        glutMouseFunc(do_mouse_button);
-        glutMotionFunc(do_mouse);
-        glutPassiveMotionFunc(do_mouse);
+      map_t &m = map();
+      for (int i = 0; i != m.size(); ++i) {
+        if (m.key(i)) {
+          glutSetWindow(m.key(i));
+          glutDisplayFunc(display);
+          glutReshapeFunc(reshape);
+          glutKeyboardFunc(do_key_down);
+          glutKeyboardUpFunc(do_key_up);
+          glutSpecialFunc(do_special_down);
+          glutSpecialUpFunc(do_special_up);
+          glutMouseFunc(do_mouse_button);
+          glutMotionFunc(do_mouse);
+          glutPassiveMotionFunc(do_mouse);
+        }
       }
       glutTimerFunc(16, timer, 1);
       glutMainLoop();

@@ -215,7 +215,7 @@ btScalar btRotationalLimitMotor::solveAngularLimits(
 
 	clippedMotorImpulse = m_accumulatedImpulse - oldaccumImpulse;
 
-	btVector3 motorImp = clippedMotorImpulse * axis;
+	//btVector3 motorImp = clippedMotorImpulse * axis;
 
 	//body0->applyTorqueImpulse(motorImp);
 	//body1->applyTorqueImpulse(-motorImp);
@@ -339,7 +339,7 @@ btScalar btTranslationalLimitMotor::solveLinearAxis(
 	m_accumulatedImpulse[limit_index] = sum > hi ? btScalar(0.) : sum < lo ? btScalar(0.) : sum;
 	normalImpulse = m_accumulatedImpulse[limit_index] - oldNormalImpulse;
 
-	btVector3 impulse_vector = axis_normal_on_a * normalImpulse;
+	//btVector3 impulse_vector = axis_normal_on_a * normalImpulse;
 	//body1.applyImpulse( impulse_vector, rel_pos1);
 	//body2.applyImpulse(-impulse_vector, rel_pos2);
 

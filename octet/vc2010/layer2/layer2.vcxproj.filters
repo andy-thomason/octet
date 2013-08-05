@@ -11,12 +11,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\examples\animation\main.cpp">
+    <ClCompile Include="..\..\src\examples\layer2\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\examples\animation\engine_app.h">
+    <ClInclude Include="..\..\src\examples\layer2\engine.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

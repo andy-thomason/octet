@@ -78,8 +78,8 @@ bool	btPolyhedralConvexShape::initializePolyhedralFeatures()
 		int numEdges = 0;
 		//compute face normals
 
-		btScalar maxCross2 = 0.f;
-		int chosenEdge = -1;
+		//btScalar maxCross2 = 0.f;
+		//int chosenEdge = -1;
 
 		do
 		{
