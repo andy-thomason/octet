@@ -148,7 +148,7 @@ namespace octet {
       int z = fgt(lhs.n * rhs.d, rhs.n * lhs.d);
       rational tmin(fsel(z, rhs.n, lhs.n), fsel(z, rhs.d, lhs.d));
       int z2 = fgt(tmin.n * rhs2.d, rhs2.n * tmin.d);
-      return rational(fsel(z, rhs.n, tmin.n), fsel(z, rhs.d, tmin.d));
+      return rational(fsel(z2, rhs.n, tmin.n), fsel(z2, rhs.d, tmin.d));
     }
 
     rational max(const rational &r, const rational &r2) const {
@@ -158,7 +158,7 @@ namespace octet {
       int z = flt(lhs.n * rhs.d, rhs.n * lhs.d);
       rational tmax(fsel(z, rhs.n, lhs.n), fsel(z, rhs.d, lhs.d));
       int z2 = flt(tmax.n * rhs2.d, rhs2.n * tmax.d);
-      return rational(fsel(z, rhs.n, tmax.n), fsel(z, rhs.d, tmax.d));
+      return rational(fsel(z2, rhs.n, tmax.n), fsel(z2, rhs.d, tmax.d));
     }
 
     rational abs() const {
