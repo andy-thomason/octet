@@ -13,7 +13,7 @@ namespace octet {
     // skeleton components
     dynarray<mat4t> nodeToParents;
     dynarray<atom_t> joints;
-    dynarray<ref<scene_node>> nodes;
+    dynarray<ref<scene_node> > nodes;
     dynarray<int> parents;
     dynarray<mat4t> boneToNode;
 

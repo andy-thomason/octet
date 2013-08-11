@@ -490,21 +490,25 @@ namespace octet {
     }
 
     // assuming this is a rotation matrix, get the axis and angle (in degrees).
-    vec4 get_rotation(float &angle) {
+    vec3 get_rotation(float &angle) {
       quat q = toQuaternion();
 
       // for stability, use atan2
-      vec4 axis = q.xyz();
+      vec3 axis = q.xyz();
       float length = axis.length();
       angle = atan2f(length, q[3]) * (360.0f/3.14159265f);
-      return length > 0.000001f ? axis / length : vec4(0, 0, 1, 0);
+      return length > 0.000001f ? axis / length : vec3(0, 0, 1);
     }
 
     // sub-matrices
-    mat4t xy() const { return mat4t(v[0].xy(), v[1].xy(), vec4(0, 0, 1, 0), vec4(0, 0, 0, 1)); }
-    mat4t xyz() const { return mat4t(v[0].xyz(), v[1].xyz(), v[2].xyz(), vec4(0, 0, 0, 1)); }
+    mat4t xy() const { return mat4t(v[0].xy00(), v[1].xy00(), vec4(0, 0, 1, 0), vec4(0, 0, 0, 1)); }
+    mat4t xyz() const { return mat4t(v[0].xyz0(), v[1].xyz0(), v[2].xyz0(), vec4(0, 0, 0, 1)); }
 
     // rows
+    vec4 x() const { return v[0]; }
+    vec4 y() const { return v[1]; }
+    vec4 z() const { return v[2]; }
+    vec4 w() const { return v[3]; }
     vec4 &x() { return v[0]; }
     vec4 &y() { return v[1]; }
     vec4 &z() { return v[2]; }

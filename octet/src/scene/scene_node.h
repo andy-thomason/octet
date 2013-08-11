@@ -14,7 +14,7 @@ namespace octet {
     ref<scene_node> parent;
 
     // child nodes
-    dynarray<ref<scene_node>> children;
+    dynarray<ref<scene_node> > children;
 
     // array of relative transforms (indexed by scene_node index)
     mat4t nodeToParent;

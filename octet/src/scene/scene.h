@@ -15,23 +15,59 @@ namespace octet {
     //
 
     // each of these is a set of (scene_node, mesh, material)
-    dynarray<ref<mesh_instance>> mesh_instances;
+    dynarray<ref<mesh_instance> > mesh_instances;
 
     // animations playing at the moment
-    dynarray<ref<animation_instance>> animation_instances;
+    dynarray<ref<animation_instance> > animation_instances;
 
     // cameras available
-    dynarray<ref<camera_instance>> camera_instances;
+    dynarray<ref<camera_instance> > camera_instances;
 
     // lights available
-    dynarray<ref<light_instance>> light_instances;
+    dynarray<ref<light_instance> > light_instances;
 
+    // set this to draw bounding boxes
+    bool render_aabbs;
+    bool render_debug_lines;
+    ref<material> debug_material;
+    dynarray<vec3> debug_line_buffer;
+    unsigned debug_in_ptr;
+
+    // derived light information
     enum { max_lights = 4, light_size = 4 };
     int num_light_uniforms;
     int num_lights;
     vec4 light_uniforms[1 + max_lights * light_size ];
 
     int frame_number;
+
+    void draw_aabb(const aabb &bb) {
+      vec3 pos[8];
+      for (int i = 0; i != 8; ++i) {
+        vec3 center = bb.get_center();
+        vec3 half = bb.get_half_extent();
+        pos[i] = center + half * vec3(
+          (i & 1 ? 1.0f : -1.0f),
+          (i & 2 ? 1.0f : -1.0f),
+          (i & 4 ? 1.0f : -1.0f)
+        );
+      }
+
+      static const uint16_t indices[] = {
+        0, 1, 2, 3, 4, 5, 6, 7,
+        0, 2, 1, 3, 4, 6, 5, 7,
+        0, 4, 1, 5, 2, 6, 3, 7
+      };
+
+      // render immediate data (this is inefficient!)
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)pos );
+      glEnableVertexAttribArray(attribute_pos);
+    
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+      glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
+      glDisableVertexAttribArray(attribute_pos);
+    }
 
     void calc_lighting(const mat4t &worldToCamera) {
       vec4 &ambient = light_uniforms[0];
@@ -65,6 +101,35 @@ namespace octet {
 
       cam.set_cameraToWorld(cameraToWorld, aspect_ratio);
       mat4t cameraToProjection = cam.get_cameraToProjection();
+
+      {
+        // debug draw the AABBs of the mesh instances in the world.
+        // draw in world space
+        mat4t worldToCamera;
+        mat4t worldToProjection;
+        mat4t worldToWorld;
+        worldToWorld.loadIdentity();
+        cam.get_matrices(worldToProjection, worldToCamera, worldToWorld);
+        debug_material->render(object_shader, worldToProjection, worldToCamera, light_uniforms, num_light_uniforms, num_lights);
+
+        if (render_debug_lines) {
+          glBindBuffer(GL_ARRAY_BUFFER, 0);
+          glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)debug_line_buffer.data() );
+          glEnableVertexAttribArray(attribute_pos);
+    
+          glDrawArrays(GL_LINES, 0, debug_line_buffer.size());
+          glDisableVertexAttribArray(attribute_pos);
+        }
+
+        if (render_aabbs) {
+          for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
+            mesh_instance *mi = mesh_instances[mesh_index];
+            aabb bb = mi->get_mesh()->get_aabb();
+            bb = bb.get_transform(mi->get_node()->calcModelToWorld());
+            draw_aabb(bb);
+          }
+        }
+      }
 
       for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
         mesh_instance *mi = mesh_instances[mesh_index];
@@ -102,6 +167,13 @@ namespace octet {
       frame_number = 0;
       num_light_uniforms = 0;
       num_lights = 0;
+      render_aabbs = true;
+      render_debug_lines = true;
+      debug_material = new material(vec4(1, 0, 0, 1));
+      debug_line_buffer.resize(256);
+      assert(is_power_of_two(debug_line_buffer.size()));
+      memset(&debug_line_buffer[0], 0, debug_line_buffer.size() * sizeof(debug_line_buffer[0]));
+      debug_in_ptr = 0;
     }
 
     void visit(visitor &v) {
@@ -181,22 +253,26 @@ namespace octet {
     }
 
     // how many mesh instances do we have?
-    int num_mesh_instances() {
+    int get_num_mesh_instances() {
       return (int)mesh_instances.size();
     }
 
     // how many camera_instances do we have?
-    int num_camera_instances() {
+    int get_num_camera_instances() {
       return (int)camera_instances.size();
     }
 
     // how many light_instances do we have?
-    int num_light_instances() {
+    int get_num_light_instances() {
       return (int)light_instances.size();
     }
 
     scene_node *get_root_node() {
       return (scene_node*)this;
+    }
+
+    void set_render_aabbs(bool value) {
+      render_aabbs = value;
     }
 
     // access camera_instance information
@@ -265,6 +341,42 @@ namespace octet {
         }
       }
       return world_aabb;
+    }
+
+    struct cast_result {
+      mesh_instance *mi;
+      rational depth;
+    };
+
+    // brute force & ignorance ray cast.
+    // return the mesh instance and location of hits.
+    // todo: build a kd tree for mesh instance bbs & mesh triangles
+    void cast_ray(cast_result &result, const ray &the_ray) {
+      result.mi = 0;
+      result.depth = rational(0, 0);
+
+      for (int i = 0; i != mesh_instances.size(); ++i) {
+        mesh_instance *mi = mesh_instances[i];
+        if (mi && mi->get_node()) {
+          mat4t nodeToWorld = mi->get_node()->calcModelToWorld();
+          aabb bb = mi->get_mesh()->get_aabb();
+          bb = bb.get_transform(nodeToWorld);
+          if (the_ray.intersects(bb)) {
+            //rational depth = the_ray.intersection(bb);
+            result.mi = mi;
+            //static int i;
+            //printf("%d hit\n", i++);
+          }
+        }
+      }
+    }
+
+    // add a new line in world space (old ones will be lost)
+    void add_debug_line(const vec3 &start, const vec3 &end) {
+      if (debug_line_buffer.size()) {
+        debug_line_buffer[debug_in_ptr++ & debug_line_buffer.size()-1] = start;
+        debug_line_buffer[debug_in_ptr++ & debug_line_buffer.size()-1] = end;
+      }
     }
   };
 }

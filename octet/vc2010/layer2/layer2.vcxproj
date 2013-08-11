@@ -14,7 +14,68 @@
     <ClCompile Include="..\..\src\examples\layer2\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\containers\allocator.h" />
+    <ClInclude Include="..\..\src\containers\dictionary.h" />
+    <ClInclude Include="..\..\src\containers\double_list.h" />
+    <ClInclude Include="..\..\src\containers\dynarray.h" />
+    <ClInclude Include="..\..\src\containers\hash_map.h" />
+    <ClInclude Include="..\..\src\containers\ptr.h" />
+    <ClInclude Include="..\..\src\containers\ref.h" />
+    <ClInclude Include="..\..\src\containers\string.h" />
     <ClInclude Include="..\..\src\examples\layer2\engine.h" />
+    <ClInclude Include="..\..\src\helpers\http_server.h" />
+    <ClInclude Include="..\..\src\helpers\mouse_ball.h" />
+    <ClInclude Include="..\..\src\helpers\text_overlay.h" />
+    <ClInclude Include="..\..\src\loaders\collada_builder.h" />
+    <ClInclude Include="..\..\src\loaders\dds_decoder.h" />
+    <ClInclude Include="..\..\src\loaders\gif_decoder.h" />
+    <ClInclude Include="..\..\src\loaders\jpeg_decoder.h" />
+    <ClInclude Include="..\..\src\loaders\tga_decoder.h" />
+    <ClInclude Include="..\..\src\math\aabb.h" />
+    <ClInclude Include="..\..\src\math\bvec4.h" />
+    <ClInclude Include="..\..\src\math\ivec4.h" />
+    <ClInclude Include="..\..\src\math\mat4t.h" />
+    <ClInclude Include="..\..\src\math\quat.h" />
+    <ClInclude Include="..\..\src\math\random.h" />
+    <ClInclude Include="..\..\src\math\vec4.h" />
+    <ClInclude Include="..\..\src\platform\app_common.h" />
+    <ClInclude Include="..\..\src\platform\CL\opencl.h" />
+    <ClInclude Include="..\..\src\platform\osx_specific.h" />
+    <ClInclude Include="..\..\src\platform\platform.h" />
+    <ClInclude Include="..\..\src\platform\windows_specific.h" />
+    <ClInclude Include="..\..\src\resources\animation_target.h" />
+    <ClInclude Include="..\..\src\resources\app_utils.h" />
+    <ClInclude Include="..\..\src\resources\atoms.h" />
+    <ClInclude Include="..\..\src\resources\gl_resource.h" />
+    <ClInclude Include="..\..\src\resources\http_writer.h" />
+    <ClInclude Include="..\..\src\resources\mesh_builder.h" />
+    <ClInclude Include="..\..\src\resources\resource.h" />
+    <ClInclude Include="..\..\src\resources\resources.h" />
+    <ClInclude Include="..\..\src\resources\url_finder.h" />
+    <ClInclude Include="..\..\src\resources\visitor.h" />
+    <ClInclude Include="..\..\src\resources\xml_writer.h" />
+    <ClInclude Include="..\..\src\scene\animation.h" />
+    <ClInclude Include="..\..\src\scene\animation_instance.h" />
+    <ClInclude Include="..\..\src\scene\camera_instance.h" />
+    <ClInclude Include="..\..\src\scene\image.h" />
+    <ClInclude Include="..\..\src\scene\light_instance.h" />
+    <ClInclude Include="..\..\src\scene\material.h" />
+    <ClInclude Include="..\..\src\scene\mesh.h" />
+    <ClInclude Include="..\..\src\scene\mesh_instance.h" />
+    <ClInclude Include="..\..\src\scene\param.h" />
+    <ClInclude Include="..\..\src\scene\scene.h" />
+    <ClInclude Include="..\..\src\scene\scene_node.h" />
+    <ClInclude Include="..\..\src\scene\skeleton.h" />
+    <ClInclude Include="..\..\src\scene\skin.h" />
+    <ClInclude Include="..\..\src\shaders\bump_shader.h" />
+    <ClInclude Include="..\..\src\shaders\color_shader.h" />
+    <ClInclude Include="..\..\src\shaders\phong_shader.h" />
+    <ClInclude Include="..\..\src\shaders\shader.h" />
+    <ClInclude Include="..\..\src\shaders\texture_shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\resources\mesh_builder.inl" />
+    <None Include="..\..\src\resources\resources.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BE3BA980-6FCB-4097-8714-32DEC6D03BF4}</ProjectGuid>

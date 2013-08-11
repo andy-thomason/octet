@@ -60,6 +60,8 @@ namespace octet {
     // get a pointer to the item
     item_t * operator ->() const { return item; }
 
+    operator bool() const { return item != 0; }
+
     // destructor - may free object
     ~ref() {
       if (item) item->release();

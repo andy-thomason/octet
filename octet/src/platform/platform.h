@@ -60,6 +60,12 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../containers/ptr.h"
 #include "../containers/ref.h"
 
+static char *get_sprintf_buffer() {
+  static int i;
+  static char tmp[4][256];
+  return tmp[i++ & 3];
+}
+
 #ifdef WIN32
   #include "windows_specific.h"
   //#include "glut_specific.h"
@@ -75,12 +81,19 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
   #include "glut_specific.h"
 #endif
 
+#include "../math/scalar.h"
+#include "../math/rational.h"
+#include "../math/vec2.h"
+#include "../math/vec3.h"
 #include "../math/vec4.h"
-#include "../math/ivec4.h"
-#include "../math/bvec4.h"
 #include "../math/quat.h"
-#include "../math/aabb.h"
 #include "../math/mat4t.h"
+#include "../math/ivec4.h"
+#include "../math/bvec2.h"
+#include "../math/bvec3.h"
+#include "../math/bvec4.h"
+#include "../math/aabb.h"
+#include "../math/ray.h"
 #include "../math/random.h"
 
 // loaders (low dependency, so you can use them in other projects)
@@ -126,6 +139,7 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../helpers/mouse_ball.h"
 #include "../helpers/http_server.h"
 #include "../helpers/text_overlay.h"
+#include "../helpers/object_picker.h"
 
 // asset loaders
 #include "../loaders/collada_builder.h"

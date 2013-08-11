@@ -28,7 +28,12 @@ namespace octet {
 
     // generated matrices
     mat4t worldToCamera;
+    mat4t cameraToWorld;
     mat4t cameraToProjection;
+
+    // generated params
+    float xscale;
+    float yscale;
 
   public:
     RESOURCE_META(camera_instance)
@@ -52,7 +57,7 @@ namespace octet {
 
     void visit(visitor &v) {
     // camera parameters
-    ref<scene_node> node;
+      v.visit(node, atom_node);
       v.visit(is_ortho, atom_is_ortho);
 
       // common to all cameras
@@ -67,10 +72,6 @@ namespace octet {
       // ortho camera
       v.visit(xmag, atom_xmag);
       v.visit(ymag, atom_ymag);
-
-      // generated matrices
-      v.visit(worldToCamera, atom_worldToCamera);
-      v.visit(cameraToProjection, atom_cameraToProjection);
     }
 
     // set the parameters as in the collada perspective element
@@ -97,17 +98,20 @@ namespace octet {
     }
 
     // call this once a frame to get the camera position
-    void set_cameraToWorld(const mat4t &cameraToWorld, float aspect_ratio) {
+    void set_cameraToWorld(const mat4t &cameraToWorld_, float aspect_ratio) {
+      cameraToWorld = cameraToWorld_;
       // flip cameraToWorld around to transform from world to camera
-      cameraToWorld.invertQuick(worldToCamera);
+      worldToCamera = cameraToWorld.inverse3x4();
 
       // build a projection matrix to add perspective
       cameraToProjection.loadIdentity();
       if (is_ortho) {
-        cameraToProjection.ortho(-xmag, xmag, -ymag, ymag, nearVal, farVal);
+        xscale = 1.0f / xmag;
+        yscale = 1.0f / ymag;
+        cameraToProjection.ortho(-xscale, xscale, -yscale, yscale, nearVal, farVal);
       } else {
-        float xscale = 0.5f;
-        float yscale = 0.5f;
+        xscale = 0.5f;
+        yscale = 0.5f;
         if (yfov) {
           yscale = tanf(yfov * (3.14159f/180/2));
           xscale = yscale * aspect_ratio;
@@ -135,9 +139,55 @@ namespace octet {
       return cameraToProjection;
     }
 
+    // return a ray from screen (x, y) to the far plane
+    ray get_ray(float x, float y) {
+      vec4 ray_start, ray_end;
+
+      // convert projection space ray to world space
+      if (is_ortho) {
+        ray_start = vec4(xscale * x, yscale * y, -nearVal, 1) * cameraToWorld;
+        ray_end = vec4(xscale * x, yscale * y, -farVal, 1) * cameraToWorld;
+      } else {
+        ray_start = vec4(xscale * nearVal * x, yscale * nearVal * y, -nearVal, 1) * cameraToWorld;
+        ray_end = vec4(xscale * farVal * x, yscale * farVal * y, -farVal, 1) * cameraToWorld;
+      }
+
+      return ray(ray_start.xyz(), ray_end.xyz());
+    }
+
+    mat4t get_worldToProjection() const {
+      mat4t result;
+      result.loadIdentity();
+      if (node) {
+        mat4t worldToCamera = node->calcModelToWorld().inverse3x4();
+        result = worldToCamera * cameraToProjection;
+      }
+      return result;
+    }
+
     // use this to get the camera from the scene
     scene_node *get_node() const {
       return node;
+    }
+
+    bool get_is_ortho() const {
+      return is_ortho;
+    }
+
+    float get_nearVal() const {
+      return nearVal;
+    }
+
+    float get_farVal() const {
+      return farVal;
+    }
+
+    float get_xscale() const {
+      return xscale;
+    }
+
+    float get_yscale() const {
+      return yscale;
     }
   };
 }

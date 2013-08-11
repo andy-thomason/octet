@@ -59,6 +59,14 @@ namespace octet {
       shininess = new param(vec4(30.0f/255, 0, 0, 0));
     }
 
+    // don't use this too much, it creates a new image every time.
+    material(const vec4 &color) {
+      specular = diffuse = ambient = new param(color);
+      emission = new param(vec4(0, 0, 0, 0));
+      bump = new param(vec4(0, 0, 0, 0));
+      shininess = new param(vec4(30.0f/255, 0, 0, 0));
+    }
+
     void visit(visitor &v) {
       v.visit(diffuse, atom_diffuse);
       v.visit(ambient, atom_ambient);

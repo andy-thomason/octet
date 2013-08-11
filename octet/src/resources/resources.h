@@ -9,7 +9,7 @@
 
 namespace octet {
   class resources : public resource {
-    dictionary<ref<resource>> dict;
+    dictionary<ref<resource> > dict;
 
     #ifdef WIN32
       // vc2010/../

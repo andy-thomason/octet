@@ -9,6 +9,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="octet">
+      <UniqueIdentifier>{a73e3cd5-6856-4e39-bf1e-9e57e52a4c27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\examples\layer2\main.cpp">
@@ -19,5 +22,184 @@
     <ClInclude Include="..\..\src\examples\layer2\engine.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\containers\allocator.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\dictionary.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\double_list.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\dynarray.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\hash_map.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\ptr.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\ref.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\containers\string.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\helpers\http_server.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\helpers\mouse_ball.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\helpers\text_overlay.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loaders\collada_builder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loaders\dds_decoder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loaders\gif_decoder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loaders\jpeg_decoder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\loaders\tga_decoder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\aabb.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\bvec4.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\ivec4.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\mat4t.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\quat.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\random.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\vec4.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\platform\app_common.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\platform\CL\opencl.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\platform\osx_specific.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\platform\platform.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\platform\windows_specific.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\animation_target.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\app_utils.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\atoms.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\gl_resource.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\http_writer.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\mesh_builder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\resource.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\resources.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\url_finder.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\visitor.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\resources\xml_writer.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\animation.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\animation_instance.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\camera_instance.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\image.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\light_instance.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\material.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\mesh.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\mesh_instance.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\param.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\scene.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\scene_node.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\skeleton.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\skin.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shaders\bump_shader.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shaders\color_shader.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shaders\phong_shader.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shaders\shader.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shaders\texture_shader.h">
+      <Filter>octet</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\resources\mesh_builder.inl">
+      <Filter>octet</Filter>
+    </None>
+    <None Include="..\..\src\resources\resources.inl">
+      <Filter>octet</Filter>
+    </None>
   </ItemGroup>
 </Project>

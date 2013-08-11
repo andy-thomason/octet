@@ -1086,8 +1086,8 @@ namespace octet {
         //printf("%s\n", id);
         //printf("%f %f %f\n", min[0], min[1], min[2]);
         //printf("%f %f %f\n", max[0], max[1], max[2]);
-        vec4 vmin(min[0], min[1], min[2], 0);
-        vec4 vmax(max[0], max[1], max[2], 0);
+        vec3 vmin(min[0], min[1], min[2]);
+        vec3 vmax(max[0], max[1], max[2]);
         mesh->set_aabb(aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f));
       }
 

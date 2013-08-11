@@ -495,10 +495,10 @@ namespace octet {
 
       // normalize
       for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
-        vec4 new_tangent = get_value(tangent_slot, i).xyz().normalize();
-        vec4 new_bitangent = get_value(bitangent_slot, i).xyz().normalize();
-        set_value(tangent_slot, i, new_tangent);
-        set_value(bitangent_slot, i, new_bitangent);
+        vec3 new_tangent = get_value(tangent_slot, i).xyz().normalize();
+        vec3 new_bitangent = get_value(bitangent_slot, i).xyz().normalize();
+        set_value(tangent_slot, i, vec4(new_tangent,0));
+        set_value(bitangent_slot, i, vec4(new_bitangent,0));
       }
     }
 

@@ -28,7 +28,7 @@ namespace octet {
     // if we are targeting a specific node or component
     // note that we keep this separate because arrays of refs have special significance
     // and we want to keep channel as a "POD" type (plain old data).
-    dynarray<ref<animation_target>> targets;
+    dynarray<ref<animation_target> > targets;
 
     float end_time;
   public:

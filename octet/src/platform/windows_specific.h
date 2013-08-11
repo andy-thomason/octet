@@ -62,6 +62,9 @@
 // A limited number uses per program is recommended.
 #define OCTET_HOT __forceinline
 
+#define OCTET_SSE 0
+#include <xmmintrin.h>
+
 namespace octet {
   // this is the class that all apps are derived from.
   class app : public app_common {
@@ -99,6 +102,8 @@ namespace octet {
       wglMakeCurrent (hdc, gl_context);
 
       init_wgl();
+
+      //printf("%s\n", glGetString(GL_EXTENSIONS));
     }
 
     typedef hash_map<HWND, app*> map_t;

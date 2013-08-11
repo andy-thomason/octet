@@ -17,9 +17,11 @@
 // argc is the number of arguments with argv[0] set to the command name.
 //
 int main(int argc, char **argv) {
+  //octet::unit_test_ray();
+
   octet::app_utils::prefix("../../");
   octet::app::init_all(argc, argv);
-  engine app(argc, argv);
+  octet::engine app(argc, argv);
   app.init();
   octet::app::run_all_apps();
 }

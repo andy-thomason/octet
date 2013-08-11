@@ -23,6 +23,14 @@ namespace octet {
       v[0] = x; v[1] = y; v[2] = z; v[3] = w;
     };
 
+    vec4(const vec2 &xy, float z, float w) {
+      v[0] = xy.x(); v[1] = xy.y(); v[2] = z; v[3] = w;
+    };
+
+    vec4(const vec3 &xyz, float w) {
+      v[0] = xyz.x(); v[1] = xyz.y(); v[2] = xyz.z(); v[3] = w;
+    };
+
     // index accessor [0] [1] [2] [3]
     float &operator[](int i) { return v[i]; }
 
@@ -33,13 +41,13 @@ namespace octet {
 
     // vector - scalar operators
     vec4 operator+(float r) const {
-       return vec4(v[0]+r, v[1]+r, v[2]+r, v[3]+r);
+      return vec4(v[0]+r, v[1]+r, v[2]+r, v[3]+r);
     }
     vec4 operator-(float r) const {
-       return vec4(v[0]-r, v[1]-r, v[2]-r, v[3]-r);
+      return vec4(v[0]-r, v[1]-r, v[2]-r, v[3]-r);
     }
     vec4 operator*(float r) const {
-       return vec4(v[0]*r, v[1]*r, v[2]*r, v[3]*r);
+      return vec4(v[0]*r, v[1]*r, v[2]*r, v[3]*r);
     }
     vec4 operator/(float r) const {
        float rcp = 1.0f / r; return vec4(v[0]*rcp, v[1]*rcp, v[2]*rcp, v[3]*rcp);
@@ -50,94 +58,111 @@ namespace octet {
 
     // vector operators
     vec4 operator+(const vec4 &r) const {
-       return vec4(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2], v[3]+r.v[3]);
+      return vec4(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2], v[3]+r.v[3]);
     }
     vec4 operator-(const vec4 &r) const {
-       return vec4(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2], v[3]-r.v[3]);
+      return vec4(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2], v[3]-r.v[3]);
     }
     vec4 operator*(const vec4 &r) const {
-       return vec4(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2], v[3]*r.v[3]);
+      return vec4(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2], v[3]*r.v[3]);
     }
     vec4 operator-() const {
-       return vec4(-v[0], -v[1], -v[2], -v[3]);
+      return vec4(-v[0], -v[1], -v[2], -v[3]);
     }
 
     // in-place vector operators
-    vec4 &operator+=(const vec4 &r) { v[0] += r.v[0]; v[1] += r.v[1]; v[2] += r.v[2]; v[3] += r.v[3]; return *this;
+    vec4 &operator+=(const vec4 &r) {
+      v[0] += r.v[0]; v[1] += r.v[1]; v[2] += r.v[2]; v[3] += r.v[3];
+      return *this;
     }
-    vec4 &operator-=(const vec4 &r) { v[0] -= r.v[0]; v[1] -= r.v[1]; v[2] -= r.v[2]; v[3] -= r.v[3]; return *this;
+    vec4 &operator-=(const vec4 &r) {
+      v[0] -= r.v[0]; v[1] -= r.v[1]; v[2] -= r.v[2]; v[3] -= r.v[3];
+      return *this;
     }
-    vec4 &operator*=(const vec4 &r) { v[0] *= r.v[0]; v[1] *= r.v[1]; v[2] *= r.v[2]; v[3] *= r.v[3]; return *this;
+    vec4 &operator*=(const vec4 &r) {
+      v[0] *= r.v[0]; v[1] *= r.v[1]; v[2] *= r.v[2]; v[3] *= r.v[3];
+      return *this;
     }
 
     // quaternion conjugate
     vec4 qconj() const {
-       return vec4(-v[0], -v[1], -v[2], v[3]);
+      return vec4(-v[0], -v[1], -v[2], v[3]);
     }
 
     // dot product
     float dot(const vec4 &r) const {
-       return v[0] * r.v[0] + v[1] * r.v[1] + v[2] * r.v[2] + v[3] * r.v[3];
+      return v[0] * r.v[0] + v[1] * r.v[1] + v[2] * r.v[2] + v[3] * r.v[3];
     }
 
     // sum of terms
     float sum() const {
-       return v[0] + v[1] + v[2] + v[3];
+      return v[0] + v[1] + v[2] + v[3];
     }
 
     // after perspective transform, use this to find x, y, z in the cube.
     vec4 perspectiveDivide() const {
-       float r = 1.0f / v[3]; return vec4(v[0]*r, v[1]*r, v[2]*r, v[3]*r);
+      float r = 1.0f / v[3];
+      return vec4(v[0]*r, v[1]*r, v[2]*r, v[3]*r);
     }
 
     // make the length equal to 1
     vec4 normalize() const {
-       return *this * lengthRecip();
+      return *this * lengthRecip();
     }
 
     // minumum of two vectors
     vec4 min(const vec4 &r) const {
-       return vec4(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1], v[2] < r[2] ? v[2] : r[2], v[3] < r[3] ? v[3] : r[3]);
+      return vec4(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1], v[2] < r[2] ? v[2] : r[2], v[3] < r[3] ? v[3] : r[3]);
     }
 
     // maximum of two vectors
     vec4 max(const vec4 &r) const {
-       return vec4(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1], v[2] >= r[2] ? v[2] : r[2], v[3] >= r[3] ? v[3] : r[3]);
+      return vec4(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1], v[2] >= r[2] ? v[2] : r[2], v[3] >= r[3] ? v[3] : r[3]);
     }
 
     // euclidean length of a vector
     float length() const {
-       return sqrtf(dot(*this));
+      return sqrtf(dot(*this));
     }
 
     // one over the euclidean length of a vector
     float lengthRecip() const {
-       return 1.0f/sqrtf(dot(*this));
+      return 1.0f/sqrtf(dot(*this));
     }
 
     // length squared
     float squared() const {
-       return dot(*this);
+      return dot(*this);
     }
 
     // make all values positive.
     vec4 abs() const {
-       return vec4(fabsf(v[0]), fabsf(v[1]), fabsf(v[2]), fabsf(v[3]));
+      return vec4(fabsf(v[0]), fabsf(v[1]), fabsf(v[2]), fabsf(v[3]));
+    }
+
+    // get xy
+    vec2 xy() const {
+      return vec2(v[0], v[1]);
+    }
+
+    // get xyz
+    vec3 xyz() const {
+      return vec3(v[0], v[1], v[2]);
     }
 
     // get xy00
-    vec4 xy() const {
-       return vec4(v[0], v[1], 0, 0);
+    vec4 xy00() const {
+      return vec4(v[0], v[1], 0, 0);
     }
 
     // get xyz0
-    vec4 xyz() const {
-       return vec4(v[0], v[1], v[2], 0);
+    vec4 xyz0() const {
+      return vec4(v[0], v[1], v[2], 0);
     }
 
     // get xyz1
     vec4 xyz1() const {
-       return vec4(v[0], v[1], v[2], 1);
+      return vec4(v[0], v[1], v[2], 1);
     }
 
     // access x
@@ -162,22 +187,22 @@ namespace octet {
 
     // get x
     float x() const {
-       return v[0];
+      return v[0];
     }
 
     // get y
     float y() const {
-       return v[1];
+      return v[1];
     }
 
     // get z
     float z() const {
-       return v[2];
+      return v[2];
     }
 
     // get w
     float w() const {
-       return v[3];
+      return v[3];
     }
 
     // quaternion multiply
@@ -209,62 +234,84 @@ namespace octet {
     // convert to a string (up to 4 strings can be included at a time)
     const char *toString() const
     {
-      static char buf[4][128];
-      static int i = 0;
-      char *dest = buf[i++&3];
+      char *dest = get_sprintf_buffer();
       sprintf(dest, "[%f, %f, %f, %f]", v[0], v[1], v[2], v[3]);
       return dest;
     }
   };
 
   // dot product
-  float dot(const vec4 &lhs, const vec4 &rhs) {
+  inline float dot(const vec4 &lhs, const vec4 &rhs) {
      return lhs.dot(rhs); 
   }
 
   // add terms
-  float sum(const vec4 &lhs) {
+  inline float sum(const vec4 &lhs) {
      return lhs.sum(); 
   }
 
   // divide by w
-  vec4 perspectiveDivide(const vec4 &lhs) {
+  inline vec4 perspectiveDivide(const vec4 &lhs) {
      return lhs.perspectiveDivide(); 
   }
 
   // make length = 1
-  vec4 normalize(const vec4 &lhs) {
+  inline vec4 normalize(const vec4 &lhs) {
      return lhs.normalize(); 
   }
 
   // comonent-wise min
-  vec4 min(const vec4 &lhs, const vec4 &r) {
+  inline vec4 min(const vec4 &lhs, const vec4 &r) {
      return lhs.min(r); 
   }
 
   // comonent-wise max
-  vec4 max(const vec4 &lhs, const vec4 &r) {
+  inline vec4 max(const vec4 &lhs, const vec4 &r) {
      return lhs.max(r); 
   }
 
   // euclidean length
-  float length(const vec4 &lhs) {
+  inline float length(const vec4 &lhs) {
      return lhs.length(); 
   }
 
   // 1/length
-  float lengthRecip(const vec4 &lhs) {
+  inline float lengthRecip(const vec4 &lhs) {
      return lhs.lengthRecip(); 
   }
 
   // length squared
-  float squared(const vec4 &lhs) {
+  inline float squared(const vec4 &lhs) {
      return lhs.squared(); 
   }
 
   // component-wise abs
-  vec4 abs(const vec4 &lhs) {
+  inline vec4 abs(const vec4 &lhs) {
      return lhs.abs(); 
+  }
+
+  inline vec4 vec3::xyz0() const {
+    return vec4(v[0], v[1], v[2], 0);
+  }
+
+  inline vec4 vec3::xyz1() const {
+    return vec4(v[0], v[1], v[2], 1);
+  }
+
+  inline vec4 operator+(float lhs, const vec4 &rhs) {
+    return rhs + lhs;
+  }
+
+  inline vec4 operator-(float lhs, const vec4 &rhs) {
+    return rhs - lhs;
+  }
+
+  inline vec4 operator*(float lhs, const vec4 &rhs) {
+    return rhs * lhs;
+  }
+
+  inline vec4 operator/(float lhs, const vec4 &rhs) {
+    return rhs / lhs;
   }
 }
 
