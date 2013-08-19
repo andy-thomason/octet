@@ -28,7 +28,7 @@ namespace octet {
     // if we are targeting a specific node or component
     // note that we keep this separate because arrays of refs have special significance
     // and we want to keep channel as a "POD" type (plain old data).
-    dynarray<ref<animation_target> > targets;
+    dynarray<ref<resource> > targets;
 
     float end_time;
   public:
@@ -61,7 +61,7 @@ namespace octet {
       return channels[ch].component;
     }
 
-    animation_target *get_target(int ch) const {
+    resource *get_target(int ch) const {
       return targets[ch];
     }
 
@@ -71,7 +71,7 @@ namespace octet {
 
     // just store the floats in the channel for now.
     // todo: optimise animation data
-    void add_channel(animation_target *target, atom_t sid, atom_t sub_target, atom_t component, dynarray<float> &times, dynarray<float> &values) {
+    void add_channel(resource *target, atom_t sid, atom_t sub_target, atom_t component, dynarray<float> &times, dynarray<float> &values) {
       int num_times = (int)times.size();
       int num_values = (int)values.size();
       int component_size = (num_values / num_times) * sizeof(float);
@@ -100,7 +100,7 @@ namespace octet {
 
     // evaluate one channel at one time - very inefficient.
     // time is in ms.
-    void eval_chan(int chan, float time, animation_target *target) const {
+    void eval_chan(int chan, float time, resource *target) const {
       int time_ms = int(time * 1000);
       const channel &ch = channels[chan];
       unsigned short *p = (unsigned short *)&data[ch.offset];

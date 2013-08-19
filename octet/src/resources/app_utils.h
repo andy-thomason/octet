@@ -86,7 +86,7 @@ namespace octet {
           setrgb(buffer, size, size/2, y+size/2, 0x808080);
         }
 
-        return make_texture(gl_kind, buffer, size, size);
+        return make_texture(gl_kind, &buffer[0], buffer.size(), GL_RGBA, size, size);
       } else if (!strcmp(name, "bump")) {
         // bump texture: make a random bump map with 0x808000 (0.5,0.5,0) the default normal x and y offsets
         class random rand(0x9bac7615);
@@ -100,7 +100,7 @@ namespace octet {
             setrgb(buffer, size, x, y, r * 0x10000 + g * 0x100);
           }
         }
-        return make_texture(gl_kind, buffer, size, size);
+        return make_texture(gl_kind, &buffer[0], buffer.size(), GL_RGBA, size, size);
       } else {
         printf("warning: stock texture %s not found\n", name);
         return 0;
@@ -125,20 +125,20 @@ namespace octet {
       buffer[0] = val >> 16;
       buffer[1] = val >> 8;
       buffer[2] = val >> 0;
-      return make_texture(gl_kind, buffer, 1, 1);
+      return make_texture(gl_kind, &buffer[0], buffer.size(), GL_RGBA, 1, 1);
     }
 
     // utility function for making textures from arrays of bytes
     // gl_kind is GL_RGB or GL_RGBA
-    static GLuint make_texture(unsigned gl_kind, dynarray<unsigned char> &buffer, unsigned width, unsigned height) {
-      assert(buffer.size() == width * height * 4);
+    static GLuint make_texture(unsigned gl_kind, uint8_t *image, unsigned size, unsigned in_format, unsigned width, unsigned height) {
+      //assert(buffer.size() == width * height * 4);
       // make a new texture handle
       GLuint handle = 0;
       glGenTextures(1, &handle);
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, handle);
 
-      glTexImage2D(GL_TEXTURE_2D, 0, gl_kind, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)buffer.data());
+      glTexImage2D(GL_TEXTURE_2D, 0, gl_kind, width, height, 0, in_format, GL_UNSIGNED_BYTE, (void*)image);
 
       glGenerateMipmap(GL_TEXTURE_2D);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

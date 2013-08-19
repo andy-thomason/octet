@@ -21,6 +21,9 @@ namespace octet {
   public:
     RESOURCE_META(skin)
 
+    skin() {
+    }
+
     skin(const mat4t &modelToBind) {
       this->modelToBind = modelToBind;
     }

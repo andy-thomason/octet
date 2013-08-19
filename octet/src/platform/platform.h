@@ -99,19 +99,21 @@ static char *get_sprintf_buffer() {
 // loaders (low dependency, so you can use them in other projects)
 #include "../loaders/gif_decoder.h"
 #include "../loaders/jpeg_decoder.h"
+#include "../loaders/jpeg_encoder.h"
 #include "../loaders/tga_decoder.h"
 #include "../loaders/dds_decoder.h"
 
 // resources
 #include "../resources/app_utils.h"
 #include "../resources/visitor.h"
+#include "../resources/binary_writer.h"
+#include "../resources/binary_reader.h"
 #include "../resources/xml_writer.h"
 #include "../resources/http_writer.h"
 #include "../resources/resource.h"
 #include "../resources/resources.h"
 #include "../resources/gl_resource.h"
 #include "../resources/mesh_builder.h"
-#include "../resources/animation_target.h"
 
 // shaders
 #include "../shaders/shader.h"
@@ -147,5 +149,26 @@ static char *get_sprintf_buffer() {
 // forward references
 #include "../resources/resources.inl"
 #include "../resources/mesh_builder.inl"
+
+namespace octet {
+  inline resource *resource::new_type(atom_t type) {
+    switch (type) {
+      case atom_skin: return new skin();
+      case atom_skeleton: return new skeleton();
+      case atom_mesh: return new mesh();
+      case atom_material: return new material();
+      case atom_image: return new image();
+      case atom_animation: return new animation();
+      case atom_camera_instance: return new camera_instance();
+      case atom_light_instance: return new light_instance();
+      case atom_mesh_instance: return new mesh_instance();
+      case atom_animation_instance: return new animation_instance();
+      case atom_scene: return new scene();
+      case atom_scene_node: return new scene_node();
+      case atom_param: return new param();
+    }
+    return NULL;
+  }
+}
 
 #include "../physics/physics.h"

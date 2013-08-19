@@ -116,7 +116,7 @@ namespace octet {
 
   public:
     // get an opengl texture from a file in memory
-    void get_image(dynarray<uint8_t> &full_image, uint32_t &num_components, uint32_t &width, uint32_t &height, const uint8_t *src, const uint8_t *src_max) {
+    void get_image(dynarray<uint8_t> &image, uint16_t &format, uint16_t &width, uint16_t &height, const uint8_t *src, const uint8_t *src_max) {
       width = src[6] + src[7]*256;
       height = src[8] + src[9]*256;
       unsigned flags = src[10];
@@ -124,8 +124,12 @@ namespace octet {
       //unsigned background = src[11];
       //unsigned aspect = src[12];
       unsigned transparency_index = 0x100; // disable transparency
-      full_image.resize(width * height * 4);
-      memset(full_image.data(), 0xff, width*height*4);
+
+      unsigned size = width * height * 4;
+      image.resize(size);
+      format = 0x1908; // GL_RGBA
+
+      memset(&image[0], 0xff, size);
       src += 13;
       const uint8_t *gct = src;
       src += gct_size * 3;
@@ -182,7 +186,7 @@ namespace octet {
           } else {
             uint8_t *src = &bytes[0];
             for (unsigned j = 0; j != lheight; ++j) {
-              uint8_t *dest = &full_image[((height - 1 - j - top) * width + left) * 4];
+              uint8_t *dest = &image[((height - 1 - j - top) * width + left) * 4];
               for (unsigned i = 0; i != lwidth; ++i) {
                 unsigned idx = *src++;
                 dest[0] = color_table[idx*3+0];
@@ -199,7 +203,7 @@ namespace octet {
         }
       }
     fail:;
-      num_components = transparency_index == 0x100 ? 3 : 4;
+      //num_components = transparency_index == 0x100 ? 3 : 4;
     }
   };
 }

@@ -124,6 +124,11 @@ namespace octet {
       return max_entries;
     }
 
+    // how many entries are used?
+    unsigned get_size() const {
+      return num_entries;
+    }
+
     // get a specific key
     const char *get_key(unsigned index) const {
       assert(index < max_entries);

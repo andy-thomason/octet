@@ -8,7 +8,7 @@
 //
 
 namespace octet {
-  class scene_node : public resource, public animation_target {
+  class scene_node : public resource {
     // every scene_node has a parent scene_node except the roots (NULL)
     // todo: support DAGs with multiple node parents
     ref<scene_node> parent;
@@ -23,8 +23,6 @@ namespace octet {
     atom_t sid;
   public:
     RESOURCE_META(scene_node)
-
-    animation_target *get_animation_target() { return (animation_target*)this; }
 
     scene_node() {
       nodeToParent.loadIdentity();
@@ -57,8 +55,11 @@ namespace octet {
     // visitor pattern used for game saves/loads (serialisation)
     //
     void visit(visitor &v) {
+      app_utils::log("visit scene_node\n");
       v.visit(parent, atom_parent);
+      app_utils::log("visit scene_node children\n");
       v.visit(children, atom_children);
+      app_utils::log("visit scene_node nodeToParent\n");
       v.visit(nodeToParent, atom_nodeToParent);
       v.visit(sid, atom_sid);
     }

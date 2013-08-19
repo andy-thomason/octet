@@ -244,6 +244,8 @@ namespace octet {
           if (app) {
             if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
               app->set_key(app::translate(msg.wParam), msg.message == WM_KEYDOWN);
+            } else if (msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP) {
+              app->set_key(app::translate(msg.wParam), msg.message == WM_SYSKEYDOWN);
             } else if (msg.message == WM_MOUSEMOVE) {
               app->set_mouse_pos(msg.lParam & 0xffff, msg.lParam >> 16);
             } else if (msg.message == WM_MOUSEWHEEL) {

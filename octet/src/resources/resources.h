@@ -10,6 +10,7 @@
 namespace octet {
   class resources : public resource {
     dictionary<ref<resource> > dict;
+    ref<scene> active_scene;
 
     #ifdef WIN32
       // vc2010/../
@@ -62,6 +63,7 @@ namespace octet {
     }
 
     virtual void visit(visitor &v) {
+      v.visit(active_scene, atom_active_scene);
       v.visit(dict, atom_dict);
     }
 
@@ -85,6 +87,14 @@ namespace octet {
       } else {
         return dict[name];
       }
+    }
+
+    scene *get_active_scene() const {
+      return active_scene;
+    }
+
+    void set_active_scene(scene *value) {
+      active_scene = value;
     }
 
     void set_resource(const char *name, resource *value) {
@@ -123,7 +133,6 @@ namespace octet {
     animation_instance *get_animation_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_instance() : 0; }
     scene *get_scene(const char *id) { resource *res = get_resource(id); return res ? res->get_scene() : 0; }
     scene_node *get_scene_node(const char *id) { resource *res = get_resource(id); return res ? res->get_scene_node() : 0; }
-    animation_target *get_animation_target(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_target() : 0; }
 
     // find all resources of a certain type
     void find_all(dynarray<resource*> &result, atom_t type) {

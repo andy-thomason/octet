@@ -32,6 +32,13 @@ namespace octet {
     {
       v[0] = x; v[1] = y; v[2] = z; v[3] = w;
     }
+
+    mat4t(float diag) {
+      v[0] = vec4(diag, 0, 0, 0);
+      v[1] = vec4(0, diag, 0, 0);
+      v[2] = vec4(0, 0, diag, 0);
+      v[3] = vec4(0, 0, 0, diag);
+    }
   
     mat4t(const quat &r)
     {
@@ -125,6 +132,19 @@ namespace octet {
         v[2] + r.v[2],
         v[3] + r.v[3]
       );
+    }
+  
+    mat4t &operator+=(const mat4t &r)
+    {
+      v[0] += r.v[0];
+      v[1] += r.v[1];
+      v[2] += r.v[2];
+      v[3] += r.v[3];
+      return *this;
+    }
+
+    vec4 trace() const {
+      return vec4(v[0].x(), v[1].y(), v[2].z(), v[3].w());
     }
   
     // generalized single axis rotate in degrees (like old glRotate)
@@ -525,5 +545,14 @@ namespace octet {
   inline vec4 vec4::operator*(const mat4t &r) const
   {
     return r.lmul(*this);
+  }
+
+  inline mat4t outer(const vec4 &lhs, const vec4 &rhs) {
+    return mat4t(
+      lhs * rhs.x(),
+      lhs * rhs.y(),
+      lhs * rhs.z(),
+      lhs * rhs.w()
+    );
   }
 }

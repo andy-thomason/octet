@@ -48,7 +48,7 @@ namespace octet {
       depth--;
     }
 
-    bool begin_refs(atom_t sid, bool is_dict) {
+    bool begin_refs(atom_t sid, int &size, bool is_dict) {
       if (depth == max_depth) {
         return false;
       } else if (url[depth] == app_utils::get_atom_name(sid)) {

@@ -26,9 +26,6 @@ namespace octet {
     // named resources loaded from collada file
     resources dict;
 
-    // scene used to draw 3d objects
-    ref<scene> app_scene;
-
     // shaders to draw triangles
     bump_shader object_shader;
     bump_shader skin_shader;
@@ -46,33 +43,32 @@ namespace octet {
     object_picker picker;
 
     void load_file(const char *filename) {
-      collada_builder builder;
-      if (!builder.load_xml(filename)) {
-        printf("\nERROR: could not open %s\nThis is likely a problem with paths.", filename);
-        return;
+      FILE *file = fopen(app_utils::get_path(filename), "rb");
+      char buf[8];
+      scene *app_scene = 0;
+      if (file && fread(buf, 1, sizeof(buf), file) && !memcmp(buf, "octet", 5)) {
+        fseek(file, 0, SEEK_SET);
+        binary_reader r(file);
+        dict.visit(r);
+        fclose(file);
+        app_scene = dict.get_active_scene();
+      } else {
+        if (file) fclose(file);
+        collada_builder builder;
+        if (!builder.load_xml(filename)) {
+          printf("\nERROR: could not open %s\nThis is likely a problem with paths.", filename);
+          return;
+        }
+
+        builder.get_resources(dict);
+        app_scene = dict.get_scene(builder.get_default_scene());
+
+        assert(app_scene);
+
+        app_scene->create_default_camera_and_lights();
+
+        dict.set_active_scene(app_scene);
       }
-
-      builder.get_resources(dict);
-      app_scene = dict.get_scene(builder.get_default_scene());
-
-      assert(app_scene);
-
-      app_scene->create_default_camera_and_lights();
-
-      /*{
-        // save the resources as an xml file
-        TiXmlDocument doc;
-        TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "utf-8", "");
-        doc.LinkEndChild(decl);
-        TiXmlElement *root = new TiXmlElement("octet");
-        doc.LinkEndChild(root);
-
-        xml_writer xml(root);
-
-        dict.visit(xml);
-
-        doc.SaveFile("animation.xml");
-      }*/
 
       app_scene->play_all_anims(dict);
 
@@ -134,6 +130,21 @@ namespace octet {
       // poll web server
       server.update();
 
+      // ctrl-s: save file
+      if (is_key_down('S') && is_key_down(key_ctrl)) {
+        FILE *file = fopen("c:/tmp/save.oct", "wb");
+        binary_writer b(file);
+        dict.visit(b);
+        fclose(file);
+
+        /*resources loaded;
+        file = fopen("save.oct", "rb");
+        binary_reader r(file);
+        loaded.visit(r);
+        fclose(file);*/
+
+      }
+
       // drag and drop file loading
       dynarray<string> &queue = access_load_queue();
       if (queue.size()) {
@@ -145,6 +156,7 @@ namespace octet {
         queue.resize(0);
       }
 
+      scene *app_scene = dict.get_active_scene();
       if (app_scene && app_scene->get_num_camera_instances()) {
         int vx = 0, vy = 0;
         get_viewport_size(vx, vy);

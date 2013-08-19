@@ -39,7 +39,7 @@ namespace octet {
         scene::cast_result res;
         the_scene->cast_ray(res, the_ray);
         if (res.mi) {
-          printf("%s\n", res.depth.toString());
+          //printf("%s\n", res.depth.toString());
         }
       }
     }

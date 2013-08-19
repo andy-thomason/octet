@@ -26,7 +26,7 @@ namespace octet {
     unsigned char num_slots;
 
     // optional skin
-    ref<skin> skin_;
+    ref<skin> mesh_skin;
     
     aabb mesh_aabb;
 
@@ -50,8 +50,8 @@ namespace octet {
       v.visit(index_type, atom_index_type);
       v.visit(normalized, atom_normalized);
       v.visit(num_slots, atom_num_slots);
-      v.visit(skin_, atom_skin_);
-      //v.visit(mesh_aabb, atom_aabb_centre);
+      v.visit(mesh_skin, atom_mesh_skin);
+      v.visit(mesh_aabb, atom_mesh_aabb);
     }
 
     ~mesh() {
@@ -72,7 +72,7 @@ namespace octet {
       index_type = GL_UNSIGNED_SHORT;
       mode = GL_TRIANGLES;
 
-      skin_ = _skin;
+      mesh_skin = _skin;
     }
 
     void release() {
@@ -147,13 +147,13 @@ namespace octet {
 
     // get the optional skin data
     skin *get_skin() const {
-      return (skin*)skin_;
+      return (skin*)mesh_skin;
     }
 
     // set the optional skin
     // note: the mesh state owns the skin.
     void set_skin(skin *value) {
-      skin_ = value;
+      mesh_skin = value;
     }
     
     // set the axis aligned bounding box of the untransformed mesh

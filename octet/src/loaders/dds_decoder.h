@@ -47,6 +47,11 @@ namespace octet {
       ddscaps2_cubemap_positivez = 0x00004000,
       ddscaps2_cubemap_negativez = 0x00008000,
       ddscaps2_volume = 0x00200000,
+
+      COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0,
+      COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1,
+      COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2,
+      COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3,
     };
 
     struct dds_header {
@@ -131,15 +136,14 @@ namespace octet {
     }
 
     // see http://www.opengl.org/registry/specs/EXT/texture_compression_s3tc.txt
-    // We can't decode s3 data as there is a patent. If you were foolish enough to use a DDS file,
-    // you can expect lousy resolution!
-    void hack_s3(dynarray<uint8_t> &full_image, unsigned dxt, unsigned width, unsigned height, const uint8_t *src, const uint8_t *src_max) {
+    // a s3tc dirty hack.
+    void hack_s3(uint8_t *image, unsigned dxt, unsigned width, unsigned height, const uint8_t *src, const uint8_t *src_max) {
       unsigned max_bytes = (width) * (height) * 8;
       if (dxt != 1) max_bytes *= 2;
       //if (src_max - src > max_bytes) return; // oops
 
       for (unsigned y = 0; y != height; ++y) {
-        uint8_t *dest = (uint8_t *)( &full_image[0] + y * (width * 4) );
+        uint8_t *dest = (uint8_t *)( image + y * (width * 4) );
         for (unsigned x = 0; x != width; ++x) {
           if (dxt == 1) {
             hack_dxt1(dest, src+8, width * 4, false);
@@ -158,28 +162,153 @@ namespace octet {
       }
     }
 
+    static void swap(uint32_t &a, uint32_t &b) {
+      uint32_t t = a; a =  b; b = t;
+    }
+
+    static void swap(uint8_t &a, uint8_t &b) {
+      uint8_t t = a; a =  b; b = t;
+    }
+
+    static void swap3(uint8_t *p1, uint8_t *p2) {
+      // 00011122 23334445 55666777
+      // 44455566 67770001 11222333
+      unsigned s1 = p1[0] + p1[1] * 0x100 + p1[2] * 0x10000;
+      unsigned s2 = p2[0] + p2[1] * 0x100 + p2[2] * 0x10000;
+      s1 = ( s1 >> 12 ) | ( s1 << 12 );
+      s2 = ( s2 >> 12 ) | ( s2 << 12 );
+      p1[0] = (s2 >> 0) & 0xff;
+      p1[1] = (s2 >> 8) & 0xff;
+      p1[2] = (s2 >> 16) & 0xff;
+      p2[0] = (s1 >> 0) & 0xff;
+      p2[1] = (s1 >> 8) & 0xff;
+      p2[2] = (s1 >> 16) & 0xff;
+    }
+
+    void flip_dxt1(dynarray<uint8_t> &image, unsigned width, unsigned height) {
+      unsigned offset = 0;
+      while (width >= 4 && height >= 4) {
+        unsigned xmax = width < 4 ? 1 : width/4;
+        unsigned ymax = height < 4 ? 1 : height/4;
+        if (offset + xmax * ymax * 8 > image.size()) break; 
+        for (unsigned y = 0; y < height/8; y++) {
+          uint8_t *p1 = &image[offset + (y * xmax) * 8];
+          uint8_t *p2 = &image[offset + ((ymax - y - 1) * xmax) * 8];
+          for (unsigned x = 0; x < width/4; x++) {
+            swap((uint32_t&)p1[0], (uint32_t&)p2[0]);
+            swap(p1[4], p2[7]);
+            swap(p1[5], p2[6]);
+            swap(p1[6], p2[5]);
+            swap(p1[7], p2[4]);
+            p1 += 8;
+            p2 += 8;
+          }
+        }
+        width >>= 1;
+        height >>= 1;
+        offset += xmax * ymax * 8;
+      }
+    }
+
+    void flip_dxt3(dynarray<uint8_t> &image, unsigned width, unsigned height) {
+      unsigned offset = 0;
+      while (width >= 4 && height >= 4) {
+        unsigned xmax = width < 4 ? 1 : width/4;
+        unsigned ymax = height < 4 ? 1 : height/4;
+        if (offset + xmax * ymax * 16 > image.size()) break; 
+        for (unsigned y = 0; y < height/8; y++) {
+          uint8_t *p1 = &image[offset + (y * xmax) * 16];
+          uint8_t *p2 = &image[offset + ((ymax - y - 1) * xmax) * 16];
+          for (unsigned x = 0; x < width/4; x++) {
+            swap(p1[0], p2[6]);
+            swap(p1[1], p2[7]);
+            swap(p1[2], p2[4]);
+            swap(p1[3], p2[5]);
+            swap(p1[4], p2[2]);
+            swap(p1[5], p2[3]);
+            swap(p1[6], p2[0]);
+            swap(p1[7], p2[1]);
+            p1 += 8;
+            p2 += 8;
+            swap((uint32_t&)p1[0], (uint32_t&)p2[0]);
+            swap(p1[4], p2[7]);
+            swap(p1[5], p2[6]);
+            swap(p1[6], p2[5]);
+            swap(p1[7], p2[4]);
+            p1 += 8;
+            p2 += 8;
+          }
+        }
+        width >>= 1;
+        height >>= 1;
+        offset += xmax * ymax * 16;
+      }
+    }
+
+    void flip_dxt5(dynarray<uint8_t> &image, unsigned width, unsigned height) {
+      unsigned offset = 0;
+      while (width >= 4 && height >= 4) {
+        unsigned xmax = width < 4 ? 1 : width/4;
+        unsigned ymax = height < 4 ? 1 : height/4;
+        if (offset + xmax * ymax * 16 > image.size()) break; 
+        for (unsigned y = 0; y < height/8; y++) {
+          uint8_t *p1 = &image[offset + (y * xmax) * 16];
+          uint8_t *p2 = &image[offset + ((ymax - y - 1) * xmax) * 16];
+          for (unsigned x = 0; x < width/4; x++) {
+            // swap alphas
+            swap(p1[0], p2[0]);
+            swap(p1[1], p2[1]);
+            // swap 3 bit indices
+            swap3(p1+2, p2+5);
+            swap3(p1+5, p2+2);
+            p1 += 8;
+            p2 += 8;
+            swap((uint32_t&)p1[0], (uint32_t&)p2[0]);
+            swap(p1[4], p2[7]);
+            swap(p1[5], p2[6]);
+            swap(p1[6], p2[5]);
+            swap(p1[7], p2[4]);
+            p1 += 8;
+            p2 += 8;
+          }
+        }
+        width >>= 1;
+        height >>= 1;
+        offset += xmax * ymax * 16;
+      }
+    }
   public:
     // get an opengl texture from a file in memory
-    void get_image(dynarray<uint8_t> &full_image, uint32_t &num_components, uint32_t &width, uint32_t &height, const uint8_t *src, const uint8_t *src_max) {
+    void get_image(dynarray<uint8_t> &image, uint16_t &format, uint16_t &width, uint16_t &height, const uint8_t *src, const uint8_t *src_max) {
       // convert the data
       dds_header *header = (dds_header*)src;
 
       if (le4(header->magic) != dds_magic) return;
-
 
       unsigned pf_flags = le4(header->pf.flags);
 
       if (pf_flags & ddpf_fourcc) {
         uint8_t *fourcc = header->pf.fourcc;
         if (fourcc[0] == 'D' && fourcc[1] == 'X' && fourcc[2] == 'T') {
-          // as S3TC is patented, we can't put a decoder in open source code.
-          // this is a hack that gets a 1/4 res image without using the S3 algorithm.
-          width = le4(header->width)/4;
-          height = le4(header->height)/4;
-          num_components = 4;
+          width = le4(header->width);
+          height = le4(header->height);
 
-          full_image.resize(width * height * 4);
-          hack_s3(full_image, fourcc[3]-'0', width, height, src + 128, src_max);
+          format =
+            fourcc[3] == '1' ? COMPRESSED_RGB_S3TC_DXT1_EXT :
+            fourcc[3] == '3' ? COMPRESSED_RGBA_S3TC_DXT3_EXT :
+            fourcc[3] == '5' ? COMPRESSED_RGBA_S3TC_DXT5_EXT :
+            0
+          ;
+          unsigned size = src_max - src - 128;
+          image.resize(size);
+          memcpy(&image[0], src + 128, size);
+
+          // dds textures are upside down, flip them!
+          switch (format) {
+            case COMPRESSED_RGB_S3TC_DXT1_EXT: flip_dxt1(image, width, height); break;
+            case COMPRESSED_RGBA_S3TC_DXT3_EXT: flip_dxt3(image, width, height); break;
+            case COMPRESSED_RGBA_S3TC_DXT5_EXT: flip_dxt5(image, width, height); break;
+          }
           return;
         }
       }

@@ -190,6 +190,7 @@ namespace octet {
     // one dimensional inverse DCT.
     // c0 is the DC term and c1..c7 increase in frequency
     // example: c0 = 128, c1..c7 = 0 -> 128, 128, 128, 128, 128, 128, 128, 128
+    // todo: improve this!
     OCTET_HOT void idct(float &c0, float &c1, float &c2, float &c3, float &c4, float &c5, float &c6, float &c7) {
       float c2c6_1 = (c2 + c6) * 0.541196100f;
       float c2c6_2 = c2c6_1 + c6 * -1.847759065f;
@@ -296,7 +297,7 @@ namespace octet {
     }
 
     // JPEG files are split up into chunks starting with 0xff
-    unsigned decode_chunk(const uint8_t *src, dynarray<uint8_t> &full_image) {
+    unsigned decode_chunk(const uint8_t *src, dynarray<uint8_t> &image, uint16_t &format) {
       if (debug) printf("decode_chunk %02x\n", src[1]);
 
       unsigned length = 2;
@@ -457,7 +458,9 @@ namespace octet {
           
           int stride = width * 4;
           if (num_mcu_blocks == 3) {
-            full_image.resize(width * height * 4);
+            unsigned size = width * height * 4;
+            image.resize(size);
+            format = 0x1908; // GL_RGBA
           }
           for (unsigned y = 0; y != ymax; ++y) {
             for (unsigned x = 0; x != xmax; ++x) {
@@ -470,7 +473,7 @@ namespace octet {
               }
               if (num_mcu_blocks == 3) {
                 // assume 4:4:4 YCbCr
-                color_convert_444(&full_image[( ( height - 1 - y * 8 ) * stride ) + ( x * 8 * 4 )], -stride, dct_coeffs);
+                color_convert_444(&image[( ( height - 1 - y * 8 ) * stride ) + ( x * 8 * 4 )], -stride, dct_coeffs);
               }
             }
           }
@@ -511,13 +514,13 @@ namespace octet {
     }
   public:
     // get an opengl texture from a file in memory
-    void get_image(dynarray<uint8_t> &full_image, uint32_t &num_components, uint32_t &width_, uint32_t &height_, const uint8_t *src, const uint8_t *src_max) {
+    void get_image(dynarray<uint8_t> &image, uint16_t &format, uint16_t &width_, uint16_t &height_, const uint8_t *src, const uint8_t *src_max) {
       while (src < src_max) {
         if (src[0] != 0xff) {
           printf("warning: bad JPEG file\n");
           return;
         }
-        unsigned length = decode_chunk(src, full_image);
+        unsigned length = decode_chunk(src, image, format);
         if (!length) {
           printf("warning: bad JPEG file\n");
           return;

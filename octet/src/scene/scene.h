@@ -300,7 +300,7 @@ namespace octet {
     }
 
     // play an animation on another target (not the same one as in the collada file)
-    void play(animation *anim, animation_target *target, bool is_looping) {
+    void play(animation *anim, resource *target, bool is_looping) {
       animation_instance *inst = new animation_instance(anim, target, is_looping);
       animation_instances.push_back(inst);
     }

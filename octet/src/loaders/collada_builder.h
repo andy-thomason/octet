@@ -791,7 +791,7 @@ namespace octet {
               input = sibling(input, "input");
             }
 
-            animation_target *target = dict.get_animation_target(node_name);
+            resource *target = dict.get_resource(node_name);
             anim->add_channel(target, node_sid, sub_target_sid, component_sid, times, values);
           }
         }

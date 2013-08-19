@@ -20,7 +20,7 @@ namespace octet {
   class animation_instance;
   class scene;
   class scene_node;
-  class animation_target;
+  class param;
 
   // this macro implements standard functions for each class
   #define RESOURCE_META(classname) \
@@ -34,6 +34,12 @@ namespace octet {
   public:
     resource() {
       ref_count = 0;
+    }
+
+    static resource *new_type(atom_t type);
+
+    // called by an animation, script or RPC.
+    virtual void set_value(atom_t sid, atom_t sub_target, atom_t component, float *value) {
     }
 
     virtual void visit(visitor &v) {
@@ -72,7 +78,7 @@ namespace octet {
     virtual animation_instance *get_animation_instance() { return 0; }
     virtual scene *get_scene() { return 0; }
     virtual scene_node *get_scene_node() { return 0; }
-    virtual animation_target *get_animation_target() { return 0; }
+    virtual param *get_param() { return 0; }
   };
 }
 

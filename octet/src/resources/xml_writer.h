@@ -67,7 +67,7 @@ namespace octet {
       stack.pop_back();
     }
 
-    bool begin_refs(atom_t sid, bool is_dict) {
+    bool begin_refs(atom_t sid, int &size, bool is_dict) {
       TiXmlElement *child = new TiXmlElement("refs");
       stack.back()->LinkEndChild(child);
       stack.push_back(child);

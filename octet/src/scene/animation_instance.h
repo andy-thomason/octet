@@ -10,14 +10,14 @@
 namespace octet {
   class animation_instance : public resource {
     ref<animation> anim;
-    ref<animation_target> target;
+    ref<resource> target;
     float time;
     bool is_looping;
     bool is_paused;
   public:
     RESOURCE_META(animation_instance)
 
-    animation_instance(animation *anim, animation_target *target, bool is_looping) {
+    animation_instance(animation *anim=0, resource *target=0, bool is_looping=true) {
       this->target = target;
       this->anim = anim;
       this->time = 0;
@@ -48,7 +48,7 @@ namespace octet {
         }
       } else {
         for (int ch = 0; ch != anim->get_num_channels(); ++ch) {
-          animation_target *anim_target = anim->get_target(ch);
+          resource *anim_target = anim->get_target(ch);
           anim->eval_chan(ch, time, anim_target);
         }
       }

@@ -42,7 +42,7 @@ namespace octet {
     }
   public:
     // get an opengl texture from a file in memory
-    void get_image(dynarray<uint8_t> &full_image, uint32_t &num_components, uint32_t &width, uint32_t &height, const uint8_t *src, const uint8_t *src_max) {
+    void get_image(dynarray<uint8_t> &image, uint16_t &format, uint16_t &width, uint16_t &height, const uint8_t *src, const uint8_t *src_max) {
       // convert the data
       TgaHeader *header = (TgaHeader*)src;
       const uint8_t *data = (uint8_t *)src + sizeof(TgaHeader);
@@ -57,10 +57,13 @@ namespace octet {
       //assert(header->descriptor == 0);
       assert(header->bits == 32 || header->bits == 24);
     
-      num_components = header->bits / 8;
-      dynarray<unsigned char> buffer;
-      buffer.resize(width * height * 4);
-      uint8_t *dest = &buffer[0];
+      unsigned num_components = header->bits / 8;
+
+      unsigned size = width * height * num_components;
+      image.resize(size);
+      format = num_components == 3 ? 0x1907 : 0x1908; // GL_RGB / GL_RGBA
+
+      uint8_t *dest = &image[0];
 
       if (num_components == 4) {
         // swap red and blue!
@@ -92,8 +95,7 @@ namespace octet {
             dest[0] = red;
             dest[1] = green;
             dest[2] = blue;
-            dest[3] = 255;
-            dest += 4;
+            dest += 3;
           }
         }
       }

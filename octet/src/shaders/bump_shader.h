@@ -120,7 +120,7 @@ namespace octet {
           float shininess = texture2D(samplers[5], uv_).x * 255.0;
           vec3 bump = normalize(vec3(texture2D(samplers[4], uv_).xy-vec2(0.5, 0.5), 1));
           vec3 nnormal = normal_; //normalize(bump.x * tangent_ + bump.y * bitangent_ + bump.z * normal_);
-          vec3 diffuse_light = vec3(0, 0, 0);
+          vec3 diffuse_light = vec3(0.3, 0.3, 0.3);
           vec3 specular_light = vec3(0, 0, 0);
 
           for (int i = 0; i != num_lights; ++i) {
@@ -142,14 +142,15 @@ namespace octet {
 
           vec3 ambient_light = light_uniforms[0].xyz;
 
-          gl_FragColor = 
-            vec4(ambient_light, 1) * ambient +
-            vec4(diffuse_light, 1) * diffuse +
-            emission +
-            vec4(specular_light, 1) * specular
+          gl_FragColor.xyz = 
+            ambient_light * ambient.xyz +
+            diffuse_light * diffuse.xyz +
+            emission.xyz +
+            specular_light * specular.xyz
           ;
+          gl_FragColor.w = diffuse.w;
           // how to debug your fragment shader: set gl_FragColor to the value you want to look at!
-          //gl_FragColor = vec4(light_uniforms[3].xyz, 1);
+          //gl_FragColor = diffuse;
           //gl_FragColor = texture2D(samplers[5], uv_);
           //gl_FragColor = vec4(ambient_light, 1);
           //gl_FragColor = vec4(light_uniforms[2].xyz, 1);

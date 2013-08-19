@@ -8,7 +8,7 @@
 //
 
 namespace octet {
-  class mesh_instance : public resource, public animation_target {
+  class mesh_instance : public resource {
     // which scene_node (model to world matrix) to use in the scene
     ref<scene_node> node;
 
@@ -25,7 +25,7 @@ namespace octet {
   public:
     RESOURCE_META(mesh_instance)
 
-    mesh_instance(scene_node *node, mesh *msh, material *mat, skeleton *skel=0) {
+    mesh_instance(scene_node *node=0, mesh *msh=0, material *mat=0, skeleton *skel=0) {
       this->node = node;
       this->msh = msh;
       this->mat = mat;

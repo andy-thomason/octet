@@ -73,7 +73,7 @@ namespace octet {
       next().format("%*s]},\n", depth*2, "");
     }
 
-    bool begin_refs(atom_t sid, bool is_dict) {
+    bool begin_refs(atom_t sid, int &size, bool is_dict) {
       if (depth == max_depth) {
         next().format("%*s{ \"data\": \"%s\" },\n", depth*2, "", app_utils::get_atom_name(sid));
         return false;
