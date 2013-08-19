@@ -92,7 +92,7 @@ namespace octet {
 
       const char *filename = 0;
 
-      int selector = 0;
+      int selector = 7;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;
@@ -101,6 +101,7 @@ namespace octet {
         case 4: filename = "assets/Laurana50k.dae"; break;
         case 5: filename = "external/Arteria3d/ElvenMale/ElevenMaleKnight_blender.dae"; break;
         case 6: filename = "external/Arteria3d/arteria3d_tropicalpack/flowers/flower%202.dae"; break; 
+        case 7: filename = "assets/plane.dae"; break;
       }
 
       load_file(filename);

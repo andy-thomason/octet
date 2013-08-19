@@ -28,6 +28,7 @@ namespace octet {
     // optional skin
     ref<skin> mesh_skin;
     
+    // bounding box
     aabb mesh_aabb;
 
     mesh(mesh &rhs);

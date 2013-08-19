@@ -153,19 +153,9 @@ static char *get_sprintf_buffer() {
 namespace octet {
   inline resource *resource::new_type(atom_t type) {
     switch (type) {
-      case atom_skin: return new skin();
-      case atom_skeleton: return new skeleton();
-      case atom_mesh: return new mesh();
-      case atom_material: return new material();
-      case atom_image: return new image();
-      case atom_animation: return new animation();
-      case atom_camera_instance: return new camera_instance();
-      case atom_light_instance: return new light_instance();
-      case atom_mesh_instance: return new mesh_instance();
-      case atom_animation_instance: return new animation_instance();
-      case atom_scene: return new scene();
-      case atom_scene_node: return new scene_node();
-      case atom_param: return new param();
+      #define OCTET_CLASS(X) case atom_##X: return new X();
+      #include "../resources/classes.h"
+      #undef OCTET_CLASS
     }
     return NULL;
   }

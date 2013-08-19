@@ -8,19 +8,9 @@
 //
 
 namespace octet {
-  class skin;
-  class skeleton;
-  class mesh;
-  class material;
-  class image;
-  class animation;
-  class camera_instance;
-  class light_instance;
-  class mesh_instance;
-  class animation_instance;
-  class scene;
-  class scene_node;
-  class param;
+  #define OCTET_CLASS(X) class X;
+  #include "classes.h"
+  #undef OCTET_CLASS
 
   // this macro implements standard functions for each class
   #define RESOURCE_META(classname) \
@@ -66,19 +56,9 @@ namespace octet {
     void operator delete (void *ptr, size_t size) { return allocator::free(ptr, size); }
 
     // casting and aggregation
-    virtual skin *get_skin() { return 0; }
-    virtual skeleton *get_skeleton() { return 0; }
-    virtual mesh *get_mesh() { return 0; }
-    virtual material *get_material() { return 0; }
-    virtual image *get_image() { return 0; }
-    virtual animation *get_animation() { return 0; }
-    virtual camera_instance *get_camera_instance() { return 0; }
-    virtual light_instance *get_light_instance() { return 0; }
-    virtual mesh_instance *get_mesh_instance() { return 0; }
-    virtual animation_instance *get_animation_instance() { return 0; }
-    virtual scene *get_scene() { return 0; }
-    virtual scene_node *get_scene_node() { return 0; }
-    virtual param *get_param() { return 0; }
+    #define OCTET_CLASS(X) virtual X *get_##X() { return 0; }
+    #include "classes.h"
+    #undef OCTET_CLASS
   };
 }
 
