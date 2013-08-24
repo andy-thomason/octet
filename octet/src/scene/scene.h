@@ -155,7 +155,9 @@ namespace octet {
           assert(num_bones < 64);
           mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, light_uniforms, num_light_uniforms, num_lights);
         }
-        msh->render();
+        msh->enable_attributes();
+        msh->draw();
+        msh->disable_attributes();
       }
       frame_number++;
     }
@@ -278,6 +280,16 @@ namespace octet {
     // access camera_instance information
     camera_instance *get_camera_instance(int index) {
       return camera_instances[index];
+    }
+
+    // access mesh_instance information
+    mesh_instance *get_mesh_instance(int index) {
+      return mesh_instances[index];
+    }
+
+    // access light_instance information
+    light_instance *get_light_instance(int index) {
+      return light_instances[index];
     }
 
     // advance all the animation instances

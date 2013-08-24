@@ -42,7 +42,7 @@ namespace octet {
 	    unsigned max_indices = 2048;
 	    unsigned vsize = sizeof(vertex) * max_vertices;
 	    unsigned isize = sizeof(unsigned short) * max_indices;
-	    msh->allocate(vsize, isize, false);
+	    msh->allocate(vsize, isize);
       //msh->assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
       msh->set_params(sizeof(vertex), 0, 0, GL_TRIANGLES, GL_UNSIGNED_SHORT);
 
@@ -59,8 +59,8 @@ namespace octet {
         0, 1, 2, 2, 1, 3,
       };
 
-      msh->get_vertices().assign((void*)vtx, 0, sizeof(vtx));
-      msh->get_indices().assign((void*)ind, 0, sizeof(ind));
+      msh->get_vertices()->assign((void*)vtx, 0, sizeof(vtx));
+      msh->get_indices()->assign((void*)ind, 0, sizeof(ind));
       msh->set_num_vertices(4);
       msh->set_num_indices(6);
     }

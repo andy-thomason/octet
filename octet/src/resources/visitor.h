@@ -14,6 +14,7 @@ namespace octet {
 
   class visitable {
   public:
+    virtual ~visitable() = 0;
     virtual atom_t get_type() = 0;
     virtual void visit(visitor &v) = 0;
   };
@@ -37,6 +38,9 @@ namespace octet {
     visitor() {
       depth = 0;
       error = false;
+    }
+
+    virtual ~visitor() {
     }
 
     // depth for debugging

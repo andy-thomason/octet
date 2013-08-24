@@ -85,6 +85,9 @@ namespace octet {
       mouse_x = mouse_y = 0;
     }
 
+    virtual ~app_common() {
+    }
+
     virtual void draw_world(int x, int y, int w, int h) = 0;
     virtual void app_init() = 0;
 

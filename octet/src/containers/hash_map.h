@@ -86,6 +86,12 @@ namespace octet {
       return entry->value;
     }
 
+    bool contains(const key_t &key) {
+      unsigned hash = (unsigned)(size_t)(key);
+      entry_t *entry = find( key, hash );
+      return !!entry->key;
+    }
+
     // bye bye hash map
     ~hash_map() {
       allocator_t::free(entries, sizeof(entry_t) * max_entries);

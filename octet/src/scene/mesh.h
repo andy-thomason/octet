@@ -9,8 +9,8 @@
 
 namespace octet {
   class mesh : public resource {
-    gl_resource vertices;
-    gl_resource indices;
+    ref<gl_resource> vertices;
+    ref<gl_resource> indices;
 
     // attribute formats
     enum { max_slots = 16 };
@@ -23,15 +23,13 @@ namespace octet {
     unsigned short index_type;
     unsigned short normalized;
 
-    unsigned char num_slots;
+    uint8_t num_slots;
 
     // optional skin
     ref<skin> mesh_skin;
     
     // bounding box
     aabb mesh_aabb;
-
-    mesh(mesh &rhs);
 
   public:
     RESOURCE_META(mesh)
@@ -41,8 +39,8 @@ namespace octet {
     }
 
     void visit(visitor &v) {
-      v.visit_agg(vertices, atom_vertices);
-      v.visit_agg(indices, atom_indices);
+      v.visit(vertices, atom_vertices);
+      v.visit(indices, atom_indices);
       v.visit(format, atom_format);
       v.visit(num_indices, atom_num_indices);
       v.visit(num_vertices, atom_num_vertices);
@@ -56,10 +54,12 @@ namespace octet {
     }
 
     ~mesh() {
-      release();
     }
 
     void init(skin *_skin=0) {
+      vertices = new gl_resource();
+      indices = new gl_resource();
+
       memset(format, 0, sizeof(format));
 
       num_indices = 0;
@@ -76,9 +76,8 @@ namespace octet {
       mesh_skin = _skin;
     }
 
-    void release() {
-      vertices.release();
-      indices.release();
+    void clear_attributes() {
+      num_slots = 0;
     }
 
     // eg. add_attribute(attribute_pos, 3, GL_FLOAT, 0)
@@ -90,7 +89,7 @@ namespace octet {
     }
 
     static unsigned kind_size(unsigned kind) {
-      static const unsigned char bytes[] = { 1, 1, 2, 2, 4, 4, 4, 4 };
+      static const uint8_t bytes[] = { 1, 1, 2, 2, 4, 4, 4, 4 };
       return kind < GL_BYTE || kind > GL_FLOAT ? 0 : bytes[kind - GL_BYTE];
     }
 
@@ -134,8 +133,9 @@ namespace octet {
       return num_slots;
     }
 
-    bool get_use_vbo() const {
-      return vertices.get_use_vbo();
+    // get the optional skin data
+    skin *get_skin() const {
+      return (skin*)mesh_skin;
     }
 
     void set_num_vertices(unsigned value) {
@@ -146,9 +146,8 @@ namespace octet {
       num_indices = value;
     }
 
-    // get the optional skin data
-    skin *get_skin() const {
-      return (skin*)mesh_skin;
+    void set_mode(unsigned value) {
+      mode = value;
     }
 
     // set the optional skin
@@ -177,12 +176,6 @@ namespace octet {
       return false;
     }
 
-    // avoid using these, please! Just for testing
-    const void *get_vertices() const { return vertices.get_ptr(); }
-    const void *get_indices() const { return indices.get_ptr(); }
-    unsigned get_vertices_size() const { return vertices.get_size(); }
-    unsigned get_indices_size() const { return indices.get_size(); }
-
     // get which slot a particular attribute is in
     unsigned get_slot(unsigned attr) const {
       for (unsigned i = 0; i != max_slots; ++i) {
@@ -197,94 +190,82 @@ namespace octet {
     // get a vec4 value of an attribute (only when not in a vbo)
     vec4 get_value(unsigned slot, unsigned index) const {
       if (get_kind(slot) == GL_FLOAT) {
-        const float *src = (float*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
+        const float *src = (float*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         float x = src[0];
         float y = size > 1 ? src[1] : 0;
         float z = size > 2 ? src[2] : 0;
         float w = size > 3 ? src[3] : 1;
+        vertices->unlock();
         return vec4(x, y, z, w);
 	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
-        const unsigned char *src = (unsigned char*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
+        const uint8_t *src = (uint8_t*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         float x = src[0]*(1.0f/255);
         float y = size > 1 ? src[1]*(1.0f/255) : 0;
         float z = size > 2 ? src[2]*(1.0f/255) : 0;
         float w = size > 3 ? src[3]*(1.0f/255) : 1;
+        vertices->unlock();
         return vec4(x, y, z, w);
       }
       return vec4(0, 0, 0, 0);
     }
 
+    void get_values(unsigned slot, uint8_t *dest, unsigned dest_stride) {
+      unsigned bytes = kind_size(get_kind(slot)) * get_size(slot);
+      unsigned nv = get_num_vertices();
+      uint8_t *src = (uint8_t*)vertices->lock() + get_offset(slot);
+      for (unsigned i  = 0; i != nv; ++i) {
+        memcpy(dest, src, bytes);
+        src += stride;
+        dest += dest_stride;
+      }
+      vertices->unlock();
+    }
+
     // set a vec4 value of an attribute (only when not in a vbo)
     void set_value(unsigned slot, unsigned index, vec4 value) {
       if (get_kind(slot) == GL_FLOAT) {
-        float *src = (float*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
+        float *src = (float*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         src[0] = value[0];
         if (size > 1) src[1] = value[1];
         if (size > 2) src[2] = value[2];
         if (size > 3) src[3] = value[3];
-	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
-        unsigned char *src = (unsigned char*)((unsigned char*)vertices.get_ptr() + stride * index + get_offset(slot));
+        vertices->unlock();
+  	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
+        uint8_t *src = (uint8_t*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
-        src[0] = (unsigned char)( value[0] * 255.0f );
-        if (size > 1) src[1] = (unsigned char)( value[1] * 255.0f );
-        if (size > 2) src[2] = (unsigned char)( value[2] * 255.0f );
-        if (size > 3) src[3] = (unsigned char)( value[3] * 255.0f );
+        src[0] = (uint8_t)( value[0] * 255.0f );
+        if (size > 1) src[1] = (uint8_t)( value[1] * 255.0f );
+        if (size > 2) src[2] = (uint8_t)( value[2] * 255.0f );
+        if (size > 3) src[3] = (uint8_t)( value[3] * 255.0f );
+        vertices->unlock();
       }
-    }
-
-    void set_mode(unsigned value) {
-      mode = value;
     }
 
     unsigned get_index(unsigned index) const {
+      unsigned result = 0;
       if (index_type == GL_UNSIGNED_SHORT) {
-        unsigned short *src = (unsigned short*)((unsigned char*)indices.get_ptr() + index*2);
-        return *src;
+        unsigned short *src = (unsigned short*)((uint8_t*)indices->lock() + index*2);
+        result = *src;
+        indices->lock();
       } else if (index_type == GL_UNSIGNED_INT) {
-        unsigned int *src = (unsigned int*)((unsigned char*)indices.get_ptr() + index*4);
-        return *src;
+        unsigned int *src = (unsigned int*)((uint8_t*)indices->lock() + index*4);
+        result = *src;
+        indices->lock();
       }
-      return 0;
+      return result;
     }
 
-    void begin_render(unsigned char **base, unsigned char **index_base) const {
-      *base = (unsigned char *)vertices.bind();
-      *index_base = (unsigned char *)indices.bind();
+    void allocate(unsigned vsize, unsigned isize) {
+      vertices->allocate(GL_ARRAY_BUFFER, vsize);
+      indices->allocate(GL_ELEMENT_ARRAY_BUFFER, isize);
     }
 
-    void allocate(unsigned vsize, unsigned isize, bool use_vbo_) {
-      vertices.allocate(GL_ARRAY_BUFFER, vsize, use_vbo_);
-      indices.allocate(GL_ELEMENT_ARRAY_BUFFER, isize, use_vbo_);
-    }
-
-    void assign(unsigned vsize, unsigned isize, unsigned char *vsrc, unsigned char *isrc) {
-      vertices.assign(vsrc, 0, vsize);
-      indices.assign(isrc, 0, isize);
-    }
-
-    void copy_format(const mesh &src) {
-      memcpy(format, src.format, sizeof(format));
-    }
-
-    void copy_params(const mesh &src) {
-      num_indices = src.num_indices;
-      num_vertices = src.num_vertices;
-      stride = src.stride;
-      mode = src.mode;
-      index_type = src.index_type;
-
-      num_slots = src.num_slots;
-    }
-
-    void copy_indices(const mesh &src) {
-      indices.copy(src.indices);
-    }
-
-    void copy_vertices(const mesh &src) {
-      vertices.copy(src.vertices);
+    void assign(unsigned vsize, unsigned isize, uint8_t *vsrc, uint8_t *isrc) {
+      vertices->assign(vsrc, 0, vsize);
+      indices->assign(isrc, 0, isize);
     }
 
     void set_params(unsigned stride_, unsigned num_indices_, unsigned num_vertices_, unsigned mode_, unsigned index_type_) {
@@ -307,20 +288,19 @@ namespace octet {
         fprintf(file, "  </slot>\n");
       }
       fprintf(file, "  <indices>\n    ");
-      void *ptr = indices.get_ptr();
+      void *ptr = indices->lock();
       for (unsigned i = 0; i != num_indices; ++i) {
         fprintf(file, "%d ", ((short*)ptr)[i]);
       }
+      indices->unlock();
       fprintf(file, "\n  </indices>\n");
       fprintf(file, "</model>\n");
     }
 
     // render a mesh with OpenGL
     // assume the shader, uniforms and render params are already set up.
-    void render() const {
-      unsigned char *base = 0;
-      unsigned char *index_base = 0;
-      begin_render(&base, &index_base);
+    void enable_attributes() const {
+      vertices->bind();
 
       unsigned n = normalized;
       for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
@@ -328,21 +308,32 @@ namespace octet {
         unsigned kind = get_kind(slot);
         unsigned attr = get_attr(slot);
         unsigned offset = get_offset(slot);
-        glVertexAttribPointer(attr, size, kind, n & 1, get_stride(), (void*)(base + offset));
+        glVertexAttribPointer(attr, size, kind, n & 1, get_stride(), (void*)(offset));
         glEnableVertexAttribArray(attr);
         n >>= 1;
       }
+    }
 
-      glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)index_base);
+    void draw() {
+      indices->bind();
+      glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)0);
+    }
 
+    void disable_attributes() {
       for (unsigned slot = 0; slot != get_num_slots(); ++slot) {
         unsigned attr = get_attr(slot);
         glDisableVertexAttribArray(attr);
       }
     }
 
+    void render() {
+      enable_attributes();
+      draw();
+      disable_attributes();
+    }
+
     void make_cube(float size = 1.0f) {
-      release();
+      init();
       mesh_builder b;
     
       b.init(6*4, 6*6);
@@ -352,7 +343,7 @@ namespace octet {
     }
 
     void make_aa_box(float x, float y, float z) {
-      release();
+      init();
       mesh_builder b;
     
       b.init(6*4, 6*6);
@@ -363,7 +354,7 @@ namespace octet {
     }
 
     void make_plane(float size = 1.0f, unsigned nx=1, unsigned ny=1) {
-      release();
+      init();
       mesh_builder b;
       b.init(nx*ny*2, nx*ny*6);
       b.add_plane(size, nx, ny);
@@ -371,7 +362,7 @@ namespace octet {
     }
 
     void make_sphere(float radius=1.0f, unsigned slices=16, unsigned stacks=16) {
-      release();
+      init();
       mesh_builder b;
     
       b.init(stacks*(slices+1), stacks*slices*6);
@@ -381,7 +372,7 @@ namespace octet {
     }
 
     void make_cone(float radius=1.0f, float height=1.0f, unsigned slices=32, unsigned stacks=1) {
-      release();
+      init();
       mesh_builder b;
     
       b.init(stacks*slices, stacks*slices*6+1);
@@ -393,7 +384,7 @@ namespace octet {
     // make a bunch of lines to show normals.
     // render this with GL_LINES
     void make_normal_visualizer(const mesh &source, float length, unsigned normal_attr) {
-      release();
+      init();
       mesh_builder builder;
     
       builder.init(source.get_num_vertices()*2, source.get_num_vertices()*2);
@@ -415,8 +406,8 @@ namespace octet {
 
     // make the normal, tangent, bitangent space for each vertex
     void add_3d_normals(const mesh &source) {
-      release();
-      if (source.get_use_vbo() || source.get_mode() != GL_TRIANGLES || source.get_num_indices() % 3 != 0) {
+      init();
+      if (source.get_mode() != GL_TRIANGLES || source.get_num_indices() % 3 != 0) {
         printf("warning: make_3d_normals expected triangles\n");
         return;
       }
@@ -429,10 +420,10 @@ namespace octet {
       unsigned bitangent_slot = add_attribute(attribute_bitangent, 3, GL_FLOAT, stride + 12);
 
       unsigned vsize = (stride + 24) * source.get_num_vertices();
-      unsigned isize = source.get_indices_size(); //mesh::kind_size(get_index_type()) * source.get_num_indices();
-      allocate(vsize, isize, false);
+      unsigned isize = source.get_indices()->get_size(); //mesh::kind_size(get_index_type()) * source.get_num_indices();
+      allocate(vsize, isize);
       set_params(stride + 24, source.get_num_indices(), source.get_num_vertices(), source.get_mode(), source.get_index_type());
-      copy_indices(source);
+      indices = source.get_indices();
 
       unsigned pos_slot = source.get_slot(attribute_pos);
       unsigned uv_slot = source.get_slot(attribute_uv);
@@ -505,7 +496,7 @@ namespace octet {
 
     // apply a matrix to every position
     void transform(unsigned attr, mat4t &matrix) {
-      if (get_use_vbo() || get_num_vertices() == 0) {
+      if (get_num_vertices() == 0) {
         return;
       }
 
@@ -518,20 +509,20 @@ namespace octet {
     }
 
     // clone a mesh state
-    void copy(const mesh &source) {
-      copy_format(source);
-      copy_params(source);
+    /*void copy(const mesh *src) {
+      copy_format(src);
+      copy_params(src);
 
-      if (get_use_vbo() || get_num_vertices() == 0) {
+      if (get_num_vertices() == 0) {
         return;
       }
 
-      unsigned vsize = source.get_vertices_size();
-      unsigned isize = source.get_indices_size();
-      allocate(vsize, isize, false);
-      copy_indices(source);
-      copy_vertices(source);
-    }
+      unsigned vsize = src->get_vertices()->get_size();
+      unsigned isize = src->get_indices()->get_size();
+      allocate(vsize, isize);
+      copy_indices(src);
+      copy_vertices(src);
+    }*/
 
     // *very* slow ray cast.
     // returns "barycentric" coordinates.
@@ -591,31 +582,24 @@ namespace octet {
       return false;
     }
 
-    // get the axis aligned bounding box (ie. the min and max of x, y, z)
-    /*void get_aabb(const mat4t &modelToWorld, vec4 &min, vec4 &max) {
-      unsigned pos_slot = get_slot(attribute_pos);
-
-      {
-        vec4 v = get_value(pos_slot, 0) * modelToWorld;
-        min = v;
-        max = v;
-      }
-  
-      for (unsigned i = 1; i < get_num_vertices(); ++i) {
-        vec4 v = get_value(pos_slot, i) * modelToWorld;
-        min = min.min(v);
-        max = max.max(v);
-      }
-    }*/
-
     // access the vbo or memory buffer
-    gl_resource &get_vertices() {
+    gl_resource *get_vertices() const {
       return vertices;
     }
 
     // access the index buffer or memory buffer
-    gl_resource &get_indices() {
+    gl_resource *get_indices() const {
       return indices;
+    }
+
+    // access the vbo or memory buffer
+    void set_vertices(gl_resource *value) {
+      vertices = value;
+    }
+
+    // access the index buffer or memory buffer
+    void set_indices(gl_resource *value) {
+      indices = value;
     }
   };
 }

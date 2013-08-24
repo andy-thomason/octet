@@ -121,18 +121,9 @@ namespace octet {
       return result;
     }
 
-    skin *get_skin(const char *id) { resource *res = get_resource(id); return res ? res->get_skin() : 0; }
-    skeleton *get_skeleton(const char *id) { resource *res = get_resource(id); return res ? res->get_skeleton() : 0; }
-    mesh *get_mesh(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh() : 0; }
-    material *get_material(const char *id) { resource *res = get_resource(id); return res ? res->get_material() : 0; }
-    image *get_image(const char *id) { resource *res = get_resource(id); return res ? res->get_image() : 0; }
-    animation *get_animation(const char *id) { resource *res = get_resource(id); return res ? res->get_animation() : 0; }
-    camera_instance *get_camera_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_camera_instance() : 0; }
-    light_instance *get_light_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_light_instance() : 0; }
-    mesh_instance *get_mesh_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_mesh_instance() : 0; }
-    animation_instance *get_animation_instance(const char *id) { resource *res = get_resource(id); return res ? res->get_animation_instance() : 0; }
-    scene *get_scene(const char *id) { resource *res = get_resource(id); return res ? res->get_scene() : 0; }
-    scene_node *get_scene_node(const char *id) { resource *res = get_resource(id); return res ? res->get_scene_node() : 0; }
+    #define OCTET_CLASS(X) X *get_##X(const char *id) { resource *res = get_resource(id); return res ? res->get_##X() : 0; }
+    #include "classes.h"
+    #undef OCTET_CLASS
 
     // find all resources of a certain type
     void find_all(dynarray<resource*> &result, atom_t type) {

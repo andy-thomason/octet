@@ -129,6 +129,8 @@ namespace octet {
     // convert an ascii sequence of integers like "1 3 9 12 34" to an array of integers
     void atoiv(dynarray<int> &values, const char *src) {  
       values.resize(0);
+      if (!src) return;
+
       while (*src > 0 && *src <= ' ') ++src;
       while(*src != 0) {
         int whole = 0, msign = 1;
@@ -142,6 +144,8 @@ namespace octet {
     // convert an ascii sequence of integers like "fred bert harry" into an array of strings
     void atonv(dynarray<string> &values, const char *src) {
       values.resize(0);
+      if (!src) return;
+
       while (*src != 0 && *src <= ' ') ++src;
       while(*src != 0) {
         int index = (int)values.size();
@@ -1091,7 +1095,7 @@ namespace octet {
         mesh->set_aabb(aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f));
       }
 
-      mesh->allocate(vsize, isize, true);
+      mesh->allocate(vsize, isize);
       mesh->assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
       mesh->set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_INT);
       if (0) {

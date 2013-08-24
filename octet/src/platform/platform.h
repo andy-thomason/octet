@@ -69,6 +69,8 @@ static char *get_sprintf_buffer() {
 #ifdef WIN32
   #include "windows_specific.h"
   //#include "glut_specific.h"
+#elif defined(SN_TARGET_PSP2)
+  #include "vita_specific.h"
 #elif defined(__APPLE__)
   #include <unistd.h>
   #include <sys/socket.h>
@@ -136,6 +138,8 @@ static char *get_sprintf_buffer() {
 #include "../scene/mesh_instance.h"
 #include "../scene/animation_instance.h"
 #include "../scene/scene.h"
+#include "../scene/displacement_map.h"
+#include "../scene/wireframe.h"
 
 // high level helpers
 #include "../helpers/mouse_ball.h"

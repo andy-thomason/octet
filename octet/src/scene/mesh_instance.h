@@ -100,6 +100,11 @@ namespace octet {
     mesh *get_mesh() const { return msh; }
     material *get_material() const { return mat; }
     skeleton *get_skeleton() const { return skel; }
+
+    void set_node(scene_node *value) { node = value; }
+    void set_mesh(mesh *value) { msh = value; }
+    void set_material(material *value) { mat = value; }
+    void set_skeleton(skeleton *value) { skel = value; }
   };
 }
 

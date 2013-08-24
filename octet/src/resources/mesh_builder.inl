@@ -14,7 +14,7 @@ namespace octet {
     unsigned isize = indices.size() * sizeof(indices[0]);
     unsigned vsize = vertices.size() * sizeof(vertices[0]);
     s.init();
-    s.allocate(vsize, isize, app_common::can_use_vbos());
+    s.allocate(vsize, isize);
     s.assign(vsize, isize, (unsigned char*)&vertices[0], (unsigned char*)&indices[0]);
     s.set_params(sizeof(vertex), indices.size(), vertices.size(), GL_TRIANGLES, GL_UNSIGNED_SHORT);
 

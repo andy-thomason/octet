@@ -72,6 +72,11 @@ namespace octet {
 
       app_scene->play_all_anims(dict);
 
+      /*for (unsigned i = 0; i != app_scene->get_num_mesh_instances(); ++i) {
+        mesh_instance *mi = app_scene->get_mesh_instance(i);
+        mi->set_mesh(new wireframe(mi->get_mesh()));
+      }*/
+
       if (app_scene->get_num_camera_instances() != 0) {
         camera_instance *cam = app_scene->get_camera_instance(0);
         scene_node *node = cam->get_node();
@@ -92,7 +97,7 @@ namespace octet {
 
       const char *filename = 0;
 
-      int selector = 7;
+      int selector = 0;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;
@@ -105,7 +110,6 @@ namespace octet {
       }
 
       load_file(filename);
-
 
       overlay.init();
       server.init(&dict);
@@ -124,9 +128,24 @@ namespace octet {
       // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
       glEnable(GL_DEPTH_TEST);
 
-      // allow alpha blend (transparency when alpha channel is 0)
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      GLint param;
+      glGetIntegerv(GL_SAMPLE_BUFFERS, &param);
+      if (param == 0) {
+        // if multisampling is disabled, we can't use GL_SAMPLE_COVERAGE (which I think is mean)
+        // Instead, allow alpha blend (transparency when alpha channel is 0)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // this is a rather brutal alpha test that cuts off anything with a small alpha.
+        #ifndef SN_TARGET_PSP2
+          glEnable(GL_ALPHA_TEST);
+          glAlphaFunc(GL_GREATER, 0.9f);
+        #endif
+      } else {
+        // if multisampling is enabled, use GL_SAMPLE_COVERAGE instead
+        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        glEnable(GL_SAMPLE_COVERAGE);
+      }
 
       // poll web server
       server.update();

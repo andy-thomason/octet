@@ -47,6 +47,15 @@ static btClock gProfileClock;
 
 #include <time.h>
 
+#elif defined(SN_TARGET_PSP2)
+struct timeval {
+  unsigned tv_sec;
+  unsigned tv_usec;
+};
+inline void gettimeofday(timeval *tv, int) {
+  tv->tv_sec = 0;
+  tv->tv_usec = 0;
+}
 
 #else //_WIN32
 #include <sys/time.h>

@@ -10,6 +10,7 @@
 
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
+#include <mmsystem.h>
 
 #include <ShellAPI.h> // for DragAcceptFiles etc.
 
@@ -22,14 +23,19 @@
 #pragma warning(disable : 4345)
 #pragma warning(disable : 4530)
 
+// basic windows audio
+#pragma comment(lib, "winmm.lib")
+
 // graphics - opengl
 #pragma comment(lib, "OpenGL32.Lib")
 #include <gl/GL.h>
 
+/*
 // audio - openal
 #pragma comment(lib, "OpenAL32.lib")
 #include "AL/alc.h"
 #include "AL/AL.h"
+*/
 
 // compute - opencl
 #if OCTET_OPENCL
@@ -52,6 +58,7 @@
 // do not use OpenGL 1.x functions *ever* they are obsolete.
 #define GL_APIENTRY __stdcall
 #include "gl_defs.h"
+#include "al_defs.h"
 
 // include cross platform app helpers, such as texture loaders
 #include "app_common.h"
@@ -71,7 +78,7 @@ namespace octet {
     HGLRC gl_context;
     HWND window_handle;
 
-    void init_gl_context(HDC hdc) {
+    void init_gl_context(HWND window_handle) {
       static const PIXELFORMATDESCRIPTOR pfd = { 
         sizeof(PIXELFORMATDESCRIPTOR),  //  size of this pfd  
         1,                     // version number  
@@ -92,7 +99,9 @@ namespace octet {
         0,                     // reserved  
         0, 0, 0                // layer masks ignored  
       };
- 
+
+      HDC hdc = GetDC(window_handle);
+
       int pixel_format = ChoosePixelFormat(hdc, &pfd);
 
       SetPixelFormat(hdc, pixel_format, &pfd);
@@ -100,6 +109,8 @@ namespace octet {
       gl_context = wglCreateContext(hdc);
 
       wglMakeCurrent (hdc, gl_context);
+
+      ReleaseDC(window_handle, hdc);
 
       init_wgl();
 
@@ -130,7 +141,7 @@ namespace octet {
 
       gl_context = 0;
      
-      window_handle = CreateWindow(L"MyClass", L"framework",
+      window_handle = CreateWindow(L"MyClass", L"octet",
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 512, 512,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
       );
@@ -140,7 +151,7 @@ namespace octet {
       // enable drag and drop of files
       DragAcceptFiles(window_handle, TRUE);
 
-      init_gl_context(GetDC(window_handle));
+      init_gl_context(window_handle);
 
       RECT rect;
       GetClientRect(window_handle, &rect);
@@ -165,6 +176,7 @@ namespace octet {
       SwapBuffers(hdc);
 
       wglMakeCurrent (hdc, NULL);
+      ReleaseDC(window_handle, hdc);
     }
 
     static unsigned translate(unsigned key) {
@@ -269,6 +281,8 @@ namespace octet {
         for (int i = 0; i != m.size(); ++i) {
           if (m.key(i)) m.value(i)->render();
         }
+
+        Fake_AL_context()->update();
       }
     }
 

@@ -16,7 +16,7 @@ namespace octet {
     }
 
     bool encode(dynarray<uint8_t> data, uint32_t width, uint32_t height, int stride, const uint8_t *src) {
-      if ((height & 7) != 0 || (width & 7) != 0) {
+      /*if ((height & 7) != 0 || (width & 7) != 0) {
         return false;
       }
 
@@ -71,7 +71,8 @@ namespace octet {
           0x93,
         0xff, 0xda, 0x00, 0x0c, // SOS
           0x03, 0x01, 0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3f, 0x00, 0xfd, 0x7f, 
-      };
+      };*/
+      return 0;
     }
   };
 }
