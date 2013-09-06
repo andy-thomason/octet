@@ -57,13 +57,15 @@ namespace octet {
       bool operator != (const iterator &rhs) const { return elem != rhs.elem; }
       void operator++() { elem++; }
       void operator--() { elem--; }
+      void operator++(int) { elem++; }
+      void operator--(int) { elem--; }
     };
 
-    iterator begin() const {
+    iterator begin() {
       return iterator(this, 0);
     }
 
-    iterator end() const {
+    iterator end() {
       return iterator(this, size_);
     }
   

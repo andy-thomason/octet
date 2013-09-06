@@ -190,22 +190,22 @@ namespace octet {
     // get a vec4 value of an attribute (only when not in a vbo)
     vec4 get_value(unsigned slot, unsigned index) const {
       if (get_kind(slot) == GL_FLOAT) {
-        const float *src = (float*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
+        const float *src = (float*)((uint8_t*)vertices->lock_read_only() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         float x = src[0];
         float y = size > 1 ? src[1] : 0;
         float z = size > 2 ? src[2] : 0;
         float w = size > 3 ? src[3] : 1;
-        vertices->unlock();
+        vertices->unlock_read_only();
         return vec4(x, y, z, w);
 	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
-        const uint8_t *src = (uint8_t*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
+        const uint8_t *src = (uint8_t*)((uint8_t*)vertices->lock_read_only() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);
         float x = src[0]*(1.0f/255);
         float y = size > 1 ? src[1]*(1.0f/255) : 0;
         float z = size > 2 ? src[2]*(1.0f/255) : 0;
         float w = size > 3 ? src[3]*(1.0f/255) : 1;
-        vertices->unlock();
+        vertices->unlock_read_only();
         return vec4(x, y, z, w);
       }
       return vec4(0, 0, 0, 0);
@@ -214,13 +214,13 @@ namespace octet {
     void get_values(unsigned slot, uint8_t *dest, unsigned dest_stride) {
       unsigned bytes = kind_size(get_kind(slot)) * get_size(slot);
       unsigned nv = get_num_vertices();
-      uint8_t *src = (uint8_t*)vertices->lock() + get_offset(slot);
+      uint8_t *src = (uint8_t*)vertices->lock_read_only() + get_offset(slot);
       for (unsigned i  = 0; i != nv; ++i) {
         memcpy(dest, src, bytes);
         src += stride;
         dest += dest_stride;
       }
-      vertices->unlock();
+      vertices->unlock_read_only();
     }
 
     // set a vec4 value of an attribute (only when not in a vbo)
@@ -247,13 +247,13 @@ namespace octet {
     unsigned get_index(unsigned index) const {
       unsigned result = 0;
       if (index_type == GL_UNSIGNED_SHORT) {
-        unsigned short *src = (unsigned short*)((uint8_t*)indices->lock() + index*2);
+        unsigned short *src = (unsigned short*)((uint8_t*)indices->lock_read_only() + index*2);
         result = *src;
-        indices->lock();
+        indices->unlock_read_only();
       } else if (index_type == GL_UNSIGNED_INT) {
-        unsigned int *src = (unsigned int*)((uint8_t*)indices->lock() + index*4);
+        unsigned int *src = (unsigned int*)((uint8_t*)indices->lock_read_only() + index*4);
         result = *src;
-        indices->lock();
+        indices->unlock_read_only();
       }
       return result;
     }
@@ -288,11 +288,10 @@ namespace octet {
         fprintf(file, "  </slot>\n");
       }
       fprintf(file, "  <indices>\n    ");
-      void *ptr = indices->lock();
-      for (unsigned i = 0; i != num_indices; ++i) {
-        fprintf(file, "%d ", ((short*)ptr)[i]);
+      unsigned ni = get_num_indices();
+      for (unsigned i = 0; i != ni; ++i) {
+        fprintf(file, "%d ", get_index(i));
       }
-      indices->unlock();
       fprintf(file, "\n  </indices>\n");
       fprintf(file, "</model>\n");
     }
@@ -601,5 +600,6 @@ namespace octet {
     void set_indices(gl_resource *value) {
       indices = value;
     }
+
   };
 }

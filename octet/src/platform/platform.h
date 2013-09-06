@@ -59,6 +59,8 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 #include "../containers/string.h"
 #include "../containers/ptr.h"
 #include "../containers/ref.h"
+#include "../containers/bitset.h"
+
 
 static char *get_sprintf_buffer() {
   static int i;
@@ -97,6 +99,18 @@ static char *get_sprintf_buffer() {
 #include "../math/aabb.h"
 #include "../math/ray.h"
 #include "../math/random.h"
+
+// CG, GLSL, C++ compiler
+#include "../compiler/cpp_error.h"
+#include "../compiler/cpp_tokens.h"
+#include "../compiler/cpp_lexer.h"
+#include "../compiler/cpp_preprocessor.h"
+#include "../compiler/cpp_value.h"
+#include "../compiler/cpp_expr.h"
+#include "../compiler/cpp_type.h"
+#include "../compiler/cpp_statement.h"
+#include "../compiler/cpp_scope.h"
+#include "../compiler/cpp_parser.h"
 
 // loaders (low dependency, so you can use them in other projects)
 #include "../loaders/gif_decoder.h"

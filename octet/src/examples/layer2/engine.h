@@ -42,6 +42,9 @@ namespace octet {
     // helper for picking objects on the screen
     object_picker picker;
 
+    // test c/c++ parser
+    cpp_parser parser;
+
     void load_file(const char *filename) {
       FILE *file = fopen(app_utils::get_path(filename), "rb");
       char buf[8];
@@ -72,10 +75,11 @@ namespace octet {
 
       app_scene->play_all_anims(dict);
 
-      /*for (unsigned i = 0; i != app_scene->get_num_mesh_instances(); ++i) {
+      for (unsigned i = 0; i != app_scene->get_num_mesh_instances(); ++i) {
         mesh_instance *mi = app_scene->get_mesh_instance(i);
-        mi->set_mesh(new wireframe(mi->get_mesh()));
-      }*/
+        mi->set_mesh(new wireframe(new displacement_map(mi->get_mesh())));
+        //mi->set_mesh(new displacement_map(mi->get_mesh()));
+      }
 
       if (app_scene->get_num_camera_instances() != 0) {
         camera_instance *cam = app_scene->get_camera_instance(0);
@@ -87,6 +91,9 @@ namespace octet {
   public:
     // this is called when we construct the class
     engine(int argc, char **argv) : app(argc, argv), ball() {
+
+      // test the c++ parser
+      parser.parse("int x = 1;");
     }
 
     // this is called once OpenGL is initialized
@@ -97,7 +104,7 @@ namespace octet {
 
       const char *filename = 0;
 
-      int selector = 0;
+      int selector = 7;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;

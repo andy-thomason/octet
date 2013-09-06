@@ -11,28 +11,45 @@ namespace octet {
     ref<job> next;
 
     enum state_t {
-      state_ready,
+      state_waiting,
       state_running,
-      state_finished,
     };
 
+    state_t state;
+
     class scheduler {
+      job *waiting;
+      job *running;
     public:
       scheduler() {
+        waiting = 0;
+        running = 0;
+      }
+
+      void add_to_waiting(job *jb) {
+        jb->next = waiting;
+        waiting = this;
       }
     };
 
     scheduler *get_scheduler() {
-      static scheduler;
-      return &scheduler;
+      static scheduler sch;
+      return &sch;
     }
   public:
     job() {
+      scheduler *sch = get_scheduler();
+      sch->add_to_waiting(this);
     }
 
     virtual ~job() {
     }
 
-    virtual void run() = 0;
+    virtual void kernel() = 0;
+    virtual bool is_ready() = 0;
+
+    state_t get_state() {
+      return state;
+    }
   };
 }
