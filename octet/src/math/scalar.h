@@ -92,5 +92,17 @@ namespace octet {
     // make sure mantissa is zero.
     return f != 0 && (fu.i & 0x007fffff) == 0;
   }
+
+  template <class T> void swap(T &a, T &b) {
+    T t = a; a = b; b = t;
+  }
+
+  template <class T> T min(const T &a, const T &b) {
+    return a < b ? a : b;
+  }
+
+  template <class T> T max(const T &a, const T &b) {
+    return a > b ? a : b;
+  }
 }
 

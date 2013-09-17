@@ -73,6 +73,15 @@
 #include <xmmintrin.h>
 
 namespace octet {
+  class HWND_cmp {
+  public:
+    static unsigned fuzz_hash(unsigned hash) { return hash ^ (hash >> 3) ^ (hash >> 5); }
+
+    static unsigned get_hash(HWND key) { return fuzz_hash((unsigned)(intptr_t)key); }
+
+    static bool is_empty(HWND key) { return !key; }
+  };
+
   // this is the class that all apps are derived from.
   class app : public app_common {
     HGLRC gl_context;
@@ -117,7 +126,7 @@ namespace octet {
       //printf("%s\n", glGetString(GL_EXTENSIONS));
     }
 
-    typedef hash_map<HWND, app*> map_t;
+    typedef hash_map<HWND, app*, HWND_cmp> map_t;
     static map_t &map() { static map_t instance; return instance; }
 
   public:

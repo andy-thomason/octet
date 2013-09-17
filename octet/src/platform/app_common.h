@@ -74,6 +74,7 @@ namespace octet {
     int mouse_wheel;
     int viewport_x;
     int viewport_y;
+    bool is_gles3;
 
     // queue of files to load
     dynarray<string> load_queue;
@@ -83,6 +84,7 @@ namespace octet {
       // this memset writes 0 to every byte of keys[]
       memset(keys, 0, sizeof(keys));
       mouse_x = mouse_y = 0;
+      is_gles3 = false;
     }
 
     virtual ~app_common() {
@@ -137,6 +139,14 @@ namespace octet {
 
     static bool can_use_vbos() {
       return false;
+    }
+
+    bool get_is_gles3() {
+      return is_gles3;
+    }
+
+    void set_is_gles3(bool value) {
+      is_gles3 = value;
     }
   };
 }

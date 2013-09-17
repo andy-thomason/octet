@@ -18,7 +18,21 @@
 //   int y = chars_to_int["y"];
 //
 namespace octet {
-  template <typename key_t, typename value_t, class allocator_t=allocator> class hash_map {
+
+  class hash_map_cmp {
+  public:
+    static unsigned fuzz_hash(unsigned hash) { return hash ^ (hash >> 3) ^ (hash >> 5); }
+
+    static unsigned get_hash(void *key) { return fuzz_hash((unsigned)(intptr_t)key); }
+    static unsigned get_hash(int key) { return fuzz_hash((unsigned)key); }
+    static unsigned get_hash(uint64_t key) { return fuzz_hash((unsigned)(key ^ (key >> 32))); }
+
+    static bool is_empty(void *key) { return !key; }
+    static bool is_empty(int key) { return !key; }
+    static bool is_empty(uint64_t key) { return !key; }
+  };
+
+  template <typename key_t, typename value_t, class cmp_t=hash_map_cmp, class allocator_t=allocator> class hash_map {
     // internal gubbins to implement the hash map
     struct entry_t { key_t key; unsigned hash; value_t value; };
 
@@ -31,7 +45,7 @@ namespace octet {
       unsigned mask = max_entries - 1;
       for (unsigned i = 0; i != max_entries; ++i) {
         entry_t *entry = &entries[ ( i + hash ) & mask ];
-        if (!entry->key) {
+        if (cmp_t::is_empty(entry->key)) {
           return entry;
         }
         if (entry->hash == hash && entry->key == key) {
@@ -51,7 +65,7 @@ namespace octet {
       max_entries *= 2;
       for (unsigned i = 0; i != old_max_entries; ++i) {
         entry_t *old_entry = &old_entries[i];
-        if (old_entry->key) {
+        if (!cmp_t::is_empty(old_entry->key)) {
           entry_t *new_entry = find(old_entry->key, old_entry->hash);
           *new_entry = *old_entry;
         }
@@ -70,9 +84,9 @@ namespace octet {
     // access the 
     // eg. my_map["fred"]
     value_t &operator[]( const key_t &key ) {
-      unsigned hash = (unsigned)(size_t)(key);
+      unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
-      if (!entry->key) {
+      if (cmp_t::is_empty(entry->key)) {
         // reducing this ratio decreases hot search time at the
         // expense of size (cold search time).
         if (num_entries >= max_entries * 3 / 4) {
@@ -87,9 +101,15 @@ namespace octet {
     }
 
     bool contains(const key_t &key) {
-      unsigned hash = (unsigned)(size_t)(key);
+      unsigned hash = get_hash(key);
       entry_t *entry = find( key, hash );
-      return !!entry->key;
+      return !cmp_t::is_empty(entry->key);
+    }
+
+    int get_index(const key_t &key) {
+      unsigned hash = get_hash(key);
+      entry_t *entry = find( key, hash );
+      return entry ? entry - entries : -1;
     }
 
     // bye bye hash map

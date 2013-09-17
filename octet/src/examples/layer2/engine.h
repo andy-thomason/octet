@@ -77,8 +77,10 @@ namespace octet {
 
       for (unsigned i = 0; i != app_scene->get_num_mesh_instances(); ++i) {
         mesh_instance *mi = app_scene->get_mesh_instance(i);
-        mi->set_mesh(new wireframe(new displacement_map(mi->get_mesh())));
-        //mi->set_mesh(new displacement_map(mi->get_mesh()));
+        //mi->set_mesh(new wireframe(new displacement_map(mi->get_mesh())));
+        //mi->set_mesh(new smooth(mi->get_mesh()));
+        //mi->set_mesh(mi->get_mesh());
+        mi->set_mesh(new indexer(mi->get_mesh()));
       }
 
       if (app_scene->get_num_camera_instances() != 0) {
@@ -104,7 +106,7 @@ namespace octet {
 
       const char *filename = 0;
 
-      int selector = 7;
+      int selector = 0;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;

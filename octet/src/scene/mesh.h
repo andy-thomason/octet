@@ -507,22 +507,6 @@ namespace octet {
       }
     }
 
-    // clone a mesh state
-    /*void copy(const mesh *src) {
-      copy_format(src);
-      copy_params(src);
-
-      if (get_num_vertices() == 0) {
-        return;
-      }
-
-      unsigned vsize = src->get_vertices()->get_size();
-      unsigned isize = src->get_indices()->get_size();
-      allocate(vsize, isize);
-      copy_indices(src);
-      copy_vertices(src);
-    }*/
-
     // *very* slow ray cast.
     // returns "barycentric" coordinates.
     // eg. hit pos = bary[0] * pos0 + bary[1] * pos1 + bary[2] * pos2;
@@ -601,5 +585,7 @@ namespace octet {
       indices = value;
     }
 
+    void get_edges(hash_map<uint64_t, unsigned> &edges) {
+    }
   };
 }

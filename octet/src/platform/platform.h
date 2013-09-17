@@ -153,6 +153,8 @@ static char *get_sprintf_buffer() {
 #include "../scene/animation_instance.h"
 #include "../scene/scene.h"
 #include "../scene/displacement_map.h"
+#include "../scene/indexer.h"
+#include "../scene/smooth.h"
 #include "../scene/wireframe.h"
 
 // high level helpers

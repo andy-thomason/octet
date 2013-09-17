@@ -205,7 +205,7 @@ namespace octet {
 
   // dumbarray:
   //   high performance vector does not use new and delete
-  template <class item_t, class allocator_t=allocator> class dumbarray : public dynarray<item_t, allocator_t, false> {
-  };
+  /*template <class item_t, class allocator_t=allocator> class dumbarray : public dynarray<item_t, allocator_t, false> {
+  };*/
 }
 
