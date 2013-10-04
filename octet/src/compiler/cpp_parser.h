@@ -497,7 +497,6 @@ namespace octet
     // generate code to cast src to destType    
     cpp_expr *makeCast( cpp_expr *src, cpp_type *destType )
     {
-      cpp_type *srcType = src->getType();
       return new cpp_expr( cpp_expr::kind_cast, destType, src );
     }
 
@@ -698,7 +697,7 @@ namespace octet
       while( curToken == tok_lbracket )
       {
         getNext();
-        cpp_expr *dim = parseExpression( 0 );
+        //cpp_expr *dim = parseExpression( 0 );
         if( !expect( tok_rbracket ) )
         {
           return NULL;
@@ -813,7 +812,7 @@ namespace octet
       if( curToken == tok_colon )
       {
         getNext();
-        if( curToken == tok_register )
+        if( curToken == (int)tok_register )
         {
           getNext();
           if( !expect( tok_lparen ) )
@@ -886,7 +885,7 @@ namespace octet
    
       for(;;)
       {
-        switch( curToken )
+        switch( (int)curToken )
         {
           case tok_identifier:
           {
@@ -1098,7 +1097,7 @@ namespace octet
         }
         getNext();
         return result;
-      } else if( curToken == tok_return )
+      } else if( (int)curToken == tok_return )
       {
         getNext();
         if( curToken != tok_semicolon )
@@ -1119,7 +1118,7 @@ namespace octet
           return NULL;
         }
         getNext();
-      } else if( curToken == tok_discard )
+      } else if( (int)curToken == tok_discard )
       {
         getNext();
         result = new cpp_statement( cpp_statement::kind_return );
@@ -1128,11 +1127,11 @@ namespace octet
           return NULL;
         }
         getNext();
-      } else if( curToken == tok_for || curToken == tok_if || curToken == tok_while )
+      } else if( (int)curToken == tok_for || (int)curToken == tok_if || (int)curToken == tok_while )
       {
-        bool isFor = curToken == tok_for;
-        bool isIf = curToken == tok_if;
-        bool isWhile = curToken == tok_while;
+        bool isFor = (int)curToken == tok_for;
+        bool isIf = (int)curToken == tok_if;
+        //bool isWhile = (int)curToken == tok_while;
 
         getNext();
         if( !expect( tok_lparen ) )
@@ -1196,7 +1195,7 @@ namespace octet
         }
         *result->getStatementsAddr() = stmt;
         
-        if( isIf && curToken == tok_else )
+        if( isIf && (int)curToken == tok_else )
         {
           getNext();
           cpp_statement *else_stmt = parseStatement();
@@ -1209,7 +1208,7 @@ namespace octet
         
         curScope = saveScope;
         return result;
-      } else if( curToken == tok_do )
+      } else if( (int)curToken == tok_do )
       {
         getNext();
 
@@ -1275,7 +1274,7 @@ namespace octet
       }
 	    if( curToken == tok_minus || curToken == tok_plus )
 	    {
-	      unsigned op = curToken;
+	      //unsigned op = curToken;
 	      getNext();
 	      cpp_expr * rhs = parseExpression( 100 );
 	      if( rhs == NULL )
@@ -1287,7 +1286,7 @@ namespace octet
 	      result = new cpp_expr( curToken == tok_minus ? cpp_expr::kind_minus : cpp_expr::kind_plus, rhs->getType(), zero, rhs );
 	    } else if( curToken == tok_not )
 	    {
-	      unsigned op = curToken;
+	      //unsigned op = curToken;
 	      getNext();
 	      cpp_expr * rhs = parseExpression( 100 );
 	      if( rhs == NULL )
@@ -1300,7 +1299,7 @@ namespace octet
 	      result = new cpp_expr( cpp_expr::kind_xor, rhs->getType(), one, rhs );
 	    } else if( curToken == tok_tilda )
 	    {
-	      unsigned op = curToken;
+	      //unsigned op = curToken;
 	      getNext();
 	      cpp_expr * rhs = parseExpression( 100 );
 	      if( rhs == NULL )
@@ -1313,7 +1312,7 @@ namespace octet
 	      result = new cpp_expr( cpp_expr::kind_xor, rhs->getType(), one, rhs );
 	    } else if( curToken == tok_plus_plus || curToken == tok_minus_minus )
 	    {
-	      unsigned op = curToken;
+	      //unsigned op = curToken;
 	      getNext();
 	      cpp_expr *rhs = parseExpression( 100 );
 	      if( rhs == NULL )
@@ -1460,7 +1459,7 @@ namespace octet
           
           if( result->getKind() == cpp_expr::kind_int_value )
           {
-            cpp_expr *rhs = parseExpression( 0 );
+            //cpp_expr *rhs = parseExpression( 0 );
             if( !expect( tok_rparen ) )
             {
               return NULL;
@@ -1574,7 +1573,7 @@ namespace octet
 	        inc = new cpp_expr( cpp_expr::kind_cast, result->getType(), inc );
           inc = new cpp_expr( curToken == tok_plus_plus ? cpp_expr::kind_plus_equals : cpp_expr::kind_minus_equals, result->getType(), result, inc );
           cpp_expr *tmpExpr = new cpp_expr( cpp_expr::kind_value, tmp );
-          cpp_expr *tmpAssign = new cpp_expr( cpp_expr::kind_equals, result->getType(), tmpExpr, result );
+          //cpp_expr *tmpAssign = new cpp_expr( cpp_expr::kind_equals, result->getType(), tmpExpr, result );
           result = new cpp_expr( cpp_expr::kind_comma, result->getType(), inc, tmpExpr );
         } else
         {
@@ -1586,7 +1585,7 @@ namespace octet
 	    // filter out operators with lower precidence than minPrecidence
 	    //unsigned thisPrecidence = tokenToPrecidence[ curToken ];
 	    //unsigned thisGrouping = tokenIsRightGrouping[ curToken ];
-      unsigned op = curToken;
+      //unsigned op = curToken;
 	    while( tokenToPrecidence[ curToken ] != 0 && tokenToPrecidence[ curToken ] > minPrecidence )
 	    {
 	      unsigned op = curToken;
@@ -1727,7 +1726,7 @@ namespace octet
         getNext();
         return true;
       }
-      if( curToken == tok_typedef )
+      if( (int)curToken == tok_typedef )
       {
         getNext();
         cpp_type *type = parseDeclspec();

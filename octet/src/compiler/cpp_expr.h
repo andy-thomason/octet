@@ -750,6 +750,7 @@ namespace octet
     #endif
     const char *toString(string &buf) {
       buf.format("");
+      return buf.c_str();
     }
     
   };

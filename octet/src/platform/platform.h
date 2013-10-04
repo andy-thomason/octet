@@ -172,7 +172,7 @@ static char *get_sprintf_buffer() {
 
 namespace octet {
   inline resource *resource::new_type(atom_t type) {
-    switch (type) {
+    switch ((int)type) {
       #define OCTET_CLASS(X) case atom_##X: return new X();
       #include "../resources/classes.h"
       #undef OCTET_CLASS

@@ -195,7 +195,7 @@ namespace octet {
         new_mip_levels++;
       }
       assert(dest - &result[0] < (int)result.size());
-      bytes.resize(dest - &result[0]);
+      bytes.resize((int)(dest - &result[0]));
       memcpy(&bytes[0], &result[0], dest - &result[0]);
       format = COMPRESSED_RGB_S3TC_DXT1_EXT;
       mip_levels = new_mip_levels;

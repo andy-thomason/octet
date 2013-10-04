@@ -156,7 +156,6 @@ namespace octet
 	  
     void push_include( const char *current, const char *end, const char *file_name, unsigned line_number )
     {
-      size_t length = strlen( file_name );
       string currentPath = file_name;
       int pos = currentPath.filename_pos();
       currentPath.truncate(pos);
@@ -262,7 +261,7 @@ namespace octet
 		    		}
 
 						bool fail = false;
-		    		while( !fail && ( level != 0 || lexer_.type() != tok_comma && lexer_.type() != tok_rparen ) )
+		    		while( !fail && ( level != 0 || (lexer_.type() != tok_comma && lexer_.type() != tok_rparen) ) )
 		    		{
 	    				while( start != lexer_.get_src() )
 	    				{
@@ -625,7 +624,7 @@ namespace octet
 	    } else if( lexer_.type() == tok_identifier )
 	    {
 	      result = 0;
-	      if( !strcmp( lexer_.id(), "defined" ) )
+	      if( !strcmp( lexer_.id(), (char*)"defined" ) )
 	      {
 	      	next_raw();
 	      	const char *name = 0;
@@ -807,7 +806,7 @@ namespace octet
 
       *dest = 0;
 
-      unsigned num_chars = ( dest - write_line_ + 1 );
+      unsigned num_chars = (unsigned)( dest - write_line_ + 1 );
       define.text_.set((const char*)write_line_, num_chars);
       define.has_params_ = has_params;
       //context_.debug( "#define %s [%s] %d\n", name.text(), define.text_, define.has_params_ );
@@ -1057,7 +1056,7 @@ namespace octet
           {
             // c++ comment
             current++;
-            while( current != end && current[ 0 ] != '\n' || current[ -1 ] == '\\' )
+            while( (current != end && current[ 0 ] != '\n') || current[ -1 ] == '\\' )
             {
 	            line_num += current[ 0 ] == '\n';
               current++;
