@@ -299,7 +299,7 @@ namespace octet {
             fourcc[3] == '5' ? COMPRESSED_RGBA_S3TC_DXT5_EXT :
             0
           ;
-          unsigned size = src_max - src - 128;
+          unsigned size = (unsigned)(src_max - src - 128);
           image.resize(size);
           memcpy(&image[0], src + 128, size);
 

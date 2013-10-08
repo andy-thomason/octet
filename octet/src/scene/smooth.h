@@ -32,8 +32,8 @@ namespace octet {
       const vec3 &pos1 = (const vec3&)src1[pos_offset];
       const vec3 &n0 = (const vec3&)src0[normal_offset];
       const vec3 &n1 = (const vec3&)src1[normal_offset];
-      const vec3 &uv0 = (const vec3&)src0[uv_offset];
-      const vec3 &uv1 = (const vec3&)src1[uv_offset];
+      //const vec3 &uv0 = (const vec3&)src0[uv_offset];
+      //const vec3 &uv1 = (const vec3&)src1[uv_offset];
 
       if (is_smooth(n0, n1, depth)) {
         return false;

@@ -144,7 +144,7 @@ namespace octet {
     int get_index(const char *key) {
       unsigned hash = calc_hash( key );
       entry_t *entry = find( key, hash );
-      return entry && entry->key ? entry - entries : -1;
+      return entry && entry->key ? (int)(entry - entries) : -1;
     }
 
     // free up the resources

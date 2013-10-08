@@ -21,19 +21,19 @@ namespace octet {
 
     void write_int(int value) {
       if (debug) app_utils::log("%*swrite %08x\n", get_depth()*2, "", value);
-      uint8_t b[4] = { value, value >> 8, value >> 16, value >> 24 };
+      uint8_t b[4] = { (uint8_t)value, (uint8_t)(value >> 8), (uint8_t)(value >> 16), (uint8_t)(value >> 24) };
       write(b, 4);
     }
 
     void write_atom(atom_t value) {
       if (debug) app_utils::log("%*swrite %08x (%s)\n", get_depth()*2, "", value, app_utils::get_atom_name((atom_t)value));
-      uint8_t b[4] = { value, value >> 8, value >> 16, value >> 24 };
+      uint8_t b[4] = { (uint8_t)value, (uint8_t)(value >> 8), (uint8_t)(value >> 16), (uint8_t)(value >> 24) };
       write(b, 4);
     }
 
     void write_string(const char *value) {
       if (debug) app_utils::log("%*swrite %s\n", get_depth()*2, "", value);
-      write((const uint8_t*)value, strlen(value)+1);
+      write((const uint8_t*)value, (int)strlen(value)+1);
     }
 
   public:

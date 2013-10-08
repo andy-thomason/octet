@@ -61,12 +61,12 @@ namespace octet {
       dynarray<uint32_t> dest_indices;
       dest_indices.reserve(get_num_indices());
 
-      const uint32_t *ip = (const uint32_t*)get_indices()->lock_read_only();
+      //const uint32_t *ip = (const uint32_t*)get_indices()->lock_read_only();
       const uint8_t *vp = (const uint8_t*)get_vertices()->lock_read_only();
       unsigned stride = get_stride();
       unsigned num_vertices = 0;
       for (unsigned i = 0; i != get_num_indices(); ++i) {
-        unsigned idx = ip[i];
+        //uint32_t idx = ip[i];
         vertex v = { vp + i * stride, stride };
         unsigned &e = vertex_to_index[v];
         if (e == 0) { // hash_map inits to zero
