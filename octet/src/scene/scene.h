@@ -29,6 +29,7 @@ namespace octet {
     // set this to draw bounding boxes
     bool render_aabbs;
     bool render_debug_lines;
+    bool dump_vertices;
     ref<material> debug_material;
     dynarray<vec3> debug_line_buffer;
     unsigned debug_in_ptr;
@@ -91,6 +92,84 @@ namespace octet {
       num_light_uniforms = 1 + num_lights * light_size;
     }
 
+    void render_mesh_aabbs() {
+      for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
+        mesh_instance *mi = mesh_instances[mesh_index];
+        aabb bb = mi->get_mesh()->get_aabb();
+        bb = bb.get_transform(mi->get_node()->calcModelToWorld());
+        draw_aabb(bb);
+      }
+    }
+
+    void render_debug_line_buffer() {
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)debug_line_buffer.data() );
+      glEnableVertexAttribArray(attribute_pos);
+    
+      glDrawArrays(GL_LINES, 0, debug_line_buffer.size());
+      glDisableVertexAttribArray(attribute_pos);
+    }
+
+    void dump_mesh_vertices(camera_instance &cam) {
+      for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
+        mesh_instance *mi = mesh_instances[mesh_index];
+        mesh *msh = mi->get_mesh();
+        mat4t modelToWorld = mi->get_node()->calcModelToWorld();
+        mat4t modelToCamera;
+        mat4t modelToProjection;
+        cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
+        const char *ip = (const char*)msh->get_indices()->lock_read_only();
+        const char *vp = (const char*)msh->get_vertices()->lock_read_only();
+        unsigned pos_offset = msh->get_offset(msh->get_slot(attribute_pos));
+        unsigned stride = msh->get_stride();
+        bool is_short_index = msh->get_index_type() != GL_UNSIGNED_INT;
+
+        for (unsigned i = 0; i != msh->get_num_indices(); ++i) {
+          unsigned index = is_short_index ? ((uint16_t*)ip)[i] : ((uint32_t*)ip)[i];
+          vec3 pos = *(vec3*)(vp + stride * index + pos_offset);
+          vec4 pos1 = pos.xyz1();
+          vec4 world_pos = pos1 * modelToWorld;
+          vec4 proj_pos = pos1 * modelToProjection;
+          app_utils::log("%5d i=%5d m=[%9.3f, %9.3f, %9.3f] w=[%9.3f, %9.3f, %9.3f] p=[%9.3f, %9.3f, %9.3f]\n",
+            i, index,
+            pos.x(), pos.y(), pos.z(),
+            world_pos.x(), world_pos.y(), world_pos.z(),
+            proj_pos.x()/proj_pos.w(), proj_pos.y()/proj_pos.w(), proj_pos.z()/proj_pos.w()
+          );
+        }
+
+        msh->get_indices()->unlock_read_only();
+        msh->get_vertices()->unlock_read_only();
+      }
+    }
+
+    void draw_debug_data(bump_shader &object_shader, camera_instance &cam) {
+      // debug draw the AABBs of the mesh instances in the world.
+      // draw in world space
+      mat4t worldToCamera;
+      mat4t worldToProjection;
+      mat4t worldToWorld;
+      worldToWorld.loadIdentity();
+      cam.get_matrices(worldToProjection, worldToCamera, worldToWorld);
+      debug_material->render(object_shader, worldToProjection, worldToCamera, light_uniforms, num_light_uniforms, num_lights);
+
+      // debug lines are a useful way of showing dynamic behaviour in the scene.
+      if (render_debug_lines) {
+        render_debug_line_buffer();
+      }
+
+      // this helps with collision problems and with scene helpers
+      if (render_aabbs) {
+        render_mesh_aabbs();
+      }
+
+      // use this to answer the question: "why can't I see my triangles?"
+      // note: only works with all-float vertex buffers
+      if (dump_vertices) {
+        dump_mesh_vertices(cam);
+      }
+    }
+
     void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam, float aspect_ratio) {
       mat4t cameraToWorld = cam.get_node()->calcModelToWorld();
 
@@ -102,34 +181,7 @@ namespace octet {
       cam.set_cameraToWorld(cameraToWorld, aspect_ratio);
       mat4t cameraToProjection = cam.get_cameraToProjection();
 
-      {
-        // debug draw the AABBs of the mesh instances in the world.
-        // draw in world space
-        mat4t worldToCamera;
-        mat4t worldToProjection;
-        mat4t worldToWorld;
-        worldToWorld.loadIdentity();
-        cam.get_matrices(worldToProjection, worldToCamera, worldToWorld);
-        debug_material->render(object_shader, worldToProjection, worldToCamera, light_uniforms, num_light_uniforms, num_lights);
-
-        if (render_debug_lines) {
-          glBindBuffer(GL_ARRAY_BUFFER, 0);
-          glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)debug_line_buffer.data() );
-          glEnableVertexAttribArray(attribute_pos);
-    
-          glDrawArrays(GL_LINES, 0, debug_line_buffer.size());
-          glDisableVertexAttribArray(attribute_pos);
-        }
-
-        if (render_aabbs) {
-          for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
-            mesh_instance *mi = mesh_instances[mesh_index];
-            aabb bb = mi->get_mesh()->get_aabb();
-            bb = bb.get_transform(mi->get_node()->calcModelToWorld());
-            draw_aabb(bb);
-          }
-        }
-      }
+      draw_debug_data(object_shader, cam);
 
       for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
         mesh_instance *mi = mesh_instances[mesh_index];
@@ -169,8 +221,9 @@ namespace octet {
       frame_number = 0;
       num_light_uniforms = 0;
       num_lights = 0;
-      render_aabbs = true;
-      render_debug_lines = true;
+      render_aabbs = false;
+      dump_vertices = false;
+      render_debug_lines = false;
       debug_material = new material(vec4(1, 0, 0, 1));
       debug_line_buffer.resize(256);
       assert(is_power_of_two(debug_line_buffer.size()));
@@ -273,8 +326,19 @@ namespace octet {
       return (scene_node*)this;
     }
 
+    // debugging aid to draw boxes around objects
     void set_render_aabbs(bool value) {
       render_aabbs = value;
+    }
+
+    // debugging aid to draw debug lines
+    void set_render_debug_lines(bool value) {
+      render_debug_lines = value;
+    }
+
+    // debugging aid to log vertices
+    void set_dump_vertices(bool value) {
+      dump_vertices = value;
     }
 
     // access camera_instance information

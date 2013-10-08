@@ -383,15 +383,15 @@ namespace octet {
     {
       float X = 2.0f / (right-left);
       float Y = 2.0f / (top-bottom);
-      float Z = 2.0f / (nearVal-farVal);
+      float Z = 2.0f / (farVal-nearVal);
       float tx = -(right+left) / (right-left);
       float ty = -(top+bottom) / (top-bottom);
-      float tz = (nearVal+farVal) / (nearVal-farVal);
+      float tz = -(farVal+nearVal) / (farVal-nearVal);
       mat4t mul(
-        vec4( X, 0, 0, tx ),
-        vec4( 0, Y, 0, ty ),
-        vec4( 0, 0, Z, tz ),
-        vec4( 0, 0, 0,  1 )
+        vec4( X,  0,  0,  0 ),
+        vec4( 0,  Y,  0,  0 ),
+        vec4( 0,  0,  Z,  0 ),
+        vec4( tx, ty, tz, 1 )
       );
       *this = mul * *this;
       return *this;

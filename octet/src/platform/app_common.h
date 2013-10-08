@@ -74,6 +74,7 @@ namespace octet {
     int mouse_wheel;
     int viewport_x;
     int viewport_y;
+    int frame_number;
     bool is_gles3;
 
     // queue of files to load
@@ -85,6 +86,7 @@ namespace octet {
       memset(keys, 0, sizeof(keys));
       mouse_x = mouse_y = 0;
       is_gles3 = false;
+      frame_number = 0;
     }
 
     virtual ~app_common() {
@@ -110,6 +112,14 @@ namespace octet {
     void get_viewport_size(int &x, int &y) {
       x = viewport_x;
       y = viewport_y;
+    }
+
+    int get_frame_number() {
+      return frame_number;
+    }
+
+    void inc_frame_number() {
+      frame_number++;
     }
 
     dynarray<string> &access_load_queue() {

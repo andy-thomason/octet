@@ -108,7 +108,7 @@ namespace octet {
       if (is_ortho) {
         xscale = 1.0f / xmag;
         yscale = 1.0f / ymag;
-        cameraToProjection.ortho(-xscale, xscale, -yscale, yscale, nearVal, farVal);
+        cameraToProjection.ortho(-xmag*0.5f, xmag*0.5f, -ymag*0.5f, ymag*0.5f, nearVal, farVal);
       } else {
         xscale = 0.5f;
         yscale = 0.5f;

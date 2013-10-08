@@ -75,6 +75,7 @@ namespace octet {
       int vx, vy;
       get_viewport_size(vx, vy);
       draw_world(0, 0, vx, vy);
+      inc_frame_number();
       glutSwapBuffers();
     }
 

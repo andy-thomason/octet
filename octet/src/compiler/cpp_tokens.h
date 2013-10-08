@@ -35,7 +35,7 @@ namespace octet
     };
   };
 
-	class cpp_tokens : public cpp_token_enum
+  class cpp_tokens : public cpp_token_enum
   {
   public:
 
@@ -66,43 +66,35 @@ namespace octet
     bitset< 256 > identifier_tail_;
     bitset< 256 > hex_digit_;
 
-    token_type first_punctuation()
-    {
-    	return tok_hash;
+    token_type first_punctuation() {
+      return tok_hash;
     }
 
-    token_type last_punctuation()
-    {
-    	return tok_arrow_star;
+    token_type last_punctuation() {
+      return tok_arrow_star;
     }
 
-    bool is_whitespace( unsigned chr )
-    {
+    bool is_whitespace( unsigned chr ) {
       return chr < 256 && whitespace_[ chr ];
     }
     
-    bool is_digit( unsigned chr )
-    {
+    bool is_digit( unsigned chr ) {
       return ( (unsigned)chr - '0' ) <= '9'-'0';
     }
     
-    bool is_id_start( unsigned chr )
-    {
+    bool is_id_start( unsigned chr ) {
       return chr < 256 && identifier_start_[ chr ];
     }
     
-    bool is_id_middle( unsigned chr )
-    {
+    bool is_id_middle( unsigned chr ) {
       return chr < 256 && identifier_tail_[ chr ];
     }
     
-    bool is_hex_digit( unsigned chr )
-    {
+    bool is_hex_digit( unsigned chr ) {
       return chr < 256 && hex_digit_[ chr ];
     }
     
-    bool is_octal_digit( unsigned chr )
-    {
+    bool is_octal_digit( unsigned chr ) {
       return ( (unsigned)chr - '0' ) <= '7'-'0';
     }
 
@@ -113,9 +105,8 @@ namespace octet
       hex_digit_ = "0-9A-Fa-f";
       whitespace_ = " \t";
 
-      for( int i = first_punctuation(); i <= last_punctuation(); ++i )
-      {
-      	const char *punctuation = token_name( (token_type)i );
+      for( int i = first_punctuation(); i <= last_punctuation(); ++i ) {
+        const char *punctuation = token_name( (token_type)i );
         punctuation_start_.setbit(punctuation[0]);
       }
     }

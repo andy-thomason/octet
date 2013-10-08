@@ -4,7 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Mesh smooth modifier.
+// Mesh smooth modifier. Work in progress.
 //
 
 namespace octet {

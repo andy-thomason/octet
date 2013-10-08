@@ -71,6 +71,7 @@ namespace octet {
     void render() {
 
       draw_world(0, 0, 1024, 768);
+      inc_frame_number();
 
       //SwapBuffers(hdc);
 

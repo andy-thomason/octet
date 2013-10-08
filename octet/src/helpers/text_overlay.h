@@ -50,9 +50,9 @@ namespace octet {
       // 2 3
       static const vertex vtx[] = {
         {   0,   0, 0.5f,  0, 0, 0xffffffff },
-        { 256,   0, 0.5f,  1, 0, 0xffffffff },
-        {   0, 256, 0.5f,  0, 1, 0xffffffff },
-        { 256, 256, 0.5f,  1, 1, 0xffffffff },
+        {  256,   0, 0.5f,  1, 0, 0xffffffff },
+        {   0,  256, 0.5f,  0, 1, 0xffffffff },
+        {  256,  256, 0.5f,  1, 1, 0xffffffff },
       };
 
       static const unsigned short ind[] = {
@@ -65,10 +65,12 @@ namespace octet {
       msh->set_num_indices(6);
     }
 
-    void render(bump_shader &object_shader, bump_shader &skin_shader, int vx, int vy) {
+    void render(bump_shader &object_shader, bump_shader &skin_shader, int vx, int vy, int frame_number) {
       cam->set_ortho((float)vx, (float)vy, 1, 0, 1);
-      //camera_instance *cam = text_scene->get_camera_instance(0);
-      //text_scene->render(object_shader, skin_shader, *cam);
+      camera_instance *cam = text_scene->get_camera_instance(0);
+      text_scene->set_dump_vertices(frame_number == 0);
+
+      text_scene->render(object_shader, skin_shader, *cam, 1);
     }
   };
 }

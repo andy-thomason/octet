@@ -181,6 +181,7 @@ namespace octet {
       set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
       draw_world(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+      inc_frame_number();
 
       SwapBuffers(hdc);
 

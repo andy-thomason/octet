@@ -43,7 +43,7 @@ namespace octet {
     object_picker picker;
 
     // test c/c++ parser
-    cpp_parser parser;
+    //cpp_parser parser;
 
     void load_file(const char *filename) {
       FILE *file = fopen(app_utils::get_path(filename), "rb");
@@ -95,7 +95,7 @@ namespace octet {
     engine(int argc, char **argv) : app(argc, argv), ball() {
 
       // test the c++ parser
-      parser.parse("int x = 1;");
+      //parser.parse("int x = 1;");
     }
 
     // this is called once OpenGL is initialized
@@ -201,7 +201,7 @@ namespace octet {
 
         app_scene->render(object_shader, skin_shader, *cam, (float)vx / vy);
 
-        overlay.render(object_shader, skin_shader, vx, vy);
+        overlay.render(object_shader, skin_shader, vx, vy, get_frame_number());
       }
     }
   };

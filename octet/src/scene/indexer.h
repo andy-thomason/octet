@@ -9,8 +9,6 @@
 
 namespace octet {
   class indexer : public mesh {
-
-  public:
     struct vertex {
       const uint8_t *bytes;
       unsigned size;
@@ -38,7 +36,7 @@ namespace octet {
 
       static bool is_empty(const vertex &key) { return key.is_empty(); }
     };
-  private:
+
     // source mesh. Provides underlying geometry.
     ref<mesh> src;
 
@@ -100,6 +98,4 @@ namespace octet {
       v.visit(src, atom_src);
     }
   };
-
-  inline unsigned get_hash(indexer::vertex vtx) { return vtx.get_hash(); }
 }
