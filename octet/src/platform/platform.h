@@ -138,6 +138,8 @@ static char *get_sprintf_buffer() {
 #include "../shaders/phong_shader.h"
 #include "../shaders/bump_shader.h"
 
+#include "../physics/physics.h"
+
 // scene
 #include "../scene/scene_node.h"
 #include "../scene/skin.h"
@@ -181,4 +183,3 @@ namespace octet {
   }
 }
 
-#include "../physics/physics.h"

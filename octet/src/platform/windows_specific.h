@@ -289,7 +289,8 @@ namespace octet {
         Sleep(1000/30);
 
         for (int i = 0; i != m.size(); ++i) {
-          if (m.key(i)) m.value(i)->render();
+          // note: because Win8 generates an invisible window, we need to check m.value(i)
+          if (m.key(i) && m.value(i)) m.value(i)->render();
         }
 
         Fake_AL_context()->update();

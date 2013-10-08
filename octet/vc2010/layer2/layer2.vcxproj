@@ -67,7 +67,6 @@
     <ClInclude Include="..\..\src\platform\glut_specific.h" />
     <ClInclude Include="..\..\src\platform\gl_defs.h" />
     <ClInclude Include="..\..\src\platform\gl_skeleton.h" />
-    <ClInclude Include="..\..\src\platform\osx_specific.h" />
     <ClInclude Include="..\..\src\platform\platform.h" />
     <ClInclude Include="..\..\src\platform\vita_specific.h" />
     <ClInclude Include="..\..\src\platform\windows_specific.h" />

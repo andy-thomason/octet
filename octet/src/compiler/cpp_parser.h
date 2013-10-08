@@ -179,7 +179,7 @@ namespace octet
       in << "out ";
     }
 
-    switch( type.getKind() ) {
+    switch( (int)type.getKind() ) {
       case cpp_type::kind_struct:
         in << "struct { } ";
         break;
@@ -500,7 +500,7 @@ namespace octet
           cpp_expr *rhs = makeCast( init, value->getType() );
           cpp_expr *assign = new cpp_expr( cpp_expr::kind_equals, value->getType(), val, rhs );
           expr = expr ? new cpp_expr( cpp_expr::kind_comma, assign->getType(), expr, assign ) : assign;
-        } else if( curToken == tok_lbrace && isFunction ) {
+        } else if( (int)curToken == tok_lbrace && isFunction ) {
           cpp_scope *saveScope = curScope;
           curScope = value->getType()->getScope();
           string s;
@@ -519,7 +519,7 @@ namespace octet
           finalToken = 0;
           break;
         }
-        if( curToken != tok_comma ) {
+        if( (int)curToken != tok_comma ) {
           break;
         }
         getNext();
@@ -542,7 +542,7 @@ namespace octet
     cpp_value *parseDeclarator( cpp_type *type, bool allowAbstract ) {
       string name;
 
-      if( curToken == tok_lparen ) {
+      if( (int)curToken == tok_lparen ) {
         // eg. int (x[5])();
         getNext();
         cpp_value *value = parseDeclarator( type, allowAbstract );
@@ -552,12 +552,12 @@ namespace octet
         getNext();
         name = value->getName();
         type = value->getType();
-      } else if( allowAbstract && ( curToken == tok_rparen || curToken == tok_comma ) ) {
+      } else if( allowAbstract && ( (int)curToken == tok_rparen || (int)curToken == tok_comma ) ) {
         // eg. float f( int, int, float );
         char tmp[ 32 ];
         sprintf( tmp, "__%d", numAbstract++ );
         name = tmp;
-      } else if( curToken == tok_identifier ) {
+      } else if( (int)curToken == tok_identifier ) {
         name = lexer.id();
         getNext();
         
@@ -575,7 +575,7 @@ namespace octet
       cpp_type *returned_type = type;
       cpp_type *working_type = (cpp_type *)type;
       bool first = true;
-      while( curToken == tok_lbracket ) {
+      while( (int)curToken == tok_lbracket ) {
         getNext();
         cpp_expr *dim = parseExpression( 0 );
         if( !expect( tok_rbracket ) ) {
@@ -607,7 +607,7 @@ namespace octet
       }
       
       // only one function allowed in type      
-      if( curToken == tok_lparen ) {
+      if( (int)curToken == tok_lparen ) {
         cpp_scope *saveScope = curScope;
         curScope = new cpp_scope( curScope );
         
@@ -630,10 +630,10 @@ namespace octet
         }
         returned_type = new_type;
         
-        while( curToken != tok_rparen ) {
+        while( (int)curToken != tok_rparen ) {
           cpp_type *type = parseDeclspec();
           if( !type ) {
-            if( curToken == tok_identifier ) {
+            if( (int)curToken == tok_identifier ) {
               cpp_log("error: type %s has not been defined\n", lexer.id());
             } else {
               cpp_log("error: expecting type here");
@@ -653,7 +653,7 @@ namespace octet
           value->setOffset( paramOffset++ );
           curScope->addValue( value );
 
-          if( curToken != tok_comma ) {
+          if( (int)curToken != tok_comma ) {
             break;
           }
           getNext();
@@ -673,9 +673,9 @@ namespace octet
 
       cpp_value *value = new cpp_value( returned_type, name );
 
-      if( curToken == tok_colon ) {
+      if( (int)curToken == tok_colon ) {
         getNext();
-        if( curToken == tok_register ) {
+        if( (int)curToken == tok_register ) {
           getNext();
           if( !expect( tok_lparen ) ) {
             return NULL;
@@ -696,16 +696,16 @@ namespace octet
         } else {
           return NULL;
         }
-      } else if( curToken == tok_equals ) {
+      } else if( (int)curToken == tok_equals ) {
         getNext();
-        if( curToken == tok_lbrace ) {
+        if( (int)curToken == tok_lbrace ) {
           int level = 0;
           do
           {
-            level += curToken == tok_lbrace;
-            level -= curToken == tok_rbrace;
+            level += (int)curToken == tok_lbrace;
+            level -= (int)curToken == tok_rbrace;
             getNext();
-          } while( level != 0 && curToken != tok_end_of_source );
+          } while( level != 0 && (int)curToken != tok_end_of_source );
         } else {
           cpp_expr *expr = parseExpression( 1 );
           value->setInit( makeCast( expr, value->getType() ) );
@@ -734,7 +734,7 @@ namespace octet
       bool isPacked = false;
    
       for(;;) {
-        switch( curToken ) {
+        switch( (int)curToken ) {
           case tok_identifier:
           {
             cpp_type *typeDef = findTypedef( lexer.id() );
@@ -754,7 +754,7 @@ namespace octet
           {
             getNext();
             
-            if( curToken != tok_lbrace ) {
+            if( (int)curToken != tok_lbrace ) {
               expect( tok_identifier );
               string structId = lexer.id();
               getNext();
@@ -779,7 +779,7 @@ namespace octet
               makeTag( thisType, structId );
             }
             
-            if( curToken == tok_lbrace ) {
+            if( (int)curToken == tok_lbrace ) {
               if( thisType->getScope() != NULL ) {
                 cpp_log("error: struct already defined\n");
                 return NULL;
@@ -790,7 +790,7 @@ namespace octet
               thisType->setScope( scope );
               unsigned structOffset = 0;
 
-              while( curToken != tok_rbrace ) {
+              while( (int)curToken != tok_rbrace ) {
                 cpp_type *type = parseDeclspec();
                 if( !type ) {
                   cpp_log("error: expected type here\n");
@@ -803,7 +803,7 @@ namespace octet
                   }
                   value->setOffset( structOffset++ );
                   scope->addValue( value );
-                  if( curToken != tok_comma ) {
+                  if( (int)curToken != tok_comma ) {
                     break;
                   }
                   getNext();
@@ -815,7 +815,7 @@ namespace octet
                 getNext();
               }
               
-              if( curToken == tok_rbrace ) {
+              if( (int)curToken == tok_rbrace ) {
                 getNext();
               }
             }
@@ -895,7 +895,7 @@ namespace octet
     
     cpp_statement *parseStatement() {
       cpp_statement *result = NULL;
-      if( curToken == tok_lbrace ) {
+      if( (int)curToken == tok_lbrace ) {
         cpp_scope *saveScope = curScope;
         curScope = new cpp_scope( curScope );
         
@@ -903,7 +903,7 @@ namespace octet
         result->setScope( curScope );
         getNext();
         cpp_statement **prev = result->getStatementsAddr();
-        while( curToken != tok_rbrace ) {
+        while( (int)curToken != tok_rbrace ) {
           cpp_statement *statement = parseStatement();
           if( statement == NULL ) {
             result = NULL;
@@ -920,9 +920,9 @@ namespace octet
         }
         getNext();
         return result;
-      } else if( curToken == tok_return ) {
+      } else if( (int)curToken == tok_return ) {
         getNext();
-        if( curToken != tok_semicolon ) {
+        if( (int)curToken != tok_semicolon ) {
           cpp_expr *expr = parseExpression();
           if( expr == NULL ) {
             return NULL;
@@ -936,17 +936,17 @@ namespace octet
           return NULL;
         }
         getNext();
-      } else if( curToken == tok_discard ) {
+      } else if( (int)curToken == tok_discard ) {
         getNext();
         result = new cpp_statement( cpp_statement::kind_return );
         if( !expect( tok_semicolon ) ) {
           return NULL;
         }
         getNext();
-      } else if( curToken == tok_for || curToken == tok_if || curToken == tok_while ) {
-        bool isFor = curToken == tok_for;
-        bool isIf = curToken == tok_if;
-        bool isWhile = curToken == tok_while;
+      } else if( (int)curToken == tok_for || (int)curToken == tok_if || (int)curToken == tok_while ) {
+        bool isFor = (int)curToken == tok_for;
+        bool isIf = (int)curToken == tok_if;
+        bool isWhile = (int)curToken == tok_while;
 
         getNext();
         if( !expect( tok_lparen ) ) {
@@ -962,7 +962,7 @@ namespace octet
         
         cpp_expr *expr = NULL;
         
-        if( !isFor || curToken != tok_semicolon ) {
+        if( !isFor || (int)curToken != tok_semicolon ) {
           if( cpp_type *type = parseDeclspec() ) {
             expr = parseDeclarators( type, false, 0, false );
           } else {
@@ -1000,7 +1000,7 @@ namespace octet
         }
         *result->getStatementsAddr() = stmt;
         
-        if( isIf && curToken == tok_else ) {
+        if( isIf && (int)curToken == tok_else ) {
           getNext();
           cpp_statement *else_stmt = parseStatement();
           if( else_stmt == NULL ) {
@@ -1011,7 +1011,7 @@ namespace octet
         
         curScope = saveScope;
         return result;
-      } else if( curToken == tok_do ) {
+      } else if( (int)curToken == tok_do ) {
         getNext();
 
         result = new cpp_statement( cpp_statement::kind_dowhile );
@@ -1063,7 +1063,7 @@ namespace octet
       if( trace_parse ) {
         cpp_log("[+] expr\n");
       }
-      if( curToken == tok_minus || curToken == tok_plus ) {
+      if( (int)curToken == tok_minus || (int)curToken == tok_plus ) {
         unsigned op = curToken;
         getNext();
         cpp_expr * rhs = parseExpression( 100 );
@@ -1072,8 +1072,8 @@ namespace octet
         }
         cpp_expr *zero = new cpp_expr( cpp_expr::kind_int_value, intType, (long long)0 );
         zero = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), zero );
-        result = new cpp_expr( curToken == tok_minus ? cpp_expr::kind_minus : cpp_expr::kind_plus, rhs->getType(), zero, rhs );
-      } else if( curToken == tok_not ) {
+        result = new cpp_expr( (int)curToken == tok_minus ? cpp_expr::kind_minus : cpp_expr::kind_plus, rhs->getType(), zero, rhs );
+      } else if( (int)curToken == tok_not ) {
         unsigned op = curToken;
         getNext();
         cpp_expr * rhs = parseExpression( 100 );
@@ -1084,7 +1084,7 @@ namespace octet
         cpp_expr *one = new cpp_expr( cpp_expr::kind_int_value, intType, (long long)1 );
         one = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), one );
         result = new cpp_expr( cpp_expr::kind_xor, rhs->getType(), one, rhs );
-      } else if( curToken == tok_tilda ) {
+      } else if( (int)curToken == tok_tilda ) {
         unsigned op = curToken;
         getNext();
         cpp_expr * rhs = parseExpression( 100 );
@@ -1095,7 +1095,7 @@ namespace octet
         cpp_expr *one = new cpp_expr( cpp_expr::kind_int_value, intType, (long long)-1 );
         one = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), one );
         result = new cpp_expr( cpp_expr::kind_xor, rhs->getType(), one, rhs );
-      } else if( curToken == tok_plus_plus || curToken == tok_minus_minus ) {
+      } else if( (int)curToken == tok_plus_plus || (int)curToken == tok_minus_minus ) {
         unsigned op = curToken;
         getNext();
         cpp_expr *rhs = parseExpression( 100 );
@@ -1104,8 +1104,8 @@ namespace octet
         }
         cpp_expr *inc = new cpp_expr( cpp_expr::kind_int_value, intType, (long long)1 );
         inc = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), inc );
-        result = new cpp_expr( curToken == tok_plus_plus ? cpp_expr::kind_plus_equals : cpp_expr::kind_minus_equals, rhs->getType(), rhs, inc );
-      } else if( curToken == tok_identifier ) {
+        result = new cpp_expr( (int)curToken == tok_plus_plus ? cpp_expr::kind_plus_equals : cpp_expr::kind_minus_equals, rhs->getType(), rhs, inc );
+      } else if( (int)curToken == tok_identifier ) {
         string name( lexer.id() );
         cpp_type *type = findTypedef( name );
         if( type ) {
@@ -1127,15 +1127,15 @@ namespace octet
           getNext();
           result = new cpp_expr( cpp_expr::kind_value, value );
         }
-      } else if( curToken == tok_int_constant || curToken == tok_int64_constant || curToken == tok_uint_constant || curToken == tok_uint64_constant ) {
+      } else if( (int)curToken == tok_int_constant || (int)curToken == tok_int64_constant || (int)curToken == tok_uint_constant || (int)curToken == tok_uint64_constant ) {
         //result = (int64_type)lexer_.value();
         result = new cpp_expr( cpp_expr::kind_int_value, cintType, (long long)lexer.value() );
         getNext();
-      } else if( curToken == tok_float_constant || curToken == tok_double_constant ) {
+      } else if( (int)curToken == tok_float_constant || (int)curToken == tok_double_constant ) {
         result = new cpp_expr( cpp_expr::kind_double_value, cfloatType, lexer.double_value() );
         //result = (int64_type)lexer_.value();
         getNext();  
-      } else if( curToken == tok_lparen ) {
+      } else if( (int)curToken == tok_lparen ) {
         getNext();
         cpp_type *type = parseDeclspec();
         if( type ) {
@@ -1150,7 +1150,7 @@ namespace octet
           expect( tok_rparen );
           getNext();
         }
-      } else if( curToken == tok_rparen ) {
+      } else if( (int)curToken == tok_rparen ) {
         cpp_log("error: missing '(' in expression\n");
         return NULL;
       } else {
@@ -1160,9 +1160,9 @@ namespace octet
       
       // handle  xxx[ n ] xxx( a, b ) xxx++ and xxx--
       for(;;) {
-        if( curToken == tok_dot ) {
+        if( (int)curToken == tok_dot ) {
           getNext();
-          if( curToken != tok_identifier ) {
+          if( (int)curToken != tok_identifier ) {
             cpp_log("error: expected member name after '.', got %s instead\n", getTokenName( curToken ));
             return NULL;
           }
@@ -1210,7 +1210,7 @@ namespace octet
             }
             result = new cpp_expr( cpp_expr::kind_dot, result, value );
           }
-        } else if( curToken == tok_lparen ) {
+        } else if( (int)curToken == tok_lparen ) {
           getNext();
           
           if( result->getKind() == cpp_expr::kind_int_value ) {
@@ -1288,7 +1288,7 @@ namespace octet
               }
             }
           }
-        } else if( curToken == tok_lbracket ) {
+        } else if( (int)curToken == tok_lbracket ) {
           getNext();
           cpp_expr * rhs = parseExpression();
           expect( tok_rbracket );
@@ -1298,14 +1298,14 @@ namespace octet
             return NULL;
           }
           result = new cpp_expr( cpp_expr::kind_index, result->getType()->getSubType(), result, rhs );
-        } else if( curToken == tok_plus_plus || curToken == tok_minus_minus ) {
+        } else if( (int)curToken == tok_plus_plus || (int)curToken == tok_minus_minus ) {
           getNext();
           char name[ 32 ];
           sprintf( name, "$tmp%d", numTmpVars++ );
           cpp_value *tmp = new cpp_value( result->getType(), name );
           cpp_expr *inc = new cpp_expr( cpp_expr::kind_int_value, intType, (long long)1 );
           inc = new cpp_expr( cpp_expr::kind_cast, result->getType(), inc );
-          inc = new cpp_expr( curToken == tok_plus_plus ? cpp_expr::kind_plus_equals : cpp_expr::kind_minus_equals, result->getType(), result, inc );
+          inc = new cpp_expr( (int)curToken == tok_plus_plus ? cpp_expr::kind_plus_equals : cpp_expr::kind_minus_equals, result->getType(), result, inc );
           cpp_expr *tmpExpr = new cpp_expr( cpp_expr::kind_value, tmp );
           cpp_expr *tmpAssign = new cpp_expr( cpp_expr::kind_equals, result->getType(), tmpExpr, result );
           result = new cpp_expr( cpp_expr::kind_comma, result->getType(), inc, tmpExpr );
@@ -1441,11 +1441,11 @@ namespace octet
     }
 
     bool parseOuter() {
-      if( curToken == tok_semicolon ) {
+      if( (int)curToken == tok_semicolon ) {
         getNext();
         return true;
       }
-      if( curToken == tok_typedef ) {
+      if( (int)curToken == tok_typedef ) {
         getNext();
         cpp_type *type = parseDeclspec();
         if( !type ) {
@@ -1469,7 +1469,7 @@ namespace octet
         cpp_log("error: expecting typedef or declaration\n");
         return false;
       }
-      if( curToken == tok_semicolon ) {
+      if( (int)curToken == tok_semicolon ) {
         getNext();
       } else {
         cpp_expr *expr = parseDeclarators( type, true, tok_semicolon, false );
@@ -1589,7 +1589,7 @@ namespace octet
       line_number = 1;
       getNext();
 
-      while( curToken != tok_end_of_source ) {
+      while( (int)curToken != tok_end_of_source ) {
         if( !parseOuter() ) {
           return;
         }

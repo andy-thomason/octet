@@ -325,9 +325,6 @@
     <ClInclude Include="..\..\src\platform\gl_skeleton.h">
       <Filter>octet\platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\platform\osx_specific.h">
-      <Filter>octet\platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\platform\platform.h">
       <Filter>octet\platform</Filter>
     </ClInclude>
