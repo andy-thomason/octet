@@ -334,6 +334,12 @@
     <ClInclude Include="..\..\src\platform\windows_specific.h">
       <Filter>octet\platform</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\resources\bitmap_font.h">
+      <Filter>octet\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scene\mesh_text.h">
+      <Filter>octet\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\resources\mesh_builder.inl">

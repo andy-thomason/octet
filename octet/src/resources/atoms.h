@@ -101,6 +101,8 @@ OCTET_ATOM(mip_levels)
 OCTET_ATOM(cube_faces)
 OCTET_ATOM(src)
 OCTET_ATOM(view_pos)
+OCTET_ATOM(font)
+OCTET_ATOM(font_info)
 
 #define OCTET_CLASS(X) OCTET_ATOM(X)
 #include "classes.h"

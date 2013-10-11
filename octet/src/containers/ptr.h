@@ -4,7 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// self deleting "smart" pointer
+// self deleting "smart" pointer (non-shared)
 //
 
 // This is a non-sharing "smart" pointer class

@@ -4,7 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-//
+// work in progress
 
 namespace octet {
   class job : public resource {

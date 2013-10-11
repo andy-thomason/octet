@@ -5,6 +5,8 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // visitor for finding objects by name in the octet graph
+//
+// work in progress
 
 namespace octet {
   class url_finder : public visitor {

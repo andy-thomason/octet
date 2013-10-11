@@ -129,6 +129,7 @@ static char *get_sprintf_buffer() {
 #include "../resources/resource.h"
 #include "../resources/resources.h"
 #include "../resources/gl_resource.h"
+#include "../resources/bitmap_font.h"
 #include "../resources/mesh_builder.h"
 
 // shaders
@@ -157,6 +158,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/displacement_map.h"
 #include "../scene/indexer.h"
 #include "../scene/smooth.h"
+#include "../scene/mesh_text.h"
 #include "../scene/wireframe.h"
 
 // high level helpers

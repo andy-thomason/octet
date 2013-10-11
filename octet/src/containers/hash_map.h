@@ -25,10 +25,12 @@ namespace octet {
 
     static unsigned get_hash(void *key) { return fuzz_hash((unsigned)(intptr_t)key); }
     static unsigned get_hash(int key) { return fuzz_hash((unsigned)key); }
+    static unsigned get_hash(unsigned key) { return fuzz_hash((unsigned)key); }
     static unsigned get_hash(uint64_t key) { return fuzz_hash((unsigned)(key ^ (key >> 32))); }
 
     static bool is_empty(void *key) { return !key; }
     static bool is_empty(int key) { return !key; }
+    static bool is_empty(unsigned key) { return !key; }
     static bool is_empty(uint64_t key) { return !key; }
   };
 
@@ -72,13 +74,29 @@ namespace octet {
       }
       allocator_t::free(old_entries, sizeof(entry_t) * old_max_entries);
     }
-  public:
-    // allocate a small map for starters that has a small number of elements.
-    hash_map() {
+
+    void release() {
+      allocator_t::free(entries, sizeof(entry_t) * max_entries);
+      entries = 0;
+      num_entries = 0;
+      max_entries = 0;
+    }
+
+    void init() {
       num_entries = 0;
       max_entries = 4;
       entries = (entry_t*)allocator_t::malloc(sizeof(entry_t) * max_entries);
       memset(entries, 0, sizeof(entry_t) * max_entries);
+    }
+  public:
+    // allocate a small map for starters that has a small number of elements.
+    hash_map() {
+      init();
+    }
+  
+    void clear() {
+      release();
+      init();
     }
   
     // access the 
@@ -101,13 +119,13 @@ namespace octet {
     }
 
     bool contains(const key_t &key) {
-      unsigned hash = get_hash(key);
+      unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
       return !cmp_t::is_empty(entry->key);
     }
 
     int get_index(const key_t &key) {
-      unsigned hash = get_hash(key);
+      unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
       return entry ? entry - entries : -1;
     }
