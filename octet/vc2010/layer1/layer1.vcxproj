@@ -19,6 +19,7 @@
     <ClInclude Include="..\..\src\containers\ptr.h" />
     <ClInclude Include="..\..\src\containers\ref.h" />
     <ClInclude Include="..\..\src\containers\string.h" />
+    <ClInclude Include="..\..\src\examples\layer1\angry_box2d\angry_box2d_app.h" />
     <ClInclude Include="..\..\src\examples\layer1\bump\bump_app.h" />
     <ClInclude Include="..\..\src\examples\layer1\cube\cube_app.h" />
     <ClInclude Include="..\..\src\examples\layer1\duck\duck_app.h" />
@@ -110,6 +111,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

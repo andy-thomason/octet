@@ -14,7 +14,8 @@
   #include "BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp"
   #include "BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp"
   #include "BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.cpp"
-  #include "BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.cpp"
+  // the following clashes with the Box2D lib
+  //#include "BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.cpp"
   #include "BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp"
   #include "BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp"
   #include "BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp"

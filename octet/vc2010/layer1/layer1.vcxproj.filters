@@ -190,6 +190,9 @@
     <ClInclude Include="..\..\src\examples\layer1\triangle\triangle_app.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\examples\layer1\angry_box2d\angry_box2d_app.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\resources\mesh_builder.inl">

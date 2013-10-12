@@ -33,7 +33,6 @@ namespace octet {
       text_scene->create_default_camera_and_lights();
       cam = text_scene->get_camera_instance(0);
       cam->get_node()->access_nodeToParent().loadIdentity();
-
     }
 
     void render(bump_shader &object_shader, bump_shader &skin_shader, int vx, int vy, int frame_number) {

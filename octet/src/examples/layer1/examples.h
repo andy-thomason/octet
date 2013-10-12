@@ -8,15 +8,19 @@
 
 #include "../../platform/platform.h"
 
+#include "../../Box2D/Box2DUnity.h"
+
 #include "triangle/triangle_app.h"
 #include "texture/texture_app.h"
 #include "gif/gif_app.h"
 #include "ping/ping_app.h"
 #include "invaderers/invaderers_app.h"
+#include "angry_box2d/angry_box2d_app.h"
 #include "cube/cube_app.h"
 #include "duck/duck_app.h"
 #include "bump/bump_app.h"
 #include "physics/physics_app.h"
+
 
 namespace octet {
   static app *app_factory(const char *name, int argc, char **argv) {
@@ -25,6 +29,7 @@ namespace octet {
     else if (!strcmp(name, "gif")) return new gif_app(argc, argv);         //  gif sample: continue here to learn how to load and draw a GIF texture
     else if (!strcmp(name, "ping")) return new ping_app(argc, argv);       //  ping sample: continue here to learn how to make a simple game
     else if (!strcmp(name, "invaderers")) return new invaderers_app(argc, argv);//  invaderers sample: continue here to learn how to make sounds
+    else if (!strcmp(name, "box2d")) return new angry_box2d_app(argc, argv);//  box2d sample: continue here to learn how to do simple 2d physics
     else if (!strcmp(name, "cube")) return new cube_app(argc, argv);       //  cube sample: continue here to learn how to draw stock 3d geometry
     else if (!strcmp(name, "duck")) return new duck_app(argc, argv);       //  duck sample: continue here to learn how to load collada geometry
     else if (!strcmp(name, "bump")) return new bump_app(argc, argv);       //  bump map sample: continue here to learn how to draw bump mapped textures
