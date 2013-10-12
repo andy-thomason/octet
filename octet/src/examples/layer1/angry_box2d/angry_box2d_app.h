@@ -118,7 +118,7 @@ namespace octet {
     texture_shader texture_shader_;
 
     enum {
-      num_sound_sources = 8,
+      num_sound_sources = 32,
     };
 
     // game state
@@ -142,6 +142,8 @@ namespace octet {
 
     // this is called once OpenGL is initialized
     void app_init() {
+      box2d_world.SetContactListener(this);
+
       // set up the shader
       texture_shader_.init();
 
@@ -167,6 +169,7 @@ namespace octet {
   	  body_def.type = b2_dynamicBody;
 
       b2FixtureDef fixture_def;
+      fixture_def.restitution = 0.5f; // bouncy
       fixture_def.shape = &poly;
 
       for (int i = 0; i != 5; ++i) {
@@ -240,9 +243,19 @@ namespace octet {
 
     // event called every time we begin a contact
     void BeginContact(b2Contact* contact) {
-      ALuint source = get_sound_source();
-      alSourcei(source, AL_BUFFER, bang);
-      alSourcePlay(source);
+      b2Fixture *fixa = contact->GetFixtureA();
+      b2Fixture *fixb = contact->GetFixtureB();
+      if (fixa && fixb) {
+        b2Vec2 va = fixa->GetBody()->GetLinearVelocity();
+        b2Vec2 vb = fixb->GetBody()->GetLinearVelocity();
+        float rel_vel2 = (vb - va).LengthSquared();
+        if (rel_vel2 > 0.5f) {
+          ALuint source = get_sound_source();
+          alSourcei(source, AL_BUFFER, bang);
+          alSourcef(source, AL_GAIN, rel_vel2 * 0.005f);
+          alSourcePlay(source);
+        }
+      }
     }
   };
 }
