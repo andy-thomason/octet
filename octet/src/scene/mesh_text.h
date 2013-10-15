@@ -9,9 +9,9 @@
 
 namespace octet {
   class mesh_text : public mesh {
-    enum { max_quads = 16384 };
     typedef bitmap_font::vertex vertex;
     ref<bitmap_font> font;
+    int max_quads;
     string text;
     aabb bb;
   public:
@@ -25,18 +25,22 @@ namespace octet {
 	    add_attribute(attribute_pos, 3, GL_FLOAT, sizeof(float)*0);
 	    add_attribute(attribute_uv, 2, GL_FLOAT, sizeof(float)*3);
 	    add_attribute(attribute_color, 4, GL_UNSIGNED_BYTE, sizeof(float)*5);
-	    unsigned max_vertices = max_quads * 4;
-	    unsigned max_indices = max_quads * 6;
-	    unsigned vsize = sizeof(vertex) * max_vertices;
-	    unsigned isize = sizeof(uint32_t) * max_indices;
-	    allocate(vsize, isize);
-      set_params(sizeof(vertex), 0, 0, GL_TRIANGLES, GL_UNSIGNED_INT);
 
       if (text.size()) update();
     }
 
     void update() {
       if (!font) return;
+
+      if (text.size() > max_quads) {
+        max_quads = max(32, (text.size() + 15) & ~15); // round up to 16
+	      unsigned max_vertices = max_quads * 4;
+	      unsigned max_indices = max_quads * 6;
+	      unsigned vsize = sizeof(vertex) * max_vertices;
+	      unsigned isize = sizeof(uint32_t) * max_indices;
+	      allocate(vsize, isize);
+        set_params(sizeof(vertex), 0, 0, GL_TRIANGLES, GL_UNSIGNED_INT);
+      }
 
       vertex *vtx = (vertex *)get_vertices()->lock();
       uint32_t *idx = (uint32_t *)get_indices()->lock();

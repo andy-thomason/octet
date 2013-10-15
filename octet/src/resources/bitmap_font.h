@@ -255,7 +255,7 @@ private:
       v.visit(font_info, atom_font_info);
       v.visit(uscale, atom_uscale);
       v.visit(vscale, atom_vscale);
-      update();
+      if (v.is_reader()) update();
     }
 
     // build a mesh by combining the string with the bitmap font info.
