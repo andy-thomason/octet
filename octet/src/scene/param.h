@@ -18,6 +18,7 @@ namespace octet {
   class param : public resource {
     atom_t kind;
     ref<image> img;
+    ref<sampler> smpl;
 
     vec4 color;
 
@@ -40,9 +41,10 @@ namespace octet {
       kind = atom_color;
     }
 
-    param(image *img) {
+    param(image *img, sampler *smpl = 0) {
       gl_texture = 0;
       this->img = img;
+      this->smpl = smpl;
       kind = atom_image;
     }
 
@@ -50,6 +52,7 @@ namespace octet {
     void visit(visitor &v) {
       v.visit(kind, atom_kind);
       v.visit(img, atom_image);
+      v.visit(smpl, atom_sampler);
     }
 
     // generate a texture for this parameter
@@ -77,6 +80,18 @@ namespace octet {
 
     image *get_image() {
       return img;
+    }
+
+    sampler *get_sampler() {
+      return smpl;
+    }
+
+    void render(unsigned slot, unsigned target) {
+      glActiveTexture(GL_TEXTURE0 + slot);
+      glBindTexture(target, get_gl_texture());
+      if (smpl) {
+        smpl->render(target);
+      }
     }
   };
 }

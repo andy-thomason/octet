@@ -143,8 +143,11 @@ namespace octet {
     }
 
     void set_viewport_size(int x, int y) {
-      viewport_x = x;
-      viewport_y = y;
+      // make the viewport size even, so the centre is always
+      // at the centre of a pixel.
+      viewport_x = x & ~1; // ie, clear the bottom bit.
+      viewport_y = y & ~1;
+      //printf("set_viewport_size: %03x %03x\n", viewport_x, viewport_y);
     }
 
     static bool can_use_vbos() {

@@ -216,6 +216,14 @@ namespace octet {
     ~image() {
     }
 
+    unsigned get_width() const {
+      return width;
+    }
+
+    unsigned get_height() const {
+      return height;
+    }
+
     // access attributes by name
     void visit(visitor &v) {
       v.visit(url, atom_url);

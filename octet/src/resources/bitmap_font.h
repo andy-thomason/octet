@@ -65,6 +65,8 @@ namespace octet {
 
     // serialized info
     dynarray<uint8_t> font_info;
+    float uscale;
+    float vscale;
 
     // transient info, built by update()
     const info *finfo;
@@ -82,12 +84,12 @@ public:
 
 private:
     // add a new vertex to the buffer
-    static vertex *add_vertex(vertex *vtx, int xdraw, int ydraw, int x, int y, unsigned color) {
+    vertex *add_vertex(vertex *vtx, int xdraw, int ydraw, int x, int y, unsigned color) {
       vtx->x = (float)xdraw;
       vtx->y = (float)ydraw;
       vtx->z = 0;
-      vtx->u = x * (1.0f/256);
-      vtx->v = 1.0f - y * (1.0f/256);
+      vtx->u = x * uscale;
+      vtx->v = 1.0f - y * vscale;
       vtx->color = color;
       return vtx + 1;
     }
@@ -117,6 +119,35 @@ private:
         chr &= mask;
       }
       return chr;
+    }
+
+    // find the next space or hyphen
+    const char *find_word_end(const char *src, const char *src_max) {
+      // a space or hyphen on its own is a word
+      if (src < src_max && (*src == ' ' || *src == '-')) {
+        src++;
+      } else {
+        // otherwise skip to a space or hyphen
+        while (src < src_max && *src != ' ' && *src != '\n' && *src != '-') ++src;
+        if (src < src_max && *src == '-') ++src;
+      }
+      return src;
+    }
+
+    // find how many pixels we move if we render this string
+    int find_escapement(const char *src, const char *src_max) {
+      int result = 0;
+      while (src < src_max) {
+        unsigned chr = decode_utf8(src);
+        int index = char_map.get_index(chr);
+        if (index >= 0) {
+          const char_info *ci = char_map.value(index);
+          if (ci) {
+            result += s2(ci->xadvance);
+          }
+        }
+      }
+      return result;
     }
 
     // create other data items from font_info
@@ -160,31 +191,11 @@ private:
       }
     }
 
-  public:
-    RESOURCE_META(bitmap_font)
-
-    bitmap_font(const char *fnt_file = 0) {
-      if (fnt_file) {
-        app_utils::get_url(font_info, fnt_file);
-        update();
-      }
-    }
-
-    // serialize this object.
-    void visit(visitor &v) {
-      v.visit(font_info, atom_font_info);
-      update();
-    }
-
-    unsigned build_mesh(int &xdraw, int &ydraw, vertex *vtx, uint32_t *idx, unsigned max_quads, const char *text, const char *max_text) {
-      unsigned num_quads = 0;
-
-      //char arabic_text[] = "أخبار الوطن العربي";
-
-      unsigned color = 0xffffffff;
-      bool left_to_right = true;
-
-      for (const char *src = text; src < max_text && *src && num_quads < max_quads; ) {
+    // draw a word by creating a serues of quads.
+    unsigned render_chars(unsigned num_quads, int xdraw, int ydraw, vertex *vtx, uint32_t *idx, const char *src, const char *src_max, bool left_to_right, unsigned color) {
+      vtx += num_quads * 4;
+      idx += num_quads * 6;
+      while (src < src_max) {
         unsigned chr = decode_utf8(src);
 
         int index = char_map.get_index(chr);
@@ -201,26 +212,134 @@ private:
 
             if (!left_to_right) xdraw -= xadvance;
 
-            if (idx && vtx) {
-              // 0 1
-              // 2 3
-              idx[0] = num_quads * 4 + 0;
-              idx[1] = num_quads * 4 + 1;
-              idx[2] = num_quads * 4 + 2;
-              idx[3] = num_quads * 4 + 2;
-              idx[4] = num_quads * 4 + 1;
-              idx[5] = num_quads * 4 + 3;
-              idx += 6;
+            // 0 1
+            // 2 3
+            idx[0] = num_quads * 4 + 0;
+            idx[1] = num_quads * 4 + 1;
+            idx[2] = num_quads * 4 + 2;
+            idx[3] = num_quads * 4 + 2;
+            idx[4] = num_quads * 4 + 1;
+            idx[5] = num_quads * 4 + 3;
+            idx += 6;
 
-              vtx = add_vertex(vtx, xdraw + xoffset, ydraw - yoffset, x, y, color);
-              vtx = add_vertex(vtx, xdraw + xoffset + width, ydraw - yoffset, x + width, y, color);
-              vtx = add_vertex(vtx, xdraw + xoffset, ydraw - yoffset - height, x, y + height, color);
-              vtx = add_vertex(vtx, xdraw + xoffset + width, ydraw - yoffset - height, x + width, y + height, color);
-            }
+            vtx = add_vertex(vtx, xdraw + xoffset, ydraw - yoffset, x, y, color);
+            vtx = add_vertex(vtx, xdraw + xoffset + width, ydraw - yoffset, x + width, y, color);
+            vtx = add_vertex(vtx, xdraw + xoffset, ydraw - yoffset - height, x, y + height, color);
+            vtx = add_vertex(vtx, xdraw + xoffset + width, ydraw - yoffset - height, x + width, y + height, color);
 
             num_quads++;
 
             if (left_to_right) xdraw += xadvance;
+          }
+        }
+      }
+      return num_quads;
+    }
+
+
+  public:
+    RESOURCE_META(bitmap_font)
+
+    // create new bitmap font info
+    bitmap_font(int page_width=1, int page_height=1, const char *fnt_file = 0) {
+      uscale = 1.0f / page_width;
+      vscale = 1.0f / page_height;
+      if (fnt_file) {
+        app_utils::get_url(font_info, fnt_file);
+        update();
+      }
+    }
+
+    // serialize this object.
+    void visit(visitor &v) {
+      v.visit(font_info, atom_font_info);
+      v.visit(uscale, atom_uscale);
+      v.visit(vscale, atom_vscale);
+      update();
+    }
+
+    // build a mesh by combining the string with the bitmap font info.
+    unsigned build_mesh(const aabb &bb, vertex *vtx, uint32_t *idx, unsigned max_quads, const char *text, const char *max_text) {
+      // defensive coding
+      if (!idx || !vtx) return 0;
+      if (!text || !max_text) return 0;
+
+      int xmin = (int)bb.get_min().x();
+      int ymin = (int)bb.get_min().y();
+      int xmax = (int)bb.get_max().x();
+      int ymax = (int)bb.get_max().y();
+
+      int line_height = u2(fcommon->lineHeight);
+
+      unsigned num_quads = 0;
+
+      //char arabic_text[] = "أخبار الوطن العربي";
+
+      unsigned color = 0xffffffff;
+      bool left_to_right = true;
+      int base = s2(fcommon->base);
+
+      int xdraw = left_to_right ? xmin : xmax;
+      int ydraw = ymax - line_height + base;
+
+      int index = char_map.get_index(' ');
+      const char_info *ci = index >= 0 ? char_map.value(index) : 0;
+      int space_size = ci ? s2(ci->xadvance) : line_height / 2;
+
+      for (const char *src = text; src < max_text && *src && num_quads < max_quads; ) {
+        const char *word_end = find_word_end(src, max_text);
+        if (word_end == src) break; // avoid infinite loops
+
+        int escapement = find_escapement(src, word_end);
+
+        // handle word wrap
+        if (left_to_right) {
+          // latin/asian text
+          if (xdraw + escapement > xmax) {
+            if (xmin + escapement <= xmax) {
+              // move to next line
+              xdraw = xmin;
+              ydraw -= line_height;
+            } else {
+              // for now: overrun line
+            }
+          }
+        } else {
+          // arabic text
+          if (xdraw - escapement < xmin) {
+            if (xmax - escapement >= xmin) {
+              // move to next line
+              xdraw = xmax;
+              ydraw -= line_height;
+            } else {
+              // for now: overrun line
+            }
+          }
+        }
+
+        // end of column
+        if (ydraw - base < ymin) {
+          break;
+        }
+
+        num_quads = render_chars(num_quads, xdraw, ydraw, vtx, idx, src, word_end, left_to_right, color);
+
+        src = word_end;
+
+        xdraw += left_to_right ? escapement : -escapement;
+
+        if (src < max_text && *src == ' ') {
+          xdraw += left_to_right ? space_size : -space_size;
+          src++;
+        }
+        if (src < max_text && *src == '\n') {
+          src++;
+          if (left_to_right) {
+            xdraw = xmin;
+            ydraw -= line_height;
+          } else {
+            xdraw = xmax;
+            ydraw -= line_height;
           }
         }
       }

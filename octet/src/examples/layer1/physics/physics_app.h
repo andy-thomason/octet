@@ -173,10 +173,10 @@ namespace octet {
       }
 
       if (is_key_down('W')) {
-        boxes[0].accelerate(world, -0.1f);
+        boxes[0].accelerate(world, -0.5f);
       }
       if (is_key_down('S')) {
-        boxes[0].accelerate(world, 0.1f);
+        boxes[0].accelerate(world, 0.5f);
       }
       if (is_key_down(key_left)) {
         boxes[0].turn(world, 0.01f);

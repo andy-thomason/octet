@@ -23,19 +23,20 @@ namespace octet {
 
     void bind_textures() const {
       // set textures 0, 1, 2, 3 to their respective values
+      diffuse->render(0, GL_TEXTURE_2D);
+      ambient->render(1, GL_TEXTURE_2D);
+      emission->render(2, GL_TEXTURE_2D);
+      specular->render(3, GL_TEXTURE_2D);
+      bump->render(4, GL_TEXTURE_2D);
+      shininess->render(5, GL_TEXTURE_2D);
       glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, diffuse->get_gl_texture());
-      glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_2D, ambient->get_gl_texture());
-      glActiveTexture(GL_TEXTURE2);
-      glBindTexture(GL_TEXTURE_2D, emission->get_gl_texture());
-      glActiveTexture(GL_TEXTURE3);
-      glBindTexture(GL_TEXTURE_2D, specular->get_gl_texture());
-      glActiveTexture(GL_TEXTURE4);
-      glBindTexture(GL_TEXTURE_2D, bump->get_gl_texture());
-      glActiveTexture(GL_TEXTURE5);
-      glBindTexture(GL_TEXTURE_2D, shininess->get_gl_texture());
-      glActiveTexture(GL_TEXTURE0);
+    }
+
+    void init(param *param_) {
+      specular = diffuse = ambient = param_;
+      emission = new param(vec4(0, 0, 0, 0));
+      bump = new param(vec4(0, 0, 0, 0));
+      shininess = new param(vec4(30.0f/255, 0, 0, 0));
     }
 
   public:
@@ -52,19 +53,17 @@ namespace octet {
     }
 
     // don't use this too much, it creates a new image every time.
-    material(const char *texture) {
-      specular = diffuse = ambient = new param(new image(texture));
-      emission = new param(vec4(0, 0, 0, 0));
-      bump = new param(vec4(0, 0, 0, 0));
-      shininess = new param(vec4(30.0f/255, 0, 0, 0));
+    material(const char *texture, sampler *sampler_ = 0) {
+      init(new param(new image(texture), sampler_));
     }
 
     // don't use this too much, it creates a new image every time.
     material(const vec4 &color) {
-      specular = diffuse = ambient = new param(color);
-      emission = new param(vec4(0, 0, 0, 0));
-      bump = new param(vec4(0, 0, 0, 0));
-      shininess = new param(vec4(30.0f/255, 0, 0, 0));
+      init(new param(color));
+    }
+
+    material(image *img) {
+      init(new param(img));
     }
 
     void visit(visitor &v) {

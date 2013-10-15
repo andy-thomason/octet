@@ -50,7 +50,7 @@ namespace octet {
       v.visit(normalized, atom_normalized);
       v.visit(num_slots, atom_num_slots);
       v.visit(mesh_skin, atom_mesh_skin);
-      v.visit(mesh_aabb, atom_mesh_aabb);
+      v.visit(mesh_aabb, atom_aabb);
     }
 
     ~mesh() {

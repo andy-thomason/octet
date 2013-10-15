@@ -127,8 +127,10 @@ namespace octet {
 
     // this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
+      int vx, vy;
+      get_viewport_size(vx, vy);
       // set a viewport - includes whole window area
-      glViewport(x, y, w, h);
+      glViewport(0, 0, vx, vy);
 
       // clear the background to black
       glClearColor(0.5f, 0.5f, 0.5f, 1);

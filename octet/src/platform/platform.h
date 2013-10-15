@@ -148,6 +148,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/animation.h"
 #include "../scene/mesh.h"
 #include "../scene/image.h"
+#include "../scene/sampler.h"
 #include "../scene/param.h"
 #include "../scene/material.h"
 #include "../scene/camera_instance.h"
