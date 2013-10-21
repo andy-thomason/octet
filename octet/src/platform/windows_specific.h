@@ -73,10 +73,8 @@
 #include <xmmintrin.h>
 
 namespace octet {
-  class HWND_cmp {
+  class HWND_cmp : public hash_map_cmp {
   public:
-    static unsigned fuzz_hash(unsigned hash) { return hash ^ (hash >> 3) ^ (hash >> 5); }
-
     static unsigned get_hash(HWND key) { return fuzz_hash((unsigned)(intptr_t)key); }
 
     static bool is_empty(HWND key) { return !key; }

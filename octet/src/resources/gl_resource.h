@@ -19,6 +19,34 @@ namespace octet {
     GLuint target;
 
   public:
+    // helper classes so that we remember to unlock!
+
+    // read-write lock
+    class rwlock {
+      gl_resource *res;
+      void *ptr;
+    public:
+      rwlock(gl_resource *res) { this->res = res; ptr = res->lock(); }
+      ~rwlock() { res->unlock(); }
+      uint8_t *u8() const { return (uint8_t*)ptr; }
+      uint16_t *u16() const { return (uint16_t*)ptr; }
+      uint32_t *u32() const { return (uint32_t*)ptr; }
+      float *f32() const { return (float*)ptr; }
+    };
+
+    // read-only lock
+    class rolock {
+      gl_resource *res;
+      const void *ptr;
+    public:
+      rolock(gl_resource *res) { this->res = res; ptr = res->lock_read_only(); }
+      ~rolock() { res->unlock_read_only(); }
+      const uint8_t *u8() const { return (const uint8_t*)ptr; }
+      const uint16_t *u16() const { return (const uint16_t*)ptr; }
+      const uint32_t *u32() const { return (const uint32_t*)ptr; }
+      const float *f32() const { return (const float*)ptr; }
+    };
+  public:
     RESOURCE_META(gl_resource)
 
     gl_resource(unsigned target=0, unsigned size=0) {
@@ -66,7 +94,7 @@ namespace octet {
     }
 
     const void *lock_read_only() const {
-      return (void*)&bytes[0];
+      return (const void*)&bytes[0];
     }
 
     void unlock_read_only() const {

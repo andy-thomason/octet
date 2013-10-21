@@ -9,6 +9,10 @@
 
 namespace octet {
   class mesh_instance : public resource {
+  public:
+    enum { flag_selected = 1 << 0 };
+
+  private:
     // which scene_node (model to world matrix) to use in the scene
     ref<scene_node> node;
 
@@ -20,7 +24,9 @@ namespace octet {
 
     // for characters, which skeleton to use
     ref<skeleton> skel;
-    
+
+    // assorted mesh instance booleans (see flag_*)
+    unsigned flags;
 
   public:
     RESOURCE_META(mesh_instance)
@@ -30,6 +36,7 @@ namespace octet {
       this->msh = msh;
       this->mat = mat;
       this->skel = skel;
+      flags = 0;
     }
 
     // metadata visitor. Used for serialisation and script interface.
@@ -38,6 +45,7 @@ namespace octet {
       v.visit(msh, atom_msh);
       v.visit(mat, atom_mat);
       v.visit(skel, atom_skel);
+      v.visit(flags, atom_flags);
     }
 
     //////////////////////////////
@@ -83,11 +91,6 @@ namespace octet {
       }
     }
 
-    //////////////////////////////
-    //
-    // accessor methods
-    //
-
     void update(float delta_time) {
     }
 
@@ -100,11 +103,13 @@ namespace octet {
     mesh *get_mesh() const { return msh; }
     material *get_material() const { return mat; }
     skeleton *get_skeleton() const { return skel; }
+    unsigned get_flags() const { return flags; }
 
     void set_node(scene_node *value) { node = value; }
     void set_mesh(mesh *value) { msh = value; }
     void set_material(material *value) { mat = value; }
     void set_skeleton(skeleton *value) { skel = value; }
+    void set_flags(unsigned value) { flags = value; }
   };
 }
 

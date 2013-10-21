@@ -21,10 +21,12 @@ namespace octet {
       font = font_;
       text = text_;
       bb = bb_ ? *bb_ : aabb(vec3(0, 0, 0), vec3(64, 64, 0));
+      max_quads = 0;
 
 	    add_attribute(attribute_pos, 3, GL_FLOAT, sizeof(float)*0);
 	    add_attribute(attribute_uv, 2, GL_FLOAT, sizeof(float)*3);
 	    add_attribute(attribute_color, 4, GL_UNSIGNED_BYTE, sizeof(float)*5);
+      set_params(sizeof(vertex), 0, 0, GL_TRIANGLES, GL_UNSIGNED_INT);
 
       if (text.size()) update();
     }
@@ -39,7 +41,6 @@ namespace octet {
 	      unsigned vsize = sizeof(vertex) * max_vertices;
 	      unsigned isize = sizeof(uint32_t) * max_indices;
 	      allocate(vsize, isize);
-        set_params(sizeof(vertex), 0, 0, GL_TRIANGLES, GL_UNSIGNED_INT);
       }
 
       vertex *vtx = (vertex *)get_vertices()->lock();

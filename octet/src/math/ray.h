@@ -88,16 +88,20 @@ namespace octet {
       return min(ax, ay, az);
     }
 
-    vec3 get_start() {
+    vec3 get_start() const {
       return origin;
     }
 
-    vec3 get_end() {
+    vec3 get_end() const {
+      return origin + distance;
+    }
+
+    vec3 get_distance() const {
       return origin + distance;
     }
   };
 
-  inline void unit_test_ray() {
+  static inline void unit_test_ray() {
     aabb my_aabb(vec3(1, 1, 1), vec3(1, 2, 3));
     for (int i = 0; i != 360; i += 30) {
       vec3 dist = vec3(cos(i*(3.131592653f/180))*4, sin(i*(3.131592653f/180))*4, 0);

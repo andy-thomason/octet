@@ -21,6 +21,7 @@ namespace octet {
 
   class hash_map_cmp {
   public:
+    // mix in some bits from higher positions to lower positions
     static unsigned fuzz_hash(unsigned hash) { return hash ^ (hash >> 3) ^ (hash >> 5); }
 
     static unsigned get_hash(void *key) { return fuzz_hash((unsigned)(intptr_t)key); }
@@ -32,6 +33,8 @@ namespace octet {
     static bool is_empty(int key) { return !key; }
     static bool is_empty(unsigned key) { return !key; }
     static bool is_empty(uint64_t key) { return !key; }
+
+    //template <typename T> static bool equals(const T &lhs, const T &rhs) { return lhs == rhs; }
   };
 
   template <typename key_t, typename value_t, class cmp_t=hash_map_cmp, class allocator_t=allocator> class hash_map {

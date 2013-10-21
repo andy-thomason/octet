@@ -110,6 +110,7 @@ OCTET_ATOM(texture_wrap_s)
 OCTET_ATOM(texture_wrap_t)
 OCTET_ATOM(uscale)
 OCTET_ATOM(vscale)
+OCTET_ATOM(flags)
 
 #define OCTET_CLASS(X) OCTET_ATOM(X)
 #include "classes.h"

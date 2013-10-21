@@ -31,6 +31,43 @@ namespace octet {
     // bounding box
     aabb mesh_aabb;
 
+    // add a new edge to a hash map. (index, index) -> (triangle+1, triangle+1)
+    static void add_edge(hash_map<uint64_t, uint64_t> &edges, unsigned tri_idx, unsigned i0, unsigned i1) {
+      if (i0 == i1) return; // note: (0, 0) means empty
+
+      if (i0 > i1) { swap(i0, i1); }
+      uint64_t key = ((uint64_t)i1 << 32) | i0;
+
+      uint64_t &edge = edges[key];
+      uint32_t upper = (uint32_t)(edge >> 32);
+      uint32_t lower = (uint32_t)(edge);
+
+      if (edge == 0) {
+        // first triangle
+        edge = tri_idx+1;
+      } else if (upper == 0) {
+        // second triangle
+        edge = ((uint64_t)upper << 32) | (tri_idx+1);
+      } else {
+        // three triangles join here... ignore.
+      }
+    }
+
+    // return true if the triangle tri is visible from the viewpoint (in model space)
+    // the exact definition of "is visible" depends on winding order.
+    static bool tri_is_visible(
+      unsigned tri, unsigned pos_offset, unsigned stride,
+      const uint32_t *ip, const uint8_t *vp, const vec3 &viewpoint,
+      bool is_directional
+    ) {
+      const vec3 &pa = *(const vec3*)(vp + ip[tri+0] * stride + pos_offset);
+      const vec3 &pb = *(const vec3*)(vp + ip[tri+1] * stride + pos_offset);
+      const vec3 &pc = *(const vec3*)(vp + ip[tri+2] * stride + pos_offset);
+      vec3 normal = cross((pb - pa), (pc - pa));
+      vec3 dir = is_directional ? viewpoint - pa : viewpoint;
+      return dot(normal, dir) <= 0;
+    }
+
   public:
     RESOURCE_META(mesh)
 
@@ -509,60 +546,84 @@ namespace octet {
 
     // *very* slow ray cast.
     // returns "barycentric" coordinates.
-    // eg. hit pos = bary[0] * pos0 + bary[1] * pos1 + bary[2] * pos2;
-    // eg. hit uv = bary[0] * uv0 + bary[1] * uv1 + bary[2] * uv2;
-    bool ray_cast(const vec4 &org, const vec4 &dir, int indices[], vec4 &bary) {
-      //static FILE *file = fopen("c:/tmp/3.txt","w");
-      //fprintf(file, "org=%s dir=%s\n", org.toString(), dir.toString());
+    // eg. hit pos = bary[0] * pos0 + bary[1] * pos1 + bary[2] * pos2 (or ray.start + ray.distance * bary[3])
+    // eg. hit uv = bary[0] * uv0 + bary[1] * uv1 + bary[2] * uv2
+    bool ray_cast(const ray &the_ray, int indices[], vec4 &bary) {
       unsigned pos_slot = get_slot(attribute_pos);
+      if (get_index_type() != GL_UNSIGNED_INT) return false;
+      if (get_size(pos_slot) < 3) return false;
+      if (get_kind(pos_slot) != GL_FLOAT) return false;
+
+      vec3 org = the_ray.get_start();
+      vec3 dir = the_ray.get_distance();
+      //app_utils::log("ray_cast: org=%s dir=%s\n", org.toString(), dir.toString());
+
+      unsigned pos_offset = get_offset(pos_slot);
+      gl_resource::rolock idx_lock(get_indices());
+      gl_resource::rolock vtx_lock(get_vertices());
+      const uint32_t *idx = idx_lock.u32();
+      const uint8_t *vtx = vtx_lock.u8();
+
+      float best_denom = 0;
+      vec4 best_numer(0, 0, 0, 0);
       for (unsigned i = 0; i != get_num_indices(); i += 3) {
-        unsigned idx[3] = {
-          get_index(i),
-          get_index(i+1),
-          get_index(i+2)
-        };
+        vec3 a = *(const vec3*)(vtx + pos_offset + stride * idx[i+0]) - org;
+        vec3 b = *(const vec3*)(vtx + pos_offset + stride * idx[i+1]) - org;
+        vec3 c = *(const vec3*)(vtx + pos_offset + stride * idx[i+2]) - org;
+        vec3 d = dir;
 
-        vec4 a = get_value(pos_slot, idx[0]) - org;
-        vec4 b = get_value(pos_slot, idx[1]) - org;
-        vec4 c = get_value(pos_slot, idx[2]) - org;
-        vec4 d = dir;
+        // solve [ba, bb, bc, bd] * [[ax, ay, az, 1], [bx, by, bz, 1], [cx, cy, cz, 1], [-dx, -dy, -dz, 0]] = [0, 0, 0, 1]
+        //
+        // ie. ba + bb + bc = 1  and  ba * a + bb * b + bc * c = bd * d
+        //
+        // [ba, bb, bc] are barycentric coordinates, bd is the distance along the vector
 
-        //fprintf(file, "a=%s b=%s c=%s d=%s\n", a.toString(), b.toString(), c.toString(), d.toString());
+        // The last line of the inverse matrix is the solution (vector triple products)
 
-        // solve [ba, bb, bc, bd] * [[ax, ay, az, 1], [bx, by, bz, 1], [cx, cy, cz, 1], [dx, dy, dz, 0]] = [0, 0, 0, 1]
-        float det = (
-          -a.x()*b.y()*d.z()+a.x()*b.z()*d.y()
-          +a.x()*c.y()*d.z()-a.x()*c.z()*d.y()
-          +a.y()*b.x()*d.z()-a.y()*b.z()*d.x()
-          -a.y()*c.x()*d.z()+a.y()*c.z()*d.x()
-          -a.z()*b.x()*d.y()+a.z()*b.y()*d.x()
-          +a.z()*c.x()*d.y()-a.z()*c.y()*d.x()
-          -b.x()*c.y()*d.z()+b.x()*c.z()*d.y()
-          +b.y()*c.x()*d.z()-b.y()*c.z()*d.x()
-          -b.z()*c.x()*d.y()+b.z()*c.y()*d.x()
+        // numerator
+        vec4 numer(
+          dot(cross(b, c), d),
+          dot(cross(c, a), d),
+          dot(cross(a, b), d),
+          dot(cross(a, b), c)
         );
 
-        vec4 bary1 = vec4(
-          -b.x()*c.y()*d.z()+b.x()*c.z()*d.y()+b.y()*c.x()*d.z()-b.y()*c.z()*d.x()-b.z()*c.x()*d.y()+b.z()*c.y()*d.x(),
-          a.x()*c.y()*d.z()-a.x()*c.z()*d.y()-a.y()*c.x()*d.z()+a.y()*c.z()*d.x()+a.z()*c.x()*d.y()-a.z()*c.y()*d.x(),
-          -a.x()*b.y()*d.z()+a.x()*b.z()*d.y()+a.y()*b.x()*d.z()-a.y()*b.z()*d.x()-a.z()*b.x()*d.y()+a.z()*b.y()*d.x(),
-          a.x()*b.y()*c.z()-a.x()*b.z()*c.y()-a.y()*b.x()*c.z()+a.y()*b.z()*c.x()+a.z()*b.x()*c.y()-a.z()*b.y()*c.x()
-        );
+        // denominator
+        float denom = numer[0] + numer[1] + numer[2];
 
-        vec4 bary2 = bary1 * det;
+        //app_utils::log("a=%s b=%s c=%s d=%s denom=%f\n", a.toString(), b.toString(), c.toString(), d.toString(), denom);
+        //app_utils::log("numer=%s\n", numer.toString());
+        //app_utils::log("res=%s\n", (numer / denom).toString());
 
-        if (bary2.x() >= 0 && bary2.y() >= 0 && bary2.z() >= 0 && bary2.w() >= 0) {
-          //fprintf(file, "!! %d %d %d  %s\n", idx[0], idx[1], idx[2], (bary1/det).toString());
-          indices[0] = idx[0];
-          indices[1] = idx[1];
-          indices[2] = idx[2];
-          bary = bary1 / det;
-          return true;
+        // using a multiply lets us check the sign without using a divide.
+        vec4 bary2 = numer * denom;
+
+        if (all(bary2 >= vec4(0, 0, 0, 0))) {
+          rational best_distance(best_numer[3], best_denom);
+          rational new_distance(numer[3], denom);
+          printf(
+            "t%d %9.3f %d %d %d  %s %s %s\n",
+            i, numer[3]/denom, idx[i+0], idx[i+1], idx[i+2],
+            (numer/denom).toString(), best_distance.toString(), new_distance.toString()
+          );
+
+          unsigned further = new_distance > best_distance;
+          if (!further) {
+            indices[0] = idx[i+0];
+            indices[1] = idx[i+1];
+            indices[2] = idx[i+2];
+            best_numer = numer;
+            best_denom = denom;
+          }
         }
       }
-      //fclose(file);
-      //exit(1);
-      return false;
+
+      if (fabsf(best_denom) < 1e-6f) {
+        return false;
+      } else {
+        bary = best_numer / best_denom;
+        return true;
+      }
     }
 
     // access the vbo or memory buffer
@@ -585,7 +646,65 @@ namespace octet {
       indices = value;
     }
 
-    void get_edges(hash_map<uint64_t, unsigned> &edges) {
+    // get all the edges in a hash map
+    // record the triangle indices that they came from.
+    void get_edges(hash_map<uint64_t, uint64_t> &edges) {
+      if (get_index_type() != GL_UNSIGNED_INT) return;
+
+      gl_resource::rolock idx_lock(get_indices());
+      const uint32_t *ip = idx_lock.u32();
+
+      for (unsigned i = 0; i < get_num_indices(); i += 3) {
+        add_edge(edges, i, ip[i+0], ip[i+1]);
+        add_edge(edges, i, ip[i+1], ip[i+2]);
+        add_edge(edges, i, ip[i+2], ip[i+0]);
+      }
+    }
+
+    // silhouette edges are used for shadows, highlighting and volumetric effects such as shadows.
+    // the resulting indices could be used for a GL_LINES render, for example.
+    // an edge is a silhouette edge if:
+    //   there is only one triangle that uses the edge
+    //   one triangle can be seen from the viewpoint, the other can't
+    void get_silhouette_edges(const vec3 &viewpoint, bool is_directional, dynarray<unsigned> &indices) {
+      unsigned pos_slot = get_slot(attribute_pos);
+      if (get_index_type() != GL_UNSIGNED_INT) return;
+      if (get_size(pos_slot) < 3) return;
+      if (get_kind(pos_slot) != GL_FLOAT) return;
+
+      unsigned pos_offset = get_offset(pos_slot);
+
+      hash_map<uint64_t, uint64_t> edges;
+      get_edges(edges);
+
+      gl_resource::rolock idx_lock(get_indices());
+      gl_resource::rolock vtx_lock(get_vertices());
+      const uint32_t *ip = idx_lock.u32();
+      const uint8_t *vp = vtx_lock.u8();
+      unsigned stride = get_stride();
+      
+      for (unsigned i = 0; i != edges.size(); ++i) {
+        if (edges.key(i)) {
+          uint64_t tris = edges.value(i);
+          uint32_t tri_a = (uint32_t)(tris) - 1;
+          uint32_t tri_b = (uint32_t)(tris >> 32) - 1;
+          assert(edges.value(i));
+          if (
+            tri_b == 0 ||
+            tri_is_visible(
+              tri_a, pos_offset, stride, ip, vp, viewpoint, is_directional
+            ) != tri_is_visible(
+              tri_b, pos_offset, stride, ip, vp, viewpoint, is_directional
+            )
+          ) {
+            uint64_t idxs = edges.value(i);
+            uint32_t idx_a = (uint32_t)idxs;
+            uint32_t idx_b = (uint32_t)(idxs >> 32);
+            indices.push_back(idx_a);
+            indices.push_back(idx_b);
+          }
+        }
+      }
     }
   };
 }

@@ -158,7 +158,6 @@ namespace octet {
         render_debug_line_buffer();
       }
 
-      // this helps with collision problems and with scene helpers
       if (render_aabbs) {
         render_mesh_aabbs();
       }
@@ -207,9 +206,16 @@ namespace octet {
           assert(num_bones < 64);
           mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, light_uniforms, num_light_uniforms, num_lights);
         }
+
         msh->enable_attributes();
         msh->draw();
         msh->disable_attributes();
+
+        if (mi->get_flags() & mesh_instance::flag_selected) {
+          aabb bb = mi->get_mesh()->get_aabb();
+          bb = bb.get_transform(mi->get_node()->calcModelToWorld());
+          draw_aabb(bb);
+        }
       }
       frame_number++;
     }
@@ -435,13 +441,17 @@ namespace octet {
         mesh_instance *mi = mesh_instances[i];
         if (mi && mi->get_node()) {
           mat4t nodeToWorld = mi->get_node()->calcModelToWorld();
-          aabb bb = mi->get_mesh()->get_aabb();
+          mesh *mesh = mi->get_mesh();
+          aabb bb = mesh->get_aabb();
           bb = bb.get_transform(nodeToWorld);
           if (the_ray.intersects(bb)) {
-            //rational depth = the_ray.intersection(bb);
-            result.mi = mi;
-            //static int i;
-            //printf("%d hit\n", i++);
+            mat4t worldToNode = nodeToWorld.inverse3x4();
+            //ray model_ray = ray(vec3(0, 0, -1), vec3(0, 0, 2)); //the_ray.get_transform(worldToNode);
+            ray model_ray = the_ray.get_transform(worldToNode);
+            int indices[3] = {0};
+            vec4 bary(0, 0, 0, 0);
+            bool hit = mesh->ray_cast(model_ray, indices, bary);
+            printf("hit=%d %s\n", hit, bary.toString());
           }
         }
       }

@@ -75,6 +75,7 @@ namespace octet {
 
       app_scene->play_all_anims(dict);
 
+      // add modifiers here to test them.
       for (unsigned i = 0; i != app_scene->get_num_mesh_instances(); ++i) {
         mesh_instance *mi = app_scene->get_mesh_instance(i);
         //mi->set_mesh(new wireframe(new displacement_map(mi->get_mesh())));
