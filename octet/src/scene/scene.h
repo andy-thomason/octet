@@ -449,9 +449,14 @@ namespace octet {
             //ray model_ray = ray(vec3(0, 0, -1), vec3(0, 0, 2)); //the_ray.get_transform(worldToNode);
             ray model_ray = the_ray.get_transform(worldToNode);
             int indices[3] = {0};
-            vec4 bary(0, 0, 0, 0);
-            bool hit = mesh->ray_cast(model_ray, indices, bary);
-            printf("hit=%d %s\n", hit, bary.toString());
+            vec4 bary_numer(0, 0, 0, 0);
+            float bary_denom;
+            bool hit = mesh->ray_cast(model_ray, indices, bary_numer, bary_denom);
+            if (hit) {
+              rational depth(bary_numer.w() / bary_denom);
+              result.depth = min(depth, result.depth);
+            }
+            printf("hit=%d %s %f\n", hit, (bary_numer/bary_denom).toString(), (float)result.depth);
           }
         }
       }

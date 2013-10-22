@@ -548,7 +548,7 @@ namespace octet {
     // returns "barycentric" coordinates.
     // eg. hit pos = bary[0] * pos0 + bary[1] * pos1 + bary[2] * pos2 (or ray.start + ray.distance * bary[3])
     // eg. hit uv = bary[0] * uv0 + bary[1] * uv1 + bary[2] * uv2
-    bool ray_cast(const ray &the_ray, int indices[], vec4 &bary) {
+    bool ray_cast(const ray &the_ray, int indices[], vec4 &bary_numer, float &bary_denom) {
       unsigned pos_slot = get_slot(attribute_pos);
       if (get_index_type() != GL_UNSIGNED_INT) return false;
       if (get_size(pos_slot) < 3) return false;
@@ -601,11 +601,11 @@ namespace octet {
         if (all(bary2 >= vec4(0, 0, 0, 0))) {
           rational best_distance(best_numer[3], best_denom);
           rational new_distance(numer[3], denom);
-          printf(
+          /*printf(
             "t%d %9.3f %d %d %d  %s %s %s\n",
             i, numer[3]/denom, idx[i+0], idx[i+1], idx[i+2],
             (numer/denom).toString(), best_distance.toString(), new_distance.toString()
-          );
+          );*/
 
           unsigned further = new_distance > best_distance;
           if (!further) {
@@ -619,9 +619,12 @@ namespace octet {
       }
 
       if (fabsf(best_denom) < 1e-6f) {
+        bary_numer = vec4(0, 0, 0, 0);
+        bary_denom = 0;
         return false;
       } else {
-        bary = best_numer / best_denom;
+        bary_numer = best_numer;
+        bary_denom = best_denom;
         return true;
       }
     }
