@@ -275,7 +275,7 @@ namespace octet {
             } else if (msg.message == WM_MBUTTONDOWN || msg.message == WM_MBUTTONUP) {
               app->set_key(key_mmb, msg.message == WM_MBUTTONDOWN);
             } else if (msg.message == WM_RBUTTONDOWN || msg.message == WM_RBUTTONUP) {
-              app->set_key(key_mmb, msg.message == WM_RBUTTONDOWN);
+              app->set_key(key_rmb, msg.message == WM_RBUTTONDOWN);
             } else if (msg.message == WM_DROPFILES) {
               handle_file_drop(app, (HDROP)msg.wParam);
             }
