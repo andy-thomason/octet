@@ -107,6 +107,7 @@ namespace octet {
 
       const char *filename = 0;
 
+      // note that you can also drag and drop files onto an active octet window.
       int selector = 0;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
