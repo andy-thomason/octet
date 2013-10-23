@@ -100,6 +100,8 @@ namespace octet {
     }
 
     void unlock_read_only() const {
+      //glBindBuffer(target, buffer);
+      //glUnmapBuffer(target);
     }
 
     void *lock() const {
