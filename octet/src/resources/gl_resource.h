@@ -95,6 +95,8 @@ namespace octet {
 
     const void *lock_read_only() const {
       return (const void*)&bytes[0];
+      glBindBuffer(target, buffer);
+      //return glMapBufferRange(target, 0, size, GL_MAP_READ_BIT);
     }
 
     void unlock_read_only() const {
@@ -102,11 +104,14 @@ namespace octet {
 
     void *lock() const {
       return (void*)&bytes[0];
+      //glBindBuffer(target, buffer);
+      //return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT);
     }
 
     void unlock() const {
       glBindBuffer(target, buffer);
       glBufferSubData(target, 0, bytes.size(), &bytes[0]);
+      //glUnmapBuffer(target);
     }
 
     void bind() const {
