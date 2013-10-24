@@ -132,8 +132,13 @@ namespace octet {
         size_ = new_length;
       } else if (new_length > capacity_) {
         if (trace) printf("case 2: growing dynarray beyond capacity_\n");
-        int_size_t new_capacity = capacity_ == 0 ? min_capacity : capacity_ * 2;
-        while (new_capacity < new_length) new_capacity *= 2;
+        int_size_t new_capacity = new_length < size_ ? size_ : new_length;
+
+        if (new_length == size_ + 1) {
+          // growing array by 1: round up to power of two.
+          new_capacity = capacity_ == 0 ? min_capacity : capacity_ * 2;
+          while (new_capacity < new_length) new_capacity *= 2;
+        }
 
         reserve(new_capacity);
 
