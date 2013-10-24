@@ -107,6 +107,17 @@ namespace octet {
 
       const char *filename = 0;
 
+      /*video_capture *vc = get_video_capture();
+      int vco = vc->open();
+      if (vco >= 0) printf("vc w=%d h=%d\n", vc->width(), vc->height());
+      dynarray<uint8_t> pixels;
+      pixels.resize(vc->width() * vc->height() * vc->bits_per_pixel() / 8);
+      vc->read(&pixels[0], pixels.size());
+      vc->read(&pixels[0], pixels.size());
+      vc->read(&pixels[0], pixels.size());
+      vc->read(&pixels[0], pixels.size());
+      vc->close();*/
+
       // note that you can also drag and drop files onto an active octet window.
       int selector = 0;
       switch (selector) {

@@ -76,6 +76,7 @@ namespace octet {
     int viewport_y;
     int frame_number;
     bool is_gles3;
+    video_capture video_capture_;
 
     // queue of files to load
     dynarray<string> load_queue;
@@ -124,6 +125,10 @@ namespace octet {
 
     dynarray<string> &access_load_queue() {
       return load_queue;
+    }
+
+    video_capture *get_video_capture() {
+      return &video_capture_;
     }
 
     // used by the platform to set a key

@@ -69,6 +69,7 @@ static char *get_sprintf_buffer() {
 }
 
 #ifdef WIN32
+  #include "direct_show.h"
   #include "windows_specific.h"
   //#include "glut_specific.h"
 #elif defined(SN_TARGET_PSP2)
