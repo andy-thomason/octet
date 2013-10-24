@@ -82,7 +82,7 @@ namespace octet {
         attribute vec4 blendindices;
       
         uniform mat4 cameraToProjection;
-        uniform mat4 modelToCamera[96];
+        uniform mat4 modelToCamera[192];
       
         void main() {
           uv_ = uv;

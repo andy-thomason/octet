@@ -44,7 +44,7 @@ namespace octet {
       app_utils::log("skeleton: add_bone %d [%s]\n", node->get_sid(), node->access_nodeToParent().toString());
     }
 
-    int get_num_bones() const { return nodeToParents.size(); }
+    int get_num_bones() const { return result.size(); }
 
     int find_joint(atom_t sid) {
       for (unsigned i = 0; i != joints.size(); ++i) {
