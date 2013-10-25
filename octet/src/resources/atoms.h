@@ -1,4 +1,5 @@
 // define standard strings used throughout the framework
+// always add new atoms to the end
 
 OCTET_ATOM(aabb_centre)
 OCTET_ATOM(aabb_half_extent)
@@ -112,6 +113,3 @@ OCTET_ATOM(uscale)
 OCTET_ATOM(vscale)
 OCTET_ATOM(flags)
 
-#define OCTET_CLASS(X) OCTET_ATOM(X)
-#include "classes.h"
-#undef OCTET_CLASS

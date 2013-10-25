@@ -1,3 +1,5 @@
+// class names used for RTTI (real-time type information) data
+// always add new classes to the end
 OCTET_CLASS(skin)
 OCTET_CLASS(skeleton)
 OCTET_CLASS(mesh)

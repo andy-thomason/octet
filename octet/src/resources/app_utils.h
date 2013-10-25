@@ -7,12 +7,19 @@
 //
 
 namespace octet {
+  // this enum is used to avoid using strings in code and files
   enum atom_t {
     atom_, // null atom
     
     #define OCTET_ATOM(X) atom_##X,
     #include "atoms.h"
     #undef OCTET_ATOM
+
+    // put classes at a fixed offset to prevent older files becomming obsolete
+    atom_class_base = 0x10000,
+    #define OCTET_CLASS(X) atom_##X,
+    #include "classes.h"
+    #undef OCTET_CLASS
   };
   
   class app_utils {
@@ -197,7 +204,7 @@ namespace octet {
     }
 
     static const char *predefined_atom(unsigned i) {
-      static const char *names[] = {
+      static const char *atom_names[] = {
         "",
 
         #define OCTET_ATOM(X) #X,
@@ -205,8 +212,18 @@ namespace octet {
         #undef OCTET_ATOM
         NULL
       };
-      if (i < sizeof(names)/sizeof(names[0])-1) {
-        return names[i];
+      static const char *class_names[] = {
+        "",
+
+        #define OCTET_CLASS(X) #X,
+        #include "classes.h"
+        #undef OCTET_CLASS
+        NULL
+      };
+      if (i < sizeof(atom_names)/sizeof(atom_names[0])-1) {
+        return atom_names[i];
+      } else if (i-(unsigned)atom_class_base < sizeof(class_names)/sizeof(class_names[0])-1) {
+        return class_names[i-(unsigned)atom_class_base];
       } else {
         return NULL;
       }
