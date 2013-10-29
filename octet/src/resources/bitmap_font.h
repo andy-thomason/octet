@@ -262,7 +262,9 @@ private:
     unsigned build_mesh(const aabb &bb, vertex *vtx, uint32_t *idx, unsigned max_quads, const char *text, const char *max_text) {
       // defensive coding
       if (!idx || !vtx) return 0;
-      if (!text || !max_text) return 0;
+      if (!text) return 0;
+
+      if (!max_text) max_text = text + strlen(text);
 
       int xmin = (int)bb.get_min().x();
       int ymin = (int)bb.get_min().y();
