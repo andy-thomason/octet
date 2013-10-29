@@ -100,11 +100,14 @@ namespace octet {
   
     // OpenGL-style scale of this matrix
     mat4t &scale(float x, float y, float z) {
-      for (int i = 0; i != 4; ++i) {
+      v[0] = v[0] * x;
+      v[1] = v[1] * y;
+      v[2] = v[2] * z;
+      /*for (int i = 0; i != 4; ++i) {
         v[i][0] *= x;
         v[i][1] *= y;
         v[i][2] *= z;
-      }
+      }*/
       return *this;
     }
   
