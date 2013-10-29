@@ -162,8 +162,8 @@ namespace octet {
 
         // this is a rather brutal alpha test that cuts off anything with a small alpha.
         #ifndef SN_TARGET_PSP2
-          glEnable(GL_ALPHA_TEST);
-          glAlphaFunc(GL_GREATER, 0.9f);
+          //glEnable(GL_ALPHA_TEST);
+          //glAlphaFunc(GL_GREATER, 0.9f);
         #endif
       } else {
         // if multisampling is enabled, use GL_SAMPLE_COVERAGE instead

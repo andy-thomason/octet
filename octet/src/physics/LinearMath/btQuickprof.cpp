@@ -31,7 +31,7 @@ static btClock gProfileClock;
 #include <stdio.h> 
 #endif
 
-#if defined(WIN32) || defined(_WIN32)
+#if (defined(WIN32) || defined(_WIN32)) && !defined(__GENERIC__)
 
 #define BT_USE_WINDOWS_TIMERS
 #define WIN32_LEAN_AND_MEAN
@@ -47,7 +47,7 @@ static btClock gProfileClock;
 
 #include <time.h>
 
-#elif defined(SN_TARGET_PSP2)
+#elif defined(SN_TARGET_PSP2) || defined(__GENERIC__)
 struct timeval {
   unsigned tv_sec;
   unsigned tv_usec;

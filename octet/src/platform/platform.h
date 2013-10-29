@@ -68,7 +68,9 @@ static char *get_sprintf_buffer() {
   return tmp[i++ & 3];
 }
 
-#ifdef WIN32
+#if defined(__GENERIC__)
+  #include "generic.h"
+#elif defined(WIN32)
   #include "direct_show.h"
   #include "windows_specific.h"
   //#include "glut_specific.h"

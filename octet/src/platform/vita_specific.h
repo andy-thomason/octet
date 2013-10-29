@@ -13,6 +13,7 @@
 
 #include "gl_skeleton.h"
 #include "al_defs.h"
+#include "video_capture.h"
 
 // include cross platform app helpers, such as texture loaders
 #include "app_common.h"

@@ -36,7 +36,7 @@ namespace octet {
       ;
 
       aabb bb(vec3(0, 0, 0), vec3(64, 256, 0));
-      text = new mesh_text(font, "", &bb);
+      text = new mesh_text(font, "Hello", &bb);
 
       scene_node *msh_node = text_scene->add_scene_node();
       material *mat = new material(page);
