@@ -204,8 +204,8 @@ namespace octet {
           mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
           int num_bones = skel->get_num_bones();
           if(num_bones > 192) {
-            GLint mvuv;
-            glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &mvuv);
+            GLint mvuv = 0;
+            //glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &mvuv);
             printf("warning: too many bones (%d/%d)\n", num_bones, mvuv/4);
           } else {
             mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, light_uniforms, num_light_uniforms, num_lights);
