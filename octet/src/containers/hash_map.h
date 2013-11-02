@@ -130,7 +130,7 @@ namespace octet {
     int get_index(const key_t &key) {
       unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
-      return entry ? entry - entries : -1;
+      return entry ? (int)(entry - entries) : -1;
     }
 
     // bye bye hash map

@@ -40,7 +40,7 @@ namespace octet {
 
       uint64_t &edge = edges[key];
       uint32_t upper = (uint32_t)(edge >> 32);
-      uint32_t lower = (uint32_t)(edge);
+      //uint32_t lower = (uint32_t)(edge);
 
       if (edge == 0) {
         // first triangle
