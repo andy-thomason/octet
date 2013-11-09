@@ -131,8 +131,8 @@ namespace octet {
         case 7: filename = "assets/plane.dae"; break;
       }
 
-      dynarray<uint8_t> buf;
-      app_utils::get_url(buf, "zip://assets/big.zip/big.fnt");
+      //dynarray<uint8_t> buf;
+      //app_utils::get_url(buf, "zip://assets/big.zip/big.fnt");
 
       load_file(filename);
 
