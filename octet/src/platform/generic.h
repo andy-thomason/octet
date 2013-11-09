@@ -1,3 +1,15 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// (C) Andy Thomason 2013
+//
+// Modular Framework for OpenGLES2 rendering on multiple platforms.
+//
+// Generic skeleton for platform development.
+//
+// Use this as a template for any new platforms.
+//
+
+
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4345)
 #pragma warning(disable : 4530)

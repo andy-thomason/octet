@@ -310,12 +310,13 @@ namespace octet {
   //
 
   // big endian unaligned load
-  static unsigned uint32_be(const uint8_t *src) {
+  inline static unsigned uint32_be(const uint8_t *src) {
     return _byteswap_ulong(*(unsigned*)src);
   }
 
   // little endian unaligned load
-  static unsigned uint32_le(const uint8_t *src) {
+  inline static unsigned uint32_le(const uint8_t *src) {
     return *(unsigned*)src;
   }
+
 }
