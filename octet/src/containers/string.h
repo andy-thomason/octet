@@ -141,7 +141,7 @@ namespace octet {
     string(const char *value) { data_ = null_string(); *this = value; }
     string(const wchar_t *value) { data_ = null_string(); *this = value; }
     string(const string& rhs) { data_ = null_string(); *this = rhs.c_str(); }
-
+    string(const char *value, unsigned size) { data_ = null_string(); set(value, size); }
 
     ~string() { release(); }
 
@@ -311,6 +311,9 @@ namespace octet {
 
     const char *c_str() const { return data_; }
     operator const char *() { return data_; }
+
+    char &operator[](int index) { return data_[index]; }
+    char operator[](int index) const { return data_[index]; }
 
     // python-style string split
     void split(dynarray<string> &result, const char *delimiter) {

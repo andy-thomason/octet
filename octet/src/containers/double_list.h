@@ -59,6 +59,9 @@ namespace octet {
       assert(n == 0);
     }*/
   
+    // do not define this!
+    // a copy constructor makes no sense.
+    double_list(const double_list &rhs);
   public:
     double_list() {
       head.next = head.prev = &head;

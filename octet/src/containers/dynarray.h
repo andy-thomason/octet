@@ -115,7 +115,8 @@ namespace octet {
 
     int_size_t capacity() const { return capacity_; }
 
-    void *data() const { return data_; }
+    const item_t *data() const { return data_; }
+    item_t *data() { return data_; }
   
     void resize(int_size_t new_length) {
       bool trace = false; // hack this for detailed traces

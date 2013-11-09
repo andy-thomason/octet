@@ -119,14 +119,14 @@ namespace octet {
       return entry && entry->key;
     }
 
-    // allow iteration over keys and values
-    unsigned get_num_indices() const {
-      return max_entries;
-    }
-
     // how many entries are used?
     unsigned get_size() const {
       return num_entries;
+    }
+
+    // allow iteration over keys and values
+    unsigned get_num_indices() const {
+      return max_entries;
     }
 
     // get a specific key
