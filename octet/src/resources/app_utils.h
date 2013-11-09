@@ -30,6 +30,16 @@ namespace octet {
       }
       return value;
     }
+
+    static zip_file *get_zip_file(const char *path) {
+      static dictionary<ref<zip_file> > zip_files;
+      int index = zip_files.get_index(path);
+      if (index == -1) {
+        return zip_files[path] = new zip_file(get_path(path));
+      } else {
+        return zip_files.get_value(index);
+      }
+    }
   
     static void setrgb(dynarray<unsigned char> &buffer, int size, int x, int y, unsigned rgb, unsigned a = 0xff) {
       buffer[(y*size+x)*4+0] = rgb >> 16;
@@ -56,7 +66,18 @@ namespace octet {
     }
 
     static void get_url(dynarray<unsigned char> &buffer, const char *url) {
-      if (!strncmp(url, "http://", 7)) {
+      if (!strncmp(url, "zip://", 6)) {
+        const char *zip = strstr(url + 6, ".zip");
+        if (zip) {
+          int path_len = zip - (url + 6) + 4;
+          string zip_url;
+          zip_url.set(url + 6, path_len);
+          const char *file = (url + 6) + path_len;
+          file += file[0] == '/';
+          zip_file *zip = get_zip_file(zip_url.c_str());
+          zip->get_file(buffer, file);
+        }
+      } else if (!strncmp(url, "http://", 7)) {
         // http
       } else {
         FILE *file = fopen(get_path(url), "rb");
