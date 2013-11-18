@@ -28,10 +28,10 @@ namespace octet {
     int depth;
 
     bool split_edge(uint8_t *dest, const uint8_t *src0, const uint8_t *src1, unsigned stride) {
-      const vec3 &pos0 = (const vec3&)src0[pos_offset];
-      const vec3 &pos1 = (const vec3&)src1[pos_offset];
-      const vec3 &n0 = (const vec3&)src0[normal_offset];
-      const vec3 &n1 = (const vec3&)src1[normal_offset];
+      const vec3p &pos0 = (const vec3p&)src0[pos_offset];
+      const vec3p &pos1 = (const vec3p&)src1[pos_offset];
+      const vec3p &n0 = (const vec3p&)src0[normal_offset];
+      const vec3p &n1 = (const vec3p&)src1[normal_offset];
       //const vec3 &uv0 = (const vec3&)src0[uv_offset];
       //const vec3 &uv1 = (const vec3&)src1[uv_offset];
 
@@ -40,7 +40,7 @@ namespace octet {
       }
 
       // Catmul-Rom spline
-      vec3 diff = pos1 - pos0;
+      vec3 diff = (vec3)pos1 - (vec3)pos0;
       vec3 t0 = cross(cross(n0, diff), n0); // bezier tangent * 3
       vec3 t1 = cross(cross(n1, diff), n1); // bezier tangent * 3
 
@@ -48,10 +48,10 @@ namespace octet {
         ((float*)dest)[i] = (((float*)src0)[i] + ((float*)src1)[i]) * 0.5f;
       }
 
-      vec3 &pos = (vec3&)dest[pos_offset];
-      vec3 &normal = (vec3&)dest[normal_offset];
+      vec3p &pos = (vec3p&)dest[pos_offset];
+      vec3p &normal = (vec3p&)dest[normal_offset];
 
-      pos = (pos0 + pos1) * 0.5f + (t0 - t1) * 0.125; // (3/8)/3 = 1/8
+      pos = ((vec3)pos0 + (vec3)pos1) * 0.5f + (t0 - t1) * 0.125; // (3/8)/3 = 1/8
       normal = normalize(normal);
 
       return true;

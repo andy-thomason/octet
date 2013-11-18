@@ -259,6 +259,7 @@ namespace octet {
       // default camera_instance
       if (camera_instances.size() == 0) {
         aabb bb = get_world_aabb();
+        bb = bb.get_union(aabb(vec3(0, 0, 0), vec3(5, 5, 5)));
         scene_node *node = add_scene_node();
         camera_instance *cam = new camera_instance();
         float bb_size = length(bb.get_half_extent()) * 2.0f;
@@ -302,20 +303,24 @@ namespace octet {
       return new_node;
     }
 
-    void add_mesh_instance(mesh_instance *inst=0) {
+    mesh_instance *add_mesh_instance(mesh_instance *inst=0) {
       mesh_instances.push_back(inst);
+      return inst;
     }
 
-    void add_animation_instance(animation_instance *inst) {
+    animation_instance *add_animation_instance(animation_instance *inst) {
       animation_instances.push_back(inst);
+      return inst;
     }
 
-    void add_camera_instance(camera_instance *inst) {
+    camera_instance *add_camera_instance(camera_instance *inst) {
       camera_instances.push_back(inst);
+      return inst;
     }
 
-    void add_light_instance(light_instance *inst) {
+    light_instance *add_light_instance(light_instance *inst) {
       light_instances.push_back(inst);
+      return inst;
     }
 
     // how many mesh instances do we have?
@@ -461,7 +466,7 @@ namespace octet {
               rational depth(bary_numer.w() / bary_denom);
               result.depth = min(depth, result.depth);
             }
-            printf("hit=%d %s %f\n", hit, (bary_numer/bary_denom).toString(), (float)result.depth);
+            //printf("hit=%d %s %f\n", hit, (bary_numer/bary_denom).toString(tmp, sizeof(tmp)), (float)result.depth);
           }
         }
       }

@@ -60,10 +60,10 @@ namespace octet {
       const uint32_t *ip, const uint8_t *vp, const vec3 &viewpoint,
       bool is_directional
     ) {
-      const vec3 &pa = *(const vec3*)(vp + ip[tri+0] * stride + pos_offset);
-      const vec3 &pb = *(const vec3*)(vp + ip[tri+1] * stride + pos_offset);
-      const vec3 &pc = *(const vec3*)(vp + ip[tri+2] * stride + pos_offset);
-      vec3 normal = cross((pb - pa), (pc - pa));
+      const vec3p &pa = *(const vec3p*)(vp + ip[tri+0] * stride + pos_offset);
+      const vec3p &pb = *(const vec3p*)(vp + ip[tri+1] * stride + pos_offset);
+      const vec3p &pc = *(const vec3p*)(vp + ip[tri+2] * stride + pos_offset);
+      vec3 normal = cross(((vec3)pb - pa), ((vec3)pc - pa));
       vec3 dir = is_directional ? viewpoint - pa : viewpoint;
       return dot(normal, dir) <= 0;
     }
@@ -261,7 +261,7 @@ namespace octet {
     }
 
     // set a vec4 value of an attribute (only when not in a vbo)
-    void set_value(unsigned slot, unsigned index, vec4 value) {
+    void set_value(unsigned slot, unsigned index, const vec4 &value) {
       if (get_kind(slot) == GL_FLOAT) {
         float *src = (float*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
         unsigned size = get_size(slot);

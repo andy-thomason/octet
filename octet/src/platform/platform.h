@@ -25,6 +25,7 @@
 #ifndef OCTET_OPENCL
   #define OCTET_OPENCL 0
 #endif
+#define OCTET_SSE 1
 
 // use <> to include from standard directories
 // use "" to include from our own project
@@ -165,6 +166,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/indexer.h"
 #include "../scene/smooth.h"
 #include "../scene/mesh_text.h"
+#include "../scene/mesh_box.h"
 #include "../scene/wireframe.h"
 
 // high level helpers

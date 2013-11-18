@@ -135,7 +135,7 @@ namespace octet {
             }
             float len = axis.length();
             if (abs(len) >= 0.001f) axis = axis / len;
-            if (y == 27) app_utils::log("%s %s %s\n", mean.toString(), axis.toString(), covariance.toString());
+            //if (y == 27) app_utils::log("%s %s %s\n", mean.toString(), axis.toString(), covariance.toString(tmp, sizeof(tmp)));
 
             // our colours all have to live on the axis.
             // in practice, we can ignore "odd man out" colours
@@ -152,7 +152,7 @@ namespace octet {
             }
             vec4 cmin = mean + axis * pmin;
             vec4 cmax = mean + axis * pmax;
-            if (y == 27) app_utils::log("%s -> %s\n", cmin.toString(), cmax.toString());
+            //if (y == 27) app_utils::log("%s -> %s\n", cmin.toString(), cmax.toString(tmp, sizeof(tmp)));
             cmin = min(max(cmin, vec4(0, 0, 0, 0)), vec4(1, 1, 1, 1));
             cmax = min(max(cmax, vec4(0, 0, 0, 0)), vec4(1, 1, 1, 1));
 

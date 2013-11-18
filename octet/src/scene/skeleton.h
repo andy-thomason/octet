@@ -41,7 +41,8 @@ namespace octet {
       nodeToParents.push_back(node->get_nodeToParent());
       joints.push_back(node->get_sid());
       parents.push_back(parent);
-      app_utils::log("skeleton: add_bone %d [%s]\n", node->get_sid(), node->access_nodeToParent().toString());
+      //char tmp[256];
+      //app_utils::log("skeleton: add_bone %d [%s]\n", node->get_sid(), node->access_nodeToParent().toString(tmp, sizeof(tmp)));
     }
 
     int get_num_bones() const { return result.size(); }
