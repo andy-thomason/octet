@@ -167,6 +167,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/smooth.h"
 #include "../scene/mesh_text.h"
 #include "../scene/mesh_box.h"
+#include "../scene/mesh_voxels.h"
 #include "../scene/wireframe.h"
 
 // high level helpers

@@ -805,12 +805,12 @@ public:
   bool get_unsigned(uint16_t key, unsigned *results, unsigned max_results) {
     int index = values.get_index(key);
     if (index < 0) return false;
-    variant &i = values.get_value(index);
+    /*variant &i = values.get_value(index);
     if (i.kind == variant::kind_float) {
       for (unsigned i = 0; i != max_results; ++i) results[i] = (unsigned)i.f[i];
     } else if (i.kind == variant::kind_unsigned) {
       for (unsigned i = 0; i != max_results; ++i) results[i] = (unsigned)i.f[i];
-    }
+    }*/
   }
 };
 
