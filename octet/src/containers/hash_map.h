@@ -133,6 +133,16 @@ namespace octet {
       return entry ? entry - entries : -1;
     }
 
+    const key_t &get_key(int index) const {
+      assert(index >= 0 && index < max_entries);
+      return entries[index].key;
+    }
+
+    const value_t &get_value(int index) const {
+      assert(index >= 0 && index < max_entries);
+      return entries[index].value;
+    }
+
     // bye bye hash map
     ~hash_map() {
       allocator_t::free(entries, sizeof(entry_t) * max_entries);

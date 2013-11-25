@@ -31,7 +31,11 @@ namespace octet {
     // todo: implement this from scratch using a pool allocator
     static void *malloc(size_t size) {
       state().num_bytes += size;
-      void *res = ::malloc(size);
+      #ifdef OCTET_SSE
+        void *res = ::_aligned_malloc(size, 16);
+      #else
+        void *res = ::malloc(size);
+      #endif
       //printf("malloc %p[%d] -> %d\n", res, size, state().num_bytes);
       return res;
     }
@@ -39,12 +43,20 @@ namespace octet {
     static void free(void *ptr, size_t size) {
       state().num_bytes -= size;
       //printf("free %p[%d] -> %d\n", ptr, size, state().num_bytes);
-      return ::free(ptr);
+      #ifdef OCTET_SSE
+        return ::_aligned_free(ptr);
+      #else
+        return ::free(ptr);
+      #endif
     }
 
     static void *realloc(void *ptr, size_t old_size, size_t size) {
       state().num_bytes += size - old_size;
-      void *res = ::realloc(ptr, size);
+      #ifdef OCTET_SSE
+        void *res = ::_aligned_realloc(ptr, size, 16);
+      #else
+        void *res = ::realloc(ptr, size);
+      #endif
       //printf("realloc %p[%d] -> %p[%d] %d\n", ptr, old_size, res, size, state().num_bytes);
       return res;
     }
