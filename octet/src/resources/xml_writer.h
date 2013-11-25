@@ -112,11 +112,13 @@ namespace octet {
     }
 
     void visit(vec4 &value, atom_t sid) {
-      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString());
+      char tmp[64];
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString(tmp, sizeof(tmp)));
     }
 
     void visit(mat4t &value, atom_t sid) {
-      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString());
+      char tmp[256];
+      stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString(tmp, sizeof(tmp)));
     }
   };
 }

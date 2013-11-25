@@ -91,6 +91,7 @@ namespace octet {
 
     void visit_bin(void *value, size_t size, atom_t sid, atom_t type) {
       string data;
+      char tmp[256];
       switch (type) {
         case atom_int8: data.format("%d", *(int8_t*)value); break;
         case atom_int16: data.format("%d", *(int16_t*)value); break;
@@ -98,8 +99,8 @@ namespace octet {
         case atom_uint8: data.format("%d", *(uint8_t*)value); break;
         case atom_uint16: data.format("%d", *(uint16_t*)value); break;
         case atom_uint32: data.format("%u", *(uint32_t*)value); break;
-        case atom_mat4t: data.format("%s", ((mat4t*)value)->toString()); break;
-        case atom_vec4: data.format("%s", ((vec4*)value)->toString()); break;
+        case atom_mat4t: data.format("%s", ((mat4t*)value)->toString(tmp, sizeof(tmp))); break;
+        case atom_vec4: data.format("%s", ((vec4*)value)->toString(tmp, sizeof(tmp))); break;
         case atom_atom: data.format("%s", app_utils::get_atom_name(*(atom_t*)value)); break;
         default: {
           if (size <= 128) {

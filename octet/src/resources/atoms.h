@@ -112,4 +112,5 @@ OCTET_ATOM(texture_wrap_t)
 OCTET_ATOM(uscale)
 OCTET_ATOM(vscale)
 OCTET_ATOM(flags)
+OCTET_ATOM(size)
 
