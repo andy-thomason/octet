@@ -9,6 +9,7 @@
 
 namespace octet {
   class mesh_box : public mesh {
+  protected:
     // output format
     struct vertex {
       vec3p pos;
@@ -26,28 +27,9 @@ namespace octet {
 
       update();
     }
-  public:
-    RESOURCE_META(mesh_box)
 
-    mesh_box() {
-      init(aabb(vec3(0, 0, 0), vec3(1, 1, 1)));
-    }
-
-    mesh_box(const vec3 &size) {
-      init(aabb(vec3(0, 0, 0), size));
-    }
-
-    mesh_box &set_size(const aabb &size) {
-      init(size);
-      update();
-    }
-
-    void update() {
-      allocate(sizeof(vertex)*4*6, sizeof(uint32_t)*6*6);
-      vertex *vtx = (vertex *)get_vertices()->lock();
-      uint32_t *idx = (uint32_t *)get_indices()->lock();
-
-      static const float box_vertices[4 * 6 * 8] = {
+    static const float *box_vertices() {
+      static const float data[4 * 6 * 8] = {
         // front
         #undef OCTET_FACE
         #define OCTET_FACE(X, Y, U, V) X, Y, 1,  0, 0, 1, U, V,
@@ -77,11 +59,17 @@ namespace octet {
         #undef OCTET_FACE
         #define OCTET_FACE(X, Y, U, V) -1, -(X), -(Y),  -1, 0, 0, U, V,
         OCTET_FACE( 1,  1,  1, 1 ) OCTET_FACE( 1, -1,  1, 0 ) OCTET_FACE(-1, -1,  0, 0 ) OCTET_FACE(-1,  1,  0, 1 )
+
+        #undef OCTET_FACE
       };
 
+      return data;
+    }
+
+    static const uint32_t *box_indices() {
       // 3 0
       // 2 1
-      static uint32_t box_indices[6 * 6] = {
+      static const uint32_t data[6 * 6] = {
         0+4*0, 1+4*0, 3+4*0,  1+4*0, 2+4*0, 3+4*0,
         0+4*1, 1+4*1, 3+4*1,  1+4*1, 2+4*1, 3+4*1,
         0+4*2, 1+4*2, 3+4*2,  1+4*2, 2+4*2, 3+4*2,
@@ -89,9 +77,30 @@ namespace octet {
         0+4*4, 1+4*4, 3+4*4,  1+4*4, 2+4*4, 3+4*4,
         0+4*5, 1+4*5, 3+4*5,  1+4*5, 2+4*5, 3+4*5,
       };
+      return data;
+    }
+  public:
+    RESOURCE_META(mesh_box)
 
-      // todo, use for loop and size.
-      const float *fs = box_vertices;
+    mesh_box() {
+      init(aabb(vec3(0, 0, 0), vec3(1, 1, 1)));
+    }
+
+    mesh_box(const vec3 &size) {
+      init(aabb(vec3(0, 0, 0), size));
+    }
+
+    mesh_box &set_size(const aabb &size) {
+      init(size);
+      update();
+    }
+
+    virtual void update() {
+      allocate(sizeof(vertex)*4*6, sizeof(uint32_t)*6*6);
+      vertex *vtx = (vertex *)get_vertices()->lock();
+      uint32_t *idx = (uint32_t *)get_indices()->lock();
+
+      const float *fs = box_vertices();
       vec3 center = get_aabb().get_center();
       vec3 half_extent = get_aabb().get_half_extent();
       for (unsigned i = 0; i != 4*6; ++i) {
@@ -101,17 +110,15 @@ namespace octet {
         vtx++;
         fs += 8;
       }
-      assert((int)fs - (int)box_vertices == get_vertices()->get_size());
+      assert((int)fs - (int)box_vertices() == get_vertices()->get_size());
 
-      assert(sizeof(box_indices) == get_indices()->get_size());
-      memcpy(idx, box_indices, sizeof(box_indices));
+      memcpy(idx, box_indices(), sizeof(uint32_t)*6*6);
 
       get_vertices()->unlock();
       get_indices()->unlock();
       set_num_indices(6 * 6);
       set_num_vertices(4 * 6);
-
-      //dump(app_utils::log("box\n"));
+      dump(app_utils::log("box\n"));
     }
 
     void visit(visitor &v) {
