@@ -9,12 +9,25 @@
 
 namespace octet {
   class bvec3 {
-    int v[3];
+    #ifdef OCTET_SSE
+      union {
+        __m128 m;
+        int v[4];
+      };
+    #else
+      int v[3];
+    #endif
   public:
     bvec3() {}
 
     bvec3(bool x, bool y, bool z) { v[0] = x ? -1 : 0; v[1] = y ? -1 : 0; v[2] = z ? -1 : 0; };
     bvec3(int x, int y, int z) { v[0] = x; v[1] = y; v[2] = z; };
+
+    #ifdef OCTET_SSE
+      bvec3(__m128 m) {
+        this->m = m;
+      }
+    #endif
 
     int &operator[](int i) { return v[i]; }
     const int &operator[](int i) const { return v[i]; }
@@ -45,7 +58,11 @@ namespace octet {
   };
 
   inline bvec3 operator>(const vec3 &lhs, const vec3 &rhs) {
-    return bvec3(fgt(lhs.x(), rhs.x()), fgt(lhs.y(), rhs.y()), fgt(lhs.z(), rhs.z()) );
+    #ifdef OCTET_SSE
+      return bvec3(_mm_cmpgt_ps(lhs.get_m(), rhs.get_m()) );
+    #else
+      return bvec3(fgt(lhs.x(), rhs.x()), fgt(lhs.y(), rhs.y()), fgt(lhs.z(), rhs.z()) );
+    #endif
   }
 
   inline bvec3 operator<(const vec3 &lhs, const vec3 &rhs) {

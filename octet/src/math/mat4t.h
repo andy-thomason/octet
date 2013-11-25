@@ -122,7 +122,7 @@ namespace octet {
     {
       mat4t res;
       for (int i = 0; i != 4; ++i) {
-        res.v[i] = r[0] * v[i][0] + r[1] * v[i][1] + r[2] * v[i][2] + r[3] * v[i][3];
+        res.v[i] = r[0] * v[i].xxxx() + r[1] * v[i].yyyy() + r[2] * v[i].zzzz() + r[3] * v[i].wwww();
       }
       return res;
     }
@@ -216,7 +216,8 @@ namespace octet {
     // multiply by vector on the left
     // [l[0],l[1],l[2],l[3]] * [v[0],v[1],v[2],v[3]]
     vec4 lmul(const vec4 &l) const {
-      return v[0] * l[0] + v[1] * l[1] + v[2] * l[2] + v[3] * l[3];
+      //return v[0] * l[0] + v[1] * l[1] + v[2] * l[2] + v[3] * l[3];
+      return v[0] * l.xxxx() + v[1] * l.yyyy() + v[2] * l.zzzz() + v[3] * l.wwww();
     }
   
     // multiply by vector on the right
@@ -441,12 +442,16 @@ namespace octet {
 		  }
     }
   
-    const char *toString() const
+    const char *toString(char *dest, size_t len) const
     {
-      static char buf[4][256];
-      static int i = 0;
-      char *dest = buf[i++&3];
-      sprintf(dest, "[%s, %s, %s, %s]", v[0].toString(), v[1].toString(), v[2].toString(), v[3].toString());
+      char buf[4][256];
+      snprintf(
+        dest, len, "[%s, %s, %s, %s]",
+        v[0].toString(buf[0], sizeof(buf[0])),
+        v[1].toString(buf[1], sizeof(buf[1])),
+        v[2].toString(buf[2], sizeof(buf[2])),
+        v[3].toString(buf[3], sizeof(buf[3]))
+      );
       return dest;
     }
 
@@ -528,10 +533,10 @@ namespace octet {
     mat4t xyz() const { return mat4t(v[0].xyz0(), v[1].xyz0(), v[2].xyz0(), vec4(0, 0, 0, 1)); }
 
     // rows
-    vec4 x() const { return v[0]; }
-    vec4 y() const { return v[1]; }
-    vec4 z() const { return v[2]; }
-    vec4 w() const { return v[3]; }
+    const vec4 &x() const { return v[0]; }
+    const vec4 &y() const { return v[1]; }
+    const vec4 &z() const { return v[2]; }
+    const vec4 &w() const { return v[3]; }
     vec4 &x() { return v[0]; }
     vec4 &y() { return v[1]; }
     vec4 &z() { return v[2]; }
@@ -557,5 +562,10 @@ namespace octet {
       lhs * rhs.z(),
       lhs * rhs.w()
     );
+  }
+
+  inline vec3 operator*(const vec3 &lhs, const mat4t &rhs) {
+    //return rhs[0].xyz() * lhs[0] + rhs[1].xyz() * lhs[1] + rhs[2].xyz() * lhs[2] + rhs[3].xyz();
+    return (rhs[0] * lhs.xxxx() + rhs[1] * lhs.yyyy() + rhs[2] * lhs.zzzz() + rhs[3]).xyz();
   }
 }

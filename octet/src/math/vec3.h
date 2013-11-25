@@ -13,7 +13,14 @@ namespace octet {
 
   class vec3 {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
-    float v[3];
+    #ifdef OCTET_SSE
+      union {
+        __m128 m;
+        float v[3];
+      };
+    #else
+      float v[3];
+    #endif
   public:
     // default constructor: note does not initialize!
     vec3() {
@@ -24,7 +31,17 @@ namespace octet {
       v[0] = x; v[1] = y; v[2] = z;
     };
 
-    // index accessor [0] [1] [2]
+    vec3(float xyz) {
+      v[0] = v[1] = v[2] = xyz;
+    }
+
+    #ifdef OCTET_SSE
+      vec3(__m128 m) {
+        this->m = m;
+      }
+    #endif
+
+    // index accessor [0] [1] ...
     float &operator[](int i) { return v[i]; }
 
     // constant index accessor
@@ -34,57 +51,37 @@ namespace octet {
 
     // vector - scalar operators
     vec3 operator+(float r) const {
-      return vec3(v[0]+r, v[1]+r, v[2]+r);
+      return *this + vec3(r);
     }
     vec3 operator-(float r) const {
-      return vec3(v[0]-r, v[1]-r, v[2]-r);
+      return *this - vec3(r);
     }
     vec3 operator*(float r) const {
-      return vec3(v[0]*r, v[1]*r, v[2]*r);
+      return *this * vec3(r);
     }
     vec3 operator/(float r) const {
-       float rcp = 1.0f / r; return vec3(v[0]*rcp, v[1]*rcp, v[2]*rcp);
-    }
-
-    // premultiply matrix operator (forward declared as matrix uses vector)
-    vec3 operator*(const mat4t &r) const;
-
-    // vector operators
-    vec3 operator+(const vec3 &r) const {
-      return vec3(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2]);
-    }
-    vec3 operator-(const vec3 &r) const {
-      return vec3(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2]);
-    }
-    vec3 operator*(const vec3 &r) const {
-      return vec3(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2]);
-    }
-    vec3 operator-() const {
-      return vec3(-v[0], -v[1], -v[2]);
+      return *this * vec3(recip(r));
     }
 
     // in-place vector operators
     vec3 &operator+=(const vec3 &r) {
-      v[0] += r.v[0]; v[1] += r.v[1]; v[2] += r.v[2];
+      *this = *this + r;
       return *this;
     }
+
     vec3 &operator-=(const vec3 &r) {
-      v[0] -= r.v[0]; v[1] -= r.v[1]; v[2] -= r.v[2];
+      *this = *this - r;
       return *this;
     }
+
     vec3 &operator*=(const vec3 &r) {
-      v[0] *= r.v[0]; v[1] *= r.v[1]; v[2] *= r.v[2];
+      *this = *this * r;
       return *this;
     }
 
     // dot product
     float dot(const vec3 &r) const {
-      return v[0] * r.v[0] + v[1] * r.v[1] + v[2] * r.v[2];
-    }
-
-    // sum of terms
-    float sum() const {
-      return v[0] + v[1] + v[2];
+      return (*this * r).sum();
     }
 
     // make the length equal to 1
@@ -92,24 +89,14 @@ namespace octet {
       return *this * lengthRecip();
     }
 
-    // minumum of two vectors
-    vec3 min(const vec3 &r) const {
-      return vec3(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1], v[2] < r[2] ? v[2] : r[2]);
-    }
-
-    // maximum of two vectors
-    vec3 max(const vec3 &r) const {
-      return vec3(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1], v[2] >= r[2] ? v[2] : r[2]);
-    }
-
     // euclidean length of a vector
     float length() const {
-      return sqrtf(dot(*this));
+      return sqrt(dot(*this));
     }
 
     // one over the euclidean length of a vector
     float lengthRecip() const {
-      return 1.0f/sqrtf(dot(*this));
+      return rsqrt(dot(*this));
     }
 
     // length squared
@@ -117,9 +104,110 @@ namespace octet {
       return dot(*this);
     }
 
+    // cross product
+    vec3 cross(const vec3 &r) const {
+      return vec3(
+        v[1] * r.v[2] - v[2] * r.v[1],
+	      v[2] * r.v[0] - v[0] * r.v[2],
+	      v[0] * r.v[1] - v[1] * r.v[0]
+	    );
+    }
+
+    // positive cross product (for box tests)
+    vec3 abs_cross(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        __m128 lshuf = _mm_shuffle_ps(r.m, r.m, _MM_SHUFFLE(1,2,0,0));
+        __m128 rshuf = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,2,0,0));
+        __m128 lprod = _mm_mul_ps(m, lshuf);
+        __m128 rprod = _mm_mul_ps(r.m, rshuf);
+        __m128 sum = _mm_add_ps(lprod, rprod);
+        return vec3(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(1,2,0,0)));
+      #else
+        return vec3(
+          v[1] * r.v[2] + v[2] * r.v[1],
+	        v[2] * r.v[0] + v[0] * r.v[2],
+	        v[0] * r.v[1] + v[1] * r.v[0]
+	      );
+      #endif
+    }
+
+    // access the floating point numbers
+    float *get() { return &v[0]; }
+
+    // get the floating point numbers
+    const float *get() const { return &v[0]; }
+
+    ////////////////////////////////////
+    //
+    // vec3 specific
+    //
+
+    vec3 operator+(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_add_ps(m, r.m));
+      #else
+        return vec3(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2]);
+      #endif
+    }
+
+    vec3 operator-(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_sub_ps(m, r.m));
+      #else
+        return vec3(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2]);
+      #endif
+    }
+
+    vec3 operator*(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_mul_ps(m, r.m));
+      #else
+        return vec3(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2]);
+      #endif
+    }
+
+    vec3 operator/(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_div_ps(m, r.m));
+      #else
+        return vec3(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2]);
+      #endif
+    }
+
+    vec3 operator-() const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_sub_ps(_mm_setzero_ps(), m));
+      #else
+        return vec3(-v[0], -v[1], -v[2]);
+      #endif
+    }
+
+    // minumum of two vectors
+    vec3 min(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_min_ps(m, r.m));
+      #else
+        return vec3(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1], v[2] < r[2] ? v[2] : r[2]);
+      #endif
+    }
+
+    // maximum of two vectors
+    vec3 max(const vec3 &r) const {
+      #ifdef OCTET_SSE
+        return vec3(_mm_max_ps(m, r.m));
+      #else
+        return vec3(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1], v[2] >= r[2] ? v[2] : r[2]);
+      #endif
+    }
+
     // make all values positive.
     vec3 abs() const {
-      return vec3(fabsf(v[0]), fabsf(v[1]), fabsf(v[2]));
+      #ifdef OCTET_SSE
+        static const union { unsigned v[4]; __m128 mask; } u = { 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff };
+        return vec3(_mm_and_ps(m, u.mask));
+      #else
+        return vec3(octet::abs(v[0]), octet::abs(v[1]), octet::abs(v[2]));
+      #endif
     }
 
     // get vec2
@@ -130,6 +218,34 @@ namespace octet {
     // get vec4
     vec4 xyz0() const;
     vec4 xyz1() const;
+
+    vec4 xxxx() const;
+    vec4 yyyy() const;
+    vec4 zzzz() const;
+
+    vec3 xxx() const { 
+      #ifdef OCTET_SSE
+        return vec3(_mm_shuffle_ps(get_m(), get_m(), _MM_SHUFFLE(0,0,0,0)));
+      #else
+        return vec3(v[0], v[0], v[0]);
+      #endif
+    }
+
+    vec3 yyy() const { 
+      #ifdef OCTET_SSE
+        return vec3(_mm_shuffle_ps(get_m(), get_m(), _MM_SHUFFLE(1,1,1,1)));
+      #else
+        return vec3(v[1], v[1], v[1]);
+      #endif
+    }
+
+    vec3 zzz() const { 
+      #ifdef OCTET_SSE
+        return vec3(_mm_shuffle_ps(get_m(), get_m(), _MM_SHUFFLE(2,2,2,2)));
+      #else
+        return vec3(v[2], v[2], v[2]);
+      #endif
+    }
 
     // access x
     float &x() {
@@ -161,35 +277,26 @@ namespace octet {
       return v[2];
     }
 
-    // cross product
-    vec3 cross(const vec3 &r) const {
-      return vec3(
-        v[1] * r.v[2] - v[2] * r.v[1],
-	      v[2] * r.v[0] - v[0] * r.v[2],
-	      v[0] * r.v[1] - v[1] * r.v[0]
-	    );
+    #ifdef OCTET_SSE
+      __m128 get_m() const { return m; }
+    #endif
+
+    // sum of terms
+    float sum() const {
+      return v[0] + v[1] + v[2];
+      /*#ifdef OCTET_SSE
+        __m128 a = _mm_add_ps(m, _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,0,3,2)));
+        __m128 b = _mm_add_ps(a, _mm_shuffle_ps(a, a, _MM_SHUFFLE(2,0,0,0)));
+        return b.m128_f32[0];
+      #else
+        return v[0] + v[1] + v[2];
+      #endif*/
     }
-
-    // positive cross product (for box tests)
-    vec3 abs_cross(const vec3 &r) const {
-      return vec3(
-        v[1] * r.v[2] + v[2] * r.v[1],
-	      v[2] * r.v[0] + v[0] * r.v[2],
-	      v[0] * r.v[1] + v[1] * r.v[0]
-	    );
-    }
-
-    // access the floating point numbers
-    float *get() { return &v[0]; }
-
-    // get the floating point numbers
-    const float *get() const { return &v[0]; }
 
     // convert to a string (up to 4 strings can be included at a time)
-    const char *toString() const
+    const char *toString(char *dest, size_t size) const
     {
-      char *dest = get_sprintf_buffer();
-      sprintf(dest, "[%f, %f, %f]", v[0], v[1], v[2]);
+      snprintf(dest, size, "[%f, %f, %f]", v[0], v[1], v[2]);
       return dest;
     }
   };
@@ -264,5 +371,19 @@ namespace octet {
   inline vec3 operator/(float lhs, const vec3 &rhs) {
     return rhs / lhs;
   }
+
+  // vec3p is a packed vec3
+  #ifdef OCTET_SSE
+    class vec3p {
+      float v[3];
+    public:
+      vec3p(const vec3 &in) { v[0] = in[0]; v[1] = in[1]; v[2] = in[2]; }
+      vec3p(float x, float y, float z) { v[0] = x; v[1] = y; v[2] = z; }
+      operator vec3() { return vec3(v[0], v[1], v[2]); }
+      operator const vec3() const { return vec3(v[0], v[1], v[2]); }
+    };
+  #else
+    typedef vec3 vec3p;
+  #endif
 }
 

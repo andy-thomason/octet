@@ -78,6 +78,18 @@ namespace octet {
     return cosf(f);
   }
 
+  inline float sqrt(float f) {
+    return sqrtf(f);
+  }
+
+  inline float rsqrt(float f) {
+    return 1.0f/sqrtf(f);
+  }
+
+  inline float recip(float f) {
+    return 1.0f/f;
+  }
+
   inline float atan2(float dy, float dx) {
     return atan2f(dy, dx);
   }

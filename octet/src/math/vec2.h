@@ -9,10 +9,22 @@
 
 namespace octet {
   class mat4t;
+  class vec4;
 
   class vec2 {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
-    float v[2];
+    #ifdef OCTET_SSE
+      union {
+        __m128 m;
+        float v[2];
+      };
+
+      vec2(__m128 m) {
+        this->m = m;
+      }
+    #else
+      float v[3];
+    #endif
   public:
     // default constructor: note does not initialize!
     vec2() {
@@ -23,7 +35,11 @@ namespace octet {
       v[0] = x; v[1] = y;
     };
 
-    // index accessor [0] [1] [2]
+    vec2(float xyz) {
+      v[0] = v[1] = xyz;
+    }
+
+    // index accessor [0] [1] ...
     float &operator[](int i) { return v[i]; }
 
     // constant index accessor
@@ -33,57 +49,37 @@ namespace octet {
 
     // vector - scalar operators
     vec2 operator+(float r) const {
-      return vec2(v[0]+r, v[1]+r);
+      return *this + vec2(r);
     }
     vec2 operator-(float r) const {
-      return vec2(v[0]-r, v[1]-r);
+      return *this - vec2(r);
     }
     vec2 operator*(float r) const {
-      return vec2(v[0]*r, v[1]*r);
+      return *this * vec2(r);
     }
     vec2 operator/(float r) const {
-       float rcp = 1.0f / r; return vec2(v[0]*rcp, v[1]*rcp);
-    }
-
-    // premultiply matrix operator (forward declared as matrix uses vector)
-    vec2 operator*(const mat4t &r) const;
-
-    // vector operators
-    vec2 operator+(const vec2 &r) const {
-      return vec2(v[0]+r.v[0], v[1]+r.v[1]);
-    }
-    vec2 operator-(const vec2 &r) const {
-      return vec2(v[0]-r.v[0], v[1]-r.v[1]);
-    }
-    vec2 operator*(const vec2 &r) const {
-      return vec2(v[0]*r.v[0], v[1]*r.v[1]);
-    }
-    vec2 operator-() const {
-      return vec2(-v[0], -v[1]);
+      return *this * vec2(recip(r));
     }
 
     // in-place vector operators
     vec2 &operator+=(const vec2 &r) {
-      v[0] += r.v[0]; v[1] += r.v[1];
+      *this = *this + r;
       return *this;
     }
+
     vec2 &operator-=(const vec2 &r) {
-      v[0] -= r.v[0]; v[1] -= r.v[1];
+      *this = *this - r;
       return *this;
     }
+
     vec2 &operator*=(const vec2 &r) {
-      v[0] *= r.v[0]; v[1] *= r.v[1];
+      *this = *this * r;
       return *this;
     }
 
     // dot product
     float dot(const vec2 &r) const {
-      return v[0] * r.v[0] + v[1] * r.v[1];
-    }
-
-    // sum of terms
-    float sum() const {
-      return v[0] + v[1];
+      return (*this * r).sum();
     }
 
     // make the length equal to 1
@@ -91,24 +87,14 @@ namespace octet {
       return *this * lengthRecip();
     }
 
-    // minumum of two vectors
-    vec2 min(const vec2 &r) const {
-      return vec2(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1]);
-    }
-
-    // maximum of two vectors
-    vec2 max(const vec2 &r) const {
-      return vec2(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1]);
-    }
-
     // euclidean length of a vector
     float length() const {
-      return sqrtf(dot(*this));
+      return sqrt(dot(*this));
     }
 
     // one over the euclidean length of a vector
     float lengthRecip() const {
-      return 1.0f/sqrtf(dot(*this));
+      return rsqrt(dot(*this));
     }
 
     // length squared
@@ -116,14 +102,78 @@ namespace octet {
       return dot(*this);
     }
 
-    // make all values positive.
-    vec2 abs() const {
-      return vec2(fabsf(v[0]), fabsf(v[1]));
+    // access the floating point numbers
+    float *get() { return &v[0]; }
+
+    // get the floating point numbers
+    const float *get() const { return &v[0]; }
+
+    ////////////////////////////////////
+    //
+    // vec2 specific
+    //
+
+    vec2 operator+(const vec2 &r) const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_add_ps(m, r.m));
+      #else
+        return vec2(v[0]+r.v[0], v[1]+r.v[1]);
+      #endif
     }
 
-    // get xy
-    vec2 xy() const {
-      return vec2(v[0], v[1]);
+    vec2 operator-(const vec2 &r) const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_sub_ps(m, r.m));
+      #else
+        return vec2(v[0]-r.v[0], v[1]-r.v[1]);
+      #endif
+    }
+
+    vec2 operator*(const vec2 &r) const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_mul_ps(m, r.m));
+      #else
+        return vec2(v[0]*r.v[0], v[1]*r.v[1]);
+      #endif
+    }
+
+    vec2 operator/(const vec2 &r) const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_div_ps(m, r.m));
+      #else
+        return vec2(v[0]*r.v[0], v[1]*r.v[1]);
+      #endif
+    }
+
+    vec2 operator-() const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_sub_ps(_mm_setzero_ps(), m));
+      #else
+        return vec2(-v[0], -v[1]);
+      #endif
+    }
+
+    // minumum of two vectors
+    vec2 min(const vec2 &r) const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_min_ps(m, r.m));
+      #else
+        return vec2(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1]);
+      #endif
+    }
+
+    // maximum of two vectors
+    vec2 max(const vec2 &r) const {
+      #ifdef OCTET_SSE
+        return vec2(_mm_max_ps(m, r.m));
+      #else
+        return vec2(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1]);
+      #endif
+    }
+
+    // make all values positive.
+    vec2 abs() const {
+      return vec2(octet::abs(v[0]), octet::abs(v[1]));
     }
 
     // access x
@@ -146,17 +196,15 @@ namespace octet {
       return v[1];
     }
 
-    // access the floating point numbers
-    float *get() { return &v[0]; }
-
-    // get the floating point numbers
-    const float *get() const { return &v[0]; }
+    // sum of terms
+    float sum() const {
+      return v[0] + v[1];
+    }
 
     // convert to a string (up to 4 strings can be included at a time)
-    const char *toString() const
+    const char *toString(char *dest, size_t size) const
     {
-      char *dest = get_sprintf_buffer();
-      sprintf(dest, "[%f, %f]", v[0], v[1]);
+      snprintf(dest, size, "[%f, %f]", v[0], v[1]);
       return dest;
     }
   };
@@ -205,5 +253,35 @@ namespace octet {
   inline vec2 abs(const vec2 &lhs) {
      return lhs.abs(); 
   }
+
+  inline vec2 operator+(float lhs, const vec2 &rhs) {
+    return rhs + lhs;
+  }
+
+  inline vec2 operator-(float lhs, const vec2 &rhs) {
+    return rhs - lhs;
+  }
+
+  inline vec2 operator*(float lhs, const vec2 &rhs) {
+    return rhs * lhs;
+  }
+
+  inline vec2 operator/(float lhs, const vec2 &rhs) {
+    return rhs / lhs;
+  }
+
+  // vec2p is a packed vec2
+  #ifdef OCTET_SSE
+    class vec2p {
+      float v[2];
+    public:
+      vec2p(const vec2 &in) { v[0] = in[0]; v[1] = in[1]; }
+      vec2p(float x, float y) { v[0] = x; v[1] = y; }
+      operator vec2() { return vec2(v[0], v[1]); }
+      operator const vec2() const { return vec2(v[0], v[1]); }
+    };
+  #else
+    typedef vec2 vec2p;
+  #endif
 }
 

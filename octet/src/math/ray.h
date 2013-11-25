@@ -33,10 +33,11 @@ namespace octet {
       return ray((origin.xyz1() * mat).xyz(), (distance.xyz0() * mat).xyz());
     }
 
-    const char *toString() const {
-      static char tmp[256];
-      sprintf(tmp, "[%s, %s]", origin.toString(), distance.toString());
-      return tmp;
+    const char *toString(char *dest, size_t len) const {
+      static char tmp[64];
+      static char tmp2[64];
+      snprintf(dest, len, "[%s, %s]", origin.toString(tmp, sizeof(tmp)), distance.toString(tmp2, sizeof(tmp2)));
+      return dest;
     }
 
     // intersection tests
