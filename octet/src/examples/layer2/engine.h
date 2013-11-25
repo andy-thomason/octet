@@ -91,6 +91,48 @@ namespace octet {
         ball.init(this, cameraToWorld.w().length(), 360.0f);
       }
     }
+
+    void test_obb_collision() {
+    #ifdef OCTET_OBB
+      aabb a(vec3(0, 0, 0), vec3(1, 1, 1));
+      aabb b(vec3(0, 0, 0), vec3(1, 1, 1));
+      mat4t mxa, mxb;
+      mxa.loadIdentity();
+      mxa.translate(3.0f, 0, 0);
+      mxa.rotateY(13);
+      mxb.loadIdentity();
+      mxb.translate(5.125f, 0, 0);
+      mxb.rotateY(7);
+      bool result = a.intersects(b, mxa, mxb);
+      printf("test_obb_collision: result=%d\n", result);
+
+      dMatrix3 ma, mb;
+      for (unsigned i = 0; i != 4; ++i) for (unsigned j = 0; j != 3; ++j) ma[i+4*j] = mxa[i][j];
+      for (unsigned i = 0; i != 4; ++i) for (unsigned j = 0; j != 3; ++j) mb[i+4*j] = mxb[i][j];
+      for (unsigned i = 0; i != 3; ++i) ma[i*4+3] = mb[i*4+3] = 0;
+      btVector3 normal;
+      btScalar depth;
+      int return_code = 0;
+      struct out_t : public btDiscreteCollisionDetectorInterface::Result {
+		    virtual void setShapeIdentifiersA(int partId0,int index0) {}
+		    virtual void setShapeIdentifiersB(int partId1,int index1) {}
+		    virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth) {}
+    	};
+      out_t output;
+
+      int res = dBoxBox2(
+        btVector3(mxa.w().x(), mxa.w().y(), mxa.w().z()),
+        ma,
+        btVector3(a.get_half_extent().x()*2, a.get_half_extent().y()*2, a.get_half_extent().z()*2),
+
+        btVector3(mxb.w().x(), mxb.w().y(), mxb.w().z()),
+        mb,
+        btVector3(b.get_half_extent().x()*2, b.get_half_extent().y()*2, b.get_half_extent().z()*2),
+
+        normal, &depth, &return_code, 4, NULL, 0, output
+      );
+    #endif
+    }
   public:
     // this is called when we construct the class
     engine(int argc, char **argv) : app(argc, argv), ball() {
@@ -133,6 +175,8 @@ namespace octet {
 
       //dynarray<uint8_t> buf;
       //app_utils::get_url(buf, "zip://assets/big.zip/big.fnt");
+
+      test_obb_collision();
 
       load_file(filename);
 

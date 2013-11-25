@@ -10,7 +10,12 @@
 //
 
 #include "../../platform/platform.h"
-#include "engine.h"
+
+#if defined(OCTET_OBB)
+  #include "obb_test.h"
+#else
+  #include "engine.h"
+#endif
 
 //
 // a C++ program starts here with the command line arguments in argv[]
@@ -21,7 +26,11 @@ int main(int argc, char **argv) {
 
   octet::app_utils::prefix("../../");
   octet::app::init_all(argc, argv);
-  octet::engine app(argc, argv);
+  #if defined(OCTET_OBB)
+    octet::obb_test app(argc, argv);
+  #else
+    octet::engine app(argc, argv);
+  #endif
   app.init();
   octet::app::run_all_apps();
 }
