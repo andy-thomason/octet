@@ -86,6 +86,7 @@ static char *get_sprintf_buffer() {
   #define OCTET_HOT __attribute__( ( always_inline ) )
   #define ioctlsocket ioctl
   #define closesocket close
+  #include "video_capture.h"
   #include "glut_specific.h"
 #endif
 

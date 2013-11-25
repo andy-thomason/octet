@@ -412,7 +412,7 @@ namespace octet
 
     // generate code to cast src to destType    
     cpp_expr *makeCast( cpp_expr *src, cpp_type *destType ) {
-      cpp_type *srcType = src->getType();
+      //cpp_type *srcType = src->getType();
       return new cpp_expr( cpp_expr::kind_cast, destType, src );
     }
 
@@ -577,7 +577,7 @@ namespace octet
       bool first = true;
       while( (int)curToken == tok_lbracket ) {
         getNext();
-        cpp_expr *dim = parseExpression( 0 );
+        //cpp_expr *dim = parseExpression( 0 );
         if( !expect( tok_rbracket ) ) {
           return NULL;
         }
@@ -946,7 +946,7 @@ namespace octet
       } else if( (int)curToken == tok_for || (int)curToken == tok_if || (int)curToken == tok_while ) {
         bool isFor = (int)curToken == tok_for;
         bool isIf = (int)curToken == tok_if;
-        bool isWhile = (int)curToken == tok_while;
+        //bool isWhile = (int)curToken == tok_while;
 
         getNext();
         if( !expect( tok_lparen ) ) {
@@ -1064,7 +1064,7 @@ namespace octet
         cpp_log("[+] expr\n");
       }
       if( (int)curToken == tok_minus || (int)curToken == tok_plus ) {
-        unsigned op = curToken;
+        //unsigned op = curToken;
         getNext();
         cpp_expr * rhs = parseExpression( 100 );
         if( rhs == NULL ) {
@@ -1074,7 +1074,7 @@ namespace octet
         zero = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), zero );
         result = new cpp_expr( (int)curToken == tok_minus ? cpp_expr::kind_minus : cpp_expr::kind_plus, rhs->getType(), zero, rhs );
       } else if( (int)curToken == tok_not ) {
-        unsigned op = curToken;
+        //unsigned op = curToken;
         getNext();
         cpp_expr * rhs = parseExpression( 100 );
         if( rhs == NULL ) {
@@ -1085,7 +1085,7 @@ namespace octet
         one = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), one );
         result = new cpp_expr( cpp_expr::kind_xor, rhs->getType(), one, rhs );
       } else if( (int)curToken == tok_tilda ) {
-        unsigned op = curToken;
+        //unsigned op = curToken;
         getNext();
         cpp_expr * rhs = parseExpression( 100 );
         if( rhs == NULL ) {
@@ -1096,7 +1096,7 @@ namespace octet
         one = new cpp_expr( cpp_expr::kind_cast, rhs->getType(), one );
         result = new cpp_expr( cpp_expr::kind_xor, rhs->getType(), one, rhs );
       } else if( (int)curToken == tok_plus_plus || (int)curToken == tok_minus_minus ) {
-        unsigned op = curToken;
+        //unsigned op = curToken;
         getNext();
         cpp_expr *rhs = parseExpression( 100 );
         if( rhs == NULL ) {
@@ -1214,7 +1214,7 @@ namespace octet
           getNext();
           
           if( result->getKind() == cpp_expr::kind_int_value ) {
-            cpp_expr *rhs = parseExpression( 0 );
+            //cpp_expr *rhs = parseExpression( 0 );
             if( !expect( tok_rparen ) ) {
               return NULL;
             }
@@ -1307,7 +1307,7 @@ namespace octet
           inc = new cpp_expr( cpp_expr::kind_cast, result->getType(), inc );
           inc = new cpp_expr( (int)curToken == tok_plus_plus ? cpp_expr::kind_plus_equals : cpp_expr::kind_minus_equals, result->getType(), result, inc );
           cpp_expr *tmpExpr = new cpp_expr( cpp_expr::kind_value, tmp );
-          cpp_expr *tmpAssign = new cpp_expr( cpp_expr::kind_equals, result->getType(), tmpExpr, result );
+          //cpp_expr *tmpAssign = new cpp_expr( cpp_expr::kind_equals, result->getType(), tmpExpr, result );
           result = new cpp_expr( cpp_expr::kind_comma, result->getType(), inc, tmpExpr );
         } else {
           break;
@@ -1318,7 +1318,7 @@ namespace octet
       // filter out operators with lower precidence than minPrecidence
       //unsigned thisPrecidence = tokenToPrecidence[ curToken ];
       //unsigned thisGrouping = tokenIsRightGrouping[ curToken ];
-      unsigned op = curToken;
+      //unsigned op = curToken;
       while( tokenToPrecidence[ curToken ] != 0 && tokenToPrecidence[ curToken ] > minPrecidence ) {
         unsigned op = curToken;
         getNext();
