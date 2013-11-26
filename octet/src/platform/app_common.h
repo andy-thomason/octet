@@ -166,5 +166,16 @@ namespace octet {
     void set_is_gles3(bool value) {
       is_gles3 = value;
     }
+
+    // use the allocator to allocate this resource and its child classes
+    void *operator new (size_t size) {
+      return allocator::malloc(size);
+    }
+
+    // use the allocator to free this resource and its child classes
+    void operator delete (void *ptr, size_t size) {
+      return allocator::free(ptr, size);
+    }
+
   };
 }
