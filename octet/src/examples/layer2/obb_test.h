@@ -48,7 +48,7 @@ namespace octet {
       nodeb->access_nodeToParent().translate(3, 0, 0);
       material *mata = new material(vec4(1, 0, 0, 1));
       material *matb = new material(vec4(0, 0, 1, 1));
-      mesh *mesha = new mesh_box(vec3(4, 3, 2));
+      mesh *mesha = new mesh_voxels(vec3(8, 8, 8));
       mesh *meshb = new mesh_box(vec3(1, 1, 1));
       mia = app_scene->add_mesh_instance(new mesh_instance(nodea, mesha, mata));
       mib = app_scene->add_mesh_instance(new mesh_instance(nodeb, meshb, matb));
@@ -87,7 +87,6 @@ namespace octet {
         glEnable(GL_SAMPLE_COVERAGE);
       }
 
-
       if (app_scene && app_scene->get_num_camera_instances()) {
         int vx = 0, vy = 0;
         get_viewport_size(vx, vy);
@@ -108,7 +107,7 @@ namespace octet {
         const mat4t &mxb = mib->get_node()->get_nodeToParent();
         //aabba.intersects_old(aabbb, mxa, mxb);
         volatile bool b = aabba.intersects(aabbb, mxa, mxb);
-        printf("\n");
+        //printf("\n");
 
         nodea->access_nodeToParent().rotateZ(1);
         nodea->access_nodeToParent().rotateX(1);

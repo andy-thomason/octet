@@ -9,22 +9,10 @@
 
 namespace octet {
   class mesh_box : public mesh {
-  protected:
-    // output format
-    struct vertex {
-      vec3p pos;
-      vec3p normal;
-      vec2p uv;
-    };
 
     void init(const aabb &size) {
-      add_attribute(attribute_pos, 3, GL_FLOAT, 0);
-      add_attribute(attribute_normal, 3, GL_FLOAT, 12);
-      add_attribute(attribute_uv, 2, GL_FLOAT, 24);
-      set_params(32, 0, 0, GL_TRIANGLES, GL_UNSIGNED_INT);
-
-      this->set_aabb(size);
-
+      set_default_attributes();
+      set_aabb(size);
       update();
     }
 
