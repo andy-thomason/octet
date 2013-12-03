@@ -126,13 +126,13 @@ namespace octet {
 
         for (unsigned i = 0; i != msh->get_num_indices(); ++i) {
           unsigned index = is_short_index ? ((uint16_t*)ip)[i] : ((uint32_t*)ip)[i];
-          vec3 pos = *(vec3*)(vp + stride * index + pos_offset);
-          vec4 pos1 = pos.xyz1();
+          const vec3p &pos = (const vec3p&)*(vp + stride * index + pos_offset);
+          vec4 pos1 = vec3(pos).xyz1();
           vec4 world_pos = pos1 * modelToWorld;
           vec4 proj_pos = pos1 * modelToProjection;
           app_utils::log("%5d i=%5d m=[%9.3f, %9.3f, %9.3f] w=[%9.3f, %9.3f, %9.3f] p=[%9.3f, %9.3f, %9.3f]\n",
             i, index,
-            pos.x(), pos.y(), pos.z(),
+            pos1.x(), pos1.y(), pos1.z(),
             world_pos.x(), world_pos.y(), world_pos.z(),
             proj_pos.x()/proj_pos.w(), proj_pos.y()/proj_pos.w(), proj_pos.z()/proj_pos.w()
           );

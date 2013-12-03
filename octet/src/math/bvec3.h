@@ -27,6 +27,10 @@ namespace octet {
       bvec3(__m128 m) {
         this->m = m;
       }
+
+      __m128 get_m() const {
+        return m;
+      }
     #endif
 
     int &operator[](int i) { return v[i]; }
@@ -66,32 +70,59 @@ namespace octet {
   }
 
   inline bvec3 operator<(const vec3 &lhs, const vec3 &rhs) {
-    return bvec3(flt(lhs.x(), rhs.x()), flt(lhs.y(), rhs.y()), flt(lhs.z(), rhs.z()) );
+    #ifdef OCTET_SSE
+      return bvec3(_mm_cmplt_ps(lhs.get_m(), rhs.get_m()) );
+    #else
+      return bvec3(flt(lhs.x(), rhs.x()), flt(lhs.y(), rhs.y()), flt(lhs.z(), rhs.z()) );
+    #endif
   }
 
   inline bvec3 operator>=(const vec3 &lhs, const vec3 &rhs) {
-    return bvec3(fge(lhs.x(), rhs.x()), fge(lhs.y(), rhs.y()), fge(lhs.z(), rhs.z()) );
+    #ifdef OCTET_SSE
+      return bvec3(_mm_cmpge_ps(lhs.get_m(), rhs.get_m()) );
+    #else
+      return bvec3(fge(lhs.x(), rhs.x()), fge(lhs.y(), rhs.y()), fge(lhs.z(), rhs.z()) );
+    #endif
   }
 
   inline bvec3 operator<=(const vec3 &lhs, const vec3 &rhs) {
-    return bvec3(fle(lhs.x(), rhs.x()), fle(lhs.y(), rhs.y()), fle(lhs.z(), rhs.z()) );
+    #ifdef OCTET_SSE
+      return bvec3(_mm_cmple_ps(lhs.get_m(), rhs.get_m()) );
+    #else
+      return bvec3(fle(lhs.x(), rhs.x()), fle(lhs.y(), rhs.y()), fle(lhs.z(), rhs.z()) );
+    #endif
   }
 
   inline bvec3 operator==(const vec3 &lhs, const vec3 &rhs) {
-    return bvec3(feq(lhs.x(), rhs.x()), feq(lhs.y(), rhs.y()), feq(lhs.z(), rhs.z()) );
+    #ifdef OCTET_SSE
+      return bvec3(_mm_cmpeq_ps(lhs.get_m(), rhs.get_m()) );
+    #else
+      return bvec3(feq(lhs.x(), rhs.x()), feq(lhs.y(), rhs.y()), feq(lhs.z(), rhs.z()) );
+    #endif
   }
 
   inline bvec3 operator!=(const vec3 &lhs, const vec3 &rhs) {
-    return bvec3(fne(lhs.x(), rhs.x()), fne(lhs.y(), rhs.y()), fne(lhs.z(), rhs.z()) );
+    #ifdef OCTET_SSE
+      return bvec3(_mm_cmpneq_ps(lhs.get_m(), rhs.get_m()) );
+    #else
+      return bvec3(fne(lhs.x(), rhs.x()), fne(lhs.y(), rhs.y()), fne(lhs.z(), rhs.z()) );
+    #endif
   }
 
-
   bool all(const bvec3 &b) {
-    return (b.x() & b.y() & b.z()) < 0;
+    #ifdef OCTET_SSE
+      return (_mm_movemask_ps(b.get_m()) & 7) == 7;
+    #else
+      return (b.x() & b.y() & b.z()) < 0;
+    #endif
   }
 
   bool any(const bvec3 &b) {
-    return (b.x() | b.y() | b.z()) < 0;
+    #ifdef OCTET_SSE
+      return (_mm_movemask_ps(b.get_m()) & 7) != 0;
+    #else
+      return (b.x() | b.y() | b.z()) < 0;
+    #endif
   }
 }
 

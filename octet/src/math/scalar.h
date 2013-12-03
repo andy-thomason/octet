@@ -8,6 +8,9 @@
 //
 
 namespace octet {
+  union u_m128_f4 { float v[4]; __m128 m; };
+  union u_m128_i4 { int v[4]; __m128 m; };
+
   // cheaty floating point compares
   // not exactly ieee!
 

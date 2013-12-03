@@ -568,4 +568,6 @@ namespace octet {
     //return rhs[0].xyz() * lhs[0] + rhs[1].xyz() * lhs[1] + rhs[2].xyz() * lhs[2] + rhs[3].xyz();
     return (rhs[0] * lhs.xxxx() + rhs[1] * lhs.yyyy() + rhs[2] * lhs.zzzz() + rhs[3]).xyz();
   }
+
+  OCTET_HUNGARIANS(mat4t)
 }

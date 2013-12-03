@@ -105,7 +105,7 @@ namespace octet {
   static inline void unit_test_ray() {
     aabb my_aabb(vec3(1, 1, 1), vec3(1, 2, 3));
     for (int i = 0; i != 360; i += 30) {
-      vec3 dist = vec3(cos(i*(3.131592653f/180))*4, sin(i*(3.131592653f/180))*4, 0);
+      vec3 dist = vec3(cos(i*(3.131592653f/180))*4.0f, sin(i*(3.131592653f/180))*4.0f, 0.0f);
       vec3 org = vec3(3, 1, 0);
       ray my_ray(org, dist);
       rational pt = my_ray.intersection(my_aabb);

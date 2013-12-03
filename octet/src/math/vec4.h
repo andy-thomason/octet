@@ -22,8 +22,12 @@ namespace octet {
       float v[4];
     #endif
   public:
-    // default constructor: note does not initialize!
     vec4() {
+      #ifdef OCTET_SSE
+        m = _mm_setzero_ps();
+      #else
+        v[0] = v[1] = v[2] = v[3] = 0;
+      #endif
     }
 
     #ifdef OCTET_SSE
@@ -42,8 +46,7 @@ namespace octet {
 
     vec4(float f) {
       #ifdef OCTET_SSE
-        v[0] = f;
-        m = _mm_shuffle_ps(m, m, _MM_SHUFFLE(0,0,0,0));
+        m = _mm_set_ps1(f);
       #else
         v[0] = v[1] = v[2] = v[3] = f;
       #endif
@@ -51,7 +54,11 @@ namespace octet {
 
     // construct from four scalars
     vec4(float x, float y, float z, float w) {
-      v[0] = x; v[1] = y; v[2] = z; v[3] = w;
+      #ifdef OCTET_SSE
+        m = _mm_setr_ps(x, y, z, w);
+      #else
+        v[0] = x; v[1] = y; v[2] = z; v[3] = w;
+      #endif
     };
 
     vec4(const vec2 &xy, float z, float w) {
@@ -459,5 +466,14 @@ namespace octet {
   inline vec4 operator/(float lhs, const vec4 &rhs) {
     return vec4(lhs) / rhs;
   }
+
+  // sadly the microsoft compile is quite poor with vector code generation
+  #ifdef OCTET_SSE
+    #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) static const u_m128_f4 VAR##_UNION = { X, Y, Z, W }; const VEC4 VAR(VAR##_UNION.m);
+  #else
+    #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) VEC4 VAR(X, Y, Z, W);
+  #endif
+
+  OCTET_HUNGARIANS(vec4)
 }
 

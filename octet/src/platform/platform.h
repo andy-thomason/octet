@@ -52,6 +52,17 @@ void *operator new(size_t size, void *place, dynarray_dummy_t x) { return place;
 // dummy placement delete operator, allows destruction at "place"
 void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
 
+// generate hungarian forms of types (abbreviations of variants of types)
+// eg. vec3_in is used for input args of type vec3
+#define OCTET_HUNGARIANS(name) \
+  typedef const name &name##_in; \
+  typedef name &name##_out; \
+  typedef name name##_ret; \
+  typedef const name *name##_pc; \
+  typedef name *name##_p; \
+  typedef const name &name##_rc; \
+  typedef name &name##_r;
+
 #include "../containers/allocator.h"
 #include "../containers/dictionary.h"
 #include "../containers/hash_map.h"
@@ -95,9 +106,10 @@ static char *get_sprintf_buffer() {
 #include "../math/vec2.h"
 #include "../math/vec3.h"
 #include "../math/vec4.h"
+#include "../math/ivec3.h"
+#include "../math/ivec4.h"
 #include "../math/quat.h"
 #include "../math/mat4t.h"
-#include "../math/ivec4.h"
 #include "../math/bvec2.h"
 #include "../math/bvec3.h"
 #include "../math/bvec4.h"
@@ -168,6 +180,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/smooth.h"
 #include "../scene/mesh_text.h"
 #include "../scene/mesh_box.h"
+#include "../scene/mesh_voxel_subcube.h"
 #include "../scene/mesh_voxels.h"
 #include "../scene/wireframe.h"
 

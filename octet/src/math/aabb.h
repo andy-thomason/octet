@@ -185,5 +185,7 @@ namespace octet {
       */
     }
   };
+
+  OCTET_HUNGARIANS(aabb)
 }
 

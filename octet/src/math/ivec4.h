@@ -40,7 +40,7 @@ namespace octet {
     int squared() { return dot(*this); }
     ivec4 abs() const { return ivec4(v[0] < 0 ? -v[0] : v[0], v[1] < 0 ? -v[1] : v[1], v[2] < 0 ? -v[2] : v[2], v[3] < 0 ? -v[3] : v[3]); }
     ivec4 xy() const { return ivec4(v[0], v[1], 0, 0); }
-    ivec4 xyz() const { return ivec4(v[0], v[1], v[2], 0); }
+    const ivec3 &xyz() const { return (ivec3&)*this; }
     ivec4 xyz1() const { return ivec4(v[0], v[1], v[2], 1); }
     int &x() { return v[0]; }
     int &y() { return v[1]; }
@@ -52,5 +52,6 @@ namespace octet {
     int w() const { return v[3]; }
   };
 
+  OCTET_HUNGARIANS(ivec4)
 }
 

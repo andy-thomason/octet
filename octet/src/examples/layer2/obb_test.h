@@ -48,8 +48,17 @@ namespace octet {
       nodeb->access_nodeToParent().translate(3, 0, 0);
       material *mata = new material(vec4(1, 0, 0, 1));
       material *matb = new material(vec4(0, 0, 1, 1));
-      mesh *mesha = new mesh_voxels(vec3(8, 8, 8));
-      mesh *meshb = new mesh_box(vec3(1, 1, 1));
+
+      mat4t mx;
+      mx.loadIdentity();
+      mesh_voxels *mesha = new mesh_voxels(1.0f/8);
+      mesha->box(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
+      //mesha->cylinder(vec3(0, 0, 0), vec3(1, 0, 0), 4, 6);
+      mesha->update();
+      //mesha->dump(app_utils::log("mesha\n"));
+      mesh_voxels *meshb = new mesh_voxels();
+      meshb->box(mx, aabb(vec3(0, 0, 0), vec3(4, 4, 4)));
+      meshb->update();
       mia = app_scene->add_mesh_instance(new mesh_instance(nodea, mesha, mata));
       mib = app_scene->add_mesh_instance(new mesh_instance(nodeb, meshb, matb));
 

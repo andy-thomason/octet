@@ -10,36 +10,69 @@
 namespace octet {
   class mat4t;
   class vec4;
+  class ivec3;
+  class ivec4;
 
+  // vec3: vector of 3 floats - optimial for computation, but not storage.
   class vec3 {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
     #ifdef OCTET_SSE
       union {
         __m128 m;
-        float v[3];
+        float v[4];
+        float i[4];
       };
     #else
       float v[3];
     #endif
   public:
-    // default constructor: note does not initialize!
     vec3() {
+      #ifdef OCTET_SSE
+        m = _mm_setzero_ps();
+      #else
+        v[0] = v[1] = v[2] = 0;
+      #endif
     }
 
     // construct from four scalars
     vec3(float x, float y, float z) {
-      v[0] = x; v[1] = y; v[2] = z;
+      #ifdef OCTET_SSE
+        m = _mm_setr_ps(x, y, z, z);
+      #else
+        v[0] = x; v[1] = y; v[2] = z;
+      #endif
+    };
+
+    // construct from four scalars
+    vec3(int x, int y, int z) {
+      #ifdef OCTET_SSE
+        //i[0] = x; i[1] = y; i[2] = i[3] = z;
+        //__m64 lo = _mm_cvtt_ps2pi(
+        v[0] = (float)x; v[1] = (float)y; v[2] = v[3] = (float)z;
+      #else
+        v[0] = x; v[1] = y; v[2] = z;
+      #endif
     };
 
     vec3(float xyz) {
-      v[0] = v[1] = v[2] = xyz;
+      #ifdef OCTET_SSE
+        m = _mm_set_ps1(xyz);
+      #else
+        v[0] = v[1] = v[2] = xyz;
+      #endif
     }
 
     #ifdef OCTET_SSE
       vec3(__m128 m) {
         this->m = m;
       }
+
+      vec3(const vec3 &rhs) {
+        this->m = rhs.m;
+      }
     #endif
+
+    vec3(const ivec3 &rhs);
 
     // index accessor [0] [1] ...
     float &operator[](int i) { return v[i]; }
@@ -106,11 +139,20 @@ namespace octet {
 
     // cross product
     vec3 cross(const vec3 &r) const {
-      return vec3(
-        v[1] * r.v[2] - v[2] * r.v[1],
-	      v[2] * r.v[0] - v[0] * r.v[2],
-	      v[0] * r.v[1] - v[1] * r.v[0]
-	    );
+      #ifdef OCTET_SSE
+        __m128 lshuf = _mm_shuffle_ps(r.m, r.m, _MM_SHUFFLE(1,2,0,0));
+        __m128 rshuf = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,2,0,0));
+        __m128 lprod = _mm_mul_ps(m, lshuf);
+        __m128 rprod = _mm_mul_ps(r.m, rshuf);
+        __m128 sum = _mm_sub_ps(lprod, rprod);
+        return vec3(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(1,2,0,0)));
+      #else
+        return vec3(
+          v[1] * r.v[2] - v[2] * r.v[1],
+	        v[2] * r.v[0] - v[0] * r.v[2],
+	        v[0] * r.v[1] - v[1] * r.v[0]
+	      );
+      #endif
     }
 
     // positive cross product (for box tests)
@@ -372,12 +414,24 @@ namespace octet {
     return rhs / lhs;
   }
 
-  // vec3p is a packed vec3
+  // sadly the microsoft compile is quite poor with vector code generation
+  #ifdef OCTET_SSE
+    #define OCTET_VEC3_CONST(VAR, X, Y, Z) static const u_m128_f4 VAR##_UNION = { X, Y, Z, 0 }; const vec3 VAR(VAR##_UNION.m);
+  #else
+    #define OCTET_VEC3_CONST(VAR, X, Y, Z) vec3 VAR(X, Y, Z);
+  #endif
+
+  // vec3p: vector of 3 floats - optimial for storage, but not computation.
   #ifdef OCTET_SSE
     class vec3p {
       float v[3];
     public:
-      vec3p(const vec3 &in) { v[0] = in[0]; v[1] = in[1]; v[2] = in[2]; }
+      vec3p(const vec3p &in) { v[0] = in.v[0]; v[1] = in.v[1]; v[2] = in.v[2]; }
+      //vec3p(const vec3 &in) { v[0] = in[0]; v[1] = in[1]; v[2] = in[2]; }
+      vec3p(const vec3 &in) {
+        static const u_m128_i4 mask = { -1, -1, -1, 0 };
+        _mm_maskmoveu_si128((__m128i&)in.get_m(), (__m128i&)mask.m, (char*)v);
+      }
       vec3p(float x, float y, float z) { v[0] = x; v[1] = y; v[2] = z; }
       operator vec3() { return vec3(v[0], v[1], v[2]); }
       operator const vec3() const { return vec3(v[0], v[1], v[2]); }
@@ -385,5 +439,7 @@ namespace octet {
   #else
     typedef vec3 vec3p;
   #endif
+
+  OCTET_HUNGARIANS(vec3)
 }
 
