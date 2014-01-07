@@ -22,6 +22,7 @@
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4345)
 #pragma warning(disable : 4530)
+#pragma warning(disable : 4799)
 
 // basic windows audio
 #pragma comment(lib, "winmm.lib")
@@ -304,27 +305,4 @@ namespace octet {
 
   };
 
-  //////////////////////////////////////
-  //
-  // platform specific intrinsics
-  //
-
-  // big endian unaligned load
-  inline static unsigned uint32_be(const uint8_t *src) {
-    return _byteswap_ulong(*(unsigned*)src);
-  }
-
-  // little endian unaligned load
-  inline static unsigned uint32_le(const uint8_t *src) {
-    return *(unsigned*)src;
-  }
-
-  // return number of 1 bits
-  inline static unsigned pop_count(uint32_t v) {
-    v = (v & 0x55555555) + ((v>>1) & 0x55555555);
-    v = (v & 0x33333333) + ((v>>2) & 0x33333333);
-    v = (v & 0x0f0f0f0f) + ((v>>4) & 0x0f0f0f0f);
-    v = (v & 0x00ff00ff) + ((v>>8) & 0x00ff00ff);
-    return (v + (v>>16)) & 0xff;
-  }
 }

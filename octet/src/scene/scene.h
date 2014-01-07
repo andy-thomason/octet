@@ -250,6 +250,31 @@ namespace octet {
       v.visit(light_instances, atom_light_instances);
     }
 
+    void begin_render(int vx, int vy, vec4_in clear_color=vec4(0.5f, 0.5f, 0.5f, 1.0f)) {
+      // set a viewport - includes whole window area
+      glViewport(0, 0, vx, vy);
+
+      // clear the background to black
+      glClearColor(clear_color.x(), clear_color.y(), clear_color.z(), clear_color.w());
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
+      glEnable(GL_DEPTH_TEST);
+
+      GLint param;
+      glGetIntegerv(GL_SAMPLE_BUFFERS, &param);
+      if (param == 0) {
+        // if multisampling is disabled, we can't use GL_SAMPLE_COVERAGE (which I think is mean)
+        // Instead, allow alpha blend (transparency when alpha channel is 0)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      } else {
+        // if multisampling is enabled, use GL_SAMPLE_COVERAGE instead
+        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        glEnable(GL_SAMPLE_COVERAGE);
+      }
+    }
+
     static float max(float x, float y) {
       return x > y ? x : y;
     }

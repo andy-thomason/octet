@@ -12,7 +12,7 @@ namespace octet {
 
   class vec4 {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       union {
         __m128 m;
         float v[4];
@@ -23,21 +23,21 @@ namespace octet {
     #endif
   public:
     vec4() {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         m = _mm_setzero_ps();
       #else
         v[0] = v[1] = v[2] = v[3] = 0;
       #endif
     }
 
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       vec4(__m128 m) {
         this->m = m;
       }
     #endif
 
     vec4(const vec4 &rhs) {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         m = rhs.m;
       #else
         v[0] = rhs.v[0]; v[1] = rhs.v[1]; v[2] = rhs.v[2]; v[3] = rhs.v[3];
@@ -45,7 +45,7 @@ namespace octet {
     }
 
     vec4(float f) {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         m = _mm_set_ps1(f);
       #else
         v[0] = v[1] = v[2] = v[3] = f;
@@ -54,12 +54,22 @@ namespace octet {
 
     // construct from four scalars
     vec4(float x, float y, float z, float w) {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         m = _mm_setr_ps(x, y, z, w);
       #else
         v[0] = x; v[1] = y; v[2] = z; v[3] = w;
       #endif
     };
+
+    /*explicit vec4(int x, int y, int z, int w) {
+      #if OCTET_SSE
+        __m64 lo = _mm_set_pi32(y, x);
+        __m64 hi = _mm_set_pi32(w, z);
+        m = _mm_cvtpi32x2_ps(lo, hi);
+      #else
+        v[0] = x; v[1] = y; v[2] = z; v[3] = w;
+      #endif
+    };*/
 
     vec4(const vec2 &xy, float z, float w) {
       v[0] = xy.x(); v[1] = xy.y(); v[2] = z; v[3] = w;
@@ -138,7 +148,7 @@ namespace octet {
         v[1] * r.v[2] - v[2] * r.v[1],
 	      v[2] * r.v[0] - v[0] * r.v[2],
 	      v[0] * r.v[1] - v[1] * r.v[0],
-	      0
+	      0.0f
 	    );
     }
 
@@ -148,7 +158,7 @@ namespace octet {
         v[1] * r.v[2] + v[2] * r.v[1],
 	      v[2] * r.v[0] + v[0] * r.v[2],
 	      v[0] * r.v[1] + v[1] * r.v[0],
-        0
+        0.0f
 	    );
     }
 
@@ -165,7 +175,7 @@ namespace octet {
 
     // vector operators
     vec4 operator+(const vec4 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_add_ps(m, r.m));
       #else
         return vec4(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2], v[3]+r.v[3]);
@@ -173,7 +183,7 @@ namespace octet {
     }
 
     vec4 operator-(const vec4 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_sub_ps(m, r.m));
       #else
         return vec4(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2], v[3]-r.v[3]);
@@ -181,7 +191,7 @@ namespace octet {
     }
 
     vec4 operator*(const vec4 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_mul_ps(m, r.m));
       #else
         return vec4(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2], v[3]*r.v[3]);
@@ -189,7 +199,7 @@ namespace octet {
     }
 
     vec4 operator/(const vec4 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_div_ps(m, r.m));
       #else
         return vec4(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2], v[3]*r.v[3]);
@@ -197,7 +207,7 @@ namespace octet {
     }
 
     vec4 operator-() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_sub_ps(_mm_setzero_ps(), m));
       #else
         return vec4(-v[0], -v[1], -v[2], -v[3]);
@@ -224,7 +234,7 @@ namespace octet {
 
     // minumum of two vectors
     vec4 min(const vec4 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_min_ps(m, r.m));
       #else
         return vec4(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1], v[2] < r[2] ? v[2] : r[2], v[3] < r[3] ? v[3] : r[3]);
@@ -233,7 +243,7 @@ namespace octet {
 
     // maximum of two vectors
     vec4 max(const vec4 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_max_ps(m, r.m));
       #else
         return vec4(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1], v[2] >= r[2] ? v[2] : r[2], v[3] >= r[3] ? v[3] : r[3]);
@@ -242,7 +252,7 @@ namespace octet {
 
     // make all values positive.
     vec4 abs() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         static const union {
           int v[4];
           __m128 m;
@@ -250,7 +260,7 @@ namespace octet {
         //u.v[0] = u.v[1] = u.v[2] = u.v[3] = 0x7fffffff;
         return vec4(_mm_and_ps(m, u.m));
       #else
-        return vec4(abs(v[0]), abs(v[1]), abs(v[2]), abs(v[3]));
+        return vec4(octet::abs(v[0]), octet::abs(v[1]), octet::abs(v[2]), octet::abs(v[3]));
       #endif
     }
 
@@ -266,21 +276,21 @@ namespace octet {
 
     // get xy00
     vec4 xy00() const {
-      return vec4(v[0], v[1], 0, 0);
+      return vec4(v[0], v[1], 0.0f, 0.0f);
     }
 
     // get xyz0
     vec4 xyz0() const {
-      return vec4(v[0], v[1], v[2], 0);
+      return vec4(v[0], v[1], v[2], 0.0f);
     }
 
     // get xyz1
     vec4 xyz1() const {
-      return vec4(v[0], v[1], v[2], 1);
+      return vec4(v[0], v[1], v[2], 1.0f);
     }
 
     vec4 xxxx() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(0,0,0,0)));
       #else
         return vec4(v[0], v[0], v[0], v[0]);
@@ -288,7 +298,7 @@ namespace octet {
     }
 
     vec4 yyyy() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(1,1,1,1)));
       #else
         return vec4(v[1], v[1], v[1], v[1]);
@@ -296,7 +306,7 @@ namespace octet {
     }
 
     vec4 zzzz() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(2,2,2,2)));
       #else
         return vec4(v[2], v[2], v[2], v[2]);
@@ -304,7 +314,7 @@ namespace octet {
     }
 
     vec4 wwww() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(3,3,3,3)));
       #else
         return vec4(v[3], v[3], v[3], v[3]);
@@ -420,15 +430,15 @@ namespace octet {
   }
 
   inline vec4 vec3::xyz0() const {
-    return vec4(v[0], v[1], v[2], 0);
+    return vec4(v[0], v[1], v[2], 0.0f);
   }
 
   inline vec4 vec3::xyz1() const {
-    return vec4(v[0], v[1], v[2], 1);
+    return vec4(v[0], v[1], v[2], 1.0f);
   }
 
   inline vec4 vec3::xxxx() const {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return vec4(_mm_shuffle_ps(get_m(), get_m(), _MM_SHUFFLE(0,0,0,0)));
     #else
       return vec4(v[0], v[0], v[0], v[0]);
@@ -436,7 +446,7 @@ namespace octet {
   }
 
   inline vec4 vec3::yyyy() const {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return vec4(_mm_shuffle_ps(get_m(), get_m(), _MM_SHUFFLE(1,1,1,1)));
     #else
       return vec4(v[1], v[1], v[1], v[1]);
@@ -444,7 +454,7 @@ namespace octet {
   }
 
   inline vec4 vec3::zzzz() const {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return vec4(_mm_shuffle_ps(get_m(), get_m(), _MM_SHUFFLE(2,2,2,2)));
     #else
       return vec4(v[2], v[2], v[2], v[2]);
@@ -468,12 +478,10 @@ namespace octet {
   }
 
   // sadly the microsoft compile is quite poor with vector code generation
-  #ifdef OCTET_SSE
+  #if OCTET_SSE
     #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) static const u_m128_f4 VAR##_UNION = { X, Y, Z, W }; const VEC4 VAR(VAR##_UNION.m);
   #else
     #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) VEC4 VAR(X, Y, Z, W);
   #endif
-
-  OCTET_HUNGARIANS(vec4)
 }
 

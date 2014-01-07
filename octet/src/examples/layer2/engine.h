@@ -4,7 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// animation example: Drawing an jointed figure with animation
+// game engine example: Load a scene from a collada file and run it.
 //
 // Level: 2
 //
@@ -92,47 +92,6 @@ namespace octet {
       }
     }
 
-    void test_obb_collision() {
-    #ifdef OCTET_OBB
-      aabb a(vec3(0, 0, 0), vec3(1, 1, 1));
-      aabb b(vec3(0, 0, 0), vec3(1, 1, 1));
-      mat4t mxa, mxb;
-      mxa.loadIdentity();
-      mxa.translate(3.0f, 0, 0);
-      mxa.rotateY(13);
-      mxb.loadIdentity();
-      mxb.translate(5.125f, 0, 0);
-      mxb.rotateY(7);
-      bool result = a.intersects(b, mxa, mxb);
-      printf("test_obb_collision: result=%d\n", result);
-
-      dMatrix3 ma, mb;
-      for (unsigned i = 0; i != 4; ++i) for (unsigned j = 0; j != 3; ++j) ma[i+4*j] = mxa[i][j];
-      for (unsigned i = 0; i != 4; ++i) for (unsigned j = 0; j != 3; ++j) mb[i+4*j] = mxb[i][j];
-      for (unsigned i = 0; i != 3; ++i) ma[i*4+3] = mb[i*4+3] = 0;
-      btVector3 normal;
-      btScalar depth;
-      int return_code = 0;
-      struct out_t : public btDiscreteCollisionDetectorInterface::Result {
-		    virtual void setShapeIdentifiersA(int partId0,int index0) {}
-		    virtual void setShapeIdentifiersB(int partId1,int index1) {}
-		    virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth) {}
-    	};
-      out_t output;
-
-      int res = dBoxBox2(
-        btVector3(mxa.w().x(), mxa.w().y(), mxa.w().z()),
-        ma,
-        btVector3(a.get_half_extent().x()*2, a.get_half_extent().y()*2, a.get_half_extent().z()*2),
-
-        btVector3(mxb.w().x(), mxb.w().y(), mxb.w().z()),
-        mb,
-        btVector3(b.get_half_extent().x()*2, b.get_half_extent().y()*2, b.get_half_extent().z()*2),
-
-        normal, &depth, &return_code, 4, NULL, 0, output
-      );
-    #endif
-    }
   public:
     // this is called when we construct the class
     engine(int argc, char **argv) : app(argc, argv), ball() {
@@ -176,8 +135,6 @@ namespace octet {
       //dynarray<uint8_t> buf;
       //app_utils::get_url(buf, "zip://assets/big.zip/big.fnt");
 
-      test_obb_collision();
-
       load_file(filename);
 
       overlay.init();
@@ -187,37 +144,6 @@ namespace octet {
 
     // this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
-      int vx, vy;
-      get_viewport_size(vx, vy);
-      // set a viewport - includes whole window area
-      glViewport(0, 0, vx, vy);
-
-      // clear the background to black
-      glClearColor(0.5f, 0.5f, 0.5f, 1);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-      // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
-      glEnable(GL_DEPTH_TEST);
-
-      GLint param;
-      glGetIntegerv(GL_SAMPLE_BUFFERS, &param);
-      if (param == 0) {
-        // if multisampling is disabled, we can't use GL_SAMPLE_COVERAGE (which I think is mean)
-        // Instead, allow alpha blend (transparency when alpha channel is 0)
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        // this is a rather brutal alpha test that cuts off anything with a small alpha.
-        #ifndef SN_TARGET_PSP2
-          //glEnable(GL_ALPHA_TEST);
-          //glAlphaFunc(GL_GREATER, 0.9f);
-        #endif
-      } else {
-        // if multisampling is enabled, use GL_SAMPLE_COVERAGE instead
-        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-        glEnable(GL_SAMPLE_COVERAGE);
-      }
-
       // poll web server
       server.update();
 
@@ -251,6 +177,7 @@ namespace octet {
       if (app_scene && app_scene->get_num_camera_instances()) {
         int vx = 0, vy = 0;
         get_viewport_size(vx, vy);
+        app_scene->begin_render(vx, vy);
 
         camera_instance *cam = app_scene->get_camera_instance(0);
         scene_node *node = cam->get_node();

@@ -32,10 +32,10 @@ namespace octet {
     // For a cube, add the front face. Matrix transforms are used to add the others.
     void add_front_face(float size) {
       unsigned short cur_vertex = (unsigned short)vertices.size();
-      add_vertex(vec4(-size, -size, size, 1), vec4(0, 0, 1, 0), 0, 0);
-      add_vertex(vec4(-size,  size, size, 1), vec4(0, 0, 1, 0), 0, 1);
-      add_vertex(vec4( size,  size, size, 1), vec4(0, 0, 1, 0), 1, 1);
-      add_vertex(vec4( size, -size, size, 1), vec4(0, 0, 1, 0), 1, 0);
+      add_vertex(vec4(-size, -size, size, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f), 0.0f, 0.0f);
+      add_vertex(vec4(-size,  size, size, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f), 0.0f, 1.0f);
+      add_vertex(vec4( size,  size, size, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f), 1.0f, 1.0f);
+      add_vertex(vec4( size, -size, size, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f), 1.0f, 0.0f);
       indices.push_back(cur_vertex+0);
       indices.push_back(cur_vertex+1);
       indices.push_back(cur_vertex+2);
@@ -53,7 +53,7 @@ namespace octet {
       unsigned first_index = (unsigned)vertices.size();
       float u = 0;
       for (unsigned i = 0; i <= num_vertices; ++i) {
-        add_vertex(vec4(radius, 0, 0, 1), normal, u, v);
+        add_vertex(vec4(radius, 0.0f, 0.0f, 1.0f), normal, u, v);
         matrix.rotateSpecial(delta_c, delta_s, 0, 1);
         u += rnv * uvscale;
       }

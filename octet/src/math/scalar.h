@@ -8,8 +8,10 @@
 //
 
 namespace octet {
-  union u_m128_f4 { float v[4]; __m128 m; };
-  union u_m128_i4 { int v[4]; __m128 m; };
+  #if OCTET_SSE
+    union u_m128_f4 { float v[4]; __m128 m; };
+    union u_m128_i4 { int v[4]; __m128 m; };
+  #endif
 
   // cheaty floating point compares
   // not exactly ieee!
@@ -73,6 +75,10 @@ namespace octet {
     return fabsf(f);
   }
 
+  inline int abs(int v) {
+    return v < 0 ? -v : v;
+  }
+
   inline float sin(float f) {
     return sinf(f);
   }
@@ -91,6 +97,10 @@ namespace octet {
 
   inline float recip(float f) {
     return 1.0f/f;
+  }
+
+  inline float squared(float v) {
+    return v * v;
   }
 
   inline float atan2(float dy, float dx) {
@@ -119,5 +129,65 @@ namespace octet {
   template <class T> T max(const T &a, const T &b) {
     return a > b ? a : b;
   }
+
+  // big endian unaligned load
+  inline static unsigned uint32_be(const uint8_t *src) {
+    return (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | (src[3] << 0);
+    //return _byteswap_ulong(*(unsigned*)src);
+  }
+
+  // little endian unaligned load
+  inline static unsigned uint32_le(const uint8_t *src) {
+    return (src[3] << 24) | (src[2] << 16) | (src[1] << 8) | (src[0] << 0);
+    //return *(unsigned*)src;
+  }
+
+  // return number of 1 bits
+  inline static int pop_count(uint32_t v) {
+    v = (v & 0x55555555) + ((v>>1) & 0x55555555);
+    v = (v & 0x33333333) + ((v>>2) & 0x33333333);
+    v = (v & 0x0f0f0f0f) + ((v>>4) & 0x0f0f0f0f);
+    v = (v & 0x00ff00ff) + ((v>>8) & 0x00ff00ff);
+    return (v + (v>>16)) & 0xff;
+  }
+
+  inline static int clz(uint32_t v) {
+    int res = 0;
+    if (v >> 16) { v >>= 16; res += 16; }
+    if (v >> 8) { v >>= 8; res += 8; }
+    if (v >> 4) { v >>= 4; res += 4; }
+    if (v >> 2) { v >>= 2; res += 2; }
+    if (v >> 1) { v >>= 1; res += 1; }
+    if (!v) { res += 1; }
+    return res;
+  }
+
+  // floor(log(2, v))
+  inline static int ilog2(uint32_t v) {
+    return 31 - (int)clz(v);
+  }
+
+  // 0a0b0c0d -> 0aabbccd -> 00ab00cd -> 00ababcd -> 0000abcd
+  inline static unsigned even_bits(unsigned a) {
+    a &= 0x55555555;
+    a = (a | a >> 1) & 0x33333333;
+    a = (a | a >> 2) & 0x0f0f0f0f;
+    a = (a | a >> 4) & 0x00ff00ff;
+    return (a | a >> 8) & 0x0000ffff;
+  }
+
+  inline static unsigned low_nibbles(unsigned a) {
+    a &= 0x0f0f0f0f;
+    a = (a | a >> 4) & 0x00ff00ff;
+    return (a | a >> 8) & 0x0000ffff;
+  }
+
+  template <typename first_t, typename second_t> class pair {
+  public:
+    pair() {}
+    pair(first_t f, second_t s) : first(f), second(s) {}
+    first_t first;
+    second_t second;
+  };
 }
 

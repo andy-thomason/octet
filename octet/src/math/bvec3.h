@@ -9,7 +9,7 @@
 
 namespace octet {
   class bvec3 {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       union {
         __m128 m;
         int v[4];
@@ -23,7 +23,7 @@ namespace octet {
     bvec3(bool x, bool y, bool z) { v[0] = x ? -1 : 0; v[1] = y ? -1 : 0; v[2] = z ? -1 : 0; };
     bvec3(int x, int y, int z) { v[0] = x; v[1] = y; v[2] = z; };
 
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       bvec3(__m128 m) {
         this->m = m;
       }
@@ -62,7 +62,7 @@ namespace octet {
   };
 
   inline bvec3 operator>(const vec3 &lhs, const vec3 &rhs) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return bvec3(_mm_cmpgt_ps(lhs.get_m(), rhs.get_m()) );
     #else
       return bvec3(fgt(lhs.x(), rhs.x()), fgt(lhs.y(), rhs.y()), fgt(lhs.z(), rhs.z()) );
@@ -70,7 +70,7 @@ namespace octet {
   }
 
   inline bvec3 operator<(const vec3 &lhs, const vec3 &rhs) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return bvec3(_mm_cmplt_ps(lhs.get_m(), rhs.get_m()) );
     #else
       return bvec3(flt(lhs.x(), rhs.x()), flt(lhs.y(), rhs.y()), flt(lhs.z(), rhs.z()) );
@@ -78,7 +78,7 @@ namespace octet {
   }
 
   inline bvec3 operator>=(const vec3 &lhs, const vec3 &rhs) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return bvec3(_mm_cmpge_ps(lhs.get_m(), rhs.get_m()) );
     #else
       return bvec3(fge(lhs.x(), rhs.x()), fge(lhs.y(), rhs.y()), fge(lhs.z(), rhs.z()) );
@@ -86,7 +86,7 @@ namespace octet {
   }
 
   inline bvec3 operator<=(const vec3 &lhs, const vec3 &rhs) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return bvec3(_mm_cmple_ps(lhs.get_m(), rhs.get_m()) );
     #else
       return bvec3(fle(lhs.x(), rhs.x()), fle(lhs.y(), rhs.y()), fle(lhs.z(), rhs.z()) );
@@ -94,7 +94,7 @@ namespace octet {
   }
 
   inline bvec3 operator==(const vec3 &lhs, const vec3 &rhs) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return bvec3(_mm_cmpeq_ps(lhs.get_m(), rhs.get_m()) );
     #else
       return bvec3(feq(lhs.x(), rhs.x()), feq(lhs.y(), rhs.y()), feq(lhs.z(), rhs.z()) );
@@ -102,7 +102,7 @@ namespace octet {
   }
 
   inline bvec3 operator!=(const vec3 &lhs, const vec3 &rhs) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return bvec3(_mm_cmpneq_ps(lhs.get_m(), rhs.get_m()) );
     #else
       return bvec3(fne(lhs.x(), rhs.x()), fne(lhs.y(), rhs.y()), fne(lhs.z(), rhs.z()) );
@@ -110,7 +110,7 @@ namespace octet {
   }
 
   bool all(const bvec3 &b) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return (_mm_movemask_ps(b.get_m()) & 7) == 7;
     #else
       return (b.x() & b.y() & b.z()) < 0;
@@ -118,7 +118,7 @@ namespace octet {
   }
 
   bool any(const bvec3 &b) {
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       return (_mm_movemask_ps(b.get_m()) & 7) != 0;
     #else
       return (b.x() | b.y() | b.z()) < 0;

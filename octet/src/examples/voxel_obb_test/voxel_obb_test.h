@@ -11,7 +11,28 @@
 // Work for a paper on OBB collision
 
 namespace octet {
-  class obb_test : public app {
+  class and_not {
+    bool result;
+  public:
+    and_not(bool a_in, bool b_in) { result = a_in; }
+    operator bool() { return result; }
+  };
+
+  class deathstar {
+    sphere a;
+    sphere b;
+  public:
+    //deathstar() : csg(sphere(vec3(0, 0, 0), 16), sphere(vec3(8, 0, 0), 12)) {}
+    //bool intersects(const vec3 &rhs) const { return csg::intersects(rhs); }
+    deathstar() : a(vec3(0, 0, 0), 16), b(vec3(8, 0, 0), 12) {
+    }
+
+    bool intersects(vec3_in pos) const {
+      return a.intersects(pos) && !b.intersects(pos);
+    }
+  };
+
+  class voxel_obb_test : public app {
     typedef mat4t mat4t;
     typedef vec4 vec4;
     typedef animation animation;
@@ -31,7 +52,7 @@ namespace octet {
 
   public:
     // this is called when we construct the class
-    obb_test(int argc, char **argv) : app(argc, argv), ball() {
+    voxel_obb_test(int argc, char **argv) : app(argc, argv), ball() {
     }
 
     // this is called once OpenGL is initialized
@@ -52,12 +73,16 @@ namespace octet {
       mat4t mx;
       mx.loadIdentity();
       mesh_voxels *mesha = new mesh_voxels(1.0f/8);
-      mesha->box(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
+      //mesha->draw(mx, sphere(vec3(8, 8, 8), 16));
+      //mesha->box(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
+      deathstar ds;
+      mesha->draw(mx, sphere(vec3(16, 0, 0), 8));
       mesha->update();
       mesha->dump(app_utils::log("mesha\n"));
       //mesha->get_subcube(0, 0, 0)->test_update_lod();
-      mesh_voxels *meshb = new mesh_voxels();
-      meshb->box(mx, aabb(vec3(0, 0, 0), vec3(4, 4, 4)));
+      mesh_voxels *meshb = new mesh_voxels(1.0f/8);
+      meshb->draw(mx, sphere(vec3(-16, 0, 0), 8));
+      //meshb->draw(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
       meshb->update();
       mia = app_scene->add_mesh_instance(new mesh_instance(nodea, mesha, mata));
       mib = app_scene->add_mesh_instance(new mesh_instance(nodeb, meshb, matb));
@@ -71,34 +96,10 @@ namespace octet {
 
     // this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
-      int vx, vy;
-      get_viewport_size(vx, vy);
-      // set a viewport - includes whole window area
-      glViewport(0, 0, vx, vy);
-
-      // clear the background to black
-      glClearColor(0.5f, 0.5f, 0.5f, 1);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-      // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
-      glEnable(GL_DEPTH_TEST);
-
-      GLint param;
-      glGetIntegerv(GL_SAMPLE_BUFFERS, &param);
-      if (param == 0) {
-        // if multisampling is disabled, we can't use GL_SAMPLE_COVERAGE (which I think is mean)
-        // Instead, allow alpha blend (transparency when alpha channel is 0)
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      } else {
-        // if multisampling is enabled, use GL_SAMPLE_COVERAGE instead
-        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-        glEnable(GL_SAMPLE_COVERAGE);
-      }
-
       if (app_scene && app_scene->get_num_camera_instances()) {
         int vx = 0, vy = 0;
         get_viewport_size(vx, vy);
+        app_scene->begin_render(vx, vy);
 
         camera_instance *cam = app_scene->get_camera_instance(0);
         scene_node *node = cam->get_node();
@@ -110,12 +111,15 @@ namespace octet {
 
         app_scene->render(object_shader, skin_shader, *cam, (float)vx / vy);
 
+        mesh_voxels *mesha = mia->get_mesh()->get_mesh_voxels();
+        mesh_voxels *meshb = mib->get_mesh()->get_mesh_voxels();
+
         const aabb &aabba = mia->get_mesh()->get_aabb();
         const aabb &aabbb = mib->get_mesh()->get_aabb();
         const mat4t &mxa = mia->get_node()->get_nodeToParent();
         const mat4t &mxb = mib->get_node()->get_nodeToParent();
-        //aabba.intersects_old(aabbb, mxa, mxb);
-        volatile bool b = aabba.intersects(aabbb, mxa, mxb);
+        aabba.intersects_old(aabbb, mxa, mxb);
+        volatile bool b = mesha->intersects(*meshb, mxa, mxb);
         //printf("\n");
 
         nodea->access_nodeToParent().rotateZ(1);

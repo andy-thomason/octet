@@ -4,14 +4,12 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Game engine example using Octet.
-//
-// Demonstrates a basic scene graph with import from Collada.
+// Test for Voxel obb test
 //
 
 #include "../../platform/platform.h"
 
-#include "engine.h"
+#include "flow_cytometry.h"
 
 //
 // a C++ program starts here with the command line arguments in argv[]
@@ -20,7 +18,7 @@
 int main(int argc, char **argv) {
   octet::app_utils::prefix("../../");
   octet::app::init_all(argc, argv);
-  octet::engine app(argc, argv);
+  octet::flow_cytometry app(argc, argv);
   app.init();
   octet::app::run_all_apps();
 }

@@ -34,20 +34,20 @@ namespace octet {
     }
 
     mat4t(float diag) {
-      v[0] = vec4(diag, 0, 0, 0);
-      v[1] = vec4(0, diag, 0, 0);
-      v[2] = vec4(0, 0, diag, 0);
-      v[3] = vec4(0, 0, 0, diag);
+      v[0] = vec4(diag, 0.0f, 0.0f, 0.0f);
+      v[1] = vec4(0.0f, diag, 0.0f, 0.0f);
+      v[2] = vec4(0.0f, 0.0f, diag, 0.0f);
+      v[3] = vec4(0.0f, 0.0f, 0.0f, diag);
     }
   
     mat4t(const quat &r)
     {
       // http://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
       float a = r[3], b = r[0], c = r[1], d = r[2];
-      v[0] = vec4( a*a + b*b - c*c - d*d, 2 * ( b*c + a*d ), 2 * ( b*d - a*c ), 0 ),
-      v[1] = vec4( 2 * ( b*c - a*d ), a*a - b*b + c*c - d*d, 2 * ( c*d + a*b ), 0 ),
-      v[2] = vec4( 2 * ( b*d + a*c ), 2 * ( c*d - a*b ), a*a - b*b - c*c + d*d, 0 ),
-      v[3] = vec4( 0, 0, 0, 1 );
+      v[0] = vec4( a*a + b*b - c*c - d*d, 2 * ( b*c + a*d ), 2 * ( b*d - a*c ), 0.0f ),
+      v[1] = vec4( 2 * ( b*c - a*d ), a*a - b*b + c*c - d*d, 2 * ( c*d + a*b ), 0.0f ),
+      v[2] = vec4( 2 * ( b*d + a*c ), 2 * ( c*d - a*b ), a*a - b*b - c*c + d*d, 0.0f ),
+      v[3] = vec4( 0.0f, 0.0f, 0.0f, 1.0f );
     }
 
     // like the OpenGL 1.0 LoadIdentity
@@ -113,7 +113,7 @@ namespace octet {
   
     // OpenGL-style translate of this matrix
     mat4t &translate(float x, float y, float z) {
-      v[3] = lmul(vec4(x,y,z,1));
+      v[3] = lmul(vec4(x,y,z,1.0f));
       return *this;
     }
   
@@ -155,10 +155,10 @@ namespace octet {
       float c = cosf(angle * (3.14159265f/180));
       float s = sinf(angle * (3.14159265f/180));
       mat4t r(
-        vec4(x*x*(1-c)+c,   x*y*(1-c)+z*s, x*z*(1-c)-y*s, 0),
-        vec4(x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0),
-        vec4(x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0),
-        vec4(          0,               0,             0, 1)
+        vec4(x*x*(1-c)+c,   x*y*(1-c)+z*s, x*z*(1-c)-y*s, 0.0f),
+        vec4(x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0.0f),
+        vec4(x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0.0f),
+        vec4(          0.0f,               0.0f,             0.0f, 1.0f)
       );
       *this = r * *this;
 
@@ -176,15 +176,15 @@ namespace octet {
 
     mat4t &skew(float angle, float x1, float y1, float z1, float x2, float y2, float z2) {
       float t = tanf(angle * (3.14159265f/180));
-      vec4 v(x1, y1, z1, 0);
-      vec4 w(x2, y2, z2, 0);
+      vec4 v(x1, y1, z1, 0.0f);
+      vec4 w(x2, y2, z2, 0.0f);
       v = v.normalize() * t;
       w = w.normalize();
       mat4t r(
-        vec4( 1 + v.x() * w.x(),     v.x() * w.y(),     v.x() * w.z(), 0 ), 
-        vec4(     v.y() * w.x(), 1 + v.y() * w.y(),     v.y() * w.z(), 0 ), 
-        vec4(     v.z() * w.x(),     v.z() * w.y(), 1 + v.z() * w.z(), 0 ), 
-        vec4(             0,             0,             0,             1 ) 
+        vec4( 1 + v.x() * w.x(),     v.x() * w.y(),     v.x() * w.z(), 0.0f ), 
+        vec4(     v.y() * w.x(), 1 + v.y() * w.y(),     v.y() * w.z(), 0.0f ), 
+        vec4(     v.z() * w.x(),     v.z() * w.y(), 1 + v.z() * w.z(), 0.0f ), 
+        vec4(             0.0f,             0.0f,             0.0f,             1.0f ) 
       );
       *this = r * *this;
       return *this;
@@ -236,11 +236,11 @@ namespace octet {
     void invertQuick(mat4t &d) const {
       // transpose x, y, z
       for (int i = 0; i != 3; ++i) {
-        d[i] = vec4(v[0][i], v[1][i], v[2][i], 0);
+        d[i] = vec4(v[0][i], v[1][i], v[2][i], 0.0f);
       }
       d[3] = vec4(0, 0, 0, 1);
       // translate by new matrix
-      d[3] = d.lmul(vec4(-v[3][0], -v[3][1], -v[3][2], 1));
+      d[3] = d.lmul(vec4(-v[3][0], -v[3][1], -v[3][2], 1.0f));
     }
 
     mat4t transpose4x4() const {
@@ -327,7 +327,7 @@ namespace octet {
       d[0] = d[0] * rdet;
       d[1] = d[1] * rdet;
       d[2] = d[2] * rdet;
-      d[3] = d.lmul(vec4(-v[3][0], -v[3][1], -v[3][2], 1));
+      d[3] = d.lmul(vec4(-v[3][0], -v[3][1], -v[3][2], 1.0f));
       return d;
     }
   
@@ -372,10 +372,10 @@ namespace octet {
       // so choose f and especially n with care!
 
       mat4t mul(
-        vec4( X, 0, 0,  0 ),
-        vec4( 0, Y, 0,  0 ),
-        vec4( A, B, C, -1 ),
-        vec4( 0, 0, D,  0 )
+        vec4( X, 0.0f, 0.0f,  0.0f ),
+        vec4( 0.0f, Y, 0.0f,  0.0f ),
+        vec4( A, B, C, -1.0f ),
+        vec4( 0.0f, 0.0f, D,  0.0f )
       );
       *this = mul * *this;
       return *this;
@@ -392,10 +392,10 @@ namespace octet {
       float ty = -(top+bottom) / (top-bottom);
       float tz = -(farVal+nearVal) / (farVal-nearVal);
       mat4t mul(
-        vec4( X,  0,  0,  0 ),
-        vec4( 0,  Y,  0,  0 ),
-        vec4( 0,  0,  Z,  0 ),
-        vec4( tx, ty, tz, 1 )
+        vec4( X,  0.0f,  0.0f,  0.0f ),
+        vec4( 0.0f,  Y,  0.0f,  0.0f ),
+        vec4( 0.0f,  0.0f,  Z,  0.0f ),
+        vec4( tx, ty, tz, 1.0f )
       );
       *this = mul * *this;
       return *this;
@@ -569,5 +569,11 @@ namespace octet {
     return (rhs[0] * lhs.xxxx() + rhs[1] * lhs.yyyy() + rhs[2] * lhs.zzzz() + rhs[3]).xyz();
   }
 
-  OCTET_HUNGARIANS(mat4t)
+  static inline mat4t inverse3x4(const mat4t &v) {
+    return v.inverse3x4();
+  }
+
+  static inline mat4t inverse4x4(const mat4t &v) {
+    return v.inverse4x4();
+  }
 }

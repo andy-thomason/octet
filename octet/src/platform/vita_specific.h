@@ -18,6 +18,10 @@
 // include cross platform app helpers, such as texture loaders
 #include "app_common.h"
 
+#define OCTET_HOT __attribute__((always_inline))
+
+#define SN_TARGET_PSP2 1
+
 #include <net.h>
 #define FIONBIO 1
 

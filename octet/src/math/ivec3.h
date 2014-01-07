@@ -17,6 +17,10 @@ namespace octet {
       v[0] = x; v[1] = y; v[2] = z;
     };
 
+    ivec3(int xyz) {
+      v[0] = v[1] = v[2] = xyz;
+    };
+
     ivec3(const vec4 &rhs) {
       v[0] = (int)rhs[0];
       v[1] = (int)rhs[1];
@@ -37,7 +41,13 @@ namespace octet {
     ivec3 operator+(const ivec3 &r) const { return ivec3(v[0]+r.v[0], v[1]+r.v[1], v[2]+r.v[2]); }
     ivec3 operator-(const ivec3 &r) const { return ivec3(v[0]-r.v[0], v[1]-r.v[1], v[2]-r.v[2]); }
     ivec3 operator*(const ivec3 &r) const { return ivec3(v[0]*r.v[0], v[1]*r.v[1], v[2]*r.v[2]); }
+    ivec3 operator>>(const ivec3 &r) const { return ivec3(v[0]>>r.v[0], v[1]>>r.v[1], v[2]>>r.v[2]); }
+    ivec3 operator<<(const ivec3 &r) const { return ivec3(v[0]<<r.v[0], v[1]<<r.v[1], v[2]<<r.v[2]); }
+    ivec3 operator&(const ivec3 &r) const { return ivec3(v[0]&r.v[0], v[1]&r.v[1], v[2]&r.v[2]); }
+    ivec3 operator|(const ivec3 &r) const { return ivec3(v[0]|r.v[0], v[1]|r.v[1], v[2]|r.v[2]); }
+    ivec3 operator^(const ivec3 &r) const { return ivec3(v[0]^r.v[0], v[1]^r.v[1], v[2]^r.v[2]); }
     ivec3 operator-() const { return ivec3(-v[0], -v[1], -v[2]); }
+    ivec3 operator~() const { return ivec3(~v[0], ~v[1], ~v[2]); }
     ivec3 &operator+=(const ivec3 &r) { v[0] += r.v[0]; v[1] += r.v[1]; v[2] += r.v[2]; return *this; }
     ivec3 &operator-=(const ivec3 &r) { v[0] -= r.v[0]; v[1] -= r.v[1]; v[2] -= r.v[2]; return *this; }
     ivec3 &operator*=(const ivec3 &r) { v[0] *= r.v[0]; v[1] *= r.v[1]; v[2] *= r.v[2]; return *this; }
@@ -55,11 +65,15 @@ namespace octet {
   };
 
   inline vec3::vec3(const ivec3 &rhs) {
-    v[0] = (float)rhs[0];
-    v[1] = (float)rhs[1];
-    v[2] = (float)rhs[2];
+    #if OCTET_SSE
+      v[0] = (float)rhs[0];
+      v[1] = (float)rhs[1];
+      v[2] = (float)rhs[2];
+    #else
+      v[0] = (float)rhs[0];
+      v[1] = (float)rhs[1];
+      v[2] = (float)rhs[2];
+    #endif
   }
-
-  OCTET_HUNGARIANS(ivec3)
 }
 

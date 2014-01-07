@@ -13,7 +13,7 @@ namespace octet {
 
   class vec2 {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
-    #ifdef OCTET_SSE
+    #if OCTET_SSE
       union {
         __m128 m;
         float v[2];
@@ -114,7 +114,7 @@ namespace octet {
     //
 
     vec2 operator+(const vec2 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_add_ps(m, r.m));
       #else
         return vec2(v[0]+r.v[0], v[1]+r.v[1]);
@@ -122,7 +122,7 @@ namespace octet {
     }
 
     vec2 operator-(const vec2 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_sub_ps(m, r.m));
       #else
         return vec2(v[0]-r.v[0], v[1]-r.v[1]);
@@ -130,7 +130,7 @@ namespace octet {
     }
 
     vec2 operator*(const vec2 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_mul_ps(m, r.m));
       #else
         return vec2(v[0]*r.v[0], v[1]*r.v[1]);
@@ -138,7 +138,7 @@ namespace octet {
     }
 
     vec2 operator/(const vec2 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_div_ps(m, r.m));
       #else
         return vec2(v[0]*r.v[0], v[1]*r.v[1]);
@@ -146,7 +146,7 @@ namespace octet {
     }
 
     vec2 operator-() const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_sub_ps(_mm_setzero_ps(), m));
       #else
         return vec2(-v[0], -v[1]);
@@ -155,7 +155,7 @@ namespace octet {
 
     // minumum of two vectors
     vec2 min(const vec2 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_min_ps(m, r.m));
       #else
         return vec2(v[0] < r[0] ? v[0] : r[0], v[1] < r[1] ? v[1] : r[1]);
@@ -164,7 +164,7 @@ namespace octet {
 
     // maximum of two vectors
     vec2 max(const vec2 &r) const {
-      #ifdef OCTET_SSE
+      #if OCTET_SSE
         return vec2(_mm_max_ps(m, r.m));
       #else
         return vec2(v[0] >= r[0] ? v[0] : r[0], v[1] >= r[1] ? v[1] : r[1]);
@@ -271,7 +271,7 @@ namespace octet {
   }
 
   // vec2p is a packed vec2
-  #ifdef OCTET_SSE
+  #if OCTET_SSE
     class vec2p {
       float v[2];
     public:

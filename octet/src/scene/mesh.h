@@ -367,7 +367,12 @@ namespace octet {
 
     void draw() {
       indices->bind();
-      glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)0);
+      //printf("de %04x %d %d\n", get_mode(), get_num_vertices(), get_index_type());
+      if (get_index_type()) {
+        glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)0);
+      } else {
+        glDrawArrays(get_mode(), 0, get_num_vertices());
+      }
     }
 
     void disable_attributes() {

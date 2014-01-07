@@ -128,7 +128,7 @@ namespace octet {
 
     // convert an ascii sequence of integers like "1 3 9 12 34" to an array of integers
     void atoiv(dynarray<int> &values, const char *src) {  
-      values.resize(0);
+      //values.resize(0);
       if (!src) return;
 
       while (*src > 0 && *src <= ' ') ++src;
@@ -966,7 +966,10 @@ namespace octet {
 
       parse_input_state state;
       state.s = mesh;
-      atoiv(state.p, pelem->GetText());
+      while (pelem) {
+        atoiv(state.p, pelem->GetText());
+        pelem = sibling(pelem, "p");
+      }
       state.input_stride = get_input_stride(mesh_child);
       //unsigned implicit_offset = 0;
       state.slot = 0;
@@ -1133,7 +1136,10 @@ namespace octet {
 
       parse_input_state state;
       state.s = NULL;
-      atoiv(state.p, pelem->GetText());
+      while (pelem) {
+        atoiv(state.p, pelem->GetText());
+        pelem = sibling(pelem, "p");
+      }
       state.input_stride = get_input_stride(mesh_child);
       state.slot = 0;
       state.attr_offset = 0;

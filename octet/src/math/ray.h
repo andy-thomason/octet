@@ -72,6 +72,16 @@ namespace octet {
       return all(can_hit_box & inside_edges);
     }
     
+    // ray-sphere is the same as capsule-point
+    bool intersects(sphere_in rhs) const {
+      vec3 diff = origin - rhs.get_center();
+      float radius2 = squared(rhs.get_radius());
+      float lambda = dot(diff, distance) / squared(distance);
+      float clamped = min(0.0f, max(lambda, 1.0f));
+      vec3 nearest_point = distance * clamped;
+      return squared(diff - distance) < radius2;
+    }
+    
     // return "a" for origin + distance * a
     rational intersection(const aabb &rhs) const {
       vec3 org = origin - rhs.get_center();

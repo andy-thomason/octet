@@ -22,4 +22,14 @@ vc2010/layer1/ipch
 vc2010/layer2/Debug
 vc2010/layer2/Release
 vc2010/layer2/ipch
+vc2010/layer2/DebugGeneric/
+vc2010/layer2/DebugOBB/
+vc2010/layer2/RealeaseObb/
+vc2010/layer2/TextFile1.txt
+vc2010/generic/Debug
+vc2010/generic/ipch
+vc2010/flow_cytometry/Debug
+vc2010/flow_cytometry/ipch
+vc2010/voxel_obb_test/Debug
+vc2010/voxel_obb_test/ipch
 

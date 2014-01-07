@@ -106,7 +106,7 @@ namespace octet {
       get_indices()->unlock();
       set_num_indices(6 * 6);
       set_num_vertices(4 * 6);
-      dump(app_utils::log("box\n"));
+      //dump(app_utils::log("box\n"));
     }
 
     void visit(visitor &v) {

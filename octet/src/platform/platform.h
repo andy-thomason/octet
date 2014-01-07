@@ -25,7 +25,10 @@
 #ifndef OCTET_OPENCL
   #define OCTET_OPENCL 0
 #endif
-#define OCTET_SSE 1
+
+#if defined(WIN32)
+  #define OCTET_SSE 1
+#endif
 
 // use <> to include from standard directories
 // use "" to include from our own project
@@ -42,26 +45,6 @@
 #include "../tinyxml/tinyxml.cpp"
 #include "../tinyxml/tinyxmlerror.cpp"
 #include "../tinyxml/tinyxmlparser.cpp"
-
-// this is a dummy class used to customise the placement new and delete
-struct dynarray_dummy_t {};
-
-// placement new operator, allows construction in-place at "place"
-void *operator new(size_t size, void *place, dynarray_dummy_t x) { return place; }
-
-// dummy placement delete operator, allows destruction at "place"
-void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
-
-// generate hungarian forms of types (abbreviations of variants of types)
-// eg. vec3_in is used for input args of type vec3
-#define OCTET_HUNGARIANS(name) \
-  typedef const name &name##_in; \
-  typedef name &name##_out; \
-  typedef name name##_ret; \
-  typedef const name *name##_pc; \
-  typedef name *name##_p; \
-  typedef const name &name##_rc; \
-  typedef name &name##_r;
 
 #include "../containers/allocator.h"
 #include "../containers/dictionary.h"
@@ -86,7 +69,7 @@ static char *get_sprintf_buffer() {
   #include "direct_show.h"
   #include "windows_specific.h"
   //#include "glut_specific.h"
-#elif defined(SN_TARGET_PSP2)
+#elif defined(OCTET_VITA)
   #include "vita_specific.h"
 #elif defined(__APPLE__)
   #include <unistd.h>
@@ -101,21 +84,8 @@ static char *get_sprintf_buffer() {
   #include "glut_specific.h"
 #endif
 
-#include "../math/scalar.h"
-#include "../math/rational.h"
-#include "../math/vec2.h"
-#include "../math/vec3.h"
-#include "../math/vec4.h"
-#include "../math/ivec3.h"
-#include "../math/ivec4.h"
-#include "../math/quat.h"
-#include "../math/mat4t.h"
-#include "../math/bvec2.h"
-#include "../math/bvec3.h"
-#include "../math/bvec4.h"
-#include "../math/aabb.h"
-#include "../math/ray.h"
-#include "../math/random.h"
+// math library
+#include "../math/math.h"
 
 // CG, GLSL, C++ compiler
 #include "../compiler/cpp_error.h"
@@ -182,6 +152,7 @@ static char *get_sprintf_buffer() {
 #include "../scene/mesh_box.h"
 #include "../scene/mesh_voxel_subcube.h"
 #include "../scene/mesh_voxels.h"
+#include "../scene/mesh_points.h"
 #include "../scene/wireframe.h"
 
 // high level helpers

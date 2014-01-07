@@ -52,6 +52,5 @@ namespace octet {
     int w() const { return v[3]; }
   };
 
-  OCTET_HUNGARIANS(ivec4)
 }
 

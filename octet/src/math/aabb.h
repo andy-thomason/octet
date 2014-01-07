@@ -156,6 +156,7 @@ namespace octet {
       vec3 da(dot(diff, ax), dot(diff, ay), dot(diff, az));
       vec3 db(dot(diff, bx), dot(diff, by), dot(diff, bz));
 
+      // axx * bxx + axy * bxy + axz * bxz
       vec3 r_x(dot(ax,bx), dot(ay,bx), dot(az,bx));
       vec3 r_y(dot(ax,by), dot(ay,by), dot(az,by));
       vec3 r_z(dot(ax,bz), dot(ay,bz), dot(az,bz));
@@ -185,7 +186,5 @@ namespace octet {
       */
     }
   };
-
-  OCTET_HUNGARIANS(aabb)
 }
 
