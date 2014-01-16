@@ -1,6 +1,5 @@
-#define USE_BULLET 1
 
-#if USE_BULLET
+#if OCTET_BULLET
   //#include "btBulletDynamicsCommon.h"
 
   #include "BulletCollision/BroadphaseCollision/btAxisSweep3.cpp"
@@ -117,4 +116,5 @@
 #endif
 
 #include "physics_world.h"
+
 

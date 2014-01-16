@@ -62,6 +62,13 @@ namespace octet {
     int x() const { return v[0]; }
     int y() const { return v[1]; }
     int z() const { return v[2]; }
+
+    // convert to a string
+    const char *toString(char *dest, size_t size) const
+    {
+      snprintf(dest, size, "[%08x, %08x, %08x]", v[0], v[1], v[2]);
+      return dest;
+    }
   };
 
   inline vec3::vec3(const ivec3 &rhs) {

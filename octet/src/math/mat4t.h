@@ -27,7 +27,17 @@ namespace octet {
     vec4 v[4];
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2012, 2013"; }
   public:
-    mat4t() {}
+    mat4t() {
+      OCTET_VEC4_CONST(v0, 1, 0, 0, 0)
+      OCTET_VEC4_CONST(v1, 0, 1, 0, 0)
+      OCTET_VEC4_CONST(v2, 0, 0, 1, 0)
+      OCTET_VEC4_CONST(v3, 0, 0, 0, 1)
+      v[0] = v0;
+      v[1] = v1;
+      v[2] = v2;
+      v[3] = v3;
+    }
+
     mat4t(const vec4 &x, const vec4 &y, const vec4 &z, const vec4 &w)
     {
       v[0] = x; v[1] = y; v[2] = z; v[3] = w;

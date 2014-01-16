@@ -17,7 +17,7 @@ namespace octet {
     };
 
     // The information we are serving. ie. the game data.
-    ref<resources> dict;
+    ref<resource_dict> dict;
 
     // client sessions active
     dynarray<session> sessions;
@@ -43,7 +43,7 @@ namespace octet {
       if (line0.size() < 3) return;
       if (line0[0] != "GET") return;
 
-      app_utils::log("http get from: %s\n", line0[1].c_str());
+      log("http get from: %s\n", line0[1].c_str());
 
       // /graph?operation=get_children&id=1
       dynarray<string> url;
@@ -65,7 +65,7 @@ namespace octet {
         } else if (lhsrhs[0] == "callback") {
           callback = lhsrhs[1];
         }
-        //app_utils::log("%s = %s\n", lhsrhs[0].c_str(), lhsrhs[1].c_str());
+        //log("%s = %s\n", lhsrhs[0].c_str(), lhsrhs[1].c_str());
       }
 
       if (!get_children) return;
@@ -102,13 +102,13 @@ namespace octet {
       send(s.client_socket, response_header.c_str(), response_header.size(), 0);
 
       for (unsigned i = 0; i != response.size(); ++i) {
-        app_utils::log("send: %s", response[i].c_str());
+        log("send: %s", response[i].c_str());
         send(s.client_socket, response[i].c_str(), response[i].size(), 0);
       }
     }
 
   public:
-    void init(resources *dict_) {
+    void init(resource_dict *dict_) {
       dict = dict_;
 
       // create a socket to listen for connections
@@ -139,7 +139,7 @@ namespace octet {
       // establish new sessions
       int client_socket = accept(listen_socket, 0, 0);
       if (client_socket >= 0) {
-        app_utils::log("http: new connection socket %d\n", client_socket);
+        log("http: new connection socket %d\n", client_socket);
         set_non_blocking(client_socket);
         session s;
         s.client_socket = client_socket;
@@ -151,11 +151,11 @@ namespace octet {
         session &s = sessions[i];
         int bytes = (int)recv(s.client_socket, &buf[0], (size_t)buf.size()-1, 0);
         if (bytes > 0) {
-          app_utils::log("http: recieved from %d\n", s.client_socket);
+          log("http: recieved from %d\n", s.client_socket);
           buf[bytes] = 0;
           parse_http_request(s, &buf[0]);
         } else if (bytes == 0) {
-          app_utils::log("http: close connection %d\n", s.client_socket);
+          log("http: close connection %d\n", s.client_socket);
           closesocket(s.client_socket); 
           sessions.erase(i);
         }

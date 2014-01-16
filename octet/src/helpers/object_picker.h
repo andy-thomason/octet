@@ -18,7 +18,7 @@ namespace octet {
       this->the_app = the_app;
     }
 
-    void update(scene *the_scene) {
+    void update(visual_scene *the_scene) {
       bool is_mouse_down = the_app->is_key_down(key_lmb);
       if (is_mouse_down) {
         int mx = 0, my = 0;
@@ -36,7 +36,7 @@ namespace octet {
         ray the_ray = cam->get_ray(x, y);
         //the_scene->add_debug_line(the_ray.get_start(), the_ray.get_end());
 
-        scene::cast_result res;
+        visual_scene::cast_result res;
         the_scene->cast_ray(res, the_ray);
         if (res.mi) {
           //printf("%s\n", res.depth.toString());

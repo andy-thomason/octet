@@ -22,46 +22,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// defines and configuration
-#include "../platform/configure.h"
-
-// data storage in containers
-#include "../containers/containers.h"
-
-// target specific support: Windows, Mac, Linux, PS Vita
-#include "../platform/machine_specific.h"
-
-// math library
-#include "../math/math.h"
-
-// CG, GLSL, C++ compiler
-#include "../compiler/compiler.h"
-
-// loaders (low dependency, so you can use them in other projects)
-#include "../loaders/loaders.h"
-
-// resource management
-#include "../resources/resources.h"
+#ifndef OCTET_SHADERS_INCLUDED
+#define OCTET_SHADERS_INCLUDED
 
 // shaders
-#include "../shaders/shaders.h"
+#include "../shaders/shader.h"
+#include "../shaders/color_shader.h"
+#include "../shaders/texture_shader.h"
+#include "../shaders/phong_shader.h"
+#include "../shaders/bump_shader.h"
 
-// physics
-#include "../physics/physics.h"
-
-// scene (layer2)
-#include "../scene/scene.h"
-
-// high level helpers
-#include "../helpers/mouse_ball.h"
-#include "../helpers/http_server.h"
-#include "../helpers/text_overlay.h"
-#include "../helpers/object_picker.h"
-
-// asset loaders
-#include "../loaders/collada_builder.h"
-
-// forward references
-#include "../resources/resources.inl"
-#include "../resources/mesh_builder.inl"
-
+#endif

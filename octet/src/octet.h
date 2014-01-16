@@ -23,45 +23,51 @@
 //
 
 // defines and configuration
-#include "../platform/configure.h"
+#include "platform/configure.h"
 
 // data storage in containers
-#include "../containers/containers.h"
+#include "containers/containers.h"
 
 // target specific support: Windows, Mac, Linux, PS Vita
-#include "../platform/machine_specific.h"
+#include "platform/machine_specific.h"
 
 // math library
-#include "../math/math.h"
+#include "math/math.h"
 
 // CG, GLSL, C++ compiler
-#include "../compiler/compiler.h"
+#include "compiler/compiler.h"
 
 // loaders (low dependency, so you can use them in other projects)
-#include "../loaders/loaders.h"
+#include "loaders/loaders.h"
+
+// xml library
+#include "tinyxml/tinystr.cpp"
+#include "tinyxml/tinyxml.cpp"
+#include "tinyxml/tinyxmlerror.cpp"
+#include "tinyxml/tinyxmlparser.cpp"
 
 // resource management
-#include "../resources/resources.h"
+#include "resources/resources.h"
 
 // shaders
-#include "../shaders/shaders.h"
+#include "shaders/shaders.h"
 
 // physics
-#include "../physics/physics.h"
+#include "physics/physics.h"
 
 // scene (layer2)
-#include "../scene/scene.h"
+#include "scene/scene.h"
 
 // high level helpers
-#include "../helpers/mouse_ball.h"
-#include "../helpers/http_server.h"
-#include "../helpers/text_overlay.h"
-#include "../helpers/object_picker.h"
+#include "helpers/mouse_ball.h"
+#include "helpers/http_server.h"
+#include "helpers/text_overlay.h"
+#include "helpers/object_picker.h"
 
 // asset loaders
-#include "../loaders/collada_builder.h"
+#include "loaders/collada_builder.h"
 
 // forward references
-#include "../resources/resources.inl"
-#include "../resources/mesh_builder.inl"
+#include "resources/resources.inl"
+#include "resources/mesh_builder.inl"
 

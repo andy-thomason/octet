@@ -95,7 +95,6 @@ namespace octet {
   public:
     // this is called when we construct the class
     engine(int argc, char **argv) : app(argc, argv), ball() {
-
       // test the c++ parser
       //parser.parse("int x = 1;");
     }
@@ -120,7 +119,7 @@ namespace octet {
       vc->close();*/
 
       // note that you can also drag and drop files onto an active octet window.
-      int selector = 0;
+      int selector = 8;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;
@@ -130,6 +129,7 @@ namespace octet {
         case 5: filename = "external/Arteria3d/ElvenMale/ElevenMaleKnight_blender.dae"; break;
         case 6: filename = "external/Arteria3d/arteria3d_tropicalpack/flowers/flower%202.dae"; break; 
         case 7: filename = "assets/plane.dae"; break;
+        case 8: filename = "external/Arteria3d/chilun-fail.dae"; break; 
       }
 
       //dynarray<uint8_t> buf;

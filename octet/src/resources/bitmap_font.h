@@ -182,7 +182,7 @@ private:
             char_map[u4(chars->id)] = chars++;
           }
           /*for (unsigned i = 0; i != char_map.size(); ++i) {
-            app_utils::log("%d %08x %p %d\n", i, char_map.key(i), char_map.value(i), char_map.get_index(char_map.key(i)));
+            log("%d %08x %p %d\n", i, char_map.key(i), char_map.value(i), char_map.get_index(char_map.key(i)));
           }*/
         } else if (*ptr == 5) {
           fkern = (const kern*)(ptr + 5);

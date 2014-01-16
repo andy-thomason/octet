@@ -22,46 +22,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// defines and configuration
-#include "../platform/configure.h"
+#ifndef OCTET_CONTAINERS_INCLUDED
+#define OCTET_CONTAINERS_INCLUDED
 
-// data storage in containers
-#include "../containers/containers.h"
+#include "../containers/allocator.h"
+#include "../containers/dictionary.h"
+#include "../containers/hash_map.h"
+#include "../containers/double_list.h"
+#include "../containers/dynarray.h"
+#include "../containers/string.h"
+#include "../containers/ptr.h"
+#include "../containers/ref.h"
+#include "../containers/bitset.h"
 
-// target specific support: Windows, Mac, Linux, PS Vita
-#include "../platform/machine_specific.h"
-
-// math library
-#include "../math/math.h"
-
-// CG, GLSL, C++ compiler
-#include "../compiler/compiler.h"
-
-// loaders (low dependency, so you can use them in other projects)
-#include "../loaders/loaders.h"
-
-// resource management
-#include "../resources/resources.h"
-
-// shaders
-#include "../shaders/shaders.h"
-
-// physics
-#include "../physics/physics.h"
-
-// scene (layer2)
-#include "../scene/scene.h"
-
-// high level helpers
-#include "../helpers/mouse_ball.h"
-#include "../helpers/http_server.h"
-#include "../helpers/text_overlay.h"
-#include "../helpers/object_picker.h"
-
-// asset loaders
-#include "../loaders/collada_builder.h"
-
-// forward references
-#include "../resources/resources.inl"
-#include "../resources/mesh_builder.inl"
-
+#endif

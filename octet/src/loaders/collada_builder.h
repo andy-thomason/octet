@@ -22,6 +22,10 @@ namespace octet {
   public:
 
   private:
+    // turn this on to debug the file as it loads
+    // 0 = none, 1 = summary, 2 = details
+    enum { debug = 2 };
+
     TiXmlDocument doc;
     string doc_path;
     dictionary<TiXmlElement *, allocator> ids;
@@ -361,7 +365,7 @@ namespace octet {
     }
 
     // get a texture or a solid colour
-    param *get_param(resources &dict, TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const vec4 &deflt) {
+    param *get_param(resource_dict &dict, TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const vec4 &deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *color = child(section, "color");
       TiXmlElement *texture = child(section, "texture");
@@ -379,7 +383,7 @@ namespace octet {
             (int)(temp_floats[0]*255.0f+0.5f), (int)(temp_floats[1]*255.0f+0.5f),
             (int)(temp_floats[2]*255.0f+0.5f), (int)(temp_floats[3]*255.0f+0.5f)
           );
-          return resources::get_texture_handle(GL_RGBA, name);
+          return resource_dict::get_texture_handle(GL_RGBA, name);
         }*/
       } else if (texture) {
         // todo: handle multiple texcoords
@@ -397,10 +401,10 @@ namespace octet {
         if (url_attr) {
           string new_path;
           new_path.format("%s%s", doc_path.c_str(), url_attr);
-          return resources::get_texture_handle(GL_RGBA, new_path);
+          return resource_dict::get_texture_handle(GL_RGBA, new_path);
         }*/
       }
-      //return resources::get_texture_handle(GL_RGBA, deflt);
+      //return resource_dict::get_texture_handle(GL_RGBA, deflt);
       return new param(deflt);
     }
 
@@ -418,7 +422,7 @@ namespace octet {
     }
 
     // add all the materials from the collada file to the resources collection
-    void add_materials(resources &dict) {
+    void add_materials(resource_dict &dict) {
       TiXmlElement *lib_mat = child(doc.RootElement(), "library_materials");
 
       if (!dict.has_resource("default_material")) {
@@ -461,7 +465,7 @@ namespace octet {
     }
 
     // add geometry and skins from the collada file to the resources collection
-    void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, resources &dict, scene &s) {
+    void add_mesh_instances(TiXmlElement *technique_common, const char *url, scene_node *node, skeleton *skel, resource_dict &dict, visual_scene &s) {
       if (!url) return;
 
       TiXmlElement *instance = child(technique_common, "instance_material");
@@ -480,14 +484,16 @@ namespace octet {
             mesh_url = new_url.c_str();
           }
 
-          app_utils::log("add mesh instance %s\n", mesh_url);
+          if (debug > 0 ) {
+            log("add mesh instance %s\n", mesh_url);
+          }
 
           mesh *msh = dict.get_mesh(mesh_url);
           if (msh) {
             mesh_instance *mi = new mesh_instance(node, msh, mat, skel);
             s.add_mesh_instance(mi);
           } else {
-            app_utils::log("warning: missing mesh %s\n", mesh_url);
+            log("warning: missing mesh %s\n", mesh_url);
           }
         }
       } else {
@@ -501,7 +507,7 @@ namespace octet {
     }
 
     // add an <instance_geometry> mesh instance
-    void add_instance_geometry(TiXmlElement *element, scene_node *node, resources &dict, scene &s) {
+    void add_instance_geometry(TiXmlElement *element, scene_node *node, resource_dict &dict, visual_scene &s) {
       const char *url = element->Attribute("url");
       url += url[0] == '#';
       TiXmlElement *bind_material = child(element, "bind_material");
@@ -511,7 +517,7 @@ namespace octet {
     }
 
     // add an <instance_controller> skin instance
-    void add_instance_controller(TiXmlElement *element, scene_node *node, resources &dict, scene &s) {
+    void add_instance_controller(TiXmlElement *element, scene_node *node, resource_dict &dict, visual_scene &s) {
       const char *controller_url = attr(element, "url");
       TiXmlElement *bind_material = child(element, "bind_material");
       TiXmlElement *technique_common = child(bind_material, "technique_common");
@@ -564,7 +570,7 @@ namespace octet {
     }
 
     // add a camera to the scene
-    void add_instance_camera(TiXmlElement *elem, scene_node *node, resources &dict, scene &s) {
+    void add_instance_camera(TiXmlElement *elem, scene_node *node, resource_dict &dict, visual_scene &s) {
       const char *url = elem->Attribute("url");
       TiXmlElement *cam = find_id(url);
       if (!cam) return;
@@ -594,7 +600,7 @@ namespace octet {
     }
 
     // add a light to the scene
-    void add_instance_light(TiXmlElement *elem, scene_node *node, resources &dict, scene &s) {
+    void add_instance_light(TiXmlElement *elem, scene_node *node, resource_dict &dict, visual_scene &s) {
       const char *url = elem->Attribute("url");
       TiXmlElement *light = find_id(url);
       if (!light) return;
@@ -628,7 +634,7 @@ namespace octet {
     }
 
     // add a geometry element to the list of mesh states
-    void add_geometry(resources &dict) {
+    void add_geometry(resource_dict &dict) {
       TiXmlElement *lib_geom = doc.RootElement()->FirstChildElement("library_geometries");
       if (!lib_geom) return;
 
@@ -649,7 +655,7 @@ namespace octet {
     }
 
     // add a geometry element to the list of mesh states
-    void add_controllers(resources &dict) {
+    void add_controllers(resource_dict &dict) {
       TiXmlElement *lib_ctrl = doc.RootElement()->FirstChildElement("library_controllers");
       if (!lib_ctrl) return;
 
@@ -722,7 +728,7 @@ namespace octet {
     }
 
     // add <library_images> to the scene
-    void add_images(resources &dict) {
+    void add_images(resource_dict &dict) {
       TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_images");
       if (!lib_anim) return;
 
@@ -739,7 +745,7 @@ namespace octet {
 
     // add <library_animations> to the scene
     // collada animations range from sensible (array of matrices) to crazy (complex rotations and translations)
-    void add_animations(resources &dict) {
+    void add_animations(resource_dict &dict) {
       TiXmlElement *lib_anim = doc.RootElement()->FirstChildElement("library_animations");
       if (!lib_anim) return;
 
@@ -747,7 +753,7 @@ namespace octet {
         animation *anim = new animation();
         const char *id = attr(anim_elem, "id");
         dict.set_resource(id, anim);
-        app_utils::log("animation %s\n", id);
+        if (debug > 0) log("animation %s\n", id);
         for (TiXmlElement *channel_elem = child(anim_elem, "channel"); channel_elem != NULL; channel_elem = sibling(channel_elem, "channel")) {
           const char *target = attr(channel_elem, "target");
           string node_name = target;
@@ -769,7 +775,7 @@ namespace octet {
           atom_t sub_target_sid = app_utils::get_atom(sub_target_name);
           atom_t component_sid = app_utils::get_atom(component_name);
           
-          app_utils::log("  channel target %s %s %s\n", node_name.c_str(), sub_target_name.c_str(), component_name.c_str());
+          if (debug > 0) log("  channel target %s %s %s\n", node_name.c_str(), sub_target_name.c_str(), component_name.c_str());
           TiXmlElement *sampler_elem = find_id(attr(channel_elem, "source"));
           if (sampler_elem) {
             dynarray<float> times;
@@ -803,7 +809,7 @@ namespace octet {
     }
 
     // build the scene_node heirachy
-    void build_heirachy(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, TiXmlElement *scene_element, resources &dict, scene &s) {
+    void build_heirachy(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, TiXmlElement *scene_element, resource_dict &dict, visual_scene &s) {
       // create a stack to avoid recursion (a bad thing in games)
       dynarray<TiXmlElement *> stack;
       dynarray<scene_node *> node_stack;
@@ -824,7 +830,7 @@ namespace octet {
           const char *sid = attr(node_elem, "sid");
           const char *id = attr(node_elem, "id");
           scene_node *new_node = new scene_node(nodeToParent, app_utils::get_atom(sid));
-          app_utils::log("add scene_node id=%s sid=%s\n", id, sid);
+          if (debug > 0) log("add scene_node id=%s sid=%s\n", id, sid);
           dict.set_resource(id, new_node);
           parent->add_child(new_node);
           stack.push_back(node_elem);
@@ -838,7 +844,7 @@ namespace octet {
     }
 
     // add matrices and instances
-    void build_matrices(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, resources &dict, scene &s) {
+    void build_matrices(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, resource_dict &dict, visual_scene &s) {
       for (int ni = 0; ni != node_elems.size(); ++ni) {
         TiXmlElement *node_elem = node_elems[ni];
         scene_node *node = nodes[ni];
@@ -879,7 +885,7 @@ namespace octet {
     }
 
     // add instances
-    void build_instances(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, resources &dict, scene &s) {
+    void build_instances(dynarray<TiXmlElement *> &node_elems, dynarray<scene_node *> &nodes, resource_dict &dict, visual_scene &s) {
       for (int ni = 0; ni != node_elems.size(); ++ni) {
         TiXmlElement *node_elem = node_elems[ni];
         scene_node *node = nodes[ni];
@@ -943,7 +949,7 @@ namespace octet {
     }
 
     // get triangles from a trilist or polylist
-    void get_mesh_component(mesh *mesh, const char *id, TiXmlElement *mesh_child, skin_state *skinst, resources &dict) {
+    void get_mesh_component(mesh *mesh, const char *id, TiXmlElement *mesh_child, skin_state *skinst, resource_dict &dict) {
       TiXmlElement *pelem = child(mesh_child, "p");
 
       if (!pelem) {
@@ -961,7 +967,11 @@ namespace octet {
         new_url.format("%s+%s", id, symbol);
         mesh_url = new_url;
       }
-      app_utils::log("created mesh %s\n", id);
+
+      if (debug > 0 ) {
+        log("created mesh %s\n", id);
+      }
+
       dict.set_resource(mesh_url, mesh);
 
       parse_input_state state;
@@ -1040,7 +1050,7 @@ namespace octet {
         for (unsigned i = 0; i != num_vertices; ++i) {
           unsigned index = state.p[i * state.input_stride + state.vertex_input_offset];
           if (0) {
-            app_utils::log("i%d\n", index);
+            log("i%d\n", index);
           }
           for (int j = 0; j != blendindices_stride; ++j) {
             state.vertices[state.attr_stride * i + blendindices_offset + j] = (float)state.skinst->gl_indices[index * blendindices_stride + j];
@@ -1072,40 +1082,16 @@ namespace octet {
       
       unsigned isize = state.indices.size() * sizeof(state.indices[0]);
       unsigned vsize = state.vertices.size() * sizeof(state.vertices[0]);
-      
-      unsigned pos_slot = mesh->get_slot(attribute_pos);
-      unsigned offset = mesh->get_offset(pos_slot);
-      if (mesh->get_size(pos_slot) == 3 && num_vertices != 0) {
-        //unsigned stride = state.attr_stride * 4;
-        float *vtx = (float*)((unsigned char*)&state.vertices[0] + offset);
-        float min[3] = { vtx[0], vtx[1], vtx[2] };
-        float max[3] = { vtx[0], vtx[1], vtx[2] };
-        vtx += state.attr_stride;
-        for (unsigned i = 1; i < num_vertices; ++i) {
-          min[0] = min[0] < vtx[0] ? min[0] : vtx[0];
-          max[0] = max[0] > vtx[0] ? max[0] : vtx[0];
-          min[1] = min[1] < vtx[1] ? min[1] : vtx[1];
-          max[1] = max[1] > vtx[1] ? max[1] : vtx[1];
-          min[2] = min[2] < vtx[2] ? min[2] : vtx[2];
-          max[2] = max[2] > vtx[2] ? max[2] : vtx[2];
-          vtx += state.attr_stride;
-        }
-        //printf("%s\n", id);
-        //printf("%f %f %f\n", min[0], min[1], min[2]);
-        //printf("%f %f %f\n", max[0], max[1], max[2]);
-        vec3 vmin(min[0], min[1], min[2]);
-        vec3 vmax(max[0], max[1], max[2]);
-        mesh->set_aabb(aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f));
+
+      if (debug > 0) {
+        log("mesh component loaded with %d indices and %d floats for vertices\n", state.indices.size(), state.vertices.size());
       }
 
       mesh->allocate(vsize, isize);
       mesh->assign(vsize, isize, (unsigned char*)&state.vertices[0], (unsigned char*)&state.indices[0]);
       mesh->set_params(state.attr_stride * 4, num_indices, num_vertices, GL_TRIANGLES, GL_UNSIGNED_INT);
-      if (0) {
-        FILE *file = app_utils::log("mesh skinst=%p\n", skinst);
-        mesh->dump(file);
-        fflush(file);
-      }
+      mesh->calc_aabb();
+      if (debug > 1) mesh->dump(log("mesh\n"));
     }
 
     // get blend weights and matrices from a skin
@@ -1179,7 +1165,7 @@ namespace octet {
         start += vc;
       }
       if (0) {
-        FILE *f = app_utils::log("raw weights & indices\n");
+        FILE *f = log("raw weights & indices\n");
         for (int i = 0; i != skin->raw_indices.size(); ++i) {
           fprintf(f, "ri %d %d\n", i, skin->raw_indices[i]);
         }
@@ -1204,7 +1190,7 @@ namespace octet {
     }
 
     // add all the scenes from the collada file to the resources collection
-    void add_scenes(resources  &dict) {
+    void add_scenes(resource_dict &dict) {
       TiXmlElement *lib = doc.RootElement()->FirstChildElement("library_visual_scenes");
 
       if (!lib) return;
@@ -1212,7 +1198,7 @@ namespace octet {
       for (TiXmlElement *elem = lib->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {
         dynarray<TiXmlElement *> node_elems;
         dynarray<scene_node *> nodes;
-        scene *scn = new scene();
+        visual_scene *scn = new visual_scene();
         dict.set_resource(attr(elem, "id"), scn);
         build_heirachy(node_elems, nodes, elem, dict, *scn);
         build_matrices(node_elems, nodes, dict, *scn);
@@ -1241,7 +1227,7 @@ namespace octet {
     }
 
     // once loaded, use this to access the first component in the mesh
-    void get_mesh(mesh &s, const char *id, resources &dict) {
+    void get_mesh(mesh &s, const char *id, resource_dict &dict) {
       TiXmlElement *geometry = find_id(id);
       s.init();
 
@@ -1275,7 +1261,7 @@ namespace octet {
     }
 
     // extract resources from the collada file into a collection.
-    void get_resources(resources &dict) {
+    void get_resources(resource_dict &dict) {
       add_images(dict);
 
       add_materials(dict);

@@ -4,7 +4,7 @@
 //
 // Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Platform specific includes
+// Machine specific includes
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -22,46 +22,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// defines and configuration
-#include "../platform/configure.h"
 
-// data storage in containers
-#include "../containers/containers.h"
+static char *get_sprintf_buffer() {
+  static int i;
+  static char tmp[4][256];
+  return tmp[i++ & 3];
+}
 
-// target specific support: Windows, Mac, Linux, PS Vita
-#include "../platform/machine_specific.h"
-
-// math library
-#include "../math/math.h"
-
-// CG, GLSL, C++ compiler
-#include "../compiler/compiler.h"
-
-// loaders (low dependency, so you can use them in other projects)
-#include "../loaders/loaders.h"
-
-// resource management
-#include "../resources/resources.h"
-
-// shaders
-#include "../shaders/shaders.h"
-
-// physics
-#include "../physics/physics.h"
-
-// scene (layer2)
-#include "../scene/scene.h"
-
-// high level helpers
-#include "../helpers/mouse_ball.h"
-#include "../helpers/http_server.h"
-#include "../helpers/text_overlay.h"
-#include "../helpers/object_picker.h"
-
-// asset loaders
-#include "../loaders/collada_builder.h"
-
-// forward references
-#include "../resources/resources.inl"
-#include "../resources/mesh_builder.inl"
+#if defined(__GENERIC__)
+  #include "generic.h"
+#elif defined(WIN32)
+  #include "direct_show.h"
+  #include "windows_specific.h"
+  //#include "glut_specific.h"
+#elif defined(OCTET_VITA)
+  #include "../../external/src/vita_specific.h"
+#elif defined(__APPLE__)
+  #include <unistd.h>
+  #include <sys/socket.h>
+  #include <sys/ioctl.h>
+  #include <fcntl.h>
+  #include <netinet/in.h>
+  #define OCTET_HOT __attribute__( ( always_inline ) )
+  #define ioctlsocket ioctl
+  #define closesocket close
+  #include "video_capture.h"
+  #include "glut_specific.h"
+#endif
 

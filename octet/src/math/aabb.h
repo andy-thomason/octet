@@ -14,39 +14,46 @@ namespace octet {
     vec3 center;
     vec3 half_extent;
   public:
+    // Default constructor: an empty bounding box
     aabb() {
       center = vec3(0, 0, 0);
       half_extent = vec3(0, 0, 0);
     }
 
+    // Constructor, given a center and size
     aabb(const vec3 &center_, const vec3 &half_extent_) {
       center = center_;
       half_extent = half_extent_;
     }
 
-    // find the union of two axis aligned bounding boxes
+    // Find the union of two axis aligned bounding boxes
     aabb get_union(const aabb &rhs) {
       vec3 min = get_min().min(rhs.get_min());
       vec3 max = get_max().max(rhs.get_max());
       return aabb(( min + max ) * 0.5f, ( max - min ) * 0.5f);
     }
 
+    // Get least value of x, y and z in the object
     const vec3 get_min() const {
       return center - half_extent;
     }
 
+    // Get highest value of x, y and z in the object
     const vec3 get_max() const {
       return center + half_extent;
     }
 
+    // Get the center of the bounding box
     const vec3 get_center() const {
       return center;
     }
 
+    // Get the distance from the center to the edge of the box in x, y and z
     const vec3 get_half_extent() const {
       return half_extent;
     }
 
+    // Get a transformed object, give a matrix "mat"
     aabb get_transform(const mat4t &mat) const {
       vec3 half =
         half_extent.x() * abs(mat.x().xyz()) +
@@ -56,46 +63,50 @@ namespace octet {
       return aabb((center.xyz1() * mat).xyz(), half);
     }
 
+    // Get a string representation of the object.
+    // Requires a buffer (dest, len)
     const char *toString(char *dest, size_t len) const {
-      static char tmp[64];
-      static char tmp2[64];
-      snprintf(dest, len, "[%s, %s]", center.toString(tmp, sizeof(tmp)), half_extent.toString(tmp2, sizeof(tmp2)));
+      char tmp[2][32];
+      snprintf(dest, len, "[%s, %s]", center.toString(tmp[0], sizeof(tmp[0])), half_extent.toString(tmp[1], sizeof(tmp[1])));
       return dest;
     }
 
+    // Return true if this point is in the object.
     bool intersects(const vec3 &rhs) const {
       vec3 diff = abs(center - rhs);
       vec3 limit = half_extent;
       return all(diff <= limit);
     }
 
+    // return true if this AABB intersects the object
     bool intersects(const aabb &rhs) const {
       vec3 diff = abs(center - rhs.center);
       vec3 limit = half_extent + rhs.half_extent;
       return all(diff <= limit);
     }
 
-    // obb collision test
-    // http://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf
-    // note: this assumes that mxa and mxb are orthonormal.
+    // Obb collision test.
+    // Deprecated.
+    // <a href="http://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf">based on this</a>
+    // Note: this assumes that mxa and mxb are orthonormal.
     // If the matrices have any scale, this will not work.
     // This is equivalent to constructing the minkowski difference
-    // ie. add the first cube to all the corners of the second making 30 faces
+    // ie. add the first cube to all the corners of the second making 30 faces.
     bool intersects_old(const aabb &b, const mat4t &mxa, const mat4t &mxb) const {
       const aabb &a = *this;
-      vec3 ca = center * mxa;
+      vec3 ca = a.center * mxa;
       vec3 cb = b.center * mxb;
       vec3 diff = cb - ca;
 
       const vec3 &ax = mxa.x().xyz(), &ay = mxa.y().xyz(), &az = mxa.z().xyz();
       const vec3 &bx = mxb.x().xyz(), &by = mxb.y().xyz(), &bz = mxb.z().xyz();
-      const vec3 &ah = half_extent;
-      const vec3 &bh = b.half_extent;
+      //const vec3 &ah = a.half_extent;
+      //const vec3 &bh = b.half_extent;
 
       float dax = dot(diff, ax), day = dot(diff, ay), daz = dot(diff, az);
       float dbx = dot(diff, bx), dby = dot(diff, by), dbz = dot(diff, bz);
 
-      float ahx = half_extent.x(), ahy = half_extent.y(), ahz = half_extent.z();
+      float ahx = a.half_extent.x(), ahy = a.half_extent.y(), ahz = a.half_extent.z();
       float bhx = b.half_extent.x(), bhy = b.half_extent.y(), bhz = b.half_extent.z();
 
       float rxx = dot(ax,bx), rxy = dot(ax,by), rxz = dot(ax,bz);
@@ -142,15 +153,21 @@ namespace octet {
       return (t1 & t2 & t3 & t4 & t5 & t6 & t7 & t8 & t9 & t10 & t11 & t12 & t13 & t14 & t15) < 0;
     }
 
+    // Obb collision test.
+    // <a href="http://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf">based on this</a>
+    // Note: this assumes that mxa and mxb are orthonormal.
+    // If the matrices have any scale, this will not work.
+    // This is equivalent to constructing the minkowski difference
+    // ie. add the first cube to all the corners of the second making 30 faces.
     bool intersects(const aabb &b, const mat4t &mxa, const mat4t &mxb) const {
       const aabb &a = *this;
-      vec3 ca = center * mxa;
+      vec3 ca = a.center * mxa;
       vec3 cb = b.center * mxb;
       vec3 diff = cb - ca;
 
       const vec3 &ax = mxa.x().xyz(), &ay = mxa.y().xyz(), &az = mxa.z().xyz();
       const vec3 &bx = mxb.x().xyz(), &by = mxb.y().xyz(), &bz = mxb.z().xyz();
-      vec3 ah = half_extent;
+      vec3 ah = a.half_extent;
       vec3 bh = b.half_extent;
 
       vec3 da(dot(diff, ax), dot(diff, ay), dot(diff, az));

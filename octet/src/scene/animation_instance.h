@@ -53,10 +53,10 @@ namespace octet {
         }
       }
 
-      //app_utils::log("update %f\n", delta_time);
+      //log("update %f\n", delta_time);
       if (!is_paused) {
         time += delta_time;
-        //app_utils::log("..update %f\n", time);
+        //log("..update %f\n", time);
         if (time >= anim->get_end_time()) {
           if (is_looping) {
             time -= anim->get_end_time();

@@ -44,7 +44,7 @@ namespace octet {
 
     mouse_ball ball;
 
-    ref<scene> app_scene;
+    ref<visual_scene> app_scene;
     ref<scene_node> nodea;
     ref<scene_node> nodeb;
     ref<mesh_instance> mia;
@@ -61,29 +61,25 @@ namespace octet {
       object_shader.init(false);
       skin_shader.init(true);
 
-      app_scene =  new scene();
+      app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
       nodea = app_scene->add_scene_node();
       nodeb = app_scene->add_scene_node();
-      nodea->access_nodeToParent().translate(-2, 0, 0);
-      nodeb->access_nodeToParent().translate(3, 0, 0);
+      //nodea->access_nodeToParent().translate(-2, 0, 0);
+      //nodeb->access_nodeToParent().translate(3, 0, 0);
       material *mata = new material(vec4(1, 0, 0, 1));
       material *matb = new material(vec4(0, 0, 1, 1));
 
       mat4t mx;
       mx.loadIdentity();
       mesh_voxels *mesha = new mesh_voxels(1.0f/8);
-      //mesha->draw(mx, sphere(vec3(8, 8, 8), 16));
-      //mesha->box(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
-      deathstar ds;
-      mesha->draw(mx, sphere(vec3(16, 0, 0), 8));
+      mesha->draw(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
       mesha->update();
-      mesha->dump(app_utils::log("mesha\n"));
-      //mesha->get_subcube(0, 0, 0)->test_update_lod();
+
       mesh_voxels *meshb = new mesh_voxels(1.0f/8);
-      meshb->draw(mx, sphere(vec3(-16, 0, 0), 8));
-      //meshb->draw(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
+      meshb->draw(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
       meshb->update();
+
       mia = app_scene->add_mesh_instance(new mesh_instance(nodea, mesha, mata));
       mib = app_scene->add_mesh_instance(new mesh_instance(nodeb, meshb, matb));
 
@@ -118,12 +114,12 @@ namespace octet {
         const aabb &aabbb = mib->get_mesh()->get_aabb();
         const mat4t &mxa = mia->get_node()->get_nodeToParent();
         const mat4t &mxb = mib->get_node()->get_nodeToParent();
-        aabba.intersects_old(aabbb, mxa, mxb);
-        volatile bool b = mesha->intersects(*meshb, mxa, mxb);
+        //aabba.intersects_old(aabbb, mxa, mxb);
+        //volatile bool b = mesha->intersects(*meshb, mxa, mxb);
         //printf("\n");
 
-        nodea->access_nodeToParent().rotateZ(1);
-        nodea->access_nodeToParent().rotateX(1);
+        //nodea->access_nodeToParent().rotateZ(1);
+        //nodea->access_nodeToParent().rotateX(1);
       }
     }
   };

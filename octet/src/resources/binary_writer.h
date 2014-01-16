@@ -15,30 +15,30 @@ namespace octet {
     FILE *file;
 
     void write(const uint8_t *src, unsigned bytes) {
-      //if (debug) app_utils::log("%*swrite %08x bytes\n", get_depth()*2, "", bytes);
+      //if (debug) log("%*swrite %08x bytes\n", get_depth()*2, "", bytes);
       fwrite(src, 1, bytes, file);
     }
 
     void write_int(int value) {
-      if (debug) app_utils::log("%*swrite %08x\n", get_depth()*2, "", value);
+      if (debug) log("%*swrite %08x\n", get_depth()*2, "", value);
       uint8_t b[4] = { (uint8_t)value, (uint8_t)(value >> 8), (uint8_t)(value >> 16), (uint8_t)(value >> 24) };
       write(b, 4);
     }
 
     void write_atom(atom_t value) {
-      if (debug) app_utils::log("%*swrite %08x (%s)\n", get_depth()*2, "", value, app_utils::get_atom_name((atom_t)value));
+      if (debug) log("%*swrite %08x (%s)\n", get_depth()*2, "", value, app_utils::get_atom_name((atom_t)value));
       uint8_t b[4] = { (uint8_t)value, (uint8_t)(value >> 8), (uint8_t)(value >> 16), (uint8_t)(value >> 24) };
       write(b, 4);
     }
 
     void write_string(const char *value) {
-      if (debug) app_utils::log("%*swrite %s\n", get_depth()*2, "", value);
+      if (debug) log("%*swrite %s\n", get_depth()*2, "", value);
       write((const uint8_t*)value, (int)strlen(value)+1);
     }
 
   public:
     binary_writer(FILE *file) {
-      if (debug) app_utils::log("%*sbinary_writer\n", get_depth()*2, "");
+      if (debug) log("%*sbinary_writer\n", get_depth()*2, "");
       next_id = 1;
       this->file = file;
 
@@ -50,7 +50,7 @@ namespace octet {
 
     // dictionary entry
     bool begin_ref(void *ref, const char *sid, atom_t type) {
-      if (debug) app_utils::log("%*sbegin_ref %p %s %s\n", get_depth()*2, "", ref, sid, app_utils::get_atom_name(type));
+      if (debug) log("%*sbegin_ref %p %s %s\n", get_depth()*2, "", ref, sid, app_utils::get_atom_name(type));
       if (ref == NULL) {
         write_atom(atom_);
         write_string(sid);
@@ -74,7 +74,7 @@ namespace octet {
 
     // ordinary ref
     bool begin_ref(void *ref, atom_t sid, atom_t type) {
-      if (debug) app_utils::log("%*sbegin_ref %p %s %s\n", get_depth()*2, "", ref, app_utils::get_atom_name(sid), app_utils::get_atom_name(type));
+      if (debug) log("%*sbegin_ref %p %s %s\n", get_depth()*2, "", ref, app_utils::get_atom_name(sid), app_utils::get_atom_name(type));
       if (ref == NULL) {
         write_atom(atom_);
         write_atom(sid);
@@ -98,7 +98,7 @@ namespace octet {
 
     // array entry
     bool begin_ref(void *ref, int index, atom_t type) {
-      if (debug) app_utils::log("%*sbegin_ref %p %d %s\n", get_depth()*2, "", ref, index, app_utils::get_atom_name(type));
+      if (debug) log("%*sbegin_ref %p %d %s\n", get_depth()*2, "", ref, index, app_utils::get_atom_name(type));
       if (ref == NULL) {
         write_atom(atom_);
         write_int(0);
@@ -118,7 +118,7 @@ namespace octet {
     }
 
     void end_ref() {
-      if (debug) app_utils::log("%*send_ref\n", get_depth()*2, "");
+      if (debug) log("%*send_ref\n", get_depth()*2, "");
       write_atom(atom_end_ref);
     }
 
@@ -132,7 +132,7 @@ namespace octet {
     }
 
     bool begin_refs(atom_t sid, int &size, bool is_dict) {
-      if (debug) app_utils::log("%*sbegin_refs sid=%s size=%d is_dict=%d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size, is_dict);
+      if (debug) log("%*sbegin_refs sid=%s size=%d is_dict=%d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size, is_dict);
       write_atom(sid);
       write_atom(atom_begin_refs);
       write_int(size);
@@ -140,7 +140,7 @@ namespace octet {
     }
 
     void end_refs(bool is_dict) {
-      if (debug) app_utils::log("%*send_refs\n", get_depth()*2, "");
+      if (debug) log("%*send_refs\n", get_depth()*2, "");
       //write_atom(atom_end_refs);
     }
 

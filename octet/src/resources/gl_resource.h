@@ -95,7 +95,7 @@ namespace octet {
 
     const void *lock_read_only() const {
       return (const void*)&bytes[0];
-      glBindBuffer(target, buffer);
+      //glBindBuffer(target, buffer);
       //return glMapBufferRange(target, 0, size, GL_MAP_READ_BIT);
     }
 

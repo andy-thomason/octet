@@ -16,7 +16,7 @@ namespace octet {
     char tmp[256];
 
     void read(uint8_t *src, unsigned bytes) {
-      //if (debug) app_utils::log("read %08x bytes\n", bytes);
+      //if (debug) log("read %08x bytes\n", bytes);
       fread(src, 1, bytes, file);
     }
 
@@ -24,7 +24,7 @@ namespace octet {
       uint8_t b[4];
       read(b, 4);
       int value = b[0] + (b[1] << 8) + (b[2] << 16) + (b[3] << 24);
-      if (debug) app_utils::log("%*sread %08x\n", get_depth()*2, "", value);
+      if (debug) log("%*sread %08x\n", get_depth()*2, "", value);
       return value;
     }
 
@@ -32,7 +32,7 @@ namespace octet {
       uint8_t b[4];
       read(b, 4);
       int value = b[0] + (b[1] << 8) + (b[2] << 16) + (b[3] << 24);
-      if (debug) app_utils::log("%*sread %08x (%s)\n", get_depth()*2, "", value, app_utils::get_atom_name((atom_t)value));
+      if (debug) log("%*sread %08x (%s)\n", get_depth()*2, "", value, app_utils::get_atom_name((atom_t)value));
       return (atom_t)value;
     }
 
@@ -44,16 +44,16 @@ namespace octet {
         if (c == 0) break;
         nchars += nchars != sizeof(tmp)-1;
       }
-      if (debug) app_utils::log("%*sread %s\n", get_depth()*2, "", tmp);
+      if (debug) log("%*sread %s\n", get_depth()*2, "", tmp);
       return tmp;
     }
 
     bool check_atom(atom_t sid) {
       if (!get_error()) {
         atom_t test = read_atom();
-        app_utils::log("%*scheck_atom %s\n", get_depth()*2, "", app_utils::get_atom_name(sid));
+        log("%*scheck_atom %s\n", get_depth()*2, "", app_utils::get_atom_name(sid));
         if (test != sid) {
-          app_utils::log("error: expected %s\n", app_utils::get_atom_name(sid));
+          log("error: expected %s\n", app_utils::get_atom_name(sid));
           set_error(true);
         }
       }
@@ -63,9 +63,9 @@ namespace octet {
     bool check_size(unsigned size) {
       if (!get_error()) {
         int test = read_int();
-        app_utils::log("%*scheck_size %d\n", get_depth()*2, "", size);
+        log("%*scheck_size %d\n", get_depth()*2, "", size);
         if (test != (int)size) {
-          app_utils::log("error: expected %d bytes\n", size);
+          log("error: expected %d bytes\n", size);
           set_error(true);
         }
       }
@@ -73,11 +73,11 @@ namespace octet {
     }
 
     void *get_ref(int id) {
-      app_utils::log("%*sget_ref %d/%d\n", get_depth()*2, "", id, id_to_ref.size());
+      log("%*sget_ref %d/%d\n", get_depth()*2, "", id, id_to_ref.size());
       if (id == (int)id_to_ref.size()) {
         return NULL;
       } else if (id > (int)id_to_ref.size()) {
-        app_utils::log("error: id overflow\n");
+        log("error: id overflow\n");
         set_error(true);
         return NULL;
       } else {
@@ -87,7 +87,7 @@ namespace octet {
 
   public:
     binary_reader(FILE *file) {
-      if (debug) app_utils::log("binary_reader\n");
+      if (debug) log("binary_reader\n");
       id_to_ref.reserve(256);
       id_to_ref.push_back(NULL);
 
@@ -129,17 +129,17 @@ namespace octet {
       sid = read_atom();
       int id = read_int();
       ref = get_ref(id);
-      if (debug) app_utils::log("%*sbegin_read_ref %p %s %s %d\n", get_depth()*2, "", ref, app_utils::get_atom_name(sid), app_utils::get_atom_name(type), id);
+      if (debug) log("%*sbegin_read_ref %p %s %s %d\n", get_depth()*2, "", ref, app_utils::get_atom_name(sid), app_utils::get_atom_name(type), id);
       return !get_error();
     }
 
     // read an array reference
     bool begin_read_ref(void *&ref, int index, atom_t &type) {
-      if (debug) app_utils::log("begin_read_ref\n");
+      if (debug) log("begin_read_ref\n");
       type = read_atom();
       int id = read_int();
       ref = get_ref(id);
-      if (debug) app_utils::log("%*sbegin_read_ref %p %d %s\n", get_depth()*2, "", ref, index, app_utils::get_atom_name(type), id);
+      if (debug) log("%*sbegin_read_ref %p %d %s\n", get_depth()*2, "", ref, index, app_utils::get_atom_name(type), id);
       return !get_error();
     }
 
@@ -147,7 +147,7 @@ namespace octet {
     bool begin_read_ref(void *&ref, const char *&sid, atom_t &type) {
       type = read_atom();
       sid = read_string();
-      if (debug) app_utils::log("%*sbegin_read_ref %s\n", get_depth()*2, "", sid);
+      if (debug) log("%*sbegin_read_ref %s\n", get_depth()*2, "", sid);
       int id = read_int();
       ref = get_ref(id);
       return !get_error();
@@ -180,13 +180,13 @@ namespace octet {
 
     // called after visiting a new object
     void end_ref() {
-      if (debug) app_utils::log("%*send_ref\n", get_depth()*2, "");
+      if (debug) log("%*send_ref\n", get_depth()*2, "");
       check_atom(atom_end_ref);
     }
 
     // called before reading an array or dictionary
     bool begin_refs(atom_t sid, int &size, bool is_dict) {
-      if (debug) app_utils::log("%*sbegin_refs %s\n", get_depth()*2, "", app_utils::get_atom_name(sid));
+      if (debug) log("%*sbegin_refs %s\n", get_depth()*2, "", app_utils::get_atom_name(sid));
       if (!check_atom(sid) && !check_atom(atom_begin_refs)) {
         size = read_int();
         return true;
@@ -196,12 +196,12 @@ namespace octet {
 
     // called after reading an array or dictionary
     void end_refs(bool is_dict) {
-      if (debug) app_utils::log("%*send_refs\n", get_depth()*2, "");
+      if (debug) log("%*send_refs\n", get_depth()*2, "");
       //check_atom(atom_end_refs);
     }
 
     void visit_bin(void *value, unsigned size, atom_t sid, atom_t type) {
-      if (debug) app_utils::log("%*svisit_bin %s %d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size);
+      if (debug) log("%*svisit_bin %s %d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size);
       if (!check_atom(type) && !check_atom(sid) && !check_size(size)) {
         read((uint8_t*)value, size);
       }

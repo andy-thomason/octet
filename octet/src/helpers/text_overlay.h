@@ -9,7 +9,7 @@
 
 namespace octet {
   class text_overlay {
-    ref<scene> text_scene;
+    ref<visual_scene> text_scene;
     ref<camera_instance> cam;
     ref<mesh_instance> msh_inst;
     ref<mesh_text> text;
@@ -18,7 +18,7 @@ namespace octet {
     void init() {
       // Make a scene for the text overlay using an ortho camera
       // that works in screen pixels.
-      text_scene = new scene();
+      text_scene = new visual_scene();
 
       image *page = new image("assets/courier_18_0.gif");
       page->load();

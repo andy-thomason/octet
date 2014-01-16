@@ -107,7 +107,7 @@ namespace octet {
       unsigned a = 0;
       unsigned b = ch.num_times - 1;
       unsigned component_size = ch.component_size;
-      //app_utils::log("ec %f %d\n", time, time_ms);
+      //log("ec %f %d\n", time, time_ms);
 
       if (time_ms < p[0]) {
         time_ms = p[0];
@@ -125,7 +125,7 @@ namespace octet {
         }
       }
 
-      //app_utils::log("t=%d a=%d b=%d p[a]=%d p[b]=%d\n", time_ms, a, b, p[a], p[b]);
+      //log("t=%d a=%d b=%d p[a]=%d p[b]=%d\n", time_ms, a, b, p[a], p[b]);
 
       unsigned data_offset = ch.offset + ch.num_times * sizeof(unsigned short);
 
@@ -138,7 +138,7 @@ namespace octet {
         for (int i = 0; i != component_size/4; ++i) {
           tmp1[i] = tmp1[i] * (1-t) + tmp2[i] * t;
         }
-        //app_utils::log("  t=%f %f %f %f\n", t, tmp1[0], tmp1[1], tmp1[2]);
+        //log("  t=%f %f %f %f\n", t, tmp1[0], tmp1[1], tmp1[2]);
         target->set_value(ch.sid, ch.sub_target, ch.component, tmp1);
       }
     }

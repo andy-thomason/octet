@@ -9,7 +9,7 @@
 
 namespace octet {
   // todo: kill this
-  GLuint resources::get_texture_handle_internal(unsigned gl_kind, const char *url) {
+  GLuint resource_dict::get_texture_handle_internal(unsigned gl_kind, const char *url) {
     if (url[0] == '!') {
       return app_utils::get_stock_texture(gl_kind, url+1);
     } else if (url[0] == '#') {
@@ -46,3 +46,15 @@ namespace octet {
     }
   };
 }
+
+namespace octet {
+  inline resource *resource::new_type(atom_t type) {
+    switch ((int)type) {
+      #define OCTET_CLASS(X) case atom_##X: return new X();
+      #include "../resources/classes.h"
+      #undef OCTET_CLASS
+    }
+    return NULL;
+  }
+}
+

@@ -70,7 +70,7 @@ namespace octet {
 
       dest_vertices.resize((num_dest_vertices + 1) * stride);
 
-      app_utils::log("%*se%d %d %d\n", depth*2, "", num_dest_vertices, i0, i1);
+      log("%*se%d %d %d\n", depth*2, "", num_dest_vertices, i0, i1);
       bool split = split_edge(
         &dest_vertices[num_dest_vertices * stride],
         &dest_vertices[i0 * stride],
@@ -95,7 +95,7 @@ namespace octet {
 
       depth++;
 
-      app_utils::log("%*sat: %d %d %d %d %d %d\n", depth*2, "", i0, i1, i2, i3, i4, i5);
+      log("%*sat: %d %d %d %d %d %d\n", depth*2, "", i0, i1, i2, i3, i4, i5);
 
       switch( (i3 != 0) + (i4 != 0)*2 + (i5 != 0)*4 ) {
         case 0: {
@@ -222,7 +222,7 @@ namespace octet {
       set_num_vertices(num_dest_vertices);
       set_num_indices(dest_indices.size());
 
-      dump(app_utils::log("dump"));
+      dump(log("dump"));
     }
 
     void visit(visitor &v) {
@@ -234,7 +234,7 @@ namespace octet {
     virtual bool is_smooth(const vec3 &n0, const vec3 &n1, int depth) {
       return true;
       float dotp = dot(n0, n1);
-      app_utils::log("%*s  dotp=%f\n", depth*2, "", dotp);
+      log("%*s  dotp=%f\n", depth*2, "", dotp);
       return (dotp >= 0.9f) || depth >= 4;
     }
   };

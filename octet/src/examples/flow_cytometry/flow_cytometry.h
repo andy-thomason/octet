@@ -253,7 +253,7 @@ namespace octet {
         if (any(pt != invalid)) {
           big = max(big, pt);
           char tmp[256], tmp2[256];
-          //app_utils::log("%s %s\n", pt.toString(tmp, sizeof(tmp)), big.toString(tmp2, sizeof(tmp2)));
+          //log("%s %s\n", pt.toString(tmp, sizeof(tmp)), big.toString(tmp2, sizeof(tmp2)));
         }
       }
 
@@ -303,7 +303,7 @@ namespace octet {
       mat4t mx;
       mx.loadIdentity();
       mesh_points *points_mesh = new mesh_points();
-      //points_mesh->dump(app_utils::log("points_mesh\n"));
+      //points_mesh->dump(log("points_mesh\n"));
 
       mesh_points *axis_mesh = new mesh_points();
       vec4 white(1, 1, 1, 1);

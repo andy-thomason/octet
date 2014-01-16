@@ -338,7 +338,7 @@ namespace octet
     }
     struct intrinsic_t
     {
-      const char name[ 16 ];
+      char name[ 16 ];
       const char *params;
     };
     

@@ -181,18 +181,6 @@ namespace octet {
       return id;
     }
 
-    // write some text to log.txt
-    static FILE * log(const char *fmt, ...) {
-      static FILE *file;
-      va_list list;
-      va_start(list, fmt);
-      if (!file) file = fopen("log.txt", "w");
-      vfprintf(file, fmt, list);
-      va_end(list);
-      fflush(file);
-      return file;
-    }
-
     static dictionary<atom_t> *get_atom_dict() {
       static dictionary<atom_t> *dict;
       if (!dict) dict = new dictionary<atom_t>();
@@ -216,10 +204,10 @@ namespace octet {
         }
       }
       if (dict->contains(name)) {
-        //app_utils::log("old atom %s %d\n", name, (*dict)[name]);
+        //log("old atom %s %d\n", name, (*dict)[name]);
         return (*dict)[name];
       } else {
-        //app_utils::log("new atom %s %d\n", name, num_atoms);
+        //log("new atom %s %d\n", name, num_atoms);
         return (*dict)[name] = (atom_t)num_atoms++;
       }
     }
@@ -264,6 +252,5 @@ namespace octet {
       }
       return "???";
     }
-
   };
 }

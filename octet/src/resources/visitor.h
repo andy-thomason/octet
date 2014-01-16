@@ -25,13 +25,13 @@ namespace octet {
     bool error;
 
     void begin_visit(atom_t type) {
-      if (debug) app_utils::log("%*svisit %s\n", get_depth()*2, "", app_utils::get_atom_name(type));
+      if (debug) log("%*svisit %s\n", get_depth()*2, "", app_utils::get_atom_name(type));
       depth++;
     }
 
     void end_visit(atom_t type) {
       depth--;
-      if (debug) app_utils::log("%*svisit %s\n", get_depth()*2, "", app_utils::get_atom_name(type));
+      if (debug) log("%*svisit %s\n", get_depth()*2, "", app_utils::get_atom_name(type));
     }
   public:
     // implementation
@@ -133,7 +133,7 @@ namespace octet {
           if (!ref && type_name != atom_) {
             type *val = (type*)type::new_type(type_name);
             if (!val) {
-              app_utils::log("unable to make type %s\n", app_utils::get_atom_name(type_name));
+              log("unable to make type %s\n", app_utils::get_atom_name(type_name));
               set_error(true);
               return;
             }
@@ -184,7 +184,7 @@ namespace octet {
             if (!ref && type_name != atom_) {
               type *val = (type*)type::new_type(type_name);
               if (!val) {
-                app_utils::log("unable to make type %s\n", app_utils::get_atom_name(type_name));
+                log("unable to make type %s\n", app_utils::get_atom_name(type_name));
                 set_error(true);
                 return;
               }
@@ -229,7 +229,7 @@ namespace octet {
             if (!ref && type_name != atom_) {
               type *val = (type*)type::new_type(type_name);
               if (!val) {
-                app_utils::log("unable to make type %s\n", app_utils::get_atom_name(type_name));
+                log("unable to make type %s\n", app_utils::get_atom_name(type_name));
                 set_error(true);
                 return;
               }

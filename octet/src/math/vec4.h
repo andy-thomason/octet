@@ -22,7 +22,7 @@ namespace octet {
       float v[4];
     #endif
   public:
-    vec4() {
+    OCTET_HOT vec4() {
       #if OCTET_SSE
         m = _mm_setzero_ps();
       #else
@@ -31,12 +31,12 @@ namespace octet {
     }
 
     #if OCTET_SSE
-      vec4(__m128 m) {
+      OCTET_HOT vec4(__m128 m) {
         this->m = m;
       }
     #endif
 
-    vec4(const vec4 &rhs) {
+    OCTET_HOT vec4(const vec4 &rhs) {
       #if OCTET_SSE
         m = rhs.m;
       #else
@@ -44,7 +44,7 @@ namespace octet {
       #endif
     }
 
-    vec4(float f) {
+    OCTET_HOT vec4(float f) {
       #if OCTET_SSE
         m = _mm_set_ps1(f);
       #else
@@ -53,7 +53,7 @@ namespace octet {
     }
 
     // construct from four scalars
-    vec4(float x, float y, float z, float w) {
+    OCTET_HOT vec4(float x, float y, float z, float w) {
       #if OCTET_SSE
         m = _mm_setr_ps(x, y, z, w);
       #else
@@ -71,79 +71,79 @@ namespace octet {
       #endif
     };*/
 
-    vec4(const vec2 &xy, float z, float w) {
+    OCTET_HOT vec4(const vec2 &xy, float z, float w) {
       v[0] = xy.x(); v[1] = xy.y(); v[2] = z; v[3] = w;
     };
 
-    vec4(const vec3 &xyz, float w) {
+    OCTET_HOT vec4(const vec3 &xyz, float w) {
       v[0] = xyz.x(); v[1] = xyz.y(); v[2] = xyz.z(); v[3] = w;
     };
 
     // index accessor [0] [1] ...
-    float &operator[](int i) { return v[i]; }
+    OCTET_HOT float &operator[](int i) { return v[i]; }
 
     // constant index accessor
-    const float &operator[](int i) const {
+    OCTET_HOT const float &operator[](int i) const {
       return v[i];
     }
 
     // vector - scalar operators
-    vec4 operator+(float r) const {
+    OCTET_HOT vec4 operator+(float r) const {
       return *this + vec4(r);
     }
-    vec4 operator-(float r) const {
+    OCTET_HOT vec4 operator-(float r) const {
       return *this - vec4(r);
     }
-    vec4 operator*(float r) const {
+    OCTET_HOT vec4 operator*(float r) const {
       return *this * vec4(r);
     }
-    vec4 operator/(float r) const {
+    OCTET_HOT vec4 operator/(float r) const {
       return *this * vec4(recip(r));
     }
 
     // in-place vector operators
-    vec4 &operator+=(const vec4 &r) {
+    OCTET_HOT vec4 &operator+=(const vec4 &r) {
       *this = *this + r;
       return *this;
     }
 
-    vec4 &operator-=(const vec4 &r) {
+    OCTET_HOT vec4 &operator-=(const vec4 &r) {
       *this = *this - r;
       return *this;
     }
 
-    vec4 &operator*=(const vec4 &r) {
+    OCTET_HOT vec4 &operator*=(const vec4 &r) {
       *this = *this * r;
       return *this;
     }
 
     // dot product
-    float dot(const vec4 &r) const {
+    OCTET_HOT float dot(const vec4 &r) const {
       return (*this * r).sum();
     }
 
     // make the length equal to 1
-    vec4 normalize() const {
+    OCTET_HOT vec4 normalize() const {
       return *this * lengthRecip();
     }
 
     // euclidean length of a vector
-    float length() const {
+    OCTET_HOT float length() const {
       return sqrt(dot(*this));
     }
 
     // one over the euclidean length of a vector
-    float lengthRecip() const {
+    OCTET_HOT float lengthRecip() const {
       return rsqrt(dot(*this));
     }
 
     // length squared
-    float squared() const {
+    OCTET_HOT float squared() const {
       return dot(*this);
     }
 
     // cross product
-    vec4 cross(const vec4 &r) const {
+    OCTET_HOT vec4 cross(const vec4 &r) const {
       return vec4(
         v[1] * r.v[2] - v[2] * r.v[1],
 	      v[2] * r.v[0] - v[0] * r.v[2],
@@ -153,7 +153,7 @@ namespace octet {
     }
 
     // positive cross product (for box tests)
-    vec4 abs_cross(const vec4 &r) const {
+    OCTET_HOT vec4 abs_cross(const vec4 &r) const {
       return vec4(
         v[1] * r.v[2] + v[2] * r.v[1],
 	      v[2] * r.v[0] + v[0] * r.v[2],
@@ -163,10 +163,10 @@ namespace octet {
     }
 
     // access the floating point numbers
-    float *get() { return &v[0]; }
+    OCTET_HOT float *get() { return &v[0]; }
 
     // get the floating point numbers
-    const float *get() const { return &v[0]; }
+    OCTET_HOT const float *get() const { return &v[0]; }
 
     ////////////////////////////////////
     //
@@ -174,7 +174,7 @@ namespace octet {
     //
 
     // vector operators
-    vec4 operator+(const vec4 &r) const {
+    OCTET_HOT vec4 operator+(const vec4 &r) const {
       #if OCTET_SSE
         return vec4(_mm_add_ps(m, r.m));
       #else
@@ -182,7 +182,7 @@ namespace octet {
       #endif
     }
 
-    vec4 operator-(const vec4 &r) const {
+    OCTET_HOT vec4 operator-(const vec4 &r) const {
       #if OCTET_SSE
         return vec4(_mm_sub_ps(m, r.m));
       #else
@@ -190,7 +190,7 @@ namespace octet {
       #endif
     }
 
-    vec4 operator*(const vec4 &r) const {
+    OCTET_HOT vec4 operator*(const vec4 &r) const {
       #if OCTET_SSE
         return vec4(_mm_mul_ps(m, r.m));
       #else
@@ -198,7 +198,7 @@ namespace octet {
       #endif
     }
 
-    vec4 operator/(const vec4 &r) const {
+    OCTET_HOT vec4 operator/(const vec4 &r) const {
       #if OCTET_SSE
         return vec4(_mm_div_ps(m, r.m));
       #else
@@ -206,7 +206,7 @@ namespace octet {
       #endif
     }
 
-    vec4 operator-() const {
+    OCTET_HOT vec4 operator-() const {
       #if OCTET_SSE
         return vec4(_mm_sub_ps(_mm_setzero_ps(), m));
       #else
@@ -215,25 +215,25 @@ namespace octet {
     }
 
     // premultiply matrix operator (forward declared as matrix uses vector)
-    vec4 operator*(const mat4t &r) const;
+    OCTET_HOT vec4 operator*(const mat4t &r) const;
 
     // sum of terms
-    float sum() const {
+    OCTET_HOT float sum() const {
       return v[0] + v[1] + v[2] + v[3];
     }
 
     // quaternion conjugate
-    vec4 qconj() const {
+    OCTET_HOT vec4 qconj() const {
       return *this * vec4(-1, -1, -1, 1);
     }
 
     // after perspective transform, use this to find x, y, z in the cube.
-    vec4 perspectiveDivide() const {
+    OCTET_HOT vec4 perspectiveDivide() const {
       return vec4(v[0], v[1], v[2], v[3]) * vec4(recip(v[3]));
     }
 
     // minumum of two vectors
-    vec4 min(const vec4 &r) const {
+    OCTET_HOT vec4 min(const vec4 &r) const {
       #if OCTET_SSE
         return vec4(_mm_min_ps(m, r.m));
       #else
@@ -242,7 +242,7 @@ namespace octet {
     }
 
     // maximum of two vectors
-    vec4 max(const vec4 &r) const {
+    OCTET_HOT vec4 max(const vec4 &r) const {
       #if OCTET_SSE
         return vec4(_mm_max_ps(m, r.m));
       #else
@@ -251,7 +251,7 @@ namespace octet {
     }
 
     // make all values positive.
-    vec4 abs() const {
+    OCTET_HOT vec4 abs() const {
       #if OCTET_SSE
         static const union {
           int v[4];
@@ -265,31 +265,31 @@ namespace octet {
     }
 
     // get xy
-    const vec2 &xy() const {
+    OCTET_HOT const vec2 &xy() const {
       return (const vec2&)v;
     }
 
     // get xyz
-    const vec3 &xyz() const {
+    OCTET_HOT const vec3 &xyz() const {
       return (const vec3&)v;
     }
 
     // get xy00
-    vec4 xy00() const {
+    OCTET_HOT vec4 xy00() const {
       return vec4(v[0], v[1], 0.0f, 0.0f);
     }
 
     // get xyz0
-    vec4 xyz0() const {
+    OCTET_HOT vec4 xyz0() const {
       return vec4(v[0], v[1], v[2], 0.0f);
     }
 
     // get xyz1
-    vec4 xyz1() const {
+    OCTET_HOT vec4 xyz1() const {
       return vec4(v[0], v[1], v[2], 1.0f);
     }
 
-    vec4 xxxx() const {
+    OCTET_HOT vec4 xxxx() const {
       #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(0,0,0,0)));
       #else
@@ -297,7 +297,7 @@ namespace octet {
       #endif
     }
 
-    vec4 yyyy() const {
+    OCTET_HOT vec4 yyyy() const {
       #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(1,1,1,1)));
       #else
@@ -305,7 +305,7 @@ namespace octet {
       #endif
     }
 
-    vec4 zzzz() const {
+    OCTET_HOT vec4 zzzz() const {
       #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(2,2,2,2)));
       #else
@@ -313,7 +313,7 @@ namespace octet {
       #endif
     }
 
-    vec4 wwww() const {
+    OCTET_HOT vec4 wwww() const {
       #if OCTET_SSE
         return vec4(_mm_shuffle_ps(m, m, _MM_SHUFFLE(3,3,3,3)));
       #else
@@ -322,47 +322,47 @@ namespace octet {
     }
 
     // access x
-    float &x() {
+    OCTET_HOT float &x() {
       return v[0];
     }
 
     // access y
-    float &y() {
+    OCTET_HOT float &y() {
       return v[1];
     }
 
     // access z
-    float &z() {
+    OCTET_HOT float &z() {
       return v[2];
     }
 
     // access w
-    float &w() {
+    OCTET_HOT float &w() {
       return v[3];
     }
 
     // get x
-    float x() const {
+    OCTET_HOT float x() const {
       return v[0];
     }
 
     // get y
-    float y() const {
+    OCTET_HOT float y() const {
       return v[1];
     }
 
     // get z
-    float z() const {
+    OCTET_HOT float z() const {
       return v[2];
     }
 
     // get w
-    float w() const {
+    OCTET_HOT float w() const {
       return v[3];
     }
 
     // quaternion multiply
-    vec4 qmul(const vec4 &r) const {
+    OCTET_HOT vec4 qmul(const vec4 &r) const {
       return vec4(
 	      v[0] * r.v[3] + v[3] * r.v[0] + v[1] * r.v[2] - v[2] * r.v[1],
 		    v[1] * r.v[3] + v[3] * r.v[1] + v[2] * r.v[0] - v[0] * r.v[2],
@@ -479,9 +479,9 @@ namespace octet {
 
   // sadly the microsoft compile is quite poor with vector code generation
   #if OCTET_SSE
-    #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) static const u_m128_f4 VAR##_UNION = { X, Y, Z, W }; const VEC4 VAR(VAR##_UNION.m);
+    #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) static const u_m128_f4 VAR##_UNION = { X, Y, Z, W }; const vec4 VAR(VAR##_UNION.m);
   #else
-    #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) VEC4 VAR(X, Y, Z, W);
+    #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) vec4 VAR(X, Y, Z, W);
   #endif
 }
 

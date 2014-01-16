@@ -37,7 +37,7 @@ namespace octet {
     void add_joint(const mat4t &bindToModel, atom_t sid) {
       this->bindToModel.push_back(bindToModel);
       joints.push_back(sid);
-      app_utils::log("skin: add_joint %d\n", sid);
+      log("skin: add_joint %d\n", sid);
     }
 
     int find_joint(atom_t sid) {

@@ -71,46 +71,57 @@ namespace octet {
     #endif
   }
 
+  // absolute value of f
   inline float abs(float f) {
     return fabsf(f);
   }
 
+  // absolute value of v
   inline int abs(int v) {
     return v < 0 ? -v : v;
   }
 
+  // sin of f
   inline float sin(float f) {
     return sinf(f);
   }
 
+  // cosine of f
   inline float cos(float f) {
     return cosf(f);
   }
 
+  // square root of f
   inline float sqrt(float f) {
     return sqrtf(f);
   }
 
+  // reciprocal square root of f
   inline float rsqrt(float f) {
     return 1.0f/sqrtf(f);
   }
 
+  // reciprocal of f
   inline float recip(float f) {
     return 1.0f/f;
   }
 
-  inline float squared(float v) {
-    return v * v;
+  // f squared
+  inline float squared(float f) {
+    return f * f;
   }
 
+  // cartesian to polar conversion: atan(y/x)
   inline float atan2(float dy, float dx) {
     return atan2f(dy, dx);
   }
 
+  // return true if i is a power of 2
   inline bool is_power_of_two(unsigned i) {
     return i != 0 && ( i & (i-1) ) == 0;
   }
 
+  // return true if f is a power of 2
   inline bool is_power_of_two(float f) {
     union { float f; int i; } fu;
     fu.f = f;
@@ -118,14 +129,17 @@ namespace octet {
     return f != 0 && (fu.i & 0x007fffff) == 0;
   }
 
+  // swap two objects
   template <class T> void swap(T &a, T &b) {
     T t = a; a = b; b = t;
   }
 
+  // find the minimum of two objects
   template <class T> T min(const T &a, const T &b) {
     return a < b ? a : b;
   }
 
+  // find the maximum of two objects
   template <class T> T max(const T &a, const T &b) {
     return a > b ? a : b;
   }
@@ -151,13 +165,14 @@ namespace octet {
     return (v + (v>>16)) & 0xff;
   }
 
+  // count leading zeros. Examples: 0xffffffff -> 0, 0x00ffffff -> 8, 0x00000000 -> 32
   inline static int clz(uint32_t v) {
     int res = 0;
-    if (v >> 16) { v >>= 16; res += 16; }
-    if (v >> 8) { v >>= 8; res += 8; }
-    if (v >> 4) { v >>= 4; res += 4; }
-    if (v >> 2) { v >>= 2; res += 2; }
-    if (v >> 1) { v >>= 1; res += 1; }
+    if (!(v >> 16)) { v <<= 16; res += 16; }
+    if (!(v >> 24)) { v <<= 8; res += 8; }
+    if (!(v >> 28)) { v <<= 4; res += 4; }
+    if (!(v >> 30)) { v <<= 2; res += 2; }
+    if (!(v >> 31)) { v <<= 1; res += 1; }
     if (!v) { res += 1; }
     return res;
   }
@@ -167,7 +182,7 @@ namespace octet {
     return 31 - (int)clz(v);
   }
 
-  // 0a0b0c0d -> 0aabbccd -> 00ab00cd -> 00ababcd -> 0000abcd
+  // discard odd bits and compress event bits into lower 16 bits
   inline static unsigned even_bits(unsigned a) {
     a &= 0x55555555;
     a = (a | a >> 1) & 0x33333333;
@@ -176,12 +191,14 @@ namespace octet {
     return (a | a >> 8) & 0x0000ffff;
   }
 
+  // discard odd nibbles and compress even nibbles into lower 16 bits
   inline static unsigned low_nibbles(unsigned a) {
     a &= 0x0f0f0f0f;
     a = (a | a >> 4) & 0x00ff00ff;
     return (a | a >> 8) & 0x0000ffff;
   }
 
+  // a pair of objects, like std::pair
   template <typename first_t, typename second_t> class pair {
   public:
     pair() {}
@@ -189,5 +206,21 @@ namespace octet {
     first_t first;
     second_t second;
   };
+
+  #if OCTET_UNIT_TEST
+    class scalar_unit_test {
+    public:
+      scalar_unit_test() {
+        assert(clz(0xffffffff) == 0);
+        assert(clz(0x00ffffff) == 8);
+        assert(clz(0x00000040) == 25);
+        assert(clz(0x00000000) == 32);
+        assert(ilog2(1<<7) == 7);
+        assert(ilog2((1<<7)+1) == 7);
+        assert(ilog2((1<<7)-1) == 6);
+      }
+    };
+    static scalar_unit_test scalar_unit_test;
+  #endif
 }
 

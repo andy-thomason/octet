@@ -22,46 +22,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// defines and configuration
-#include "../platform/configure.h"
+#ifndef OCTET_OPENCL
+  #define OCTET_OPENCL 0
+#endif
 
-// data storage in containers
-#include "../containers/containers.h"
+#if defined(WIN32)
+  #define OCTET_SSE 1
+  #pragma warning(disable : 4996)
+#endif
 
-// target specific support: Windows, Mac, Linux, PS Vita
-#include "../platform/machine_specific.h"
+#if !OCTET_VOXEL_TEST && !OCTET_VITA
+  #define OCTET_BULLET 1
+  #define OCTET_BOX2D 1
+#endif
 
-// math library
-#include "../math/math.h"
+// use <> to include from standard directories
+// use "" to include from our own project
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <math.h>
+#include <assert.h>
 
-// CG, GLSL, C++ compiler
-#include "../compiler/compiler.h"
-
-// loaders (low dependency, so you can use them in other projects)
-#include "../loaders/loaders.h"
-
-// resource management
-#include "../resources/resources.h"
-
-// shaders
-#include "../shaders/shaders.h"
-
-// physics
-#include "../physics/physics.h"
-
-// scene (layer2)
-#include "../scene/scene.h"
-
-// high level helpers
-#include "../helpers/mouse_ball.h"
-#include "../helpers/http_server.h"
-#include "../helpers/text_overlay.h"
-#include "../helpers/object_picker.h"
-
-// asset loaders
-#include "../loaders/collada_builder.h"
-
-// forward references
-#include "../resources/resources.inl"
-#include "../resources/mesh_builder.inl"
+namespace octet {
+  // write some text to log.txt
+  inline static FILE * log(const char *fmt, ...) {
+    static FILE *file;
+    va_list list;
+    va_start(list, fmt);
+    if (!file) file = fopen("log.txt", "w");
+    vfprintf(file, fmt, list);
+    va_end(list);
+    //fflush(file);
+    return file;
+  }
+}
 

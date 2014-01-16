@@ -10,13 +10,6 @@
 namespace octet {
   template <class interface_t, int dim> class mesh_iterate_faces : public interface_t {
   public:
-    /*void interface_t::add_lefts(uint32_t v, int, int);
-    void interface_t::add_rights(uint32_t v, int, int);
-    void interface_t::add_tops(uint32_t v, int, int);
-    void interface_t::add_bottoms(uint32_t v, int, int);
-    void interface_t::add_fronts(uint32_t v, int, int);
-    void interface_t::add_backs(uint32_t v, int, int);*/
-
     void iterate(const uint32_t *opaque) {
       for (int z = 0; z != dim; ++z) {
         for (int y = 0; y != dim; ++y) {
@@ -366,7 +359,7 @@ namespace octet {
                   get##A(ANY, x, y, z+1) | get##A(ANY, x+1, y, z+1) | get##A(ANY, x, y+1, z+1) | get##A(ANY, x+1, y+1, z+1) \
                 ;\
                 ANY[off##B(x/2, y/2, z/2)] |= any << shift##B(x/2, y/2, z/2); \
-                /*app_utils::log("%2d %2d %2d: %d %08x %d\n", x, y, z, any, ANY[off##B(x/2, y/2, z/2)], shift##B(x/2, y/2, z/2));*/ \
+                /*log("%2d %2d %2d: %d %08x %d\n", x, y, z, any, ANY[off##B(x/2, y/2, z/2)], shift##B(x/2, y/2, z/2));*/ \
                 unsigned all = \
                   get##A(ALL, x, y, z) & get##A(ALL, x+1, y, z) & get##A(ALL, x, y+1, z) & get##A(ALL, x+1, y+1, z) & \
                   get##A(ALL, x, y, z+1) & get##A(ALL, x+1, y, z+1) & get##A(ALL, x, y+1, z+1) & get##A(ALL, x+1, y+1, z+1) \
@@ -386,7 +379,7 @@ namespace octet {
           memcmp(any_opaque, any_test, sizeof(any_test)) ||
           memcmp(all_opaque, all_test, sizeof(all_test))
         ) {
-          FILE *fp = app_utils::log("test failure\n");
+          FILE *fp = log("test failure\n");
 
           for (int z = 0; z != dim; ++z) {
             fprintf(fp, "z=%2d ", z);
@@ -416,7 +409,8 @@ namespace octet {
         case 2: return get8(any_opaque, pos.x(), pos.y(), pos.z());
         case 3: return get4(any_opaque, pos.x(), pos.y(), pos.z());
         case 4: return get2(any_opaque, pos.x(), pos.y(), pos.z());
-        default: assert(0 && "only 0-4"); return 1;
+        case 5: return any_opaque[d2] != 0;
+        default: assert(0 && "only 0-5"); return 1;
       }
     }
 
@@ -427,7 +421,8 @@ namespace octet {
         case 2: return get8(all_opaque, pos.x(), pos.y(), pos.z());
         case 3: return get4(all_opaque, pos.x(), pos.y(), pos.z());
         case 4: return get2(all_opaque, pos.x(), pos.y(), pos.z());
-        default: assert(0 && "only 0-4"); return 1;
+        case 5: return all_opaque[d2] == 0xff;
+        default: assert(0 && "only 0-5"); return 1;
       }
     }
   };

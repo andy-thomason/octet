@@ -63,7 +63,7 @@ namespace octet {
         } else {
           char name[16];
           sprintf(name, "#%02x%02x%02x%02x", (int)(color[0]*255.0f+0.5f), (int)(color[1]*255.0f+0.5f), (int)(color[2]*255.0f+0.5f), (int)(color[3]*255.0f+0.5f));
-          gl_texture = resources::get_texture_handle(GL_RGBA, name);
+          gl_texture = resource_dict::get_texture_handle(GL_RGBA, name);
         }
       }
       return gl_texture;

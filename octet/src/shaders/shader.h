@@ -13,6 +13,30 @@
 namespace octet {
   class shader {
     GLuint program_;
+
+    void link(GLuint vertex_shader, GLuint fragment_shader) {
+          // assemble the program for use by glUseProgram
+      GLuint program = glCreateProgram();
+      glAttachShader(program, vertex_shader);
+      glAttachShader(program, fragment_shader);
+
+      // standardize the attribute slots (in NVidia's CG you can do this in the shader)
+      glBindAttribLocation(program, attribute_pos, "pos");
+      glBindAttribLocation(program, attribute_normal, "normal");
+      glBindAttribLocation(program, attribute_tangent, "tangent");
+      glBindAttribLocation(program, attribute_bitangent, "bitangent");
+      glBindAttribLocation(program, attribute_blendweight, "blendweight");
+      glBindAttribLocation(program, attribute_blendindices, "blendindices");
+      glBindAttribLocation(program, attribute_color, "color");
+      glBindAttribLocation(program, attribute_uv, "uv");
+      glLinkProgram(program);
+
+      program_ = program;
+      GLsizei length;
+      char buf[256];
+      glGetProgramInfoLog(program, sizeof(buf), &length, buf);
+      puts(buf);
+    }
   public:
     shader() {}
 
@@ -37,27 +61,22 @@ namespace octet {
       glGetShaderInfoLog(fragment_shader, sizeof(buf), &length, buf);
       puts(buf);
 
-      // assemble the program for use by glUseProgram
-      GLuint program = glCreateProgram();
-      glAttachShader(program, vertex_shader);
-      glAttachShader(program, fragment_shader);
-
-      // standardize the attribute slots (in NVidia's CG you can do this in the shader)
-      glBindAttribLocation(program, attribute_pos, "pos");
-      glBindAttribLocation(program, attribute_normal, "normal");
-      glBindAttribLocation(program, attribute_tangent, "tangent");
-      glBindAttribLocation(program, attribute_bitangent, "bitangent");
-      glBindAttribLocation(program, attribute_blendweight, "blendweight");
-      glBindAttribLocation(program, attribute_blendindices, "blendindices");
-      glBindAttribLocation(program, attribute_color, "color");
-      glBindAttribLocation(program, attribute_uv, "uv");
-      glLinkProgram(program);
-
-      program_ = program;
-      glGetProgramInfoLog(program, sizeof(buf), &length, buf);
-      puts(buf);
+      link(vertex_shader, fragment_shader);
     }
-  
+
+    /// create a program from pre-compiled binary code. (ie. PS Vita)  
+    void init_bin(const uint8_t *vs, const uint8_t *fs) {
+      printf("creating binary shader program\n");
+
+      GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+      glShaderBinary(1, &vertex_shader, 0, vs, 0);
+    
+      GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+      glShaderBinary(1, &fragment_shader, 0, fs, 0);
+
+      link(vertex_shader, fragment_shader);
+    }
+
     // use the program we have compiled in init()
     void render() {
       glUseProgram(program_);

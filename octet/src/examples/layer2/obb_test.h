@@ -54,7 +54,7 @@ namespace octet {
       mesh_voxels *mesha = new mesh_voxels(1.0f/8);
       mesha->box(mx, aabb(vec3(0, 0, 0), vec3(16, 16, 16)));
       mesha->update();
-      mesha->dump(app_utils::log("mesha\n"));
+      mesha->dump(log("mesha\n"));
       //mesha->get_subcube(0, 0, 0)->test_update_lod();
       mesh_voxels *meshb = new mesh_voxels();
       meshb->box(mx, aabb(vec3(0, 0, 0), vec3(4, 4, 4)));

@@ -330,5 +330,9 @@ namespace octet {
       result.push_back(string());
       result.back() = cur;
     }
+
+    bool empty() {
+      return size() == 0;
+    }
   };
 }

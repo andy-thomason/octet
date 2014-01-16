@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012-2014 (MIT license)
+// (C) Andy Thomason 2012, 2013, 2014 (MIT license)
 //
 // Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Platform specific includes
+// loaders (low dependency, so you can use them in other projects)
+//
+// Collada, JPEG, ZIP, GIF etc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -22,46 +24,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// defines and configuration
-#include "../platform/configure.h"
+#ifndef OCTET_LOADERS_INCLUDED
+#define OCTET_LOADERS_INCLUDED
 
-// data storage in containers
-#include "../containers/containers.h"
+#include "../loaders/zip_decoder.h"
+#include "../loaders/gif_decoder.h"
+#include "../loaders/jpeg_decoder.h"
+#include "../loaders/jpeg_encoder.h"
+#include "../loaders/tga_decoder.h"
+#include "../loaders/dds_decoder.h"
 
-// target specific support: Windows, Mac, Linux, PS Vita
-#include "../platform/machine_specific.h"
-
-// math library
-#include "../math/math.h"
-
-// CG, GLSL, C++ compiler
-#include "../compiler/compiler.h"
-
-// loaders (low dependency, so you can use them in other projects)
-#include "../loaders/loaders.h"
-
-// resource management
-#include "../resources/resources.h"
-
-// shaders
-#include "../shaders/shaders.h"
-
-// physics
-#include "../physics/physics.h"
-
-// scene (layer2)
-#include "../scene/scene.h"
-
-// high level helpers
-#include "../helpers/mouse_ball.h"
-#include "../helpers/http_server.h"
-#include "../helpers/text_overlay.h"
-#include "../helpers/object_picker.h"
-
-// asset loaders
-#include "../loaders/collada_builder.h"
-
-// forward references
-#include "../resources/resources.inl"
-#include "../resources/mesh_builder.inl"
-
+#endif

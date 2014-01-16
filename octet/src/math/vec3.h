@@ -9,6 +9,7 @@
 
 namespace octet {
   class mat4t;
+  class vec3;
   class vec4;
   class ivec3;
   class ivec4;
@@ -16,6 +17,7 @@ namespace octet {
   // vec3: vector of 3 floats - optimial for computation, but not storage.
   class vec3 {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
+
     #if OCTET_SSE
       union {
         __m128 m;
@@ -335,9 +337,8 @@ namespace octet {
       #endif*/
     }
 
-    // convert to a string (up to 4 strings can be included at a time)
-    const char *toString(char *dest, size_t size) const
-    {
+    // convert to a string
+    const char *toString(char *dest, size_t size) const {
       snprintf(dest, size, "[%f, %f, %f]", v[0], v[1], v[2]);
       return dest;
     }
@@ -439,5 +440,17 @@ namespace octet {
     operator vec3() { return vec3(v[0], v[1], v[2]); }
     operator const vec3() const { return vec3(v[0], v[1], v[2]); }
   };
+
+  #if OCTET_UNIT_TEST
+    class vec3_unit_test {
+    public:
+      vec3_unit_test() {
+        vec3 a;
+        assert(a[0] == 0 && a[1] == 0 && a[2] == 0);
+        assert(sizeof(a) <= 16);
+      }
+    };
+    static vec3_unit_test vec3_unit_test;
+  #endif
 }
 

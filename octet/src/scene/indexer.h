@@ -95,7 +95,7 @@ namespace octet {
       set_vertices(vertices);
       set_num_vertices(num_vertices);
 
-      //this->dump(app_utils::log("dump\n"));
+      //this->dump(log("dump\n"));
     }
 
     void visit(visitor &v) {

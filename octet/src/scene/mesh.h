@@ -564,6 +564,25 @@ namespace octet {
       }
     }
 
+    // compute the axis aligned bounding box for this mesh in model space.
+    void calc_aabb() {
+      unsigned num_vertices = get_num_vertices();
+      if (get_num_vertices() == 0) {
+        mesh_aabb = aabb();
+        return;
+      }
+
+      unsigned slot = get_slot(attribute_pos);
+      vec3 vmin = get_value(slot, 0).xyz();
+      vec3 vmax = vmin;
+      for (unsigned i = 1; i < num_vertices; ++i) {
+        vec3 pos = get_value(slot, i).xyz();
+        vmin = min(pos, vmin);
+        vmax = max(pos, vmin);
+      }
+      mesh_aabb = aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f);
+    }
+
     // *very* slow ray cast.
     // returns "barycentric" coordinates.
     // eg. hit pos = bary[0] * pos0 + bary[1] * pos1 + bary[2] * pos2 (or ray.start + ray.distance * bary[3])
@@ -576,7 +595,7 @@ namespace octet {
 
       vec3 org = the_ray.get_start();
       vec3 dir = the_ray.get_distance();
-      //app_utils::log("ray_cast: org=%s dir=%s\n", org.toString(), dir.toString());
+      //log("ray_cast: org=%s dir=%s\n", org.toString(), dir.toString());
 
       unsigned pos_offset = get_offset(pos_slot);
       gl_resource::rolock idx_lock(get_indices());
@@ -587,9 +606,9 @@ namespace octet {
       float best_denom = 0;
       vec4 best_numer(0, 0, 0, 0);
       for (unsigned i = 0; i != get_num_indices(); i += 3) {
-        vec3 a = *(const vec3*)(vtx + pos_offset + stride * idx[i+0]) - org;
-        vec3 b = *(const vec3*)(vtx + pos_offset + stride * idx[i+1]) - org;
-        vec3 c = *(const vec3*)(vtx + pos_offset + stride * idx[i+2]) - org;
+        vec3 a = (vec3)*(const vec3p*)(vtx + pos_offset + stride * idx[i+0]) - org;
+        vec3 b = (vec3)*(const vec3p*)(vtx + pos_offset + stride * idx[i+1]) - org;
+        vec3 c = (vec3)*(const vec3p*)(vtx + pos_offset + stride * idx[i+2]) - org;
         vec3 d = dir;
 
         // solve [ba, bb, bc, bd] * [[ax, ay, az, 1], [bx, by, bz, 1], [cx, cy, cz, 1], [-dx, -dy, -dz, 0]] = [0, 0, 0, 1]
@@ -611,9 +630,9 @@ namespace octet {
         // denominator
         float denom = numer[0] + numer[1] + numer[2];
 
-        //app_utils::log("a=%s b=%s c=%s d=%s denom=%f\n", a.toString(), b.toString(), c.toString(), d.toString(), denom);
-        //app_utils::log("numer=%s\n", numer.toString());
-        //app_utils::log("res=%s\n", (numer / denom).toString());
+        //log("a=%s b=%s c=%s d=%s denom=%f\n", a.toString(), b.toString(), c.toString(), d.toString(), denom);
+        //log("numer=%s\n", numer.toString());
+        //log("res=%s\n", (numer / denom).toString());
 
         // using a multiply lets us check the sign without using a divide.
         vec4 bary2 = numer * denom;
