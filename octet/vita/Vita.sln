@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vita", "Vita.vcxproj", "{40FD3090-4B93-4BB5-AA16-B0C4C85C2F39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|PSVita = Debug|PSVita
+		Release|PSVita = Release|PSVita
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40FD3090-4B93-4BB5-AA16-B0C4C85C2F39}.Debug|PSVita.ActiveCfg = Debug|PSVita
+		{40FD3090-4B93-4BB5-AA16-B0C4C85C2F39}.Debug|PSVita.Build.0 = Debug|PSVita
+		{40FD3090-4B93-4BB5-AA16-B0C4C85C2F39}.Release|PSVita.ActiveCfg = Release|PSVita
+		{40FD3090-4B93-4BB5-AA16-B0C4C85C2F39}.Release|PSVita.Build.0 = Release|PSVita
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
