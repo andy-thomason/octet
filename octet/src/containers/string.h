@@ -12,7 +12,7 @@
 //   printf("%s\n", my_string.c_str());
 //
 
-namespace octet {
+namespace octet { namespace containers {
   class string {
     char *data_;
 
@@ -335,4 +335,4 @@ namespace octet {
       return size() == 0;
     }
   };
-}
+} }

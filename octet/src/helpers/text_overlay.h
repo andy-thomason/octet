@@ -7,7 +7,7 @@
 //
 // scene for rendering text overlays
 
-namespace octet {
+namespace octet { namespace helpers {
   class text_overlay {
     ref<visual_scene> text_scene;
     ref<camera_instance> cam;
@@ -56,5 +56,5 @@ namespace octet {
       text_scene->render(object_shader, skin_shader, *cam, 1);
     }
   };
-}
+}}
 

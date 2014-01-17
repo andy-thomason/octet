@@ -35,4 +35,8 @@
 #include "../containers/ref.h"
 #include "../containers/bitset.h"
 
+namespace octet {
+  using namespace containers;
+}
+
 #endif

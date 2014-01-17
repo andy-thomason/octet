@@ -6,7 +6,7 @@
 //
 // include all examples
 
-#include "../../platform/platform.h"
+#include "../../octet.h"
 
 #if OCTET_BOX2D
 	#include "../../Box2D/Box2DUnity.h"

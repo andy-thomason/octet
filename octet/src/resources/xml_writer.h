@@ -7,7 +7,7 @@
 // visitor for writing xml files.
 //
 
-namespace octet {
+namespace octet { namespace resources {
   class xml_writer : public visitor {
     dynarray<TiXmlElement *> stack;
     TiXmlElement *root;
@@ -121,5 +121,5 @@ namespace octet {
       stack.back()->SetAttribute(app_utils::get_atom_name(sid), value.toString(tmp, sizeof(tmp)));
     }
   };
-}
+} }
 

@@ -48,7 +48,7 @@ namespace octet {
       cameraToWorld.translate(0, 0, 3);
 
       // use helper function to generate an OpenGL texture
-      texture_handle_ = resources::get_texture_handle(GL_RGBA, "assets/stars.gif");
+      texture_handle_ = resource_dict::get_texture_handle(GL_RGBA, "assets/stars.gif");
     }
 
     // this is called to draw the world

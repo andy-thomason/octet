@@ -9,7 +9,7 @@
 // A visitor pattern can be used to solve a number of problems and provides
 // "Metadata" for the classes.
 
-namespace octet {
+namespace octet { namespace resources {
   class visitor;
 
   class visitable {
@@ -288,5 +288,5 @@ namespace octet {
       visit_bin((void*)&value, sizeof(value), sid, atom_unknown);
     }
   };
-}
+} }
 

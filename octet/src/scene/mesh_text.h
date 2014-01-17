@@ -7,7 +7,7 @@
 // Text mesh source.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class mesh_text : public mesh {
     typedef bitmap_font::vertex vertex;
     ref<bitmap_font> font;
@@ -64,4 +64,4 @@ namespace octet {
       v.visit(bb, atom_aabb);
     }
   };
-}
+}}

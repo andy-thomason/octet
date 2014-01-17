@@ -9,17 +9,13 @@
 // This class is a base class for most of the allocatable objects in the engine.
 // It provides automation for casts, saving and loading.
 
-namespace octet {
-  #define OCTET_CLASS(X) class X;
-  #include "classes.h"
-  #undef OCTET_CLASS
+// this macro implements standard functions for each class
+#define RESOURCE_META(classname) \
+  classname *get_##classname() { return this; } \
+  atom_t get_type() { return atom_##classname; } \
+  static atom_t get_type_static() { return atom_##classname; }
 
-  // this macro implements standard functions for each class
-  #define RESOURCE_META(classname) \
-    classname *get_##classname() { return this; } \
-    atom_t get_type() { return atom_##classname; } \
-    static atom_t get_type_static() { return atom_##classname; }
-
+namespace octet { namespace resources {
   class resource {
     // how many lives do we have?
     int ref_count;
@@ -80,9 +76,10 @@ namespace octet {
     // casting and aggregation: make a get_* function for each class
     // the RESOURCE_META macro overrides each of these once for every class.
     // use the get_* function for casting and checking types.
-    #define OCTET_CLASS(X) virtual X *get_##X() { return 0; }
+    #define OCTET_CLASS(N, X) virtual N::X *get_##X() { return 0; }
+    #pragma message("resource.h 2")
     #include "classes.h"
     #undef OCTET_CLASS
   };
-}
+} }
 

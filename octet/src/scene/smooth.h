@@ -7,7 +7,7 @@
 // Mesh smooth modifier. Work in progress.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class smooth : public mesh {
     // source mesh. Provides underlying geometry.
     ref<mesh> src;
@@ -238,4 +238,4 @@ namespace octet {
       return (dotp >= 0.9f) || depth >= 4;
     }
   };
-}
+}}

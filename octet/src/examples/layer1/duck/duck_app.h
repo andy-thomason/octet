@@ -43,7 +43,7 @@ namespace octet {
     GLuint specular;
 
     // container for resources
-    resources dict;
+    resource_dict dict;
   public:
 
     // this is called when we construct the class
@@ -65,10 +65,10 @@ namespace octet {
       //duck_mesh.make_collada_mesh(builder, "LOD3spShape-lib", dict);
       builder.get_mesh(duck_mesh, "LOD3spShape-lib", dict);
 
-      diffuse = ambient = resources::get_texture_handle(GL_RGB, "assets/duckCM.gif");
-      //diffuse = ambient = resources::get_texture_handle(GL_RGB, "!bump");
-      emission = resources::get_texture_handle(GL_RGB, "#000000");
-      specular = resources::get_texture_handle(GL_RGB, "#ffffff");
+      diffuse = ambient = resource_dict::get_texture_handle(GL_RGB, "assets/duckCM.gif");
+      //diffuse = ambient = resource_dict::get_texture_handle(GL_RGB, "!bump");
+      emission = resource_dict::get_texture_handle(GL_RGB, "#000000");
+      specular = resource_dict::get_texture_handle(GL_RGB, "#ffffff");
     }
 
     // this is called to draw the world

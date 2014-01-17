@@ -7,7 +7,7 @@
 // Container for bitmap font metrics
 //
 
-namespace octet {
+namespace octet { namespace resources {
   class bitmap_font : public resource {
     // Angelcode BMFont .fnt file format
 
@@ -348,4 +348,4 @@ private:
       return num_quads;
     }
   };
-}
+} }

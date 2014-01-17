@@ -19,7 +19,7 @@
 //     printf("%d\n", *i);
 //   }
 // 
-namespace octet {
+namespace octet { namespace containers {
   template <class item, class allocator_t=allocator> class double_list {
     struct double_list_head {
       // this makes new and delete use the allocator
@@ -124,4 +124,4 @@ namespace octet {
       head.prev = new_node;
     }
   };
-}
+} }

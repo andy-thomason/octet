@@ -7,7 +7,7 @@
 // Sphere in 3d space
 //
 
-namespace octet {
+namespace octet { namespace math {
   // Sphere: used for simple collision tests
   class sphere {
     vec3 center;
@@ -65,5 +65,5 @@ namespace octet {
       return d2 <= squared(get_radius() + rhs.get_radius());
     }
   };
-}
+} }
 

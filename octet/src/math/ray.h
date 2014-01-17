@@ -7,7 +7,7 @@
 // Axis aligned bounding box
 //
 
-namespace octet {
+namespace octet { namespace math {
   // ray for casting of
   class ray {
     vec3 distance;
@@ -123,5 +123,5 @@ namespace octet {
       printf("%d %12.7f [%12.7f %12.7f] [%12.7f %12.7f]\n", i, (float)pt, pt.numer(), pt.denom(), ipt.x(), ipt.y());
     }
   }
-}
+} }
 

@@ -7,7 +7,7 @@
 // Mesh smooth modifier. Work in progress.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class mesh_points : public mesh {
     dynarray<vec3p> points;
 
@@ -49,4 +49,4 @@ namespace octet {
       mesh::visit(v);
     }
   };
-}
+}}

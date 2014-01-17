@@ -36,4 +36,8 @@
 #include "../scene/mesh_points.h"
 #include "../scene/wireframe.h"
 
+namespace octet {
+  using namespace scene;
+}
+
 #endif

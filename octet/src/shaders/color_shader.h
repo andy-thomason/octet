@@ -8,7 +8,7 @@
 //
 // shader which renders with a solid color
 
-namespace octet {
+namespace octet { namespace shaders {
   class color_shader : public shader {
     // indices to use with glUniform*()
 
@@ -59,4 +59,4 @@ namespace octet {
       // now we are ready to define the attributes and draw the triangles.
     }
   };
-}
+}}

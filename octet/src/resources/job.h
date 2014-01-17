@@ -6,7 +6,7 @@
 //
 // work in progress
 
-namespace octet {
+namespace octet { namespace resources {
   class job : public resource {
     ref<job> next;
 
@@ -52,4 +52,4 @@ namespace octet {
       return state;
     }
   };
-}
+} }

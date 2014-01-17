@@ -6,7 +6,7 @@
 //
 // Single texture shader with no lighting
 
-namespace octet {
+namespace octet { namespace shaders {
   class texture_shader : public shader {
     // indices to use with glUniform*()
 
@@ -60,4 +60,4 @@ namespace octet {
       glUniformMatrix4fv(modelToProjectionIndex_, 1, GL_FALSE, modelToProjection.get());
     }
   };
-}
+}}

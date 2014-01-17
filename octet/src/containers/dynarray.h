@@ -18,7 +18,7 @@
 
 
 // dynamic array class similar to std::vector
-namespace octet {
+namespace octet { namespace containers {
   template <class item_t, class allocator_t=allocator, bool use_new_delete=true> class dynarray {
     item_t *data_;
     typedef unsigned int_size_t;
@@ -213,5 +213,5 @@ namespace octet {
   //   high performance vector does not use new and delete
   /*template <class item_t, class allocator_t=allocator> class dumbarray : public dynarray<item_t, allocator_t, false> {
   };*/
-}
+} }
 

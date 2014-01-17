@@ -6,7 +6,7 @@
 //
 // mouse ball for rotating cameras around points of interest.
 
-namespace octet {
+namespace octet { namespace helpers {
   class object_picker {
     app *the_app;
     dynarray<ref<mesh_instance> > objects;
@@ -44,4 +44,4 @@ namespace octet {
       }
     }
   };
-}
+}}

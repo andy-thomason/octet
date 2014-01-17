@@ -11,7 +11,7 @@
 // as they are very large (you should use GIF files or other compressed formats by choice)
 // 
 
-namespace octet {
+namespace octet { namespace loaders {
   class tga_decoder {
     typedef unsigned char uint8_t;
     // this is the TGA header
@@ -101,4 +101,4 @@ namespace octet {
       }
     }
   };
-}
+}}

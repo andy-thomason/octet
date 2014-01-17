@@ -9,7 +9,7 @@
 //
 // See http://en.wikipedia.org/wiki/JPEG
 // 
-namespace octet {
+namespace octet { namespace loaders {
   class jpeg_decoder {
     enum { debug = 0 };
 
@@ -532,5 +532,5 @@ namespace octet {
       num_components = 3;
     }
   };
-}
+}}
 

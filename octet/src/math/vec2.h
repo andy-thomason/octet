@@ -7,7 +7,7 @@
 // Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class mat4t;
   class vec4;
 
@@ -283,5 +283,5 @@ namespace octet {
   #else
     typedef vec2 vec2p;
   #endif
-}
+} }
 

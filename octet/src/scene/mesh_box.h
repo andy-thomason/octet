@@ -7,7 +7,7 @@
 // Mesh smooth modifier. Work in progress.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class mesh_box : public mesh {
 
     void init(const aabb &size) {
@@ -113,4 +113,4 @@ namespace octet {
       mesh::visit(v);
     }
   };
-}
+}}

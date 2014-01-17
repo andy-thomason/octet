@@ -7,7 +7,7 @@
 // Test for Voxel obb test
 //
 
-#include "../../platform/platform.h"
+#include "../../octet.h"
 
 #include "flow_cytometry.h"
 

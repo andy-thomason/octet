@@ -8,7 +8,7 @@
 //
 // work in progress
 
-namespace octet {
+namespace octet { namespace resources {
   class url_finder : public visitor {
     dynarray<string> &url;
     int depth;

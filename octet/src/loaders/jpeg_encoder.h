@@ -9,7 +9,7 @@
 //
 // See http://en.wikipedia.org/wiki/JPEG
 // 
-namespace octet {
+namespace octet { namespace loaders {
   class jpeg_encoder {
   public:
     jpeg_encoder() {
@@ -75,5 +75,5 @@ namespace octet {
       return 0;
     }
   };
-}
+}}
 

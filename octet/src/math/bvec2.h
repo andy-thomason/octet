@@ -7,7 +7,7 @@
 // Boolean Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class bvec2 {
     int v[2]; // true if < 0
   public:
@@ -48,5 +48,5 @@ namespace octet {
   bool any(const bvec2 &b) {
     return (b.x() | b.y()) < 0;
   }
-}
+} }
 

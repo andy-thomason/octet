@@ -7,7 +7,7 @@
 // Voxel subcube for the mesh_voxel component
 //
 
-namespace octet {
+namespace octet { namespace scene {
   template <class interface_t, int dim> class mesh_iterate_faces : public interface_t {
   public:
     void iterate(const uint32_t *opaque) {
@@ -426,4 +426,4 @@ namespace octet {
       }
     }
   };
-}
+}}

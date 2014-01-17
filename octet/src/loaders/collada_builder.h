@@ -17,7 +17,7 @@
 // there are very few direct exporters as yet.
 
 // mesh builder class for standard meshes.
-namespace octet {
+namespace octet { namespace loaders {
   class collada_builder {
   public:
 
@@ -1277,4 +1277,4 @@ namespace octet {
       add_animations(dict);
     }
   };
-}
+}}

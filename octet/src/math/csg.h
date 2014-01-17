@@ -7,7 +7,7 @@
 // Combine two shapes (constructive solid geometry)
 //
 
-namespace octet {
+namespace octet { namespace math {
   // boolean combination of two shapes
   template <class shapea_t, class shapeb_t, class op_t> class csg {
     const shapea_t &a;
@@ -36,5 +36,5 @@ namespace octet {
     }
   };
 
-}
+} }
 

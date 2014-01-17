@@ -7,7 +7,7 @@
 // Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class mat4t;
   class vec3;
   class vec4;
@@ -452,5 +452,5 @@ namespace octet {
     };
     static vec3_unit_test vec3_unit_test;
   #endif
-}
+} }
 

@@ -7,7 +7,7 @@
 //
 // HTTP server for debugging game code and building game editors.
 
-namespace octet {
+namespace octet { namespace helpers {
   class http_server {
     enum { port = 8888 };
     int listen_socket;
@@ -162,5 +162,5 @@ namespace octet {
       }
     }
   };
-}
+}}
 

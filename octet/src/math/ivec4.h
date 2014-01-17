@@ -7,7 +7,7 @@
 // Integer Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class ivec4 {
     int v[4];
   public:
@@ -52,5 +52,5 @@ namespace octet {
     int w() const { return v[3]; }
   };
 
-}
+} }
 

@@ -7,7 +7,7 @@
 // Animation resource
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class animation : public resource {
     // todo: this could be a GL/CL buffer
     dynarray<unsigned char> data;
@@ -143,4 +143,4 @@ namespace octet {
       }
     }
   };
-}
+}}

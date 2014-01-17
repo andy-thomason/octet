@@ -7,7 +7,7 @@
 // Phong shader that uses textures for all material channels
 // This shader has only one light which 
 
-namespace octet {
+namespace octet { namespace shaders {
   class phong_shader : public shader {
     // indices to use with glUniform*()
 
@@ -133,4 +133,4 @@ namespace octet {
       glUniform1iv(samplers_index, num_samplers, samplers);
     }
   };
-}
+}}

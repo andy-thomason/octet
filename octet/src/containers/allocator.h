@@ -48,7 +48,7 @@ void operator delete(void *ptr, void *place, dynarray_dummy_t x) {}
   typedef name &name##_r;
 
 
-namespace octet {
+namespace octet { namespace containers {
   class allocator {
     // singleton state, a bit like an old-world global variable
     struct state_t {
@@ -103,5 +103,5 @@ namespace octet {
       ::free(::malloc(32));
     }
   };
-}
+} }
 

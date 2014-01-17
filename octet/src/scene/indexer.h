@@ -7,7 +7,7 @@
 // Index modifier. Reduce vertices to the minimum set
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class indexer : public mesh {
     struct vertex {
       const uint8_t *bytes;
@@ -103,4 +103,4 @@ namespace octet {
       v.visit(src, atom_src);
     }
   };
-}
+}}

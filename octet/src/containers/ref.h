@@ -9,7 +9,7 @@
 // These should only be used in long-lived containers, never on the stack.
 //
 
-namespace octet {
+namespace octet { namespace containers {
   template <class item_t, class allocator_t=allocator> class ref {
     // wrapped pointer to the object
     item_t *item;
@@ -68,4 +68,4 @@ namespace octet {
       item = 0;
     }
   };
-}
+} }

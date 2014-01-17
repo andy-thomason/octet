@@ -20,7 +20,7 @@
 //   fred->my_method();
 // } <-- object gets deleted here
 //
-namespace octet {
+namespace octet { namespace containers {
   template <class item_t, class allocator_t=allocator> class ptr {
     // wrapped pointer to the object
     item_t *item;
@@ -61,4 +61,4 @@ namespace octet {
       if (item) delete item;
     }
   };
-}
+} }

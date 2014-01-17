@@ -7,11 +7,11 @@
 // a container for named resources
 //
 
-namespace octet {
+namespace octet { namespace resources {
 
   class resource_dict : public resource {
     dictionary<ref<resource> > dict;
-    ref<visual_scene> active_scene;
+    ref<scene::visual_scene> active_scene;
 
     #ifdef WIN32
       // vc2010/../
@@ -90,11 +90,11 @@ namespace octet {
       }
     }
 
-    visual_scene *get_active_scene() const {
+    scene::visual_scene *get_active_scene() const {
       return active_scene;
     }
 
-    void set_active_scene(visual_scene *value) {
+    void set_active_scene(scene::visual_scene *value) {
       active_scene = value;
     }
 
@@ -122,7 +122,8 @@ namespace octet {
       return result;
     }
 
-    #define OCTET_CLASS(X) X *get_##X(const char *id) { resource *res = get_resource(id); return res ? res->get_##X() : 0; }
+    #define OCTET_CLASS(N, X) N::X *get_##X(const char *id) { resource *res = get_resource(id); return res ? res->get_##X() : 0; }
+    #pragma message("resource_dict.h")
     #include "classes.h"
     #undef OCTET_CLASS
 
@@ -141,4 +142,4 @@ namespace octet {
     }
   };
 
-}
+} }

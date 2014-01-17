@@ -7,7 +7,7 @@
 // Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class mat4t;
 
   class vec4 {
@@ -483,5 +483,5 @@ namespace octet {
   #else
     #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) vec4 VAR(X, Y, Z, W);
   #endif
-}
+} }
 

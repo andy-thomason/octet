@@ -27,11 +27,11 @@
 #ifndef OCTET_LOADERS_INCLUDED
 #define OCTET_LOADERS_INCLUDED
 
-#include "../loaders/zip_decoder.h"
-#include "../loaders/gif_decoder.h"
-#include "../loaders/jpeg_decoder.h"
-#include "../loaders/jpeg_encoder.h"
-#include "../loaders/tga_decoder.h"
-#include "../loaders/dds_decoder.h"
+  #include "../loaders/zip_decoder.h"
+  #include "../loaders/gif_decoder.h"
+  #include "../loaders/jpeg_decoder.h"
+  #include "../loaders/jpeg_encoder.h"
+  #include "../loaders/tga_decoder.h"
+  #include "../loaders/dds_decoder.h"
 
 #endif

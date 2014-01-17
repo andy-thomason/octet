@@ -7,7 +7,7 @@
 // fixed size boolean bitset
 //
 
-namespace octet {
+namespace octet { namespace containers {
   template < unsigned size_ > class bitset
   {
     unsigned bits_[ ( size_ + 31 ) / 32 ];
@@ -88,4 +88,4 @@ namespace octet {
     }
 
   };
-}
+} }

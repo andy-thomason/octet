@@ -7,7 +7,7 @@
 // Animation resource
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class animation_instance : public resource {
     ref<animation> anim;
     ref<resource> target;
@@ -67,4 +67,4 @@ namespace octet {
       }
     }
   };
-}
+}}

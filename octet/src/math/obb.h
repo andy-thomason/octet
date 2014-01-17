@@ -7,7 +7,7 @@
 // Axis aligned bounding box
 //
 
-namespace octet {
+namespace octet { namespace math {
   // Orientated bounding box.
   class obb {
     vec3 center;        // world space center
@@ -143,4 +143,4 @@ namespace octet {
     };
     static obb_unit_test obb_unit_test;
   #endif
-}
+} }

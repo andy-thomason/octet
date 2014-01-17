@@ -7,7 +7,7 @@
 // Scene Node heirachy
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class visual_scene : public scene_node {
     ///////////////////////////////////////////
     //
@@ -505,5 +505,5 @@ namespace octet {
       }
     }
   };
-}
+}}
 

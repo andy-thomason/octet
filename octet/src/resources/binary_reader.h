@@ -7,7 +7,7 @@
 // visitor for writing xml files.
 //
 
-namespace octet {
+namespace octet { namespace resources {
   class binary_reader : public visitor {
     enum { debug = true };
     hash_map<void *, int> refs;
@@ -243,5 +243,5 @@ namespace octet {
       }
     }
   };
-}
+} }
 

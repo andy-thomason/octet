@@ -17,7 +17,7 @@
 //   int x = chars_to_int["x"];
 //   int y = chars_to_int["y"];
 //
-namespace octet {
+namespace octet { namespace containers {
 
   class hash_map_cmp {
   public:
@@ -156,4 +156,4 @@ namespace octet {
     key_t key(unsigned i) { return entries[i].key; }
     value_t value(unsigned i) { return entries[i].value; }
   };
-}
+} }

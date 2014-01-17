@@ -6,7 +6,7 @@
 //
 // mouse ball for rotating cameras around points of interest.
 
-namespace octet {
+namespace octet { namespace helpers {
   class mouse_ball {
     app *the_app;
     float distance;
@@ -66,4 +66,4 @@ namespace octet {
       was_mouse_down = is_mouse_down;
     }
   };
-}
+}}

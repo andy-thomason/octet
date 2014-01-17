@@ -7,7 +7,7 @@
 // plane in 3d space
 //
 
-namespace octet {
+namespace octet { namespace math {
   // plane: used for simple collision tests
   class plane {
     // dot(p, normal) == offset
@@ -67,5 +67,5 @@ namespace octet {
       return distance <= rhs.get_radius();
     }
   };
-}
+} }
 

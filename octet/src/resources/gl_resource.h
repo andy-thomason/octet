@@ -7,7 +7,7 @@
 // a gl_resource can be stored in a gl buffer or allocated memory
 //
 
-namespace octet {
+namespace octet { namespace resources {
   class gl_resource : public resource {
     // in GLES2, we need to have a second buffer containing the data
     dynarray<uint8_t> bytes;
@@ -133,4 +133,4 @@ namespace octet {
       rhs->unlock();
     }
   };
-}
+} }

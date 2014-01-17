@@ -11,7 +11,7 @@
 // This simplifies shader design.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class material : public resource {
     // material
     ref<param> diffuse;
@@ -103,5 +103,5 @@ namespace octet {
       bind_textures();
     }
   };
-}
+}}
 

@@ -6,7 +6,7 @@
 //
 // Zip file reader, uses zip_decoder to inflate compressed files.
 
-namespace octet {
+namespace octet { namespace resources {
   class zip_file {
     int ref_cnt;
     FILE *the_file;
@@ -132,4 +132,4 @@ namespace octet {
       }
     }
   };
-}
+} }

@@ -7,7 +7,7 @@
 // Boolean Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   // boolean vector
   class bvec4 {
     int v[4]; // (v < 0) = true, (v >= 0) = false
@@ -56,5 +56,5 @@ namespace octet {
   bool any(const bvec4 &b) {
     return (b.x() | b.y() | b.z() | b.w()) < 0;
   }
-}
+} }
 

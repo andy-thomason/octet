@@ -7,7 +7,7 @@
 // raw 3D mesh container
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class skin : public resource {
     // the original transform of the skin to world space (bind space)
     mat4t modelToBind;
@@ -55,4 +55,4 @@ namespace octet {
     unsigned get_num_joints() const { return joints.size(); }
   };
 
-}
+}}

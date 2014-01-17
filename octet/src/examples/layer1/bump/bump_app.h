@@ -60,10 +60,10 @@ namespace octet {
       cube_mesh.add_3d_normals(tmp);
       //cube_mesh_normals.make_normal_visualizer(cube_mesh, 0.1f, attribute_bitangent);
 
-      diffuse = ambient = resources::get_texture_handle(GL_RGB, "!bricks");
-      emission = resources::get_texture_handle(GL_RGB, "#000000");
-      specular = resources::get_texture_handle(GL_RGB, "#ffffff");
-      bump = resources::get_texture_handle(GL_RGB, "!bump");
+      diffuse = ambient = resource_dict::get_texture_handle(GL_RGB, "!bricks");
+      emission = resource_dict::get_texture_handle(GL_RGB, "#000000");
+      specular = resource_dict::get_texture_handle(GL_RGB, "#ffffff");
+      bump = resource_dict::get_texture_handle(GL_RGB, "!bump");
     }
 
     // this is called to draw the world

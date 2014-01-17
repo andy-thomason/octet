@@ -8,7 +8,7 @@
 // DDS file decoder - direct draw surface
 //
 
-namespace octet {
+namespace octet { namespace loaders {
   class dds_decoder {
     // http://en.wikipedia.org/wiki/DirectDraw_Surface
     // http://www.mindcontrol.org/~hplus/graphics/dds-info/
@@ -315,4 +315,4 @@ namespace octet {
       printf("warning: DDS decoder only supports DXTn\n");
     }
   };
-}
+}}

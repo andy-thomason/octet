@@ -9,7 +9,7 @@
 // Demonstrates a basic scene graph with import from Collada.
 //
 
-#include "../../platform/platform.h"
+#include "../../octet.h"
 
 #include "engine.h"
 

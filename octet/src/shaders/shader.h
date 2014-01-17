@@ -10,7 +10,7 @@
 // (effectively puts quotes around X)
 #define SHADER_STR(X) #X
 
-namespace octet {
+namespace octet { namespace shaders {
   class shader {
     GLuint program_;
 
@@ -83,4 +83,4 @@ namespace octet {
     }
   };
 
-}
+}}

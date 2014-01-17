@@ -19,7 +19,7 @@
 //
 // int annes_age = my_dict["anne"];
 //
-namespace octet {
+namespace octet { namespace containers {
   template <class value_t, class allocator_t=allocator> class dictionary {
     struct entry_t { const char *key; unsigned hash; value_t value; };
     entry_t *entries;
@@ -158,4 +158,4 @@ namespace octet {
       reset();
     }
   };
-}
+} }

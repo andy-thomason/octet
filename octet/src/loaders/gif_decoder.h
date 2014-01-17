@@ -7,7 +7,7 @@
 //
 // gif file decoder - only the most common variants
 // 
-namespace octet {
+namespace octet { namespace loaders {
   class gif_decoder {
     uint16_t lzw_head[0x1001];
     uint8_t lzw_tail[0x1001];
@@ -206,5 +206,5 @@ namespace octet {
       //num_components = transparency_index == 0x100 ? 3 : 4;
     }
   };
-}
+}}
 

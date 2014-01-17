@@ -7,7 +7,7 @@
 // Random number generator
 //
 //
-namespace octet {
+namespace octet { namespace math {
   class random {
     int seed;
   public:
@@ -36,4 +36,4 @@ namespace octet {
       return ( ( seed >> 8 ) & 0xffff );
     }
   };
-}
+} }

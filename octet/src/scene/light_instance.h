@@ -7,7 +7,7 @@
 // Light in a scene. Note that for shadow maps, lights are cameras.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class light_instance : public resource {
     ref<scene_node> node;
 
@@ -106,4 +106,4 @@ namespace octet {
       }*/
     }
   };
-}
+}}

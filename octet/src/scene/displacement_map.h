@@ -8,7 +8,7 @@
 // use with smooth modifier for terrain.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class displacement_map : public mesh {
     // source mesh. Provides underlying geometry.
     ref<mesh> src;
@@ -33,4 +33,4 @@ namespace octet {
       v.visit(src, atom_src);
     }
   };
-}
+}}

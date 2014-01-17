@@ -7,7 +7,7 @@
 // visitor for fetching the game world to a web browser
 // This visitor writes the JSON format required by jquery.jstree.js
 
-namespace octet {
+namespace octet { namespace resources {
   class http_writer : public visitor {
     hash_map<void *, int> refs;
     int next_id;
@@ -113,5 +113,5 @@ namespace octet {
       next().format("%*s{ \"data\": \"%s\", children: [\"%s\"] },\n", depth*2, "", app_utils::get_atom_name(sid), data.c_str());
     }
   };
-}
+} }
 

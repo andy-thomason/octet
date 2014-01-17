@@ -7,7 +7,7 @@
 // raw 3D mesh container
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class mesh_instance : public resource {
   public:
     enum { flag_selected = 1 << 0 };
@@ -111,5 +111,5 @@ namespace octet {
     void set_skeleton(skeleton *value) { skel = value; }
     void set_flags(unsigned value) { flags = value; }
   };
-}
+}}
 

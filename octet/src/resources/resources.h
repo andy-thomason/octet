@@ -7,6 +7,14 @@
 // a container for named resources
 //
 
+namespace octet {
+  namespace scene { class visual_scene; }
+  #define OCTET_CLASS(N, X) namespace N { class X; }
+  #pragma message("resources.h")
+  #include "classes.h"
+  #undef OCTET_CLASS
+}
+
 // resources
 #include "../resources/zip_file.h"
 #include "../resources/app_utils.h"
@@ -20,3 +28,7 @@
 #include "../resources/gl_resource.h"
 #include "../resources/bitmap_font.h"
 #include "../resources/mesh_builder.h"
+
+namespace octet {
+  using namespace resources;
+}

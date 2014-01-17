@@ -151,13 +151,13 @@ namespace octet {
       cameraToWorld.loadIdentity();
       cameraToWorld.translate(0, 0, 5);
 
-      GLuint ship = resources::get_texture_handle(GL_RGBA, "assets/invaderers/ship.gif");
-      GLuint GameOver = resources::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
-      GLuint invaderer = resources::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
+      GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/ship.gif");
+      GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
+      GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
 
       // sounds
-      whoosh = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
-      bang = resources::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
+      whoosh = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
+      bang = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
       cur_source = 0;
       alGenSources(num_sound_sources, sources);
 

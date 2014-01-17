@@ -1,20 +1,23 @@
 namespace octet
 {
-  struct cpp_error
+  namespace compiler
   {
-    enum error_
+    struct cpp_error
     {
-      none,
-      stack_overflow,
-      line_too_long,
-      unterminated_comment,
-      unknown,
-      file_not_found,
-      syntax,
-      expect,
-      internal,
+      enum error_
+      {
+        none,
+        stack_overflow,
+        line_too_long,
+        unterminated_comment,
+        unknown,
+        file_not_found,
+        syntax,
+        expect,
+        internal,
+      };
     };
-  };
+
+  }
 
 }
-

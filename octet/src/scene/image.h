@@ -11,7 +11,7 @@
 // This simplifies shader design.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class image : public resource {
     // primary attributes (to save)
 
@@ -317,5 +317,5 @@ namespace octet {
       return gl_texture;
     }
   };
-}
+}}
 

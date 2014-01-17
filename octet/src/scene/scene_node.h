@@ -7,7 +7,7 @@
 // Scene Node
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class scene_node : public resource {
     // every scene_node has a parent scene_node except the roots (NULL)
     // todo: support DAGs with multiple node parents
@@ -123,4 +123,4 @@ namespace octet {
       }
     }
   };
-}
+}}

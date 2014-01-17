@@ -7,7 +7,7 @@
 // Mesh smooth modifier. Work in progress.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class entry {
   public:
     ivec3 pos;
@@ -350,4 +350,4 @@ namespace octet {
     };
     static mesh_voxels_unit_test mesh_voxels_unit_test;
   #endif
-}
+}}

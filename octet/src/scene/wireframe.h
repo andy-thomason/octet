@@ -7,7 +7,7 @@
 // Wireframe modifier. Generate a wireframe for the triangles in the source.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class wireframe : public mesh {
     // source mesh. Provides underlying geometry.
     ref<mesh> src;
@@ -66,4 +66,4 @@ namespace octet {
       v.visit(src, atom_src);
     }
   };
-}
+}}

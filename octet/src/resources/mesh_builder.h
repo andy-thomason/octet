@@ -9,7 +9,7 @@
 // mesh builder class for standard meshes.
 //
 
-namespace octet {
+namespace octet { namespace resources {
   class mesh_builder {
     struct vertex { float pos[3]; float normal[3]; float uv[2]; };
     dynarray<vertex, allocator> vertices;
@@ -192,7 +192,7 @@ namespace octet {
     }
 
     // get a mesh mesh from the builder either as VBOs or allocated memory.
-    void get_mesh(mesh &s);
+    void get_mesh(scene::mesh &s);
 
     void scale(float x, float y, float z) {
       matrix.scale(x, y, z);
@@ -202,5 +202,5 @@ namespace octet {
       matrix.translate(x, y, z);
     }
   };
-}
+} }
 

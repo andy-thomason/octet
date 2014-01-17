@@ -11,7 +11,7 @@
 // This simplifies shader design.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   // a param is an abstract thing that can provide color or other attributes
   // it could be a texture (with a uv set) or a vertex attribute or a solid color.
   // we could also extend it to provide functions in shaders.
@@ -94,5 +94,5 @@ namespace octet {
       }
     }
   };
-}
+}}
 

@@ -47,7 +47,7 @@
 #include <assert.h>
 
 namespace octet {
-  // write some text to log.txt
+  /// write some text to log.txt
   inline static FILE * log(const char *fmt, ...) {
     static FILE *file;
     va_list list;

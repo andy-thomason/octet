@@ -7,7 +7,7 @@
 //
 // zip deflate format decoder
 // 
-namespace octet {
+namespace octet { namespace loaders {
   class zip_decoder {
     enum { debug = 1 };
 
@@ -353,5 +353,5 @@ namespace octet {
       } while( !is_last_block && bitptr != ~0);
     }
   };
-}
+}}
 

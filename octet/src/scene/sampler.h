@@ -11,7 +11,7 @@
 // This simplifies shader design.
 //
 
-namespace octet {
+namespace octet { namespace scene {
   // Textures need to have control over sampling.
   // for example, we can sample to the "nearest" texel or use
   // "linear" blending between adjacent texels and mip levels
@@ -46,5 +46,5 @@ namespace octet {
       v.visit(texture_wrap_t, atom_texture_wrap_t);
     }
   };
-}
+}}
 

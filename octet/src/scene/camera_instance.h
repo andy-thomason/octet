@@ -7,7 +7,7 @@
 // Scene camera
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class camera_instance : public resource {
     // camera parameters
     ref<scene_node> node;
@@ -190,5 +190,5 @@ namespace octet {
       return yscale;
     }
   };
-}
+}}
 

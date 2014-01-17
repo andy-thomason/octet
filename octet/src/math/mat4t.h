@@ -21,7 +21,7 @@
 //
 // The inverse of the matrix transforms the other way. so inverse4x4(modelToWorld) == worldToModel
 //
-namespace octet {
+namespace octet { namespace math {
   class mat4t {
     // these vectors are the x, y, z, w components. w is the translation.
     vec4 v[4];
@@ -586,4 +586,4 @@ namespace octet {
   static inline mat4t inverse4x4(const mat4t &v) {
     return v.inverse4x4();
   }
-}
+} }

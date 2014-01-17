@@ -7,7 +7,7 @@
 // raw 3D mesh container
 //
 
-namespace octet {
+namespace octet { namespace scene {
   class mesh : public resource {
   public:
     // default vertex format
@@ -749,4 +749,4 @@ namespace octet {
       }
     }
   };
-}
+}}

@@ -6,7 +6,7 @@
 //
 // Bump shader that uses textures for all material channels
 
-namespace octet {
+namespace octet { namespace shaders {
   class bump_shader : public shader {
     // indices to use with glUniform*()
 
@@ -195,4 +195,4 @@ namespace octet {
       glUniform1iv(samplers_index, 5, samplers);
     }
   };
-}
+}}

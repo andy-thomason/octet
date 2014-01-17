@@ -7,7 +7,7 @@
 // Axis aligned bounding box
 //
 
-namespace octet {
+namespace octet { namespace math {
   // Axis aligned bounding box. Used to find the size and location of objects.
   class aabb {
     // we store aabbs this way because it makes ray tests and other operations much simpler.
@@ -203,5 +203,5 @@ namespace octet {
       */
     }
   };
-}
+} }
 

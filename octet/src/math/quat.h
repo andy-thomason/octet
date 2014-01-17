@@ -7,7 +7,7 @@
 // Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class quat : public vec4
   {
   public:
@@ -20,5 +20,5 @@ namespace octet {
     vec4 rotate(const vec4 &r) const { return (*this * r) * conjugate(); }
   };
 
-}
+} }
 

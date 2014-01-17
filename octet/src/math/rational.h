@@ -10,7 +10,7 @@
 // that happen around them.
 //
 
-namespace octet {
+namespace octet { namespace math {
   class rational {
     static const char *Copyright() { return "Copyright(C) Andy Thomason 2011-2013"; }
     // value = n / d
@@ -219,4 +219,4 @@ namespace octet {
   rational abs(const rational &l) {
     return l.abs();
   }
-}
+} }

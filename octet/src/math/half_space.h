@@ -7,7 +7,7 @@
 // half space in 3d. 
 //
 
-namespace octet {
+namespace octet { namespace math {
   // half_space: used for simple collision tests
   class half_space : public plane {
   public:
@@ -32,5 +32,5 @@ namespace octet {
       return distance >= -rhs.get_radius();
     }
   };
-}
+} }
 

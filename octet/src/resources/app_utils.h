@@ -17,10 +17,14 @@ namespace octet {
 
     // put classes at a fixed offset to prevent older files becomming obsolete
     atom_class_base = 0x10000,
-    #define OCTET_CLASS(X) atom_##X,
+    #define OCTET_CLASS(C, X) atom_##X,
+    #pragma message("app_utils.h")
     #include "classes.h"
     #undef OCTET_CLASS
   };
+}
+
+namespace octet { namespace resources {
   
   class app_utils {
   public:
@@ -224,7 +228,8 @@ namespace octet {
       static const char *class_names[] = {
         "",
 
-        #define OCTET_CLASS(X) #X,
+        #define OCTET_CLASS(N, X) #X,
+        #pragma message("app_utils.h 2")
         #include "classes.h"
         #undef OCTET_CLASS
         NULL
@@ -253,4 +258,4 @@ namespace octet {
       return "???";
     }
   };
-}
+} }

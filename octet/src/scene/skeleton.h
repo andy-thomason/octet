@@ -8,7 +8,7 @@
 //
 // A mini scene heirachy for one actor.
 
-namespace octet {
+namespace octet { namespace scene {
   class skeleton : public resource {
     // skeleton components
     dynarray<mat4t> nodeToParents;
@@ -116,4 +116,4 @@ namespace octet {
       nodeToParents[index] = value;
     }
   };
-}
+}}

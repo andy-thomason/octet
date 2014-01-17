@@ -25,16 +25,16 @@
 #ifndef OCTET_COMPILER_INCLUDED
 #define OCTET_COMPILER_INCLUDED
 
-// CG, GLSL, C++ compiler
-#include "../compiler/cpp_error.h"
-#include "../compiler/cpp_tokens.h"
-#include "../compiler/cpp_lexer.h"
-#include "../compiler/cpp_preprocessor.h"
-#include "../compiler/cpp_value.h"
-#include "../compiler/cpp_expr.h"
-#include "../compiler/cpp_type.h"
-#include "../compiler/cpp_statement.h"
-#include "../compiler/cpp_scope.h"
-#include "../compiler/cpp_parser.h"
+  // CG, GLSL, C++ compiler
+  #include "../compiler/cpp_error.h"
+  #include "../compiler/cpp_tokens.h"
+  #include "../compiler/cpp_lexer.h"
+  #include "../compiler/cpp_preprocessor.h"
+  #include "../compiler/cpp_value.h"
+  #include "../compiler/cpp_expr.h"
+  #include "../compiler/cpp_type.h"
+  #include "../compiler/cpp_statement.h"
+  #include "../compiler/cpp_scope.h"
+  #include "../compiler/cpp_parser.h"
 
 #endif

@@ -24,7 +24,7 @@ namespace octet {
     typedef scene_node scene_node;
 
     // named resources loaded from collada file
-    resources dict;
+    resource_dict dict;
 
     // shaders to draw triangles
     bump_shader object_shader;
@@ -48,7 +48,7 @@ namespace octet {
     void load_file(const char *filename) {
       FILE *file = fopen(app_utils::get_path(filename), "rb");
       char buf[8];
-      scene *app_scene = 0;
+      visual_scene *app_scene = 0;
       if (file && fread(buf, 1, sizeof(buf), file) && !memcmp(buf, "octet", 5)) {
         fseek(file, 0, SEEK_SET);
         binary_reader r(file);
@@ -64,7 +64,7 @@ namespace octet {
         }
 
         builder.get_resources(dict);
-        app_scene = dict.get_scene(builder.get_default_scene());
+        app_scene = dict.get_visual_scene(builder.get_default_scene());
 
         assert(app_scene);
 
@@ -173,7 +173,7 @@ namespace octet {
         queue.resize(0);
       }
 
-      scene *app_scene = dict.get_active_scene();
+      visual_scene *app_scene = dict.get_active_scene();
       if (app_scene && app_scene->get_num_camera_instances()) {
         int vx = 0, vy = 0;
         get_viewport_size(vx, vy);

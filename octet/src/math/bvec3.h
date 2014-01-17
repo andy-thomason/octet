@@ -7,7 +7,7 @@
 // Vector class
 //
 
-namespace octet {
+namespace octet { namespace math {
   class bvec3 {
     #if OCTET_SSE
       union {
@@ -124,5 +124,5 @@ namespace octet {
       return (b.x() | b.y() | b.z()) < 0;
     #endif
   }
-}
+} }
 
