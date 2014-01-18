@@ -66,15 +66,17 @@ namespace octet { namespace shaders {
 
     /// create a program from pre-compiled binary code. (ie. PS Vita)  
     void init_bin(const uint8_t *vs, const uint8_t *fs) {
-      printf("creating binary shader program\n");
+      #if OCTET_VITA
+        printf("creating binary shader program\n");
 
-      GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-      glShaderBinary(1, &vertex_shader, 0, vs, 0);
+        GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderBinary(1, &vertex_shader, 0, vs, 0);
     
-      GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-      glShaderBinary(1, &fragment_shader, 0, fs, 0);
+        GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderBinary(1, &fragment_shader, 0, fs, 0);
 
-      link(vertex_shader, fragment_shader);
+        link(vertex_shader, fragment_shader);
+      #endif
     }
 
     // use the program we have compiled in init()

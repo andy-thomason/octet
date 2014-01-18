@@ -18,7 +18,7 @@ namespace octet {
     // put classes at a fixed offset to prevent older files becomming obsolete
     atom_class_base = 0x10000,
     #define OCTET_CLASS(C, X) atom_##X,
-    #pragma message("app_utils.h")
+    //#pragma message("app_utils.h")
     #include "classes.h"
     #undef OCTET_CLASS
   };
@@ -73,7 +73,7 @@ namespace octet { namespace resources {
       if (!strncmp(url, "zip://", 6)) {
         const char *zip = strstr(url + 6, ".zip");
         if (zip) {
-          int path_len = zip - (url + 6) + 4;
+          int path_len = (int)(zip - (url + 6) + 4);
           string zip_url;
           zip_url.set(url + 6, path_len);
           const char *file = (url + 6) + path_len;
@@ -229,7 +229,7 @@ namespace octet { namespace resources {
         "",
 
         #define OCTET_CLASS(N, X) #X,
-        #pragma message("app_utils.h 2")
+        //#pragma message("app_utils.h 2")
         #include "classes.h"
         #undef OCTET_CLASS
         NULL

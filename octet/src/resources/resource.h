@@ -77,7 +77,7 @@ namespace octet { namespace resources {
     // the RESOURCE_META macro overrides each of these once for every class.
     // use the get_* function for casting and checking types.
     #define OCTET_CLASS(N, X) virtual N::X *get_##X() { return 0; }
-    #pragma message("resource.h 2")
+    //#pragma message("resource.h 2")
     #include "classes.h"
     #undef OCTET_CLASS
   };

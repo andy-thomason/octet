@@ -10,7 +10,7 @@
 namespace octet {
   namespace scene { class visual_scene; }
   #define OCTET_CLASS(N, X) namespace N { class X; }
-  #pragma message("resources.h")
+  //#pragma message("resources.h")
   #include "classes.h"
   #undef OCTET_CLASS
 }

@@ -437,8 +437,7 @@ namespace octet { namespace math {
       #endif
     }
     vec3p(float x, float y, float z) { v[0] = x; v[1] = y; v[2] = z; }
-    operator vec3() { return vec3(v[0], v[1], v[2]); }
-    operator const vec3() const { return vec3(v[0], v[1], v[2]); }
+    operator vec3() const { return vec3(v[0], v[1], v[2]); }
   };
 
   #if OCTET_UNIT_TEST

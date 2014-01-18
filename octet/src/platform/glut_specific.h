@@ -184,7 +184,7 @@ namespace octet {
   };
 
   // dummy video capture class
-  class video_capture {
+  /*class video_capture {
   public:
     video_capture() {
     }
@@ -205,7 +205,7 @@ namespace octet {
     unsigned height() { return 0; }
     unsigned bits_per_pixel() { return 0; }
     unsigned image_size() { return 0; }
-  };
+  };*/
 
   // on ARM we can do this faster with the "rev" instruction
   inline static unsigned rev16(unsigned value) {
