@@ -108,7 +108,7 @@ namespace octet { namespace scene {
       dynarray<int> parent_stack;
       stack.push_back(this);
       parent_stack.push_back(-1);
-      while (!stack.is_empty()) {
+      while (!stack.empty()) {
         scene_node *node = stack.back();
         int parent = parent_stack.back();
         int new_parent = nodes.size();

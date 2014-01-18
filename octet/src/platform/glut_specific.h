@@ -135,8 +135,8 @@ namespace octet {
       glutTimerFunc(16, timer, 1);
       map_t &m = map();
       for (int i = 0; i != m.size(); ++i) {
-        if (m.key(i)) {
-          glutSetWindow(m.key(i));
+        if (m.get_key(i)) {
+          glutSetWindow(m.get_key(i));
           glutPostRedisplay();
         }
       }
@@ -160,8 +160,8 @@ namespace octet {
     static void run_all_apps() {
       map_t &m = map();
       for (int i = 0; i != m.size(); ++i) {
-        if (m.key(i)) {
-          glutSetWindow(m.key(i));
+        if (m.get_key(i)) {
+          glutSetWindow(m.get_key(i));
           glutDisplayFunc(display);
           glutReshapeFunc(reshape);
           glutKeyboardFunc(do_key_down);
