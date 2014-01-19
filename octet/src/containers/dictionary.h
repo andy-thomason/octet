@@ -4,22 +4,22 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// map strings to value_t.
-//
-// strings and values are owned by the dictionary.
-//
-// This is like a JavaScript or Python dictionary but for text keys only.
-// It is about twenty times faster than using std::map<std::string, xxx>
-//
-// example:
-//
-// dictionary<int> my_dict;
-// my_dict["fred"] = 27; 
-// my_dict["anne"] = 28; 
-//
-// int annes_age = my_dict["anne"];
-//
 namespace octet { namespace containers {
+  /// Map strings to objects and object references.
+  ///
+  /// Strings and objects are owned by the dictionary.
+  ///
+  /// This is like a JavaScript or Python dictionary but for text keys only.
+  /// It is about twenty times faster than using std::map<std::string, xxx>
+  ///
+  /// Example:
+  ///
+  ///     dictionary<int> my_dict;
+  ///     my_dict["fred"] = 27; 
+  ///     my_dict["anne"] = 28; 
+  ///
+  ///     int annes_age = my_dict["anne"];
+  ///
   template <class value_t, class allocator_t=allocator> class dictionary {
     struct entry_t { const char *key; unsigned hash; value_t value; };
     entry_t *entries;
@@ -88,12 +88,14 @@ namespace octet { namespace containers {
       memset(entries, 0, sizeof(entry_t) * max_entries);
     }
   public:
-    // make a new dictionary
+    /// make a new dictionary
     dictionary() {
       init();
     }
 
-    // index the dictionary
+    /// Access an element by name.
+    /// This will create a new element if one does not exist.
+    /// For more detail, use get_index(), get_key() and get_value()
     value_t &operator[]( const char *key ) {
       unsigned hash = calc_hash( key );
       entry_t *entry = find( key, hash );
@@ -113,47 +115,49 @@ namespace octet { namespace containers {
       return entry->value;
     }
 
+    /// Return true if the dictionary contains key.
     bool contains(const char *key) {
       unsigned hash = calc_hash( key );
       entry_t *entry = find( key, hash );
       return entry && entry->key;
     }
 
-    // how many entries are used?
+    /// Return the number of entries stored in the dictionary.
     unsigned get_size() const {
       return num_entries;
     }
 
-    // allow iteration over keys and values
+    /// Return the max number of entries to allow iteration over keys and values.
     unsigned get_num_indices() const {
       return max_entries;
     }
 
-    // get a specific key
+    /// When iterating, get the key for a certain index. Index can also be found by get_index()
     const char *get_key(unsigned index) const {
       assert(index < max_entries);
       return entries[index].key;
     }
 
-    // access a specific value
+    /// When iterating, access a specified value.
     value_t &get_value(unsigned index) {
       assert(index < max_entries);
       return entries[index].value;
     }
 
+    /// Get the index for a certain key, or -1 if the key is not found.
     int get_index(const char *key) {
       unsigned hash = calc_hash( key );
       entry_t *entry = find( key, hash );
       return entry && entry->key ? (int)(entry - entries) : -1;
     }
 
-    // free up the resources
+    /// Reset the dictionary to empty and free up the resources.
     void reset() {
       release();
       init();
     }
   
-    // bye bye dictionary. Use the allocator to free up memory.
+    /// Bye bye dictionary. Use the allocator to free up memory.
     ~dictionary() {
       reset();
     }

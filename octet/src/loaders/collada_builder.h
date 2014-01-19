@@ -818,7 +818,7 @@ namespace octet { namespace loaders {
 
       node_stack.push_back(s.get_root_node());
       stack.push_back(scene_element);
-      while (!stack.is_empty()) {
+      while (!stack.empty()) {
         TiXmlElement *parent_elem = stack.back();
         scene_node *parent = node_stack.back();
         stack.pop_back();

@@ -48,7 +48,7 @@ GLuint octet::resources::resource_dict::get_texture_handle_internal(unsigned gl_
 inline octet::resources::resource *octet::resources::resource::new_type(atom_t type) {
   switch ((int)type) {
     #define OCTET_CLASS(N, X) case atom_##X: return new X();
-    #pragma message("resources.inl")
+    //#pragma message("resources.inl")
     #include "../resources/classes.h"
     #undef OCTET_CLASS
   }

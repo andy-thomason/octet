@@ -764,11 +764,11 @@ namespace octet { namespace scene {
       unsigned stride = get_stride();
       
       for (unsigned i = 0; i != edges.size(); ++i) {
-        if (edges.key(i)) {
-          uint64_t tris = edges.value(i);
+        if (edges.get_key(i)) {
+          uint64_t tris = edges.get_value(i);
           uint32_t tri_a = (uint32_t)(tris) - 1;
           uint32_t tri_b = (uint32_t)(tris >> 32) - 1;
-          assert(edges.value(i));
+          assert(edges.get_value(i));
           if (
             tri_b == 0 ||
             tri_is_visible(
@@ -777,7 +777,7 @@ namespace octet { namespace scene {
               tri_b, pos_offset, stride, ip, vp, viewpoint, is_directional
             )
           ) {
-            uint64_t idxs = edges.value(i);
+            uint64_t idxs = edges.get_value(i);
             uint32_t idx_a = (uint32_t)idxs;
             uint32_t idx_b = (uint32_t)(idxs >> 32);
             indices.push_back(idx_a);

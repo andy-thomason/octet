@@ -142,7 +142,7 @@ private:
         unsigned chr = decode_utf8(src);
         int index = char_map.get_index(chr);
         if (index >= 0) {
-          const char_info *ci = char_map.value(index);
+          const char_info *ci = char_map.get_value(index);
           if (ci) {
             result += s2(ci->xadvance);
           }
@@ -153,7 +153,7 @@ private:
 
     // create other data items from font_info
     void update() {
-      if (font_info.is_empty()) return;
+      if (font_info.empty()) return;
 
       finfo = 0;
       fcommon = 0;
@@ -201,7 +201,7 @@ private:
 
         int index = char_map.get_index(chr);
         if (index >= 0) {
-          const char_info *ci = char_map.value(index);
+          const char_info *ci = char_map.get_value(index);
           if (ci) {
             unsigned x = u2(ci->x);
             unsigned y = u2(ci->y);
@@ -286,7 +286,7 @@ private:
       int ydraw = ymax - line_height + base;
 
       int index = char_map.get_index(' ');
-      const char_info *ci = index >= 0 ? char_map.value(index) : 0;
+      const char_info *ci = index >= 0 ? char_map.get_value(index) : 0;
       int space_size = ci ? s2(ci->xadvance) : line_height / 2;
 
       for (const char *src = text; src < max_text && *src && num_quads < max_quads; ) {

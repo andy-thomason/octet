@@ -25,14 +25,55 @@
 #ifndef OCTET_INCLUDED
 #define OCTET_INCLUDED
 
-  // project namespace layout
+  ///
+  /// octet is the top-level namespace.
+  /// All classes that are part of the octet framework are part of this namespace.
+  /// 
   namespace octet {
+    /// The containers namespace holds classes that own data.
+    ///
+    /// The data will be freed when the objects go out of scope.
+    ///
+    /// Examples
+    ///
+    ///     dynarray<float> my_float_array; // a variable length array of floating point numbers
+    ///     ref<visual_scene> my_scene;     // a smart pointer to a visual scene object.
+    ///     dictionary<int> my_dict;        // text-to-object map, can be accessed like my_dict["twenty"]
     namespace containers {}
+
+
+    /// The resources namespace holds classes that manage game data.
+    ///
+    /// All classes that are derived from the class resouce will work with the ref<> class.
+    ///
+    /// Examples
+    ///
+    ///     resource_dict my_resource;
+    ///     visual_scene *scene = my_resource.get_visual_scene("loading_scene");
     namespace resources {}
+    
+    /// The scene namespace holds classes that represent parts of a game scene.
+    ///
+    /// All classes are derived from resource so that the ref<> class can hold a pointer to them.
+    ///
+    /// Example
+    ///
+    ///     visual_scene *scene = new visual_scene();
+    ///     
     namespace scene {}
+    
+    /// The math namespace contains classes that deal with numbers and vectors.
+    ///
+    /// The classes are designed to be similar to vectors and matrices in GLSL and OpenCL
     namespace math {}
+    
+    /// The helpers namespace contains classe that provide user interface services.
     namespace helpers {}
+    
+    /// The loaders namespace contains classes that decode and encode a variety of formats.
     namespace loaders {}
+    
+    /// The shaders namespace contains a number of stock shaders.
     namespace shaders {}
 
     using namespace containers;

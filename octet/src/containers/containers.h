@@ -31,7 +31,6 @@
 #include "../containers/double_list.h"
 #include "../containers/dynarray.h"
 #include "../containers/string.h"
-#include "../containers/ptr.h"
 #include "../containers/ref.h"
 #include "../containers/bitset.h"
 

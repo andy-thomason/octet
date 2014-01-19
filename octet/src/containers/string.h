@@ -13,6 +13,14 @@
 //
 
 namespace octet { namespace containers {
+  /// The string class is used to hold persistant text strings.
+  ///
+  /// Only use this class as a data member in another class. Do not pass strings as parameters
+  /// but instead use const char * to pass strings around locally.
+  ///
+  /// This string class has the ability to perform a few common operations such as formatting
+  /// and url encode/decode.
+  ///
   class string {
     char *data_;
 
@@ -136,15 +144,30 @@ namespace octet { namespace containers {
       return num_bytes;
     }
   public:
+    /// Default constructor: empty string.
     string() { data_ = null_string(); }
 
+    /// Copy a UTF8 C string
     string(const char *value) { data_ = null_string(); *this = value; }
+    
+    /// Copy of a UFT16 C string
     string(const wchar_t *value) { data_ = null_string(); *this = value; }
+    
+    /// Copy of another string
     string(const string& rhs) { data_ = null_string(); *this = rhs.c_str(); }
+    
+    /// Copy of a substring
     string(const char *value, unsigned size) { data_ = null_string(); set(value, size); }
 
+    /// Free up memory used by the string.
     ~string() { release(); }
 
+    /// Format a string using sprintf.
+    ///
+    /// Example
+    ///
+    ///     string my_path;
+    ///     my_path.format("%s/%s.dat", path, filename);
     string &format(const char *fmt, ...) {
       release();
       va_list v;
@@ -163,7 +186,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
-    // decode url strings - to turn them into filenames, for example
+    /// Decode url strings - to turn them into filenames, for example.
     string &urldecode(const char *value) {
       release();
       if (value) {
@@ -176,7 +199,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
-    // encode url strings - to turn them into filenames, for example
+    /// encode url strings - to turn them into URLs, for example
     string &urlencode(const char *value) {
       release();
       if (value) {
@@ -189,7 +212,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
-    // utf8 strings - unix, mac and the web
+    // copy a utf8 string - unix, mac and the web.
     string &operator=(const char *value) {
       release();
       if (value) {
@@ -202,7 +225,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
-    // utf16 unicode strings - microsoft & java
+    // copy utf16 unicode strings - microsoft & java
     string &operator=(const wchar_t *value) {
       release();
       if (value) {
@@ -215,8 +238,10 @@ namespace octet { namespace containers {
       return *this;
     }
 
+    /// copy another string
     string &operator=(const string& rhs) { data_ = null_string(); *this = rhs.c_str(); return *this; }
 
+    /// copy a substring
     string &set(const char *value, unsigned size) {
       release();
       if (value) {
@@ -229,6 +254,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
+    /// shorten a string to a new length
     string &truncate(int new_len) {
       int size = (int)strlen(data_);
       if (new_len < size) {
@@ -242,11 +268,16 @@ namespace octet { namespace containers {
       return *this;
     }
 
+    /// compare two strings
     bool operator==(const char *rhs) const { return strcmp(data_, rhs) == 0; }
+    /// compare two strings
     bool operator!=(const char *rhs) const { return strcmp(data_, rhs) != 0; }
+    /// compare two strings
     bool operator<(const char *rhs) const { return strcmp(data_, rhs) < 0; }
+    /// compare two strings
     bool operator>(const char *rhs) const { return strcmp(data_, rhs) > 0; }
 
+    /// Append to a string. Note: it is generally better to use format.
     string &operator+=(const char *rhs) {
       if (rhs) {
         size_t data_size = strlen(data_);
@@ -261,6 +292,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
+    /// Insert a substring.
     string &insert(unsigned pos, const char *rhs) {
       if (rhs) {
         size_t data_size = strlen(data_);
@@ -275,6 +307,7 @@ namespace octet { namespace containers {
       return *this;
     }
 
+    /// Find a substring.
     int find(const char *rhs) const {
       char *d = strstr(data_, rhs);
       if (d) {
@@ -283,6 +316,7 @@ namespace octet { namespace containers {
       return -1;
     }
 
+    /// Find the position of the extension in a file path.
     int extension_pos() const {
       int res = -1;
       for (const char *p = data_; *p; ++p) {
@@ -296,6 +330,7 @@ namespace octet { namespace containers {
       return res;
     }
 
+    /// Find the position of a filename in a file path
     int filename_pos() const  {
       int res = 0;
       for (const char *p = data_; *p; ++p) {
@@ -307,15 +342,28 @@ namespace octet { namespace containers {
       return res;
     }
 
+    /// Number of bytes in a string. Note: this is not the number of characters.
     int size() { return (int)strlen(data_); }
 
+    /// Get a C string from this string.
     const char *c_str() const { return data_; }
+    /// Get a C string from this string.
     operator const char *() { return data_; }
 
+    /// Get/set a byte from the string.
     char &operator[](int index) { return data_[index]; }
+    
+    /// Get a byte from the string.
     char operator[](int index) const { return data_[index]; }
 
-    // python-style string split
+    /// python-style string split.
+    ///
+    /// Example.
+    ///
+    ///     dynarray<string> parts;
+    ///     string my_csv = "100,fred,bert,harry";
+    ///     my_csv.split(parts, ",")
+    ///     // parts now contains four strings: "100", "fred", "bert", "harry"
     void split(dynarray<string> &result, const char *delimiter) {
       result.resize(0);
       char *cur = data_;
@@ -331,6 +379,7 @@ namespace octet { namespace containers {
       result.back() = cur;
     }
 
+    /// return true if the string is empty.
     bool empty() {
       return size() == 0;
     }

@@ -9,12 +9,9 @@
 
 #ifndef OCTET_RESOURCES_INCLUDED
 #define OCTET_RESOURCES_INCLUDED
-
-  // use the classes.h file to create prototypes for core classes.
   namespace octet {
     namespace scene { class visual_scene; }
     #define OCTET_CLASS(N, X) namespace N { class X; }
-    #pragma message("resources.h")
     #include "classes.h"
     #undef OCTET_CLASS
   }

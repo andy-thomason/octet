@@ -8,12 +8,27 @@
 //
 
 namespace octet { namespace containers {
+  /// Fixed size bit set class.
+  /// Bit sets are useful for keeping track of multiple boolean states.
+  /// For example, if we have a particle system, we can track the "live" state of a particle
+  /// by using only one bit per particle.
+  ///
+  /// Example
+  ///
+  ///     bitset<256> is_upper_case;
+  ///     for (unsigned i = 'A'; i <= 'Z'; ++i) {
+  ///       is_upper_case.setbit(i);
+  ///     }
+  ///
+  ///     now we can test if a character is upper case:
+  ///     if (bitset[chr]) printf("%c is upper case\n", chr);
+  ///
   template < unsigned size_ > class bitset
   {
     unsigned bits_[ ( size_ + 31 ) / 32 ];
 
   public:
-
+    /// clear the bit set to zeros
     void clear()
     {
       for( unsigned i = 0; i < ( size_ + 31 ) / 32; ++i )
@@ -22,6 +37,11 @@ namespace octet { namespace containers {
       }
     }
 
+    /// In the case of a character bitset, set these character values to "true"
+    /// Example:
+    ///
+    ///   bitset<256> numbers;
+    ///   numbers = "0123456789";
     void operator =( const char *members )
     {
       clear();
@@ -39,6 +59,7 @@ namespace octet { namespace containers {
       }
     }
 
+    /// In the case of numeric sets, set these members to 1.
     void operator =( const short *members )
     {
       clear();
@@ -49,16 +70,25 @@ namespace octet { namespace containers {
       }
     }
 
+    /// Return 1 if a specific bit is set.
     unsigned operator[] ( unsigned index )
     {
       return ( bits_[ index >> 5 ] >> ( index & 31 ) ) & 1;
     }
     
+    /// Set a bit to one.
     void setbit( unsigned bit )
     {
       bits_[ bit >> 5 ] |= 1 << ( bit & 31 );
     }
 
+    /// Reset a bit to zero.
+    void clearbit( unsigned bit )
+    {
+      bits_[ bit >> 5 ] &= ~(1 << ( bit & 31 ));
+    }
+
+    /// Return true if thse two sets intersect.
     bool intersects( const bitset &b ) const
     {
       unsigned u = 0;
@@ -69,6 +99,7 @@ namespace octet { namespace containers {
       return u != 0;
     }
 
+    /// Make the union of sets a and b into a.
     void make_union( const bitset &b )
     {
       for( unsigned i = 0; i < ( size_ + 31 ) / 32; ++i )
@@ -77,6 +108,7 @@ namespace octet { namespace containers {
       }
     }
 
+    /// Make the intersection of sets a and b into a.
     bitset make_intersect( const bitset &b ) const
     {
       bitset result;

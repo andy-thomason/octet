@@ -135,8 +135,8 @@ namespace octet {
       glutTimerFunc(16, timer, 1);
       map_t &m = map();
       for (int i = 0; i != m.size(); ++i) {
-        if (m.key(i)) {
-          glutSetWindow(m.key(i));
+        if (m.get_key(i)) {
+          glutSetWindow(m.get_key(i));
           glutPostRedisplay();
         }
       }
@@ -160,8 +160,8 @@ namespace octet {
     static void run_all_apps() {
       map_t &m = map();
       for (int i = 0; i != m.size(); ++i) {
-        if (m.key(i)) {
-          glutSetWindow(m.key(i));
+        if (m.get_key(i)) {
+          glutSetWindow(m.get_key(i));
           glutDisplayFunc(display);
           glutReshapeFunc(reshape);
           glutKeyboardFunc(do_key_down);
@@ -184,7 +184,7 @@ namespace octet {
   };
 
   // dummy video capture class
-  class video_capture {
+  /*class video_capture {
   public:
     video_capture() {
     }
@@ -205,7 +205,7 @@ namespace octet {
     unsigned height() { return 0; }
     unsigned bits_per_pixel() { return 0; }
     unsigned image_size() { return 0; }
-  };
+  };*/
 
   // on ARM we can do this faster with the "rev" instruction
   inline static unsigned rev16(unsigned value) {

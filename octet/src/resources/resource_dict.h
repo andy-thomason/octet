@@ -134,7 +134,7 @@ namespace octet { namespace resources {
     }
 
     #define OCTET_CLASS(N, X) N::X *get_##X(const char *id) { resource *res = get_resource(id); return res ? res->get_##X() : 0; }
-    #pragma message("resource_dict.h")
+    //#pragma message("resource_dict.h")
     #include "classes.h"
     #undef OCTET_CLASS
 

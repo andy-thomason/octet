@@ -82,6 +82,5 @@ namespace octet {
 #include "plane.h"
 #include "half_space.h"
 #include "ray.h"
-#include "csg.h"
 
 #endif

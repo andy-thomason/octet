@@ -81,8 +81,7 @@ namespace octet { namespace scene {
       init(aabb(vec3(0, 0, 0), size));
     }
 
-    /// Construct box from aabb
-    mesh_box &set_size(const aabb &size) {
+    void set_size(const aabb &size) {
       init(size);
       update();
     }
@@ -103,7 +102,7 @@ namespace octet { namespace scene {
         vtx++;
         fs += 8;
       }
-      assert((int)fs - (int)box_vertices() == get_vertices()->get_size());
+      assert((intptr_t)fs - (intptr_t)box_vertices() == get_vertices()->get_size());
 
       memcpy(idx, box_indices(), sizeof(uint32_t)*6*6);
 
@@ -117,7 +116,6 @@ namespace octet { namespace scene {
     /// Serialise the box
     void visit(visitor &v) {
       mesh::visit(v);
-      v.visit(size, atom_size);
       if (v.is_reader()) {
         update();
       }

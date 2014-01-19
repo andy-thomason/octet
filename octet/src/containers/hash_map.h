@@ -8,17 +8,9 @@
 //
 // strings and values are owned by the dictionary.
 //
-// A hash map is like a dictionary in JavaScript or Python, but works with only one type of key and value.
-//
-// example:
-//   hash_map<chars, int> chars_to_int;
-//   chars_to_int["x"] = 1;
-//   chars_to_int["y"] = 2;
-//   int x = chars_to_int["x"];
-//   int y = chars_to_int["y"];
-//
 namespace octet { namespace containers {
 
+  /// A support class for hash_map that is used to implement different kinds of key.
   class hash_map_cmp {
   public:
     // mix in some bits from higher positions to lower positions
@@ -37,6 +29,22 @@ namespace octet { namespace containers {
     //template <typename T> static bool equals(const T &lhs, const T &rhs) { return lhs == rhs; }
   };
 
+  /// A map fom a key type to an object type.
+  ///
+  /// Do not use for strings, use %dictionary instead.
+  ///
+  /// A hash map is like a dictionary in JavaScript or Python, but works with only one type of key and value.
+  ///
+  /// Example:
+  ///
+  ///     hash_map<int, int> int_to_int;
+  ///     int_to_int[5] = 7;
+  ///     int_to_int[9] = 11;
+  ///     printf("[5]=%d [9]=%d\n", int_to_int[5], int_to_int[9]);
+  ///
+  ///     for (unsigned i = 0; i != int_to_int.size(); ++i) {
+  ///       printf("key=d value=%d\n", int_to_int.get_key(i), int_to_int.get_value(i));
+  ///     }
   template <typename key_t, typename value_t, class cmp_t=hash_map_cmp, class allocator_t=allocator> class hash_map {
     // internal gubbins to implement the hash map
     struct entry_t { key_t key; unsigned hash; value_t value; };
@@ -92,18 +100,18 @@ namespace octet { namespace containers {
       memset(entries, 0, sizeof(entry_t) * max_entries);
     }
   public:
-    // allocate a small map for starters that has a small number of elements.
+    // Create an empty map.
     hash_map() {
       init();
     }
-  
+
+    /// Remove all keys and values from the hash map.
     void clear() {
       release();
       init();
     }
   
-    // access the 
-    // eg. my_map["fred"]
+    /// Access the map by key
     value_t &operator[]( const key_t &key ) {
       unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
@@ -121,29 +129,37 @@ namespace octet { namespace containers {
       return entry->value;
     }
 
+    /// Does the map have this key?
     bool contains(const key_t &key) {
       unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
       return !cmp_t::is_empty(entry->key);
     }
 
+    /// Get an integer that represents the position in the map of this key.
+    ///
+    /// Note: only valid if the map does not change size.
     int get_index(const key_t &key) {
       unsigned hash = cmp_t::get_hash(key);
       entry_t *entry = find( key, hash );
       return entry ? (int)(entry - entries) : -1;
     }
 
+    /// For a specfic index, get the key.
+    ///
+    /// Used for iterating through the map or if using find()
     const key_t &get_key(int index) const {
-      assert(index >= 0 && index < max_entries);
+      assert((unsigned)index < max_entries);
       return entries[index].key;
     }
 
+    /// For a specific index, get the value
     const value_t &get_value(int index) const {
-      assert(index >= 0 && index < max_entries);
+      assert((unsigned)index < max_entries);
       return entries[index].value;
     }
 
-    // bye bye hash map
+    /// bye bye hash map
     ~hash_map() {
       allocator_t::free(entries, sizeof(entry_t) * max_entries);
       entries = 0;
@@ -151,9 +167,12 @@ namespace octet { namespace containers {
       max_entries = 0;
     }
 
-    // stl-style iterators are bloated. This is a simpler iterator scheme
+    /// Get the maximum number of keys and values in the map.
+    ///
+    /// Used for iteration.
     unsigned size() { return max_entries; }
-    key_t key(unsigned i) { return entries[i].key; }
-    value_t value(unsigned i) { return entries[i].value; }
+    
+    //key_t key(unsigned i) { return entries[i].key; }
+    //value_t value(unsigned i) { return entries[i].value; }
   };
 } }

@@ -6,20 +6,24 @@
 //
 // map strings to value_t.
 //
-// Double-linked list class
-//
-// example:
-//
-//   double_list<int> my_list;
-//   my_list.push_back(1);
-//   my_list.push_back(2);
-//   my_list.push_back(3);
-//
-//   for (auto i = my_list.begin(); i != my_list.end(); ++i) {
-//     printf("%d\n", *i);
-//   }
-// 
 namespace octet { namespace containers {
+  /// Double-linked list class
+  ///
+  /// Double linke lists make for easy inertion but cannot random access.
+  /// They also have an overhead of two pointers for every element.
+  /// For this reason, use dynarray and dynarray<ref<> > where possible.
+  ///
+  /// example:
+  ///
+  ///     double_list<int> my_list;
+  ///     my_list.push_back(1);
+  ///     my_list.push_back(2);
+  ///     my_list.push_back(3);
+  ///
+  ///     for (auto i = my_list.begin(); i != my_list.end(); ++i) {
+  ///       printf("%d\n", *i);
+  ///     }
+  /// 
   template <class item, class allocator_t=allocator> class double_list {
     struct double_list_head {
       // this makes new and delete use the allocator
@@ -62,11 +66,14 @@ namespace octet { namespace containers {
     // do not define this!
     // a copy constructor makes no sense.
     double_list(const double_list &rhs);
+
   public:
+    /// Construct a new double linked list
     double_list() {
       head.next = head.prev = &head;
     }
 
+    /// Delete all the elements in a double linked list.
     ~double_list() {
       for (double_list_head *ptr = head.next, *next; ptr != &head; ptr = next) {
         next = ptr->next;
@@ -75,6 +82,7 @@ namespace octet { namespace containers {
       }
     }
 
+    /// STL-style iterator.
     class iterator {
       double_list_node *node;
       friend class double_list;
@@ -87,14 +95,17 @@ namespace octet { namespace containers {
       iterator &operator--() { node = (double_list_node *)node->prev; return *this; }
     };
 
+    /// get an iterator reprenting the first element in the list
     iterator begin() {
       return iterator( (double_list_node*)head.next );
     }
 
+    /// get an iterator reprenting the end of the list
     iterator end() {
       return iterator( (double_list_node*)&head );
     }
   
+    /// Use an interator to insert in the list.
     iterator insert(iterator it, const item &new_item) {
       double_list_node *new_node = new double_list_node(new_item);
       //printf("insert %p at %p\n", new_node, it.node);
@@ -106,7 +117,7 @@ namespace octet { namespace containers {
       return iterator(new_node);
     }
 
-    // you can erase one element from the node
+    /// Use an iterator to erase one element from the list.
     iterator erase(iterator it) {
       double_list_head tmp = *it.node;
       tmp.next->prev = tmp.prev;
@@ -116,6 +127,7 @@ namespace octet { namespace containers {
       return iterator((double_list_node *)tmp.prev);
     }
   
+    /// Add an element to the end of the list.
     void push_back(const item &new_item) {
       double_list_node *new_node = new double_list_node(new_item);
       head.prev->next = new_node;
