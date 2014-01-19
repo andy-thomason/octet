@@ -16,59 +16,61 @@
   static atom_t get_type_static() { return atom_##classname; }
 
 namespace octet { namespace resources {
+  /// Base class for resources; provides aligned allocation and reference counting.
   class resource {
     // how many lives do we have?
     int ref_count;
 
   public:
-    // make a new resource with no lives.
-    // adding it to a ref<> will give it a life.
+    /// Make a new resource with no lives.
+    /// Adding it to a ref<> will give it a life.
     resource() {
       ref_count = 0;
     }
 
-    // factory for making new resources of various kinds
+    /// factory for making new resources of various kinds
+    /// used by readers
     static resource *new_type(atom_t type);
 
-    // called by an animation, script or RPC.
+    /// Animation hook; called by an animation, script or RPC.
     virtual void set_value(atom_t sid, atom_t sub_target, atom_t component, float *value) {
     }
 
-    // visit the resource for saving, loading and script access
+    /// visit the resource for saving, loading and script access
     virtual void visit(visitor &v) {
     }
 
-    // update the resource if anything has changed
+    /// update the resource if anything has changed
     virtual void update() {
     }
 
-    // what kind of resource are we?
+    /// what kind of resource are we?
     virtual atom_t get_type() {
       return atom_;
     }
 
-    // destructors must be virtual or they may not get called!
+    /// destructors must be virtual or they may not get called!
     virtual ~resource() {
     }
 
-    // give this resource an extra life
+    /// Give this resource an extra life; see the %ref class.
     void add_ref() {
       ref_count++;
     }
 
-    // remove a life from this resource and delete it if it is dead.
+    /// Remove a life from this resource and delete it if it is dead; see the %ref class.
     void release() {
       if (--ref_count == 0) {
         delete this;
       }
     }
 
-    // use the allocator to allocate this resource and its child classes
+    /// use the allocator to allocate this resource and its child classes
     void *operator new (size_t size) {
       return allocator::malloc(size);
     }
 
-    // use the allocator to free this resource and its child classes
+    /// use the allocator to free this resource and its child classes
     void operator delete (void *ptr, size_t size) {
       return allocator::free(ptr, size);
     }

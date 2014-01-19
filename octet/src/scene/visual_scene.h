@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Visual scene; contains instances of meshes, cameras and lights required to draw a scene.
   class visual_scene : public scene_node {
     ///////////////////////////////////////////
     //
@@ -227,7 +228,7 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(visual_scene)
 
-    // create an empty visual_scene
+    /// Create an empty visual_scene; Use add_* functions to add components to the scene.
     visual_scene() {
       frame_number = 0;
       num_light_uniforms = 0;

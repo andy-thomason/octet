@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace resources {
+  /// Bitmap font class. Uses the Angelcode BMFont .fnt file format
   class bitmap_font : public resource {
     // Angelcode BMFont .fnt file format
 
@@ -75,7 +76,7 @@ namespace octet { namespace resources {
     hash_map<unsigned, const char_info *> char_map;
 
 public:
-    // output format
+    /// Output vertex format used by the mesh generator.
     struct vertex {
       float x, y, z;
       float u, v;
@@ -240,7 +241,7 @@ private:
   public:
     RESOURCE_META(bitmap_font)
 
-    // create new bitmap font info
+    /// Create new bitmap font info object given the URL of a .fnt file
     bitmap_font(int page_width=1, int page_height=1, const char *fnt_file = 0) {
       uscale = 1.0f / page_width;
       vscale = 1.0f / page_height;
@@ -250,7 +251,7 @@ private:
       }
     }
 
-    // serialize this object.
+    /// Serialize this object.
     void visit(visitor &v) {
       v.visit(font_info, atom_font_info);
       v.visit(uscale, atom_uscale);
@@ -258,7 +259,7 @@ private:
       if (v.is_reader()) update();
     }
 
-    // build a mesh by combining the string with the bitmap font info.
+    /// Build a mesh by combining the string with the bitmap font info.
     unsigned build_mesh(const aabb &bb, vertex *vtx, uint32_t *idx, unsigned max_quads, const char *text, const char *max_text) {
       // defensive coding
       if (!idx || !vtx) return 0;

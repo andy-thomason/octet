@@ -4,10 +4,6 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// generalised visitor for serialisation, web interfaces and RPCs.
-//
-// A visitor pattern can be used to solve a number of problems and provides
-// "Metadata" for the classes.
 
 namespace octet { namespace resources {
   class visitor;
@@ -19,6 +15,10 @@ namespace octet { namespace resources {
     virtual void visit(visitor &v) = 0;
   };
 
+  /// A Generalised visitor for serialisation, scripting, web interfaces and RPCs.
+  ///
+  /// A visitor pattern can be used to solve a number of problems and provides
+  /// "Metadata" for the classes.
   class visitor {
     enum { debug = true };
     unsigned depth;
@@ -34,96 +34,144 @@ namespace octet { namespace resources {
       if (debug) log("%*svisit %s\n", get_depth()*2, "", app_utils::get_atom_name(type));
     }
   public:
-    // implementation
+    /// Constructor. This will be called by derived classes.
     visitor() {
       depth = 0;
       error = false;
     }
 
+    /// Destructor. This will be called by derived classes.
+    /// Note this is a virtual destructor.
     virtual ~visitor() {
     }
 
-    // depth for debugging
+    /// Depth for debugging. Used when tracing visits.
     unsigned get_depth() {
       return depth;
     }
 
-    // set to terminate scan
+    /// If we get an error while scanning, set this value.
     void set_error(bool value) {
       error = value;
     }
 
-    // returns true if an error has occured
+    /// returns true if an error has occured
     bool get_error() {
       return error;
     }
 
-    // begin_ref returns true if we need to recurse.
+    /// Begin a reference that is part of a structure. begin_ref returns true if we need to recurse.
     virtual bool begin_ref(void *ref, atom_t sid, atom_t type) = 0;
+
+    /// Begin a reference that is part of an array.
     virtual bool begin_ref(void *ref, int index, atom_t type) = 0;
+
+    /// Begin a reference that is part of a dictionary.
     virtual bool begin_ref(void *ref, const char *sid, atom_t type) = 0;
+
+    /// End a reference
     virtual void end_ref() = 0;
 
-    // for arrays and dictionaries
+    /// Begin an array or dictionary.
     virtual bool begin_refs(atom_t sid, int &size, bool is_dict) = 0;
+
+    /// End an array or dictionary.
     virtual void end_refs(bool is_dict) = 0;
 
-    // for "blobs" binary large objects
+    /// Implement this for "blobs" binary large objects
     virtual void visit_bin(void *value, size_t size, atom_t sid, atom_t type) = 0;
+
+    /// Implement this for octet strings
     virtual void visit_string(string &value, atom_t sid) {}
 
-    // when loading, we use these functions as well
+    /// Implement this for readers.
     virtual bool is_reader() { return false; }
+
+    /// Implement this to read/write references
     virtual bool begin_read_ref(void *&ref, atom_t &sid, atom_t &type) { return false; }
+
+    /// Implement this to read/write arrays
     virtual bool begin_read_ref(void *&ref, int index, atom_t &type) { return false; }
+
+    /// Implement this to read/write dictionaries
     virtual bool begin_read_ref(void *&ref, const char *&sid, atom_t &type) { return false; }
+
+    /// Implement this to read/write dynarrays
     virtual unsigned begin_read_dynarray(unsigned elem_size, atom_t &sid) { return 0; }
+
+    /// Implement this to read/write dynarrays
     virtual void end_read_dynarray(void *ptr, unsigned bytes) {}
+
+    /// readers use this to add a new reference
     virtual void add_new_ref(void *ref) {}
+
+    /// begin an aggregate
     virtual bool begin_agg(void *ref, atom_t sid, atom_t type) { return true; }
+
+    /// end an aggregate
     virtual void end_agg() {}
 
+    /// Call this in your "visit" method
     void visit(int8_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_int8);
     }
 
+    /// Call this in your "visit" method
     void visit(int16_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_int16);
     }
 
+    /// Call this in your "visit" method
     void visit(int32_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_int32);
     }
 
+    /// Call this in your "visit" method
     void visit(uint8_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_uint8);
     }
 
+    /// Call this in your "visit" method
     void visit(uint16_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_uint16);
     }
 
+    /// Call this in your "visit" method
     void visit(uint32_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_uint32);
     }
 
+    /// Call this in your "visit" method
     void visit(mat4t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_mat4t);
     }
 
+    /// Call this in your "visit" method
+    void visit(vec2 &value, atom_t sid) {
+      visit_bin(&value, sizeof(value), sid, atom_vec2);
+    }
+
+    /// Call this in your "visit" method
+    void visit(vec3 &value, atom_t sid) {
+      visit_bin(&value, sizeof(value), sid, atom_vec3);
+    }
+
+    /// Call this in your "visit" method
     void visit(vec4 &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_vec4);
     }
 
+    /// Call this in your "visit" method
     void visit(atom_t &value, atom_t sid) {
       visit_bin(&value, sizeof(value), sid, atom_atom);
     }
 
+    /// Call this in your "visit" method
     void visit(string &value, atom_t sid) {
       visit_string(value, sid);
     }
 
-    // visit references
+    /// Call this in your "visit" method for references
     template <class type> void visit(ref<type> &value, atom_t sid) {
       if (error) return;
       if (is_reader()) {
@@ -160,7 +208,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // visit aggregates (like gl_resource in mesh)
+    /// Call this in your "visit" method for aggregates (sub-structures etc.)
     void visit_agg(visitable &value, atom_t sid) {
       if (error) return;
       if (begin_agg(&value, sid, value.get_type())) {
@@ -169,7 +217,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // arrays of references
+    /// Call this in your "visit" method for dynarrays of references
     template <class type> void visit(dynarray<ref<type> > &value, atom_t sid) {
       if (error) return;
       int size = value.size();
@@ -215,7 +263,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // dictionaries of references
+    /// Call this in your "visit" method for dictionaries
     template <class type> void visit(dictionary<ref<type> > &value, atom_t sid) {
       if (error) return;
       int size = value.get_size();
@@ -267,7 +315,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // Plain old data dynarrays
+    /// Call this in your "visit" method for dynarrays of POD types (except references)
     template <class type> void visit(dynarray<type> &value, atom_t sid) {
       if (error) return;
       if (is_reader()) {
@@ -283,7 +331,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // any other type
+    /// Call this in your "visit" method for any other type.
     template <class type> void visit(type &value, atom_t sid) {
       visit_bin((void*)&value, sizeof(value), sid, atom_unknown);
     }

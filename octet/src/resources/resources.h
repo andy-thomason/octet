@@ -7,28 +7,30 @@
 // a container for named resources
 //
 
-namespace octet {
-  namespace scene { class visual_scene; }
-  #define OCTET_CLASS(N, X) namespace N { class X; }
-  #pragma message("resources.h")
-  #include "classes.h"
-  #undef OCTET_CLASS
-}
+#ifndef OCTET_RESOURCES_INCLUDED
+#define OCTET_RESOURCES_INCLUDED
 
-// resources
-#include "../resources/zip_file.h"
-#include "../resources/app_utils.h"
-#include "../resources/visitor.h"
-#include "../resources/binary_writer.h"
-#include "../resources/binary_reader.h"
-#include "../resources/xml_writer.h"
-#include "../resources/http_writer.h"
-#include "../resources/resource.h"
-#include "../resources/resource_dict.h"
-#include "../resources/gl_resource.h"
-#include "../resources/bitmap_font.h"
-#include "../resources/mesh_builder.h"
+  // use the classes.h file to create prototypes for core classes.
+  namespace octet {
+    namespace scene { class visual_scene; }
+    #define OCTET_CLASS(N, X) namespace N { class X; }
+    #pragma message("resources.h")
+    #include "classes.h"
+    #undef OCTET_CLASS
+  }
 
-namespace octet {
-  using namespace resources;
-}
+  // resources
+  #include "../resources/zip_file.h"
+  #include "../resources/app_utils.h"
+  #include "../resources/visitor.h"
+  #include "../resources/binary_writer.h"
+  #include "../resources/binary_reader.h"
+  #include "../resources/xml_writer.h"
+  #include "../resources/http_writer.h"
+  #include "../resources/resource.h"
+  #include "../resources/resource_dict.h"
+  #include "../resources/gl_resource.h"
+  #include "../resources/bitmap_font.h"
+  #include "../resources/mesh_builder.h"
+
+#endif

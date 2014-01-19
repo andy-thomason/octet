@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Instance of an animation; which Animation, what the target is, current time, etc.
   class animation_instance : public resource {
     ref<animation> anim;
     ref<resource> target;
@@ -17,6 +18,7 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(animation_instance)
 
+    /// Create an animation instance. Adding this to the scene starts the animation playing.
     animation_instance(animation *anim=0, resource *target=0, bool is_looping=true) {
       this->target = target;
       this->anim = anim;
@@ -25,6 +27,7 @@ namespace octet { namespace scene {
       this->is_paused = false;
     }
 
+    /// serialize the animation
     void visit(visitor &v) {
       v.visit(anim, atom_anim);
       v.visit(target, atom_target);
@@ -33,14 +36,17 @@ namespace octet { namespace scene {
       v.visit(is_paused, atom_is_paused);
     }
 
+    /// get the animation
     const animation *get_anim() const {
       return anim;
     }
 
+    /// get the current time.
     float get_time() const {
       return time;
     }
 
+    /// update the animation and the resources it connects to.
     void update(float delta_time) {
       if (target) {
         for (int ch = 0; ch != anim->get_num_channels(); ++ch) {

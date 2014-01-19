@@ -4,11 +4,10 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Displacement map modifier.
-// use with smooth modifier for terrain.
-//
 
 namespace octet { namespace scene {
+  /// Prototype displacement map modifier.
+  /// use with smooth modifier for terrain.
   class displacement_map : public mesh {
     // source mesh. Provides underlying geometry.
     ref<mesh> src;

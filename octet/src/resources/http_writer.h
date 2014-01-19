@@ -8,6 +8,7 @@
 // This visitor writes the JSON format required by jquery.jstree.js
 
 namespace octet { namespace resources {
+  /// Visitor to serialize game data to JSON format for use by web browsers.
   class http_writer : public visitor {
     hash_map<void *, int> refs;
     int next_id;
@@ -36,6 +37,7 @@ namespace octet { namespace resources {
       return response.back();
     }
   public:
+    /// Use as a visitor to generate response text for game data
     http_writer(int depth_, int max_depth_, dynarray<string> &response_) : response(response_) {
       depth = depth_;
       max_depth = max_depth_;

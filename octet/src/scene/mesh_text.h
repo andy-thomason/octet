@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Mesh for formatting text. Uses the bitmap_font resource.
   class mesh_text : public mesh {
     typedef bitmap_font::vertex vertex;
     ref<bitmap_font> font;
@@ -17,6 +18,7 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(mesh_text)
 
+    /// make a new formated text mesh inside the bounding box.
     mesh_text(bitmap_font *font_ = 0, const char *text_="", aabb *bb_ = 0) {
       font = font_;
       text = text_;
@@ -31,6 +33,7 @@ namespace octet { namespace scene {
       if (text.size()) update();
     }
 
+    /// update the OpenGL geometry.
     void update() {
       if (!font) return;
 
@@ -57,6 +60,7 @@ namespace octet { namespace scene {
       set_num_vertices(num_quads * 4);
     }
 
+    /// Serialize.
     void visit(visitor &v) {
       mesh::visit(v);
       v.visit(font, atom_font);

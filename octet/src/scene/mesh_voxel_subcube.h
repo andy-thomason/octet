@@ -134,6 +134,7 @@ namespace octet { namespace scene {
     }
   };
 
+  /// experimental voxel world subcube class.
   class mesh_voxel_subcube : public resource {
     enum {
       // dimension of subcube

@@ -4,10 +4,10 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Index modifier. Reduce vertices to the minimum set
-//
 
 namespace octet { namespace scene {
+  /// Mesh modifier to index a mesh. The meshes from Collada may not be correctly indexed
+  /// and vertices may be duplicated. This modifier de-duplicates vertices.
   class indexer : public mesh {
     struct vertex {
       const uint8_t *bytes;
@@ -43,11 +43,13 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(indexer)
 
+    /// Construct a mesh indexer from a mesh.
     indexer(mesh *src=0) {
       this->src = src;
       update();
     }
 
+    /// standard update function, called if input changes.
     void update() {
       if (!src) return;
 
@@ -98,6 +100,7 @@ namespace octet { namespace scene {
       //this->dump(log("dump\n"));
     }
 
+    /// Serialization, scripts, web access
     void visit(visitor &v) {
       mesh::visit(v);
       v.visit(src, atom_src);

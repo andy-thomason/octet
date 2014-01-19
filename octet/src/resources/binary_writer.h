@@ -8,6 +8,8 @@
 //
 
 namespace octet { namespace resources {
+  /// The binary writer is a visitor that writes binary files.
+  /// Use this to save game worlds or to do game saves.
   class binary_writer : public visitor {
     enum { debug = true };
     hash_map<void *, int> refs;
@@ -37,6 +39,7 @@ namespace octet { namespace resources {
     }
 
   public:
+    /// Construct a binary writer from a file
     binary_writer(FILE *file) {
       if (debug) log("%*sbinary_writer\n", get_depth()*2, "");
       next_id = 1;
@@ -45,10 +48,11 @@ namespace octet { namespace resources {
       fwrite("octet\r\n\x1a", 1, 8, file);
     }
 
+    /// Destroy the writer
     ~binary_writer() {
     }
 
-    // dictionary entry
+    /// Write a dictionary entry.
     bool begin_ref(void *ref, const char *sid, atom_t type) {
       if (debug) log("%*sbegin_ref %p %s %s\n", get_depth()*2, "", ref, sid, app_utils::get_atom_name(type));
       if (ref == NULL) {
@@ -72,7 +76,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // ordinary ref
+    /// Write an ordinary ref embedded in a class.
     bool begin_ref(void *ref, atom_t sid, atom_t type) {
       if (debug) log("%*sbegin_ref %p %s %s\n", get_depth()*2, "", ref, app_utils::get_atom_name(sid), app_utils::get_atom_name(type));
       if (ref == NULL) {
@@ -96,7 +100,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // array entry
+    /// Write an array entry
     bool begin_ref(void *ref, int index, atom_t type) {
       if (debug) log("%*sbegin_ref %p %d %s\n", get_depth()*2, "", ref, index, app_utils::get_atom_name(type));
       if (ref == NULL) {
@@ -117,20 +121,24 @@ namespace octet { namespace resources {
       }
     }
 
+    /// finish writing a reference
     void end_ref() {
       if (debug) log("%*send_ref\n", get_depth()*2, "");
       write_atom(atom_end_ref);
     }
 
+    /// Begin writing an aggregate
     bool begin_agg(void *ref, atom_t sid, atom_t type) {
       write_atom(type);
       write_atom(sid);
       return true;
     }
 
+    /// End writing an aggregate
     void end_agg() {
     }
 
+    /// Begin writing array or dictionary references
     bool begin_refs(atom_t sid, int &size, bool is_dict) {
       if (debug) log("%*sbegin_refs sid=%s size=%d is_dict=%d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size, is_dict);
       write_atom(sid);
@@ -139,11 +147,13 @@ namespace octet { namespace resources {
       return true;
     }
 
+    /// End writing array or dictionary references
     void end_refs(bool is_dict) {
       if (debug) log("%*send_refs\n", get_depth()*2, "");
       //write_atom(atom_end_refs);
     }
 
+    /// Write an opaque binary object
     void visit_bin(void *value, unsigned size, atom_t sid, atom_t type) {
       write_atom(type);
       write_atom(sid);
@@ -151,36 +161,42 @@ namespace octet { namespace resources {
       write((const uint8_t*)value, size);
     }
 
+    /// Write a string
     void visit_string(string &value, atom_t sid) {
       write_atom(atom_string);
       write_atom(sid);
       write_string(value);
     }
 
+    /// Write an int value
     void visit(int &value, atom_t sid) {
       write_int(sid);
       write_int(sizeof(value));
       write((const uint8_t*)value, sizeof(value));
     }
 
+    /// Write an unsigned int
     void visit(unsigned &value, atom_t sid) {
       write_int(sid);
       write_int(sizeof(value));
       write((const uint8_t*)value, sizeof(value));
     }
 
+    /// Write an atom
     void visit(atom_t &value, atom_t sid) {
       write_int(sid);
       write_int(sizeof(value));
       write((const uint8_t*)value, sizeof(value));
     }
 
+    /// Write a vec4 value
     void visit(vec4 &value, atom_t sid) {
       write_int(sid);
       write_int(sizeof(value));
       write((const uint8_t*)&value, sizeof(value));
     }
 
+    /// Write a matrix value
     void visit(mat4t &value, atom_t sid) {
       write_int(sid);
       write_int(sizeof(value));

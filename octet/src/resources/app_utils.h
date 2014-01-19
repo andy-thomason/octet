@@ -25,9 +25,10 @@ namespace octet {
 }
 
 namespace octet { namespace resources {
-  
+  /// A set of utilities   
   class app_utils {
   public:
+    /// Set and get the file prefix. This is used to find resource files in the game.
     static const char *prefix(const char *new_prefix=NULL) {
       static const char *value = "../../";      if (new_prefix) {
         value = new_prefix;
@@ -35,16 +36,18 @@ namespace octet { namespace resources {
       return value;
     }
 
-    static zip_file *get_zip_file(const char *path) {
+    /// open a zip file for a given URL
+    static zip_file *get_zip_file(const char *url) {
       static dictionary<ref<zip_file> > zip_files;
-      int index = zip_files.get_index(path);
+      int index = zip_files.get_index(url);
       if (index == -1) {
-        return zip_files[path] = new zip_file(get_path(path));
+        return zip_files[url] = new zip_file(get_path(url));
       } else {
         return zip_files.get_value(index);
       }
     }
   
+    /// utility function to set rgb values in a buffer.
     static void setrgb(dynarray<unsigned char> &buffer, int size, int x, int y, unsigned rgb, unsigned a = 0xff) {
       buffer[(y*size+x)*4+0] = rgb >> 16;
       buffer[(y*size+x)*4+1] = rgb >> 8;
@@ -52,7 +55,7 @@ namespace octet { namespace resources {
       buffer[(y*size+x)*4+3] = a;
     }
   
-    // turn a url into a file path
+    /// Convert a url into a file path.
     static const char *get_path(const char *url) {
       if (url == NULL) return "";
 
@@ -69,6 +72,7 @@ namespace octet { namespace resources {
       return path;
     }
 
+    /// Get a file into a buffer, given a URL.
     static void get_url(dynarray<unsigned char> &buffer, const char *url) {
       if (!strncmp(url, "zip://", 6)) {
         const char *zip = strstr(url + 6, ".zip");
@@ -97,6 +101,7 @@ namespace octet { namespace resources {
       }
     }
 
+    /// Generate a stock texture. To be deprecated.
     static GLuint get_stock_texture(unsigned gl_kind, const char *name) {
       //stock_texture_generator stock;
       if (!strcmp(name, "bricks")) {
@@ -139,6 +144,7 @@ namespace octet { namespace resources {
       }
     }
 
+    /// Generate a solid texture. to be deprecated.
     static GLuint get_solid_texture(unsigned gl_kind, const char *name) {
       dynarray<unsigned char>buffer(1*1*4);
       unsigned val = 0;
@@ -160,8 +166,8 @@ namespace octet { namespace resources {
       return make_texture(gl_kind, &buffer[0], buffer.size(), GL_RGBA, 1, 1);
     }
 
-    // utility function for making textures from arrays of bytes
-    // gl_kind is GL_RGB or GL_RGBA
+    /// Utility function for making textures from arrays of bytes.
+    /// gl_kind is GL_RGB or GL_RGBA
     static GLuint make_texture(unsigned gl_kind, uint8_t *image, unsigned size, unsigned in_format, unsigned width, unsigned height) {
       //assert(buffer.size() == width * height * 4);
       // make a new texture handle
@@ -178,6 +184,7 @@ namespace octet { namespace resources {
       return handle;
     }
 
+    /// Make an OpenAL sound buffer
     static ALuint make_sound_buffer(unsigned kind, unsigned rate, dynarray<unsigned char> &buffer, unsigned offset, unsigned size) {
       ALuint id = 0;
       alGenBuffers(1, &id);
@@ -185,14 +192,15 @@ namespace octet { namespace resources {
       return id;
     }
 
+    /// Get the system atom dictionary. Atoms are unique names with an integer representation.
     static dictionary<atom_t> *get_atom_dict() {
       static dictionary<atom_t> *dict;
       if (!dict) dict = new dictionary<atom_t>();
       return dict;
     }
 
-    // get a unique int for a string.
-    // these values are much cheaper to work with than strings.
+    /// Get a unique int for a string (atom). Atoms are unique names with an integer representation.
+    /// These values are much cheaper to work with than strings.
     static atom_t get_atom(const char *name) {
       // the null name is 0
       if (name == 0 || name[0] == 0) {
@@ -216,6 +224,7 @@ namespace octet { namespace resources {
       }
     }
 
+    /// Get the text of a predefined atom (atom_*)
     static const char *predefined_atom(unsigned i) {
       static const char *atom_names[] = {
         "",
@@ -243,6 +252,7 @@ namespace octet { namespace resources {
       }
     }
 
+    /// Get the name of an atom, either predefined or user defined.
     static const char *get_atom_name(atom_t atom) {
       const char *name = predefined_atom((unsigned)atom);
       if (name) return name;

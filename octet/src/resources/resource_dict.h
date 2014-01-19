@@ -8,7 +8,10 @@
 //
 
 namespace octet { namespace resources {
-
+  /// Resource dictionary / game world class.
+  ///
+  /// Used to hold resources in a game and access them by name.
+  ///
   class resource_dict : public resource {
     dictionary<ref<resource> > dict;
     ref<scene::visual_scene> active_scene;
@@ -60,23 +63,29 @@ namespace octet { namespace resources {
       return 0;
     }
   public:
+    /// Construct a new resource dictionary
     resource_dict() {
     }
 
+    /// Visitor for loading and saving
     virtual void visit(visitor &v) {
       v.visit(active_scene, atom_active_scene);
       v.visit(dict, atom_dict);
     }
 
+    /// Reset the dictionary, clearing all data
     void reset() {
       dict.reset();
     }
 
+    /// does the dictionary have this resource?
     bool has_resource(const char *name) {
       return dict.contains(name);
     }
 
-    // get a unique int for a string.
+    /// Get a generic resource by name
+    /// Note: you can get a specific type using get_<typename>
+    /// For example, scene_node *node = dict.get_scene_node("name");
     resource *get_resource(const char *name) {
       if (name == 0 || name[0] == 0) {
         return NULL;
@@ -90,10 +99,12 @@ namespace octet { namespace resources {
       }
     }
 
+    /// As this dict represents a game world, what is the active scene?
     scene::visual_scene *get_active_scene() const {
       return active_scene;
     }
 
+    /// Set the active scene for this game world
     void set_active_scene(scene::visual_scene *value) {
       active_scene = value;
     }
@@ -104,7 +115,7 @@ namespace octet { namespace resources {
       }
     }
 
-    // factory for textures
+    /// factory for textures: Deprecated will use Image object in future
     static GLuint get_texture_handle(unsigned gl_kind, const char *name) {
       GLuint &result = textures()[name];
       if (result == 0) {
@@ -113,7 +124,7 @@ namespace octet { namespace resources {
       return result;
     }
 
-    // factory for sounds
+    /// factory for sounds: Deprecated will use Sound object in future
     static int get_sound_handle(unsigned al_kind, const char *name) {
       int &result = sounds()[name];
       if (result == 0) {
@@ -127,7 +138,7 @@ namespace octet { namespace resources {
     #include "classes.h"
     #undef OCTET_CLASS
 
-    // find all resources of a certain type
+    /// Find all resources of a certain type
     void find_all(dynarray<resource*> &result, atom_t type) {
       unsigned num_indices = dict.get_num_indices();
       for (unsigned i = 0; i != num_indices; ++i) {

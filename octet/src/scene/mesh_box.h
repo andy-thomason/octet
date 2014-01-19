@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Box mesh. Generate triangles for an AABB.
   class mesh_box : public mesh {
 
     void init(const aabb &size) {
@@ -70,19 +71,23 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(mesh_box)
 
+    /// Default constructor: 1x1x1
     mesh_box() {
       init(aabb(vec3(0, 0, 0), vec3(1, 1, 1)));
     }
 
+    /// Construct box from size
     mesh_box(const vec3 &size) {
       init(aabb(vec3(0, 0, 0), size));
     }
 
+    /// Construct box from aabb
     mesh_box &set_size(const aabb &size) {
       init(size);
       update();
     }
 
+    /// Generate mesh from parameters.
     virtual void update() {
       allocate(sizeof(vertex)*4*6, sizeof(uint32_t)*6*6);
       vertex *vtx = (vertex *)get_vertices()->lock();
@@ -109,8 +114,14 @@ namespace octet { namespace scene {
       //dump(log("box\n"));
     }
 
+    /// Serialise the box
     void visit(visitor &v) {
       mesh::visit(v);
+      v.visit(size, atom_size);
+      if (v.is_reader()) {
+        update();
+      }
     }
   };
 }}
+

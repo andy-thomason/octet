@@ -4,9 +4,11 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Zip file reader, uses zip_decoder to inflate compressed files.
 
 namespace octet { namespace resources {
+  /// Zip file reader, uses zip_decoder to inflate compressed files.
+  /// Zip files are smaller and faster than regular files.
+  /// They make updates easier and work will over the internet.
   class zip_file {
     int ref_cnt;
     FILE *the_file;
@@ -40,6 +42,7 @@ namespace octet { namespace resources {
     }
 
   public:
+    /// Open a zip file for reading
     zip_file(const char *filename) {
       ref_cnt = 0;
       the_file = fopen(filename, "rb");
@@ -85,20 +88,24 @@ namespace octet { namespace resources {
       }
     }
 
+    /// close the zip file
     ~zip_file() {
       if (the_file) fclose(the_file);
     }
 
+    /// allow ref<zip_file>
     void add_ref() {
       ref_cnt++;
     }
 
+    /// allow ref<zip_file>
     void release() {
       if (--ref_cnt) {
         delete this;
       }
     }
 
+    /// get a file from a zip file, this is called from get_url with a zip:// prefix.
     void get_file(dynarray<uint8_t> &buffer, const char *file) {
       int index = directory.get_index(file);
       if (index < 0) return;

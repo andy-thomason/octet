@@ -10,6 +10,7 @@
 //
 
 namespace octet { namespace resources {
+  /// Now deprecated mesh builder for spheres, cones etc. Being replaced by mesh_* classes
   class mesh_builder {
     struct vertex { float pos[3]; float normal[3]; float uv[2]; };
     dynarray<vertex, allocator> vertices;

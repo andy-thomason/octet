@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Instance of a mesh in a game world; node, mesh, material and skin.
   class mesh_instance : public resource {
   public:
     enum { flag_selected = 1 << 0 };
@@ -31,6 +32,7 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(mesh_instance)
 
+    /// Create a new mesh instance. If you add this instance to a scene, it will render it.
     mesh_instance(scene_node *node=0, mesh *msh=0, material *mat=0, skeleton *skel=0) {
       this->node = node;
       this->msh = msh;
@@ -39,7 +41,7 @@ namespace octet { namespace scene {
       flags = 0;
     }
 
-    // metadata visitor. Used for serialisation and script interface.
+    /// metadata visitor. Used for serialisation and script interface.
     void visit(visitor &v) {
       v.visit(node, atom_node);
       v.visit(msh, atom_msh);
@@ -53,17 +55,17 @@ namespace octet { namespace scene {
     // animation_target interface
     //
 
-    // the virtual add_ref on animation_target gets passed to here and we pass iton (delegate it) to the resource
+    /// the virtual add_ref on animation_target gets passed to here and we pass iton (delegate it) to the resource
     void add_ref() {
       resource::add_ref();
     }
 
-    // the virtual release on animation_target gets passed to here and we pass iton (delegate it) to the resource
+    /// the virtual release on animation_target gets passed to here and we pass iton (delegate it) to the resource
     void release() {
       resource::release();
     }
 
-    // animation input: for now, we only support skeleton animation
+    /// animation input: for now, we only support skeleton animation
     void set_value(atom_t sid, atom_t sub_target, atom_t component, float *value) {
       if (skel) {
         // hack for 
@@ -99,16 +101,34 @@ namespace octet { namespace scene {
     // accessor methods
     //
 
+    /// Get the transformation for this instance.
     scene_node *get_node() const { return node; }
+
+    /// Get the mesh for this instance.
     mesh *get_mesh() const { return msh; }
+
+    /// Get the material for this instance.
     material *get_material() const { return mat; }
+
+    /// Get the skeleton for this instance.
     skeleton *get_skeleton() const { return skel; }
+
+    /// Get the flags for this instance.
     unsigned get_flags() const { return flags; }
 
+    /// Set the transformation for this instance.
     void set_node(scene_node *value) { node = value; }
+
+    /// Set the mesh for this instance.
     void set_mesh(mesh *value) { msh = value; }
+
+    /// Set the mesh for this instance.
     void set_material(material *value) { mat = value; }
+
+    /// Set the skeleton for this instance.
     void set_skeleton(skeleton *value) { skel = value; }
+
+    /// Set the flags for this instance.
     void set_flags(unsigned value) { flags = value; }
   };
 }}

@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// A mesh class for making prcedural geometry of various kinds.
   class mesh_points : public mesh {
     dynarray<vec3p> points;
 
@@ -20,14 +21,17 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(mesh_points)
 
+    /// make a new, empty mesh.
     mesh_points() {
       init();
     }
 
+    /// add a point to the mesh.
     void add_point(vec3_in pos, vec4_in color) {
       points.push_back(pos);
     }
 
+    /// Build the OpenGL geometry.
     void update() {
       allocate(sizeof(vertex)*points.size(), 0);
 
@@ -45,8 +49,10 @@ namespace octet { namespace scene {
       set_num_vertices(points.size());
     }
 
+    /// Serialize.
     void visit(visitor &v) {
       mesh::visit(v);
+      v.visit(points, atom_point);
     }
   };
 }}

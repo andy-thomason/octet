@@ -8,6 +8,8 @@
 //
 
 namespace octet { namespace resources {
+  /// The binary reader is a visitor that is used to load a binary file.
+  /// The binary reader will use a factory to create new classes, providied the class is in classes.h
   class binary_reader : public visitor {
     enum { debug = true };
     hash_map<void *, int> refs;
@@ -86,6 +88,7 @@ namespace octet { namespace resources {
     }
 
   public:
+    /// Construct a binary reader for a file.
     binary_reader(FILE *file) {
       if (debug) log("binary_reader\n");
       id_to_ref.reserve(256);
@@ -99,20 +102,22 @@ namespace octet { namespace resources {
       }
     }
 
+    /// Destroy the reader
     ~binary_reader() {
     }
 
-    // this is a reader
+    /// This function returns true to indicate that this is a reader
+    /// The visitor will behave differently for readers and writers
     bool is_reader() {
       return true;
     }
 
-    // register a reference after creating a new object
+    /// register a reference after creating a new object
     void add_new_ref(void *ref) {
       id_to_ref.push_back(ref);
     }
 
-    // aggregate read
+    /// Read an aggregate object such as a struct or array.
     bool begin_ref(void *ref, atom_t sid, atom_t type) {
       if (check_atom(type) || check_atom(sid)) {
         return false;
@@ -120,10 +125,13 @@ namespace octet { namespace resources {
       return true;
     }
 
+    /// When loading a reference in an array, call this function
     bool begin_ref(void *ref, int index, atom_t type) { return false; }
+
+    /// When loading a reference in a dictionary, call this function
     bool begin_ref(void *ref, const char *sid, atom_t type) { return false; }
 
-    // read a regular reference
+    /// Read a regular reference embeded in a class.
     bool begin_read_ref(void *&ref, atom_t &sid, atom_t &type) {
       type = read_atom();
       sid = read_atom();
@@ -133,7 +141,7 @@ namespace octet { namespace resources {
       return !get_error();
     }
 
-    // read an array reference
+    /// Read an array reference
     bool begin_read_ref(void *&ref, int index, atom_t &type) {
       if (debug) log("begin_read_ref\n");
       type = read_atom();
@@ -143,7 +151,7 @@ namespace octet { namespace resources {
       return !get_error();
     }
 
-    // read a dictionary reference
+    /// Read a dictionary reference
     bool begin_read_ref(void *&ref, const char *&sid, atom_t &type) {
       type = read_atom();
       sid = read_string();
@@ -153,7 +161,7 @@ namespace octet { namespace resources {
       return !get_error();
     }
 
-    // read an aggregate
+    /// Read an aggregate such as an array or struct.
     bool begin_agg(void *ref, atom_t sid, atom_t type) {
       if (!check_atom(type) && !check_atom(sid)) {
         return true;
@@ -161,11 +169,11 @@ namespace octet { namespace resources {
       return false;
     }
 
-    // finish reading an aggregate
+    /// finish reading an aggregate
     void end_agg() {
     }
 
-    // begin reading a dynarray
+    /// Begin reading a dynarray
     unsigned begin_read_dynarray(unsigned elem_size, atom_t &sid) {
       if (!check_atom(atom_dynarray) && !check_atom(sid)) {
         return (unsigned)read_int() / elem_size;
@@ -173,18 +181,18 @@ namespace octet { namespace resources {
       return 0;
     }
 
-    // finish reading a dynarray
+    /// finish reading a dynarray
     void end_read_dynarray(void *ptr, unsigned bytes) {
       read((uint8_t*)ptr, bytes);
     }
 
-    // called after visiting a new object
+    /// called after visiting a new object
     void end_ref() {
       if (debug) log("%*send_ref\n", get_depth()*2, "");
       check_atom(atom_end_ref);
     }
 
-    // called before reading an array or dictionary
+    /// called before reading an array or dictionary
     bool begin_refs(atom_t sid, int &size, bool is_dict) {
       if (debug) log("%*sbegin_refs %s\n", get_depth()*2, "", app_utils::get_atom_name(sid));
       if (!check_atom(sid) && !check_atom(atom_begin_refs)) {
@@ -194,12 +202,13 @@ namespace octet { namespace resources {
       return false;
     }
 
-    // called after reading an array or dictionary
+    /// called after reading an array or dictionary
     void end_refs(bool is_dict) {
       if (debug) log("%*send_refs\n", get_depth()*2, "");
       //check_atom(atom_end_refs);
     }
 
+    /// Read a binary object. The contents are opaque.
     void visit_bin(void *value, unsigned size, atom_t sid, atom_t type) {
       if (debug) log("%*svisit_bin %s %d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size);
       if (!check_atom(type) && !check_atom(sid) && !check_size(size)) {
@@ -207,36 +216,42 @@ namespace octet { namespace resources {
       }
     }
 
+    /// Read a string object.
     void visit_string(string &value, atom_t sid) {
       if (!check_atom(atom_string) && !check_atom(sid)) {
         value = read_string();
       }
     }
 
+    /// Read an int object
     void visit(int &value, atom_t sid) {
       if (!check_atom(sid) && !check_size(sizeof(value))) {
         value = read_int();
       }
     }
 
+    /// Read an unsigned int object
     void visit(unsigned &value, atom_t sid) {
       if (!check_atom(sid) && !check_size(sizeof(value))) {
         value = read_int();
       }
     }
 
+    /// Read an atom object
     void visit(atom_t &value, atom_t sid) {
       if (!check_atom(sid) && !check_size(sizeof(value))) {
         value = read_atom();
       }
     }
 
+    /// Read a vec4 object
     void visit(vec4 &value, atom_t sid) {
       if (!check_atom(sid) && !check_size(sizeof(value))) {
         read((uint8_t*)&value, sizeof(value));
       }
     }
 
+    /// Read a mat4t object
     void visit(mat4t &value, atom_t sid) {
       if (!check_atom(sid) && !check_size(sizeof(value))) {
         read((uint8_t*)&value, sizeof(value));

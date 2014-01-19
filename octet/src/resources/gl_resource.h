@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace resources {
+  /// Wrapper for an OpenGL resource.
   class gl_resource : public resource {
     // in GLES2, we need to have a second buffer containing the data
     dynarray<uint8_t> bytes;
@@ -19,9 +20,7 @@ namespace octet { namespace resources {
     GLuint target;
 
   public:
-    // helper classes so that we remember to unlock!
-
-    // read-write lock
+    /// Helper class to make a read-write lock
     class rwlock {
       gl_resource *res;
       void *ptr;
@@ -34,7 +33,7 @@ namespace octet { namespace resources {
       float *f32() const { return (float*)ptr; }
     };
 
-    // read-only lock
+    /// Helper class to make a read-only lock
     class rolock {
       gl_resource *res;
       const void *ptr;
@@ -49,6 +48,7 @@ namespace octet { namespace resources {
   public:
     RESOURCE_META(gl_resource)
 
+    /// Make a new OpenGL Resource
     gl_resource(unsigned target=0, unsigned size=0) {
       buffer = 0;
       this->target = target;
@@ -57,13 +57,13 @@ namespace octet { namespace resources {
       }
     }
 
-    // serialize this object.
+    /// serialize this object.
     void visit(visitor &v) {
       v.visit(bytes, atom_bytes);
       v.visit(target, atom_target);
     }
 
-    // 
+    /// Allocate a new OpenGL object.
     void allocate(GLuint target, unsigned size) {
       reset();
       glGenBuffers(1, &buffer);
@@ -73,6 +73,7 @@ namespace octet { namespace resources {
       this->target = target;
     }
 
+    /// Clear the OpenGL object
     void reset() {
       if (buffer != 0) {
         glDeleteBuffers(1, &buffer);
@@ -81,45 +82,54 @@ namespace octet { namespace resources {
       buffer = 0;
     }
 
+    /// Destructor
     ~gl_resource() {
       reset();
     }
 
+    /// get the target this resource is bound to
     unsigned get_target() const {
       return target;
     }
 
+    /// get the buffer number
     unsigned get_size() const {
       return bytes.size();
     }
 
+    /// get a read-only lock on this buffer
     const void *lock_read_only() const {
       return (const void*)&bytes[0];
       //glBindBuffer(target, buffer);
       //return glMapBufferRange(target, 0, size, GL_MAP_READ_BIT);
     }
 
+    /// release read-only lock on this buffer
     void unlock_read_only() const {
       //glBindBuffer(target, buffer);
       //glUnmapBuffer(target);
     }
 
+    /// get a read-write lock on this buffer
     void *lock() const {
       return (void*)&bytes[0];
       //glBindBuffer(target, buffer);
       //return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT);
     }
 
+    /// release a read-write lock
     void unlock() const {
       glBindBuffer(target, buffer);
       glBufferSubData(target, 0, bytes.size(), &bytes[0]);
       //glUnmapBuffer(target);
     }
 
+    /// bind the resource to the target
     void bind() const {
       glBindBuffer(target, buffer);
     }
 
+    /// copy data into the resource
     void assign(void *ptr, unsigned offset, unsigned size) {
       assert(offset + size <= this->get_size());
 
@@ -127,6 +137,7 @@ namespace octet { namespace resources {
       unlock();
     }
 
+    /// copy data from another gl resource.
     void copy(const gl_resource *rhs) {
       allocate(rhs->get_target(), rhs->get_size());
       assign(rhs->lock(), 0, rhs->get_size());

@@ -12,6 +12,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Image from a file. Stored as an array of bytes for later conversion to GL resource.
   class image : public resource {
     // primary attributes (to save)
 
@@ -29,6 +30,7 @@ namespace octet { namespace scene {
     uint8_t cube_faces;
 
     // derived attributes (not for saving)
+    // todo: use gl_resource
     GLuint gl_texture;
 
     void init(const char *name) {
@@ -55,6 +57,7 @@ namespace octet { namespace scene {
       COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83F3,
     };
 
+    /// Make mipmaps for this image.
     void make_mipmaps() {
       if (format != RGB && format != RGBA) return;
 
@@ -89,6 +92,8 @@ namespace octet { namespace scene {
       //printf("%d %d\n", dest - &bytes[0], bytes.size());
     }
 
+    /// DXT encode the image, making it smaller and grainier.
+    /// Todo: do standard error-diffusion and other improvements.
     void dxt_encode() {
       if (format != RGB && format != RGBA) return;
 
@@ -204,27 +209,31 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(image)
 
-    // default constructor makes a blank image.
+    /// default constructor makes a blank image.
     image() {
       init("");
     }
 
+    /// give url of file to load.
     image(const char *name) {
       init(name);
     }
 
+    /// release resources.
     ~image() {
     }
 
+    /// width in pixels
     unsigned get_width() const {
       return width;
     }
 
+    /// height in pixels
     unsigned get_height() const {
       return height;
     }
 
-    // access attributes by name
+    /// access attributes by name
     void visit(visitor &v) {
       v.visit(url, atom_url);
       v.visit(bytes, atom_bytes);
@@ -235,7 +244,7 @@ namespace octet { namespace scene {
       v.visit(cube_faces, atom_cube_faces);
     }
 
-    // load the image from a file
+    /// load the image from a url
     void load() {
       dynarray<uint8_t> buffer;
       app_utils::get_url(buffer, url);
@@ -262,6 +271,7 @@ namespace octet { namespace scene {
       //dxt_encode();
     }
 
+    /// get the OpenGL texture handle for this image.
     GLuint get_gl_texture() {
       if (!gl_texture) {
         if (bytes.size() == 0 || width == 0 || height == 0) {

@@ -9,6 +9,7 @@
 // work in progress
 
 namespace octet { namespace resources {
+  /// Work in progress: Visitor to find objects by name.
   class url_finder : public visitor {
     dynarray<string> &url;
     int depth;

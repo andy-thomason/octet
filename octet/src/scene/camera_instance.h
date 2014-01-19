@@ -8,6 +8,7 @@
 //
 
 namespace octet { namespace scene {
+  /// Instance of a camera in a scene. Provides camera paramers and a node for transformation.
   class camera_instance : public resource {
     // camera parameters
     ref<scene_node> node;
@@ -38,6 +39,7 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(camera_instance)
 
+    /// Constuct a camera instance.
     camera_instance() {
       is_ortho = 0;
 
@@ -55,6 +57,7 @@ namespace octet { namespace scene {
       ymag = 1;
     }
 
+    /// Serialize
     void visit(visitor &v) {
     // camera parameters
       v.visit(node, atom_node);
@@ -74,7 +77,7 @@ namespace octet { namespace scene {
       v.visit(ymag, atom_ymag);
     }
 
-    // set the parameters as in the collada perspective element
+    /// set the parameters as in the collada perspective element
     void set_perspective(float xfov, float yfov, float aspect_ratio, float n, float f)
     {
       this->xfov = xfov;
@@ -84,6 +87,7 @@ namespace octet { namespace scene {
       is_ortho = false;
     }
 
+    /// set the parameters as in the collada ortho element
     void set_ortho(float xmag, float ymag, float aspect_ratio, float n, float f)
     {
       this->xmag = xmag;
@@ -93,11 +97,12 @@ namespace octet { namespace scene {
       is_ortho = true;
     }
 
+    /// set the transform node
     void set_node(scene_node *node) {
       this->node = node;
     }
 
-    // call this once a frame to get the camera position
+    /// call this once a frame to set the camera parameters.
     void set_cameraToWorld(const mat4t &cameraToWorld_, float aspect_ratio) {
       cameraToWorld = cameraToWorld_;
       // flip cameraToWorld around to transform from world to camera
@@ -123,7 +128,7 @@ namespace octet { namespace scene {
       }
     }
 
-    // call this many times to build matrices for uniforms.
+    /// call this many times to build matrices for uniforms.
     void get_matrices(mat4t &modelToProjection, mat4t &modelToCamera, const mat4t &modelToWorld) const
     {
       // model -> world -> camera
@@ -133,13 +138,13 @@ namespace octet { namespace scene {
       modelToProjection = modelToCamera * cameraToProjection;
     }
 
-    // call this many times to build matrices for uniforms.
+    /// call this many times to build matrices for uniforms.
     const mat4t &get_cameraToProjection() const
     {
       return cameraToProjection;
     }
 
-    // return a ray from screen (x, y) to the far plane
+    /// return a ray from screen (x, y) to the far plane; used for picking.
     ray get_ray(float x, float y) {
       vec4 ray_start, ray_end;
 
@@ -155,6 +160,7 @@ namespace octet { namespace scene {
       return ray(ray_start.xyz(), ray_end.xyz());
     }
 
+    /// Get the world to projection matrix for this camera.
     mat4t get_worldToProjection() const {
       mat4t result;
       result.loadIdentity();
@@ -165,27 +171,32 @@ namespace octet { namespace scene {
       return result;
     }
 
-    // use this to get the camera from the scene
+    /// Get the node used for the transform.
     scene_node *get_node() const {
       return node;
     }
 
+    /// is this camera instance an ortho camera? Todo: create a separate camera object.
     bool get_is_ortho() const {
       return is_ortho;
     }
 
+    /// Near plane
     float get_nearVal() const {
       return nearVal;
     }
 
+    /// Far plane
     float get_farVal() const {
       return farVal;
     }
 
+    /// x scale for ortho.
     float get_xscale() const {
       return xscale;
     }
 
+    /// y scale for ortho.
     float get_yscale() const {
       return yscale;
     }

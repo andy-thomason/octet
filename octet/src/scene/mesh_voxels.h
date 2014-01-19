@@ -25,6 +25,7 @@ namespace octet { namespace scene {
 
   typedef pair<entry, entry> entries;
 
+  /// Experimental Voxel world mesh, uses subcubes to create a voxel world.
   class mesh_voxels : public mesh {
     ivec3 size;
     float voxel_size;
@@ -106,49 +107,6 @@ namespace octet { namespace scene {
       //dump(log("voxels\n"));
     }
 
-  public:
-    RESOURCE_META(mesh_voxels)
-
-    mesh_voxels(float voxel_size_in=1.0f/32, const ivec3 &size_in = ivec3(1, 1, 1)) {
-      set_default_attributes();
-      voxel_size = voxel_size_in;
-      size = size_in;
-      //set_aabb(aabb(vec3(0, 0, 0), size));
-
-      subcubes.resize(size.x() * size.y() * size.z());
-      set_aabb(aabb(vec3(0, 0, 0), vec3(size)*(voxel_size*subcube_dim*0.5f)));
-      int idx = 0;
-      for (int z = 0; z != size.z(); ++z) {
-        for (int y = 0; y != size.y(); ++y) {
-          for (int x = 0; x != size.x(); ++x) {
-            ivec3 pos(x, y, z);
-            subcubes[idx++] = new mesh_voxel_subcube();
-          }
-        }
-      }
-
-      //box(aabb(vec3(8, 8, 8), vec3(8, 8, 8)));
-      update_lod();
-    }
-
-    void update_lod() {
-      for (unsigned i = 0; i != subcubes.size(); ++i) {
-        mesh_voxel_subcube *p = subcubes[i];
-        if (p) {
-          p->update_lod();
-        }
-      }
-    }
-
-    void update() {
-      update_lod();
-      update_mesh();
-    }
-
-    void visit(visitor &v) {
-      mesh::visit(v);
-    }
-
     template <class set> void add_voxels(mat4t_in voxelToWorld, const set &set_in) {
       int idx = 0;
       vec3 offset = vec3(size) * (-0.5f * subcube_dim) + vec3(0.5f);
@@ -200,6 +158,53 @@ namespace octet { namespace scene {
       return *this;
     }*/
 
+  public:
+    RESOURCE_META(mesh_voxels)
+
+    /// Make a new voxel mesh
+    mesh_voxels(float voxel_size_in=1.0f/32, const ivec3 &size_in = ivec3(1, 1, 1)) {
+      set_default_attributes();
+      voxel_size = voxel_size_in;
+      size = size_in;
+      //set_aabb(aabb(vec3(0, 0, 0), size));
+
+      subcubes.resize(size.x() * size.y() * size.z());
+      set_aabb(aabb(vec3(0, 0, 0), vec3(size)*(voxel_size*subcube_dim*0.5f)));
+      int idx = 0;
+      for (int z = 0; z != size.z(); ++z) {
+        for (int y = 0; y != size.y(); ++y) {
+          for (int x = 0; x != size.x(); ++x) {
+            ivec3 pos(x, y, z);
+            subcubes[idx++] = new mesh_voxel_subcube();
+          }
+        }
+      }
+
+      //box(aabb(vec3(8, 8, 8), vec3(8, 8, 8)));
+      update_lod();
+    }
+
+    /// Update only the LODs used for collision detection.
+    void update_lod() {
+      for (unsigned i = 0; i != subcubes.size(); ++i) {
+        mesh_voxel_subcube *p = subcubes[i];
+        if (p) {
+          p->update_lod();
+        }
+      }
+    }
+
+    /// Update both the mesh and the LODs.
+    void update() {
+      update_lod();
+      update_mesh();
+    }
+
+    /// Serialize.
+    void visit(visitor &v) {
+      mesh::visit(v);
+    }
+
     template <class bounds_t> mesh_voxels &draw(mat4t_in voxelToWorld, const bounds_t &bounds) {
       add_voxels(voxelToWorld, bounds);
       return *this;
@@ -220,12 +225,14 @@ namespace octet { namespace scene {
       mesh::dump(fp);
     }
 
+    /// get a subcube of 32x32x32 voxels.
     mesh_voxel_subcube *get_subcube(ivec3_in pos) const {
       assert(all(pos < size));
       //assert(x < (unsigned)size.x() && y < (unsigned)size.y() && z < (unsigned)size.z());
       return subcubes[pos.x()+ size.x() * (pos.y() + size.y()*pos.z())];
     }
 
+    /// Is any cube in this subcube collidable?
     unsigned is_any(ivec3_in pos, int level) const {
       if (level > log_subcube_dim) {
         return 1;
@@ -240,7 +247,7 @@ namespace octet { namespace scene {
       }
     }
 
-    // collide two orientated voxel meshes.
+    /// Experimental: collide two orientated voxel meshes.
     bool intersects(const mesh_voxels &b, const mat4t &mxa, const mat4t &mxb) const {
       const mesh_voxels &a = *this;
       vec3 corner_a(vec3(a.size) * (a.voxel_size * (-0.5f * subcube_dim)));
