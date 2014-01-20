@@ -17,7 +17,7 @@ namespace octet { namespace resources {
     FILE *file;
     char tmp[256];
 
-    void read(uint8_t *src, unsigned bytes) {
+    void read(uint8_t *src, size_t bytes) {
       //if (debug) log("read %08x bytes\n", bytes);
       fread(src, 1, bytes, file);
     }
@@ -209,7 +209,7 @@ namespace octet { namespace resources {
     }
 
     /// Read a binary object. The contents are opaque.
-    void visit_bin(void *value, unsigned size, atom_t sid, atom_t type) {
+    void visit_bin(void *value, size_t size, atom_t sid, atom_t type) {
       if (debug) log("%*svisit_bin %s %d\n", get_depth()*2, "", app_utils::get_atom_name(sid), size);
       if (!check_atom(type) && !check_atom(sid) && !check_size(size)) {
         read((uint8_t*)value, size);

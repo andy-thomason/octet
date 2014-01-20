@@ -16,7 +16,7 @@ namespace octet { namespace resources {
     int next_id;
     FILE *file;
 
-    void write(const uint8_t *src, unsigned bytes) {
+    void write(const uint8_t *src, size_t bytes) {
       //if (debug) log("%*swrite %08x bytes\n", get_depth()*2, "", bytes);
       fwrite(src, 1, bytes, file);
     }
@@ -154,10 +154,10 @@ namespace octet { namespace resources {
     }
 
     /// Write an opaque binary object
-    void visit_bin(void *value, unsigned size, atom_t sid, atom_t type) {
+    void visit_bin(void *value, size_t size, atom_t sid, atom_t type) {
       write_atom(type);
       write_atom(sid);
-      write_int(size);
+      write_int((int)size);
       write((const uint8_t*)value, size);
     }
 

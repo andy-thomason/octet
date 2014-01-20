@@ -119,7 +119,7 @@ namespace octet {
       vc->close();*/
 
       // note that you can also drag and drop files onto an active octet window.
-      int selector = 8;
+      int selector = 0;
       switch (selector) {
         case 0: filename = "assets/duck_triangulate.dae"; break;
         case 1: filename = "assets/skinning/skin_unrot.dae"; break;
