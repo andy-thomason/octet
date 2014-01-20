@@ -167,41 +167,6 @@ namespace octet { namespace resources {
       write_atom(sid);
       write_string(value);
     }
-
-    /// Write an int value
-    void visit(int &value, atom_t sid) {
-      write_int(sid);
-      write_int(sizeof(value));
-      write((const uint8_t*)value, sizeof(value));
-    }
-
-    /// Write an unsigned int
-    void visit(unsigned &value, atom_t sid) {
-      write_int(sid);
-      write_int(sizeof(value));
-      write((const uint8_t*)value, sizeof(value));
-    }
-
-    /// Write an atom
-    void visit(atom_t &value, atom_t sid) {
-      write_int(sid);
-      write_int(sizeof(value));
-      write((const uint8_t*)value, sizeof(value));
-    }
-
-    /// Write a vec4 value
-    void visit(vec4 &value, atom_t sid) {
-      write_int(sid);
-      write_int(sizeof(value));
-      write((const uint8_t*)&value, sizeof(value));
-    }
-
-    /// Write a matrix value
-    void visit(mat4t &value, atom_t sid) {
-      write_int(sid);
-      write_int(sizeof(value));
-      write((const uint8_t*)&value, sizeof(value));
-    }
   };
 } }
 

@@ -223,40 +223,6 @@ namespace octet { namespace resources {
       }
     }
 
-    /// Read an int object
-    void visit(int &value, atom_t sid) {
-      if (!check_atom(sid) && !check_size(sizeof(value))) {
-        value = read_int();
-      }
-    }
-
-    /// Read an unsigned int object
-    void visit(unsigned &value, atom_t sid) {
-      if (!check_atom(sid) && !check_size(sizeof(value))) {
-        value = read_int();
-      }
-    }
-
-    /// Read an atom object
-    void visit(atom_t &value, atom_t sid) {
-      if (!check_atom(sid) && !check_size(sizeof(value))) {
-        value = read_atom();
-      }
-    }
-
-    /// Read a vec4 object
-    void visit(vec4 &value, atom_t sid) {
-      if (!check_atom(sid) && !check_size(sizeof(value))) {
-        read((uint8_t*)&value, sizeof(value));
-      }
-    }
-
-    /// Read a mat4t object
-    void visit(mat4t &value, atom_t sid) {
-      if (!check_atom(sid) && !check_size(sizeof(value))) {
-        read((uint8_t*)&value, sizeof(value));
-      }
-    }
   };
 } }
 
