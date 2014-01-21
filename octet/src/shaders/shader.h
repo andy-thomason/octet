@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -11,7 +11,7 @@
 #define SHADER_STR(X) #X
 
 namespace octet { namespace shaders {
-  class shader {
+  class shader : public resource {
     GLuint program_;
 
     void link(GLuint vertex_shader, GLuint fragment_shader) {

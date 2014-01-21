@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -30,7 +30,8 @@ namespace octet { namespace resources {
   public:
     /// Set and get the file prefix. This is used to find resource files in the game.
     static const char *prefix(const char *new_prefix=NULL) {
-      static const char *value = "../../";      if (new_prefix) {
+      static const char *value = "../../";
+      if (new_prefix) {
         value = new_prefix;
       }
       return value;

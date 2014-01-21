@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -18,6 +18,7 @@
 
 // mesh builder class for standard meshes.
 namespace octet { namespace loaders {
+  /// Class for loading COLADA files.
   class collada_builder {
   public:
 

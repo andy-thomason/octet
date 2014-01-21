@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // mouse ball for rotating cameras around points of interest.
 
 namespace octet { namespace helpers {
+  /// Class for rotating the camera around the center of the world.
   class mouse_ball {
     app *the_app;
     float distance;

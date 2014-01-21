@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -42,6 +42,10 @@ namespace octet { namespace scene {
     vec4 light_uniforms[1 + max_lights * light_size ];
 
     int frame_number;
+
+    // shaders to draw triangles
+    ref<bump_shader> object_shader;
+    ref<bump_shader> skin_shader;
 
     void draw_aabb(const aabb &bb) {
       vec3 pos[8];
@@ -243,6 +247,7 @@ namespace octet { namespace scene {
       debug_in_ptr = 0;
     }
 
+    /// Serialization
     void visit(visitor &v) {
       scene_node::visit(v);
       v.visit(mesh_instances, atom_mesh_instances);
@@ -251,6 +256,8 @@ namespace octet { namespace scene {
       v.visit(light_instances, atom_light_instances);
     }
 
+
+    /// set up OpenGL state
     void begin_render(int vx, int vy, vec4_in clear_color=vec4(0.5f, 0.5f, 0.5f, 1.0f)) {
       // set a viewport - includes whole window area
       glViewport(0, 0, vx, vy);
@@ -308,6 +315,13 @@ namespace octet { namespace scene {
         li->set_kind(atom_directional);
         li->set_node(node);
         light_instances.push_back(li);
+      }
+
+      if (!object_shader) {
+        object_shader = new bump_shader();
+        object_shader->init(false);
+        skin_shader = new bump_shader();
+        skin_shader->init(true);
       }
     }
 
@@ -412,24 +426,33 @@ namespace octet { namespace scene {
       }
     }
 
-    // call OpenGL to draw all the mesh instances (scene_node + mesh + material)
+    /// render using specific shaders.
+    /// call OpenGL to draw all the mesh instances (scene_node + mesh + material)
     void render(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam, float aspect_ratio) {
       render_impl(object_shader, skin_shader, cam, aspect_ratio);
     }
 
-    // play an animation on another target (not the same one as in the collada file)
+    /// render using default shaders.
+    void render(float aspect_ratio) {
+      if (camera_instances.size() != 0) {
+        camera_instance *cam = camera_instances[0];
+        render_impl(*object_shader, *skin_shader, *cam, aspect_ratio);
+      }
+    }
+
+    /// play an animation on another target (not the same one as in the collada file)
     void play(animation *anim, resource *target, bool is_looping) {
       animation_instance *inst = new animation_instance(anim, target, is_looping);
       animation_instances.push_back(inst);
     }
 
-    // play an animation with built-in targets (as in the collada file)
+    /// play an animation with built-in targets (as in the collada file)
     void play(animation *anim, bool is_looping) {
       animation_instance *inst = new animation_instance(anim, NULL, is_looping);
       animation_instances.push_back(inst);
     }
 
-    // find a mesh instance for a node
+    /// find a mesh instance for a node
     mesh_instance *get_first_mesh_instance(scene_node *node) {
       for (int i = 0; i != mesh_instances.size(); ++i) {
         mesh_instance *mi = mesh_instances[i];
@@ -440,7 +463,7 @@ namespace octet { namespace scene {
       return NULL;
     }
 
-    // get the approximate size of the scene, not including lights or cameras
+    /// get the approximate size of the scene, not including lights or cameras
     aabb get_world_aabb() {
       aabb world_aabb;
       bool first = true;
@@ -466,9 +489,9 @@ namespace octet { namespace scene {
       rational depth;
     };
 
-    // brute force & ignorance ray cast.
-    // return the mesh instance and location of hits.
-    // todo: build a kd tree for mesh instance bbs & mesh triangles
+    /// brute force & ignorance ray cast.
+    /// return the mesh instance and location of hits.
+    /// todo: build a kd tree for mesh instance bbs & mesh triangles
     void cast_ray(cast_result &result, const ray &the_ray) {
       result.mi = 0;
       result.depth = rational(0, 0);
@@ -498,7 +521,7 @@ namespace octet { namespace scene {
       }
     }
 
-    // add a new line in world space (old ones will be lost)
+    /// Debug rendering: add a new line in world space (old ones will be lost)
     void add_debug_line(const vec3 &start, const vec3 &end) {
       if (debug_line_buffer.size()) {
         debug_line_buffer[debug_in_ptr++ & debug_line_buffer.size()-1] = start;

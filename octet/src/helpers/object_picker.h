@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 // mouse ball for rotating cameras around points of interest.
 
 namespace octet { namespace helpers {
+  /// Class for picking objects using mouse clicks.
   class object_picker {
     app *the_app;
     dynarray<ref<mesh_instance> > objects;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -8,6 +8,7 @@
 // scene for rendering text overlays
 
 namespace octet { namespace helpers {
+  /// Class for managing text overlays.
   class text_overlay {
     ref<visual_scene> text_scene;
     ref<camera_instance> cam;

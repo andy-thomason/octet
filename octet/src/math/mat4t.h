@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -22,11 +22,13 @@
 // The inverse of the matrix transforms the other way. so inverse4x4(modelToWorld) == worldToModel
 //
 namespace octet { namespace math {
+  /// 4x4 Matrix class
   class mat4t {
     // these vectors are the x, y, z, w components. w is the translation.
     vec4 v[4];
-    static const char *Copyright() { return "Copyright(C) Andy Thomason 2012, 2013"; }
+    static const char *Copyright() { return "Copyright(C) Andy Thomason 2012-2014"; }
   public:
+    /// Construct an identity matrix
     mat4t() {
       OCTET_VEC4_CONST(v0, 1, 0, 0, 0)
       OCTET_VEC4_CONST(v1, 0, 1, 0, 0)
@@ -38,11 +40,13 @@ namespace octet { namespace math {
       v[3] = v3;
     }
 
+    /// Construct a matrix from vectors
     mat4t(const vec4 &x, const vec4 &y, const vec4 &z, const vec4 &w)
     {
       v[0] = x; v[1] = y; v[2] = z; v[3] = w;
     }
 
+    /// Construct a scalar matrix
     mat4t(float diag) {
       v[0] = vec4(diag, 0.0f, 0.0f, 0.0f);
       v[1] = vec4(0.0f, diag, 0.0f, 0.0f);
@@ -50,6 +54,7 @@ namespace octet { namespace math {
       v[3] = vec4(0.0f, 0.0f, 0.0f, diag);
     }
   
+    /// Construct a matrix from a quaternion.
     mat4t(const quat &r)
     {
       // http://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
@@ -60,7 +65,7 @@ namespace octet { namespace math {
       v[3] = vec4( 0.0f, 0.0f, 0.0f, 1.0f );
     }
 
-    // like the OpenGL 1.0 LoadIdentity
+    /// like the OpenGL 1.0 LoadIdentity
     mat4t &loadIdentity() {
       v[0][0] = 1; v[0][1] = 0; v[0][2] = 0; v[0][3] = 0;
       v[1][0] = 0; v[1][1] = 1; v[1][2] = 0; v[1][3] = 0;
@@ -69,13 +74,13 @@ namespace octet { namespace math {
       return *this;
     }
 
-    // in-place initialise
+    /// in-place initialise
     void init(const vec4 &x, const vec4 &y, const vec4 &z, const vec4 &w)
     {
       v[0] = x; v[1] = y; v[2] = z; v[3] = w;
     }
 
-    // initialise the matrix from a collada matrix, for example.
+    /// initialise the matrix from a collada matrix, for example.
     void init_transpose(const float *f)
     {
       init(
@@ -86,7 +91,7 @@ namespace octet { namespace math {
       );
     }
 
-    // initialise the matrix from a C-style matrix
+    /// initialise the matrix from a C-style matrix
     void init_c_style(const float *f)
     {
       init(
@@ -97,18 +102,25 @@ namespace octet { namespace math {
       );
     }
 
+    /// Index the matrix rows.
     vec4 &operator[](int i) { return v[i]; }
+
+    /// Read the matrix rows.
     const vec4 &operator[](int i) const { return v[i]; }
 
-    vec4 row(int i) { return v[i]; }
-    vec4 column(int i) { return vec4(v[0][i], v[1][i], v[2][i], v[3][i]); }
-    const vec4 row(int i) const { return v[i]; }
-    const vec4 column(int i) const { return vec4(v[0][i], v[1][i], v[2][i], v[3][i]); }
+    /// Read a row.
+    vec4 row(int i) const { return v[i]; }
 
+    /// Read a column.
+    vec4 column(int i) const { return vec4(v[0][i], v[1][i], v[2][i], v[3][i]); }
+
+    /// Access the float values of the matrix (for OpenGL uniforms)
     float *get() { return &v[0][0]; }
+
+    /// Read the float values of the matrix (for OpenGL uniforms)
     const float *get() const { return &v[0][0]; }
   
-    // OpenGL-style scale of this matrix
+    /// OpenGL-style scale of this matrix
     mat4t &scale(float x, float y, float z) {
       v[0] = v[0] * x;
       v[1] = v[1] * y;
@@ -121,13 +133,13 @@ namespace octet { namespace math {
       return *this;
     }
   
-    // OpenGL-style translate of this matrix
+    /// OpenGL-style translate of this matrix
     mat4t &translate(float x, float y, float z) {
       v[3] = lmul(vec4(x,y,z,1.0f));
       return *this;
     }
   
-    // note this treats matrices as row-major unlike gl matrices which are column-major
+    /// Multiply operator: note this treats matrices as row-major unlike gl matrices which are column-major
     mat4t operator*(const mat4t &r) const
     {
       mat4t res;
@@ -137,6 +149,7 @@ namespace octet { namespace math {
       return res;
     }
   
+    /// Add operator
     mat4t operator+(const mat4t &r) const
     {
       return mat4t(
@@ -147,6 +160,7 @@ namespace octet { namespace math {
       );
     }
   
+    /// In-place add operator
     mat4t &operator+=(const mat4t &r)
     {
       v[0] += r.v[0];
@@ -156,11 +170,12 @@ namespace octet { namespace math {
       return *this;
     }
 
+    /// Get the trace of the matrix
     vec4 trace() const {
       return vec4(v[0].x(), v[1].y(), v[2].z(), v[3].w());
     }
   
-    // generalized single axis rotate in degrees (like old glRotate)
+    /// Rotate the matrix about an axis in degrees
     mat4t &rotate(float angle, float x, float y, float z) {
       float c = cosf(angle * (3.14159265f/180));
       float s = sinf(angle * (3.14159265f/180));
@@ -184,6 +199,7 @@ namespace octet { namespace math {
       return *this;
     }
 
+    /// Skew the matrix (as in Collada skew)
     mat4t &skew(float angle, float x1, float y1, float z1, float x2, float y2, float z2) {
       float t = tanf(angle * (3.14159265f/180));
       vec4 v(x1, y1, z1, 0.0f);
@@ -200,7 +216,7 @@ namespace octet { namespace math {
       return *this;
     }
 
-    // specialised xyz axis rotate
+    /// Specialised xyz axis rotate. More efficent than rotate()
     mat4t &rotateSpecial(float cosAngle, float sinAngle, int a, int b) {
       vec4 t = v[a] * cosAngle + v[b] * sinAngle;
       v[b] = v[b] * cosAngle - v[a] * sinAngle;
@@ -208,29 +224,41 @@ namespace octet { namespace math {
       return *this;
     }
 
-    // rotate by angle in degrees
+    /// rotate by angle in degrees about X axis
     mat4t &rotateX(float angle) { return rotateSpecial(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 1, 2); }
+
+    /// rotate by angle in degrees about Y axis
     mat4t &rotateY(float angle) { return rotateSpecial(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 2, 0); }
+
+    /// rotate by angle in degrees about Z axis
     mat4t &rotateZ(float angle) { return rotateSpecial(cosf(angle*(3.14159265f/180)), sinf(angle*(3.14159265f/180)), 0, 1); }
 
-    // accurate rotate by 90
+    // accurate rotate by 90 degrees about X axis
     mat4t &rotateX90() { return rotateSpecial(0, 1, 1, 2); }
+
+    // accurate rotate by 90 degrees about Y axis
     mat4t &rotateY90() { return rotateSpecial(0, 1, 2, 0); }
+
+    // accurate rotate by 90 degrees about Z axis
     mat4t &rotateZ90() { return rotateSpecial(0, 1, 0, 1); }
 
-    // accurate rotate by 180
+    // accurate rotate by 180 degrees about X axis
     mat4t &rotateX180() { return rotateSpecial(-1, 0, 1, 2); }
+
+    // accurate rotate by 180 degrees about Y axis
     mat4t &rotateY180() { return rotateSpecial(-1, 0, 2, 0); }
+
+    // accurate rotate by 180 degrees about Z axis
     mat4t &rotateZ180() { return rotateSpecial(-1, 0, 0, 1); }
 
-    // multiply by vector on the left
+    /// Multiply by vector on the left
     // [l[0],l[1],l[2],l[3]] * [v[0],v[1],v[2],v[3]]
     vec4 lmul(const vec4 &l) const {
       //return v[0] * l[0] + v[1] * l[1] + v[2] * l[2] + v[3] * l[3];
       return v[0] * l.xxxx() + v[1] * l.yyyy() + v[2] * l.zzzz() + v[3] * l.wwww();
     }
   
-    // multiply by vector on the right
+    /// Multiply by vector on the right
     // [v[0],v[1],v[2],v[3]] * [r[0],r[1],r[2],r[3]]
     vec4 rmul(const vec4 &r) const {
       return vec4(
@@ -241,7 +269,7 @@ namespace octet { namespace math {
       );
     }
   
-    // quick invert, assumes the matrix is a rotate and translate only.
+    /// Quick invert, assumes the matrix is a rotate and translate only.
     // works for orthonormal rotation component matrices
     void invertQuick(mat4t &d) const {
       // transpose x, y, z
@@ -253,10 +281,12 @@ namespace octet { namespace math {
       d[3] = d.lmul(vec4(-v[3][0], -v[3][1], -v[3][2], 1.0f));
     }
 
+    /// get a transpose of the matrix
     mat4t transpose4x4() const {
       return mat4t( colx(), coly(), colz(), colw() );
     }
 
+    /// Get the full inverse of the matrix
     mat4t inverse4x4() const {
       vec4 v0 = v[0];
       vec4 v1 = v[1];
@@ -291,7 +321,7 @@ namespace octet { namespace math {
       );
     }
 
-    // 3x3 adjoint matrix, used for generalized 3x3 invert
+    /// Get the 3x3 adjoint matrix, used for generalized 3x3 invert.
     mat4t adjoint3x3() const {
       vec4 c0 = column(0);
       vec4 c1 = column(1);
@@ -304,12 +334,12 @@ namespace octet { namespace math {
       );
     }
   
-    // determinant of 3x3 matrix
+    /// Get the determinant of a 3x3 matrix
     float det3x3() const {
       return v[0].cross(v[1]).dot(v[2]);
     }
   
-    // complete 4x4 determinant
+    /// Get the complete 4x4 determinant
     float det4x4() const {
       vec4 v0 = v[0];
       vec4 v1 = v[1];
@@ -325,12 +355,12 @@ namespace octet { namespace math {
       ;
     }
   
-    // general inverse of 3x3 matrix
+    /// Get the general inverse of a 3x3 matrix
     mat4t inverse3x3() const {
       return adjoint3x3() * (1.0f/det3x3());
     }
   
-    // general inverse of 3x4 matrix (with v[3] = vec4(0, 0, 0, 1))
+    /// Get the  general inverse of 3x4 matrix (with v[3] = vec4(0, 0, 0, 1))
     mat4t inverse3x4() const {
       float rdet = 1.0f / det3x3();
       mat4t d = adjoint3x3();
@@ -341,18 +371,18 @@ namespace octet { namespace math {
       return d;
     }
   
-    // absolute of matrix useful for extents.
+    /// Get the absolute value of a matrix; useful for extents.
     mat4t abs() const { return mat4t(v[0].abs(), v[1].abs(), v[2].abs(), v[3].abs()); }
   
-    // as in glMultMatrix
+    // In place matrix multiply, as in glMultMatrix
     mat4t &multMatrix(const mat4t &r)
     {
       *this = r * *this;
       return *this;
     }
   
-    // as in glFrustum - make a perspective matrix used for conventional cameras
-    // this matrix makes a 4x4 vector which is then divided to get perspective
+    /// As in glFrustum - make a perspective matrix used for conventional cameras
+    /// this matrix makes a 4x4 vector which is then divided to get perspective
     mat4t &frustum(float left, float right, float bottom, float top, float n, float f)
     {
       float X = 2*n / (right-left);
@@ -391,8 +421,8 @@ namespace octet { namespace math {
       return *this;
     }
   
-    // as in glOrtho - make a non-shrinking camera matrix (wp=1)
-    // used for GUI displays and editors.
+    /// As in glOrtho - make a non-shrinking camera matrix (wp=1)
+    /// used for GUI displays and editors.
     mat4t &ortho(float left, float right, float bottom, float top, float nearVal, float farVal)
     {
       float X = 2.0f / (right-left);
@@ -411,10 +441,10 @@ namespace octet { namespace math {
       return *this;
     }
   
-    // multiply by scalar
+    /// multiply by scalar
     mat4t operator*(float r) const { return mat4t(v[0]*r, v[1]*r, v[2]*r, v[3]*r); }
 
-    // postmultiply vector
+    /// postmultiply by a vector
     vec4 operator*(const vec4 &r) const {
       return vec4(
         v[0].dot(r),
@@ -424,7 +454,7 @@ namespace octet { namespace math {
       );
     }
 
-    // convert rotation matrix to quaternion
+    /// Convert a rotation matrix to a quaternion.
     quat toQuaternion() const {
       float trace = v[0][0] + v[1][1] + v[2][2];
       if (trace > 0)
@@ -452,6 +482,7 @@ namespace octet { namespace math {
 		  }
     }
   
+    /// Convert to a string for debugging.
     const char *toString(char *dest, size_t len) const
     {
       char buf[4][256];
@@ -465,10 +496,7 @@ namespace octet { namespace math {
       return dest;
     }
 
-    /*void dump() {
-      printf("{"); v[0].dump(); printf(", "); v[1].dump(); printf(", "); v[2].dump(); printf(", "); v[3].dump(); printf("}\n");
-    }*/
-    // helper function for building a simple camera
+    /// helper function for building a simple camera
     static mat4t build_projection_matrix(const mat4t &modelToWorld, const mat4t &cameraToWorld, float n = 0.1f, float f = 1000.0f)
     {
       // flip it around to transform from world to camera
@@ -484,7 +512,7 @@ namespace octet { namespace math {
       return modelToWorld * worldToCamera * cameraToProjection;
     }
 
-    // helper function for building a simple camera
+    /// helper function for building a simple camera
     static mat4t build_camera_matrices(mat4t &modelToCamera, mat4t &worldToCamera, const mat4t &modelToWorld, const mat4t &cameraToWorld, float n = 0.1f, float f = 1000.0f)
     {
       // flip it around to transform from world to camera
@@ -501,7 +529,7 @@ namespace octet { namespace math {
       return modelToCamera * cameraToProjection;
     }
 
-    // Gram Schmidt orthogonalisation: make a pure rotation
+    /// Gram Schmidt orthogonalisation: make a pure rotation.
     mat4t normalize_3x3() {
       // note: it may be best to normalize z first.
       vec4 u0 = v[0];
@@ -510,15 +538,15 @@ namespace octet { namespace math {
       return mat4t(u0.normalize(), u1.normalize(), u2.normalize(), vec4(0, 0, 0, 1));
     }
 
-    // QR decomposition (after normalize_3x3)
-    // get R component (upper triangular)
+    /// QR decomposition (after normalize_3x3)
+    /// get R component (upper triangular)
     mat4t get_skew(const mat4t &rotation) {
       return xyz() * rotation.transpose4x4();
     }
 
-    // Power method to find approximate pincipal axis
-    // only works for matrices where there is a single dominant eigenvalue.
-    // No good for rotations.
+    /// Power method to find approximate pincipal axis.
+    /// Only works for matrices where there is a single dominant eigenvalue.
+    /// ie. no good for rotations.
     vec4 get_principal_axis(unsigned steps=5) {
       vec4 t = v[2].normalize();
       for (unsigned i = 0; i != 5; ++i) {
@@ -527,7 +555,7 @@ namespace octet { namespace math {
       return t;
     }
 
-    // assuming this is a rotation matrix, get the axis and angle (in degrees).
+    /// Assuming this is a rotation matrix, get the axis and angle (in degrees).
     vec3 get_rotation(float &angle) {
       quat q = toQuaternion();
 
@@ -538,33 +566,56 @@ namespace octet { namespace math {
       return length > 0.000001f ? axis / length : vec3(0, 0, 1);
     }
 
-    // sub-matrices
+    /// get 2x2 sub-matrix
     mat4t xy() const { return mat4t(v[0].xy00(), v[1].xy00(), vec4(0, 0, 1, 0), vec4(0, 0, 0, 1)); }
+
+    /// get 3x3 sub-matrix
     mat4t xyz() const { return mat4t(v[0].xyz0(), v[1].xyz0(), v[2].xyz0(), vec4(0, 0, 0, 1)); }
 
-    // rows
+    // get X row
     const vec4 &x() const { return v[0]; }
+
+    // get Y row
     const vec4 &y() const { return v[1]; }
+
+    // get Z row
     const vec4 &z() const { return v[2]; }
+
+    // get W row
     const vec4 &w() const { return v[3]; }
+
+    // access X row
     vec4 &x() { return v[0]; }
+
+    // access Y row
     vec4 &y() { return v[1]; }
+
+    // access Z row
     vec4 &z() { return v[2]; }
+
+    // access W row
     vec4 &w() { return v[3]; }
 
-    // columns
+    // get X column
     vec4 colx() const { return vec4( v[0][0], v[1][0], v[2][0], v[3][0] ); }
+
+    // get X column
     vec4 coly() const { return vec4( v[0][1], v[1][1], v[2][1], v[3][1] ); }
+
+    // get X column
     vec4 colz() const { return vec4( v[0][2], v[1][2], v[2][2], v[3][2] ); }
+
+    // get X column
     vec4 colw() const { return vec4( v[0][3], v[1][3], v[2][3], v[3][3] ); }
   };
 
-  // vector times a matrix (premultiplication)
+  /// vector times a matrix (premultiplication)
   inline vec4 vec4::operator*(const mat4t &r) const
   {
     return r.lmul(*this);
   }
 
+  /// Outer product of two 4x4 vectors.
   inline mat4t outer(const vec4 &lhs, const vec4 &rhs) {
     return mat4t(
       lhs * rhs.x(),
@@ -574,15 +625,18 @@ namespace octet { namespace math {
     );
   }
 
+  /// Multiply vec3 by 3x4 matrix.
   inline vec3 operator*(const vec3 &lhs, const mat4t &rhs) {
     //return rhs[0].xyz() * lhs[0] + rhs[1].xyz() * lhs[1] + rhs[2].xyz() * lhs[2] + rhs[3].xyz();
     return (rhs[0] * lhs.xxxx() + rhs[1] * lhs.yyyy() + rhs[2] * lhs.zzzz() + rhs[3]).xyz();
   }
 
+  /// Get 3x4 inverse
   static inline mat4t inverse3x4(const mat4t &v) {
     return v.inverse3x4();
   }
 
+  /// Get full 4x4 inverse.
   static inline mat4t inverse4x4(const mat4t &v) {
     return v.inverse4x4();
   }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -9,6 +9,7 @@
 //
 
 namespace octet { namespace loaders {
+  /// Class for loading DDS texture files
   class dds_decoder {
     // http://en.wikipedia.org/wiki/DirectDraw_Surface
     // http://www.mindcontrol.org/~hplus/graphics/dds-info/

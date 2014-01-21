@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013, 2014 (MIT license)
+// (C) Andy Thomason 2012-2014, 2014 (MIT license)
 //
 // Math library for games and geometry based on glsl
 //

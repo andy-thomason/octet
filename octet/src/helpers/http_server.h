@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// (C) Andy Thomason 2012, 2013
+// (C) Andy Thomason 2012-2014
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
@@ -8,6 +8,7 @@
 // HTTP server for debugging game code and building game editors.
 
 namespace octet { namespace helpers {
+  /// Class for exposing game object to web browsers.
   class http_server {
     enum { port = 8888 };
     int listen_socket;
