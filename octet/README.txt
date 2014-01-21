@@ -30,4 +30,8 @@ Xcode:
 
 All libraries come as standard with Xcode, but you must use the
 "Product -> Edit Scheme -> Options" dialogue to set the working directory
-to the "xcode" folder in your project.
+to a folder under the "xcode" folder in your project.
+
+By default, the framework travels up two directories before looking for
+files.
+
