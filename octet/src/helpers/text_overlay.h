@@ -9,52 +9,51 @@
 
 namespace octet { namespace helpers {
   /// Class for managing text overlays.
-  class text_overlay {
+  class text_overlay : public resource {
     ref<visual_scene> text_scene;
-    ref<camera_instance> cam;
-    ref<mesh_instance> msh_inst;
-    ref<mesh_text> text;
-
+    ref<bitmap_font> font;
+    ref<material> mat;
+    ref<scene_node> node;
   public:
-    void init() {
+    /// Create an empty text overlay.
+    text_overlay() {
+      image *page = new image("assets/courier_18_0.gif");
+      page->load();
+      font = new bitmap_font(
+        page->get_width(), page->get_height(), "assets/courier_18.fnt"
+      );
+
       // Make a scene for the text overlay using an ortho camera
       // that works in screen pixels.
       text_scene = new visual_scene();
 
-      image *page = new image("assets/courier_18_0.gif");
-      page->load();
-      bitmap_font *font = new bitmap_font(
-        page->get_width(), page->get_height(), "assets/courier_18.fnt"
-      );
+      // Make a material from the font image.
+      mat = new material(page);
 
-      /*static const char sample_text[] =
-        "Antonio: Where is the master, boatswain?\n"
-        "Boatswain: Do you not hear him? You mar our labour: keep your cabins; you do assist the storm.\n"
-        "Gonzalo: Nay, good, be patient.\n"
-        "Boatswain: When the sea is. Hence! What cares these roarers for the name of king? To cabin! silence! Trouble us not.\n"
-        "Gonzalo: Good, yet remember whom thou hast aboard.\n"
-        "Boatswain: None that I more love than myself. You are counsellor; — if you can command these elements to silence, and work the peace of the present, we will not hand a rope more. Use your authority; if you cannot, give thanks you have liv'd so long, and make yourself ready in your cabin for the mischance of the hour, if it so hap.\n"
-      ;*/
+      // Make a default node for the scene (no transformation)
+      node = text_scene->add_scene_node();
 
-      aabb bb(vec3(0, 0, 0), vec3(64, 256, 0));
-      text = new mesh_text(font, "Hello", &bb);
-
-      scene_node *msh_node = text_scene->add_scene_node();
-      material *mat = new material(page);
-      msh_inst = new mesh_instance(msh_node, text, mat);
-      text_scene->add_mesh_instance(msh_inst);
-
+      // Create scene defaults.
       text_scene->create_default_camera_and_lights();
-      cam = text_scene->get_camera_instance(0);
-      cam->get_node()->access_nodeToParent().loadIdentity();
     }
 
-    void render(bump_shader &object_shader, bump_shader &skin_shader, int vx, int vy, int frame_number) {
-      cam->set_ortho((float)vx, (float)vy, 1, -1, 1);
-      camera_instance *cam = text_scene->get_camera_instance(0);
-      text_scene->set_dump_vertices(frame_number == 0);
+    /// Add a block of text
+    void add_mesh_text(mesh_text *mesh) {
+      mesh_instance *msh_inst = new mesh_instance(node, mesh, mat);
+      text_scene->add_mesh_instance(msh_inst);
+    }
 
-      text_scene->render(object_shader, skin_shader, *cam, 1);
+    /// Render the text overlay
+    void render(int vx, int vy) {
+      camera_instance *cam = text_scene->get_camera_instance(0);
+      cam->get_node()->loadIdentity();
+      cam->set_ortho((float)vx, (float)vy, 1, -1, 1);
+      text_scene->render(1);
+    }
+
+    /// Get the default font.
+    bitmap_font *get_default_font() {
+      return font;
     }
   };
 }}
