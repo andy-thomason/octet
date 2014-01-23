@@ -7,6 +7,7 @@
 namespace octet {
   /// Scene containing a box with octet.
   class example_box : public app {
+    // scene for drawing box
     ref<visual_scene> app_scene;
   public:
     /// this is called when we construct the class before everything is initialised.
@@ -17,6 +18,7 @@ namespace octet {
     void app_init() {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
+
       material *red = new material(vec4(1, 0, 0, 1));
       mesh_box *box = new mesh_box(vec3(4));
       scene_node *node = new scene_node();

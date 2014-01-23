@@ -33,9 +33,6 @@ namespace octet {
     // helper to rotate camera about scene
     mouse_ball ball;
 
-    // helper for drawing text
-    text_overlay overlay;
-
     // helper for debugging by web browser
     http_server server;
 
@@ -137,7 +134,6 @@ namespace octet {
 
       load_file(filename);
 
-      overlay.init();
       server.init(&dict);
       picker.init(this);
     }
@@ -189,8 +185,6 @@ namespace octet {
         app_scene->update(1.0f/30);
 
         app_scene->render(object_shader, skin_shader, *cam, (float)vx / vy);
-
-        overlay.render(object_shader, skin_shader, vx, vy, get_frame_number());
       }
     }
   };
