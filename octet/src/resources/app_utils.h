@@ -89,9 +89,11 @@ namespace octet { namespace resources {
       } else if (!strncmp(url, "http://", 7)) {
         // http
       } else {
-        FILE *file = fopen(get_path(url), "rb");
+        const char *path = get_path(url);
+        FILE *file = fopen(path, "rb");
         if (!file) {
-          printf("file %s not found\n", get_path(url));
+          char tmp[1024];
+          printf("file %s not found. cwd=%s\n", path, getcwd(tmp, sizeof(tmp)));
         } else {
           fseek(file, 0, SEEK_END);
           buffer.resize((unsigned)ftell(file));

@@ -228,8 +228,8 @@ namespace octet { namespace math {
     }
 
     // after perspective transform, use this to find x, y, z in the cube.
-    OCTET_HOT vec4 perspectiveDivide() const {
-      return vec4(v[0], v[1], v[2], v[3]) * vec4(recip(v[3]));
+    OCTET_HOT vec3 perspectiveDivide() const {
+      return vec3(v[0], v[1], v[2]) * vec3(recip(v[3]));
     }
 
     // minumum of two vectors
@@ -390,7 +390,7 @@ namespace octet { namespace math {
   }
 
   // divide by w
-  inline vec4 perspectiveDivide(const vec4 &lhs) {
+  inline vec3 perspectiveDivide(const vec4 &lhs) {
      return lhs.perspectiveDivide(); 
   }
 

@@ -33,6 +33,13 @@ namespace octet { namespace scene {
       if (text.size()) update();
     }
 
+    void format(const char *fmt, ...) {
+      va_list list;
+      va_start(list, fmt);
+      text.vformat(fmt, list);
+      va_end(list);
+    }
+
     /// update the OpenGL geometry.
     void update() {
       if (!font) return;

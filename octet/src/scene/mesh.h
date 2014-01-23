@@ -786,5 +786,25 @@ namespace octet { namespace scene {
         }
       }
     }
+
+    /// Debugging: show the effect of the vertex shader on the vertices
+    /// If the vertices are outside [[-1,1], [-1,1], [-1,1]] then something is wrong!
+    void dump_transformed(mat4t_in modelToProjection) {
+      unsigned pos_offset = get_offset(get_slot(attribute_pos));
+      gl_resource::rolock idx_lock(get_indices());
+      gl_resource::rolock vtx_lock(get_vertices());
+      const uint32_t *ip = idx_lock.u32();
+      const uint8_t *vp = vtx_lock.u8();
+      unsigned stride = get_stride();
+      for (unsigned i = 0; i != get_num_indices(); ++i) {
+        vec4 pos_in = vec4((vec3)*(const vec3p*)(vp + ip[i] * stride + pos_offset), 1.0f );
+        vec4 pos_out = pos_in * modelToProjection;
+        vec3 res = pos_out.perspectiveDivide();
+        vec3 ares = abs(res);
+        bool err = any(abs(res) > vec3(1));
+        char tmp[2][256];
+        log("%5d %s -> %s %s\n", i, pos_in.toString(tmp[0], sizeof(tmp[0])), res.toString(tmp[1], sizeof(tmp[1])), err ? "FAIL" : "");
+      }
+    }
   };
 }}

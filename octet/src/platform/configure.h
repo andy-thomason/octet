@@ -45,6 +45,7 @@
 #include <stdarg.h>
 #include <math.h>
 #include <assert.h>
+#include <direct.h>
 
 namespace octet {
   /// write some text to log.txt

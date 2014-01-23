@@ -153,11 +153,11 @@ private:
 
     // create other data items from font_info
     void update() {
-      if (font_info.empty()) return;
-
       finfo = 0;
       fcommon = 0;
       fkern = 0;
+
+      if (font_info.empty()) return;
 
       const uint8_t *ptr = &font_info[0];
       const uint8_t *ptr_max = ptr + font_info.size();
@@ -243,6 +243,10 @@ private:
 
     /// Create new bitmap font info object given the URL of a .fnt file
     bitmap_font(int page_width=1, int page_height=1, const char *fnt_file = 0) {
+      finfo = 0;
+      fcommon = 0;
+      fkern = 0;
+
       uscale = 1.0f / page_width;
       vscale = 1.0f / page_height;
       if (fnt_file) {
@@ -264,6 +268,7 @@ private:
       // defensive coding
       if (!idx || !vtx) return 0;
       if (!text) return 0;
+      if (!fcommon) return 0;
 
       if (!max_text) max_text = text + strlen(text);
 

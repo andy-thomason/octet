@@ -107,6 +107,11 @@ namespace octet { namespace scene {
       return nodeToParent;
     }
 
+    /// reset the matrix
+    void loadIdentity() {
+      nodeToParent.loadIdentity();
+    }
+
     /// Translate the matrix
     void translate(vec3_in xyz) {
       nodeToParent.translate(xyz[0], xyz[1], xyz[2]);

@@ -166,12 +166,6 @@ namespace octet { namespace scene {
       if (render_aabbs) {
         render_mesh_aabbs();
       }
-
-      // use this to answer the question: "why can't I see my triangles?"
-      // note: only works with all-float vertex buffers
-      if (dump_vertices) {
-        dump_mesh_vertices(cam);
-      }
     }
 
     void render_impl(bump_shader &object_shader, bump_shader &skin_shader, camera_instance &cam, float aspect_ratio) {
@@ -217,6 +211,10 @@ namespace octet { namespace scene {
           }
         }
 
+        /*if (true) {
+          static bool dumped;
+          if (!dumped) { msh->dump_transformed(modelToProjection); dumped = true; }
+        }*/
         msh->enable_attributes();
         msh->draw();
         msh->disable_attributes();
@@ -337,8 +335,10 @@ namespace octet { namespace scene {
       }
     }
 
-    scene_node *add_scene_node() {
-      scene_node *new_node = new scene_node();
+    scene_node *add_scene_node(scene_node *new_node = 0) {
+      if (!new_node) {
+        new_node = new scene_node();
+      }
       scene_node::add_child(new_node);
       return new_node;
     }
