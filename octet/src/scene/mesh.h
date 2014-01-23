@@ -806,5 +806,28 @@ namespace octet { namespace scene {
         log("%5d %s -> %s %s\n", i, pos_in.toString(tmp[0], sizeof(tmp[0])), res.toString(tmp[1], sizeof(tmp[1])), err ? "FAIL" : "");
       }
     }
+
+    void make_wireframe() {
+      if (mode != GL_TRIANGLES) return;
+      if (index_type != GL_UNSIGNED_INT) return;
+
+      gl_resource::rolock idx_lock(get_indices());
+      const uint32_t *sip = idx_lock.u32();
+      gl_resource *new_indices = new gl_resource();
+      new_indices->allocate(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * get_num_indices() * 2);
+      gl_resource::rwlock new_idx_lock(new_indices);
+      uint32_t *dip = new_idx_lock.u32();
+
+      for (unsigned i = 0; i < num_indices; i += 3) {
+        dip[0] = dip[5] = sip[0];
+        dip[2] = dip[1] = sip[1];
+        dip[4] = dip[3] = sip[2];
+        sip += 3;
+        dip += 6;
+      }
+      set_indices(new_indices);
+      set_num_indices(get_num_indices() * 2);
+      set_mode(GL_LINES);
+    }
   };
 }}

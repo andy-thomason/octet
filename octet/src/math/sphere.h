@@ -34,6 +34,10 @@ namespace octet { namespace math {
       return center + radius;
     }
 
+    aabb get_aabb() const {
+      return aabb(center, vec3(radius));
+    }
+
     // get transformed sphere assuming mat is orthonormal.
     sphere get_transform(const mat4t &mat) const {
       return sphere(get_center(), get_radius());

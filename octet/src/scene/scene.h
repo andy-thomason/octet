@@ -29,6 +29,7 @@
 #include "../scene/smooth.h"
 #include "../scene/mesh_text.h"
 #include "../scene/mesh_box.h"
+#include "../scene/mesh_sphere.h"
 #ifdef OCTET_VOXEL_TEST
   #include "../scene/mesh_voxel_subcube.h"
   #include "../scene/mesh_voxels.h"

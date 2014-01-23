@@ -22,6 +22,7 @@ OCTET_CLASS(resources, bitmap_font)
 OCTET_CLASS(scene, mesh_text)
 OCTET_CLASS(scene, sampler)
 OCTET_CLASS(scene, mesh_box)
+OCTET_CLASS(scene, mesh_sphere)
 #ifdef OCTET_VOXEL_TEST
   OCTET_CLASS(scene, mesh_voxels)
   OCTET_CLASS(scene, mesh_voxel_subcube)
