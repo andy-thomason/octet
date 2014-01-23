@@ -172,6 +172,12 @@ namespace octet { namespace containers {
       release();
       va_list v;
       va_start(v, fmt);
+      vformat(fmt, v);
+      va_end(v);
+      return *this;
+    }
+
+    void vformat(const char *fmt, va_list v) {
       #ifdef WIN32
         int len = _vscprintf(fmt, v);
         if (len) {
@@ -183,7 +189,6 @@ namespace octet { namespace containers {
         vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
         *this = tmp;
       #endif
-      return *this;
     }
 
     /// Decode url strings - to turn them into filenames, for example.
