@@ -41,6 +41,34 @@ namespace octet { namespace scene {
     // bounding box
     aabb mesh_aabb;
 
+    struct general_vertex {
+      const uint8_t *bytes;
+      unsigned size;
+
+      bool is_empty() const { return bytes == 0; }
+
+      bool operator ==(const general_vertex &rhs) const {
+        //printf("%p %p %d\n", this, &rhs, size == rhs.size && memcmp(bytes, rhs.bytes, size) == 0);
+        return size == rhs.size && memcmp(bytes, rhs.bytes, size) == 0;
+      }
+
+      unsigned get_hash() const {
+        unsigned hash = 0;
+        for (unsigned i = 0; i != size; ++i) {
+          hash = ( hash * 7 ) + ( hash >> 13 ) + bytes[i];
+          //printf("%02x ", bytes[i]);
+        }
+        //printf("%d hash=%08x\n", size, hash_map_cmp::fuzz_hash(hash));
+        return hash;
+      }
+    };
+
+    class vertex_cmp : public hash_map_cmp {
+    public:
+      static unsigned get_hash(const general_vertex &key) { return fuzz_hash(key.get_hash()); }
+      static bool is_empty(const general_vertex &key) { return key.is_empty(); }
+    };
+
     // add a new edge to a hash map. (index, index) -> (triangle+1, triangle+1)
     static void add_edge(hash_map<uint64_t, uint64_t> &edges, unsigned tri_idx, unsigned i0, unsigned i1) {
       if (i0 == i1) return; // note: (0, 0) means empty
@@ -828,6 +856,47 @@ namespace octet { namespace scene {
       set_indices(new_indices);
       set_num_indices(get_num_indices() * 2);
       set_mode(GL_LINES);
+    }
+
+    // re-index the mesh
+    void reindex() {
+      if (get_index_type() != GL_UNSIGNED_INT) return;
+
+      hash_map<general_vertex, unsigned, vertex_cmp> vertex_to_index;
+
+      dynarray<uint8_t> dest_vertices;
+      dynarray<uint32_t> dest_indices;
+      dest_indices.reserve(get_num_indices());
+
+      gl_resource::rolock idx_lock(get_indices());
+      gl_resource::rolock vtx_lock(get_vertices());
+      const uint32_t *ip = idx_lock.u32();
+      const uint8_t *vp = vtx_lock.u8();
+
+      unsigned stride = get_stride();
+      unsigned num_vertices = 0;
+      for (unsigned i = 0; i != get_num_indices(); ++i) {
+        uint32_t idx = ip[i];
+        general_vertex v = { vp + idx * stride, stride };
+        unsigned &e = vertex_to_index[v];
+        if (e == 0) { // hash_map inits to zero
+          e = ++num_vertices;
+          unsigned old_size = dest_vertices.size();
+          dest_vertices.resize(old_size + stride);
+          memcpy(&dest_vertices[old_size], vp + idx * stride, stride);
+        }
+        dest_indices.push_back(e - 1);
+      }
+
+      unsigned isize = dest_indices.size() * sizeof(uint32_t);
+      unsigned vsize = dest_vertices.size() * sizeof(uint8_t);
+      gl_resource *indices = get_indices();
+      gl_resource *vertices = new gl_resource(GL_ARRAY_BUFFER, vsize);
+      indices->assign(&dest_indices[0], 0, isize);
+      vertices->assign(&dest_vertices[0], 0, vsize);
+
+      set_vertices(vertices);
+      set_num_vertices(num_vertices);
     }
   };
 }}

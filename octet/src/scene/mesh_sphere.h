@@ -146,6 +146,7 @@ namespace octet { namespace scene {
         };
         add_shape(icosahedron, 12, icosahedron_indices, 20);
       }
+      reindex();
     }
 
     /// Serialise the box
