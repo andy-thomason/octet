@@ -6,7 +6,7 @@
 //
 namespace octet {
   /// Scene containing a particle system
-  class sprite_sheet : public app {
+  class example_particles : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;
 
@@ -16,7 +16,7 @@ namespace octet {
     random r;
   public:
     /// this is called when we construct the class before everything is initialised.
-    sprite_sheet(int argc, char **argv) : app(argc, argv) {
+    example_particles(int argc, char **argv) : app(argc, argv) {
     }
 
     /// this is called once OpenGL is initialized
