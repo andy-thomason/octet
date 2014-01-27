@@ -4,9 +4,6 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// raw 3D mesh container
-//
-
 namespace octet { namespace scene {
   /// General mesh class. This is a base class for all meshes such as mesh_box.
   /// Meshes may be dynamic or static.
@@ -227,6 +224,11 @@ namespace octet { namespace scene {
       return index_type;
     }
 
+    /// Set the kind of index to use (0 means use glDrawArrays)
+    void set_index_type(unsigned value) {
+      index_type = value;
+    }
+
     /// Get the number of slots (attributes) we have.
     unsigned get_num_slots() const {
       return num_slots;
@@ -423,9 +425,9 @@ namespace octet { namespace scene {
 
     /// When rendering a mesh, call this next to draw the primitives.
     void draw() {
-      indices->bind();
       //printf("de %04x %d %d\n", get_mode(), get_num_vertices(), get_index_type());
       if (get_index_type()) {
+        indices->bind();
         glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)0);
       } else {
         glDrawArrays(get_mode(), 0, get_num_vertices());
@@ -835,6 +837,8 @@ namespace octet { namespace scene {
       }
     }
 
+    /// Convert from GL_TRIANGLES to GL_LINES.
+    /// Double the number of indices.
     void make_wireframe() {
       if (mode != GL_TRIANGLES) return;
       if (index_type != GL_UNSIGNED_INT) return;
@@ -858,7 +862,7 @@ namespace octet { namespace scene {
       set_mode(GL_LINES);
     }
 
-    // re-index the mesh
+    /// re-index the mesh
     void reindex() {
       if (get_index_type() != GL_UNSIGNED_INT) return;
 
@@ -880,6 +884,7 @@ namespace octet { namespace scene {
         general_vertex v = { vp + idx * stride, stride };
         unsigned &e = vertex_to_index[v];
         if (e == 0) { // hash_map inits to zero
+          // vertex is unique.
           e = ++num_vertices;
           unsigned old_size = dest_vertices.size();
           dest_vertices.resize(old_size + stride);
@@ -888,15 +893,18 @@ namespace octet { namespace scene {
         dest_indices.push_back(e - 1);
       }
 
-      unsigned isize = dest_indices.size() * sizeof(uint32_t);
-      unsigned vsize = dest_vertices.size() * sizeof(uint8_t);
-      gl_resource *indices = get_indices();
-      gl_resource *vertices = new gl_resource(GL_ARRAY_BUFFER, vsize);
-      indices->assign(&dest_indices[0], 0, isize);
-      vertices->assign(&dest_vertices[0], 0, vsize);
+      // if we have fewer vertices now, update the index and vertices.
+      if (num_vertices != get_num_vertices()) {
+        unsigned isize = dest_indices.size() * sizeof(uint32_t);
+        unsigned vsize = dest_vertices.size() * sizeof(uint8_t);
+        gl_resource *indices = get_indices();
+        gl_resource *vertices = new gl_resource(GL_ARRAY_BUFFER, vsize);
+        indices->assign(&dest_indices[0], 0, isize);
+        vertices->assign(&dest_vertices[0], 0, vsize);
 
-      set_vertices(vertices);
-      set_num_vertices(num_vertices);
+        set_vertices(vertices);
+        set_num_vertices(num_vertices);
+      }
     }
   };
 }}

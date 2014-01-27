@@ -33,10 +33,16 @@ namespace octet { namespace math {
     // construct from four scalars
     vec2(float x, float y) {
       v[0] = x; v[1] = y;
+      #if OCTET_SSE
+        v[2] = v[3] = 0;
+      #endif
     };
 
     vec2(float xyz) {
       v[0] = v[1] = xyz;
+      #if OCTET_SSE
+        v[2] = v[3] = 0;
+      #endif
     }
 
     // index accessor [0] [1] ...
@@ -276,7 +282,7 @@ namespace octet { namespace math {
       float v[2];
     public:
       vec2p(const vec2 &in) { v[0] = in[0]; v[1] = in[1]; }
-      vec2p(float x, float y) { v[0] = x; v[1] = y; }
+      vec2p(float x=0, float y=0) { v[0] = x; v[1] = y; }
       operator vec2() { return vec2(v[0], v[1]); }
       operator const vec2() const { return vec2(v[0], v[1]); }
     };
