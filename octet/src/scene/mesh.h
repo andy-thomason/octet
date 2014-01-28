@@ -108,7 +108,11 @@ namespace octet { namespace scene {
 
     /// make a new, empty, mesh.
     mesh(skin *_skin=0) {
-      init(_skin);
+      init(_skin, 0, 0);
+    }
+
+    mesh(unsigned num_vertices, unsigned num_indices) {
+      init(0, num_vertices, num_indices);
     }
 
     /// Serialize.
@@ -132,7 +136,7 @@ namespace octet { namespace scene {
     }
 
     // Init function used for aggregated meshes. (Deprecated).
-    void init(skin *_skin=0) {
+    void init(skin *_skin=0, unsigned max_vertices=0, unsigned max_indices=0) {
       vertices = new gl_resource();
       indices = new gl_resource();
 
@@ -150,6 +154,11 @@ namespace octet { namespace scene {
       mode = GL_TRIANGLES;
 
       mesh_skin = _skin;
+
+      if (max_vertices || max_indices) {
+        set_default_attributes();
+        allocate(max_vertices * sizeof(vertex), max_indices * sizeof(uint32_t));
+      }
     }
 
     /// Set the defuault mesh parameters, used for boxes, spheres etc.
@@ -226,6 +235,7 @@ namespace octet { namespace scene {
 
     /// Set the kind of index to use (0 means use glDrawArrays)
     void set_index_type(unsigned value) {
+      assert(value == 0 || value == GL_UNSIGNED_SHORT || value == GL_UNSIGNED_INT);
       index_type = value;
     }
 
@@ -251,6 +261,7 @@ namespace octet { namespace scene {
 
     /// Set the kind of primitive to draw. (ie. GL_TRIANGLES etc.)
     void set_mode(unsigned value) {
+      assert(value >= GL_POINTS && value <= GL_POLYGON);
       mode = value;
     }
 
@@ -270,7 +281,7 @@ namespace octet { namespace scene {
       return mesh_aabb;
     }
 
-    /// return true if this mesh has a particular attribute
+    /// return true if this mesh has a particular attribute. eg. attribute_pos
     bool has_attribute(unsigned attr) {
       for (unsigned i = 0; i != num_slots; ++i) {
         if (get_attr(i) == attr) {
@@ -905,6 +916,63 @@ namespace octet { namespace scene {
         set_vertices(vertices);
         set_num_vertices(num_vertices);
       }
+    }
+
+    /// Add a polygon to the mesh, appending vertices until the buffer size is exceeded.
+    /// returns false if no space is available.
+    /// If we are in GL_TRIANGLES mode, fill the triangles.
+    template <class uvgen> bool add_polygon(const polygon &poly) {
+      bool is_triangles = get_mode() == GL_TRIANGLES;
+      unsigned npv = poly.get_num_vertices();
+
+      if (is_triangles && npv < 3) {
+        return false;
+      }
+
+      if ((num_vertices + npv) * sizeof(vertex) > vertices->get_size()) {
+        return false;
+      }
+
+      unsigned ni = is_triangles ? (npv - 2) * 3 : npv * 2;
+      if ((num_indices + ni) * sizeof(uint32_t) > indices->get_size()) {
+        return false;
+      }
+
+      gl_resource::rwlock vlock(get_vertices());
+      gl_resource::rwlock ilock(get_indices());
+
+      vertex *vtx = (vertex*)vlock.u8() + num_vertices;
+      unsigned onv = num_vertices;
+      for (unsigned i = 0; i != npv; ++i) {
+        vec3 pos = poly.get_vertex(i);
+        vtx->pos = uvgen::pos(pos);
+        vtx->normal = uvgen::normal(pos);
+        vtx->uv = uvgen::uv(pos);
+        vtx++;
+      }
+      num_vertices += npv;
+
+      uint32_t *idx = ilock.u32() + num_indices;
+      if (is_triangles) {
+        // assume polygon is convex and fill it
+        for (unsigned i = 0; i + 2 < npv; ++i) {
+          *idx++ = onv;
+          *idx++ = onv + i + 1;
+          *idx++ = onv + i + 2;
+        }
+        num_indices += (npv - 2) * 3;
+      } else {
+        // add a ring of lines.
+        for (unsigned i = 0; i + 1 < npv; ++i) {
+          *idx++ = onv + i;
+          *idx++ = onv + i + 1;
+        }
+        *idx++ = onv + npv - 1;
+        *idx++ = onv;
+        num_indices += npv * 2;
+      }
+
+      return true;
     }
   };
 }}

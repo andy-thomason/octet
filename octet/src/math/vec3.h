@@ -46,7 +46,7 @@ namespace octet { namespace math {
     };
 
     // construct from four scalars
-    explicit vec3(int x, int y, int z) {
+    /*explicit vec3(int x, int y, int z) {
       #if OCTET_SSE
         __m64 lo = _mm_set_pi32(y, x);
         __m64 hi = _m_from_int(z);
@@ -54,7 +54,7 @@ namespace octet { namespace math {
       #else
         v[0] = x; v[1] = y; v[2] = z;
       #endif
-    };
+    };*/
 
     vec3(float xyz) {
       #if OCTET_SSE
@@ -413,6 +413,14 @@ namespace octet { namespace math {
 
   inline vec3 operator/(float lhs, const vec3 &rhs) {
     return rhs / lhs;
+  }
+
+  inline vec3 mix(vec3_in a, vec3_in b, float lambda) {
+    return a * (1.0f - lambda) + b * lambda;
+  }
+
+  inline vec3 mix(vec3_in a, vec3_in b, rational_in lambda) {
+    return (a * (lambda.denom() - lambda.numer()) + b * lambda.numer()) / lambda.denom();
   }
 
   // sadly the microsoft compile is quite poor with vector code generation

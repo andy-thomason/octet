@@ -15,6 +15,10 @@ namespace octet { namespace math {
       seed = new_seed;
     }
 
+    void set_seed(unsigned new_seed) {
+      seed = new_seed;
+    }
+
     // get a floating point value
     float get(float min, float max) {
       // todo: test for period 

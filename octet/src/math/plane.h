@@ -44,26 +44,26 @@ namespace octet { namespace math {
     }
 
     const char *toString(char *dest, size_t len) const {
-      char tmp[32];
+      char tmp[64];
       snprintf(dest, len, "[%s, %f]", normal.toString(tmp, sizeof(tmp)), offset);
       return dest;
     }
 
     // point and plane
     bool intersects(const vec3 &rhs) const {
-      return dot(rhs, normal) == offset; // really this is nearly always false. Perhaps you need a half space?
+      return dot(rhs, normal) + offset == 0; // really this is nearly always false. Perhaps you need a half space?
     }
 
     // equivalent to a point - fat plane test
     bool intersects(const aabb &rhs) const {
       float fatness = sum(abs(normal * rhs.get_half_extent()));
-      float distance = abs(dot(normal, rhs.get_center()) - offset);
+      float distance = abs(dot(normal, rhs.get_center()) + offset);
       return distance <= fatness;
     }
 
     // equivalent to a point - fat plane test
     bool intersects(const sphere &rhs) const {
-      float distance = abs(dot(normal, rhs.get_center()) - offset);
+      float distance = abs(dot(normal, rhs.get_center()) + offset);
       return distance <= rhs.get_radius();
     }
   };

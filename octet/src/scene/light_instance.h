@@ -21,15 +21,15 @@ namespace octet { namespace scene {
     float falloff_exponent;
 
     // todo: compute these values
-    float nearVal;
-    float farVal;
+    float near_plane;
+    float far_plane;
   public:
     RESOURCE_META(light_instance)
 
     /// Construct a default light instance
     light_instance() {
-      nearVal = 0.1f;
-      farVal = 1000.0f;
+      near_plane = 0.1f;
+      far_plane = 1000.0f;
     }
 
     /// Serialize.
@@ -44,8 +44,8 @@ namespace octet { namespace scene {
       v.visit(falloff_angle, atom_falloff_angle);
       v.visit(falloff_exponent, atom_falloff_exponent);
 
-      v.visit(nearVal, atom_nearVal);
-      v.visit(farVal, atom_farVal);
+      v.visit(near_plane, atom_near_plane);
+      v.visit(far_plane, atom_far_plane);
     }
 
     /// Set the transform node
@@ -59,9 +59,9 @@ namespace octet { namespace scene {
     }
 
     /// Set the near and far planes of the light. (Lights get used for shadow maps).
-    void set_near_far(float nearVal, float farVal) {
-      this->nearVal = nearVal;
-      this->farVal = farVal;
+    void set_near_far(float near_plane, float far_plane) {
+      this->near_plane = near_plane;
+      this->far_plane = far_plane;
     }
 
     /// Set the color of the light,

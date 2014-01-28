@@ -15,8 +15,8 @@ namespace octet { namespace scene {
     bool is_ortho;
 
     // common to all cameras
-    float nearVal;
-    float farVal;
+    float near_plane;
+    float far_plane;
 
     // perspective camera
     float xfov;
@@ -44,8 +44,8 @@ namespace octet { namespace scene {
       is_ortho = 0;
 
       // common to all cameras
-      nearVal = 0.1f;
-      farVal = 1000;
+      near_plane = 0.1f;
+      far_plane = 1000;
 
       // perspective camera
       xfov = 0;
@@ -64,8 +64,8 @@ namespace octet { namespace scene {
       v.visit(is_ortho, atom_is_ortho);
 
       // common to all cameras
-      v.visit(nearVal, atom_nearVal);
-      v.visit(farVal, atom_farVal);
+      v.visit(near_plane, atom_near_plane);
+      v.visit(far_plane, atom_far_plane);
 
       // perspective camera
       v.visit(xfov, atom_xfov);
@@ -82,8 +82,8 @@ namespace octet { namespace scene {
     {
       this->xfov = xfov;
       this->yfov = yfov;
-      this->nearVal = n;
-      this->farVal = f;
+      this->near_plane = n;
+      this->far_plane = f;
       is_ortho = false;
     }
 
@@ -92,8 +92,8 @@ namespace octet { namespace scene {
     {
       this->xmag = xmag;
       this->ymag = ymag;
-      this->nearVal = n;
-      this->farVal = f;
+      this->near_plane = n;
+      this->far_plane = f;
       is_ortho = true;
     }
 
@@ -113,7 +113,7 @@ namespace octet { namespace scene {
       if (is_ortho) {
         xscale = 1.0f / xmag;
         yscale = 1.0f / ymag;
-        cameraToProjection.ortho(-xmag*0.5f, xmag*0.5f, -ymag*0.5f, ymag*0.5f, nearVal, farVal);
+        cameraToProjection.ortho(-xmag*0.5f, xmag*0.5f, -ymag*0.5f, ymag*0.5f, near_plane, far_plane);
       } else {
         xscale = 0.5f;
         yscale = 0.5f;
@@ -124,7 +124,7 @@ namespace octet { namespace scene {
           xscale = tanf(xfov * (3.14159f/180/2));
           yscale = xscale / aspect_ratio;
         }
-        cameraToProjection.frustum(-nearVal * xscale, nearVal * xscale, -nearVal * yscale, nearVal * yscale, nearVal, farVal);
+        cameraToProjection.frustum(-near_plane * xscale, near_plane * xscale, -near_plane * yscale, near_plane * yscale, near_plane, far_plane);
       }
     }
 
@@ -150,11 +150,11 @@ namespace octet { namespace scene {
 
       // convert projection space ray to world space
       if (is_ortho) {
-        ray_start = vec4(xscale * x, yscale * y, -nearVal, 1) * cameraToWorld;
-        ray_end = vec4(xscale * x, yscale * y, -farVal, 1) * cameraToWorld;
+        ray_start = vec4(xscale * x, yscale * y, -near_plane, 1) * cameraToWorld;
+        ray_end = vec4(xscale * x, yscale * y, -far_plane, 1) * cameraToWorld;
       } else {
-        ray_start = vec4(xscale * nearVal * x, yscale * nearVal * y, -nearVal, 1) * cameraToWorld;
-        ray_end = vec4(xscale * farVal * x, yscale * farVal * y, -farVal, 1) * cameraToWorld;
+        ray_start = vec4(xscale * near_plane * x, yscale * near_plane * y, -near_plane, 1) * cameraToWorld;
+        ray_end = vec4(xscale * far_plane * x, yscale * far_plane * y, -far_plane, 1) * cameraToWorld;
       }
 
       return ray(ray_start.xyz(), ray_end.xyz());
@@ -182,13 +182,13 @@ namespace octet { namespace scene {
     }
 
     /// Near plane
-    float get_nearVal() const {
-      return nearVal;
+    float get_near_plane() const {
+      return near_plane;
     }
 
     /// Far plane
-    float get_farVal() const {
-      return farVal;
+    float get_far_plane() const {
+      return far_plane;
     }
 
     /// x scale for ortho.
@@ -200,6 +200,17 @@ namespace octet { namespace scene {
     float get_yscale() const {
       return yscale;
     }
+
+    /// Set the far plane (greatest distance you can see)
+    void set_far_plane(float v) {
+      far_plane = v;
+    }
+
+    /// Set the far plane (greatest distance you can see)
+    void set_near_plane(float v) {
+      near_plane = v;
+    }
+
   };
 }}
 

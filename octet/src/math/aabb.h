@@ -66,7 +66,7 @@ namespace octet { namespace math {
     // Get a string representation of the object.
     // Requires a buffer (dest, len)
     const char *toString(char *dest, size_t len) const {
-      char tmp[2][32];
+      char tmp[2][64];
       snprintf(dest, len, "[%s, %s]", center.toString(tmp[0], sizeof(tmp[0])), half_extent.toString(tmp[1], sizeof(tmp[1])));
       return dest;
     }

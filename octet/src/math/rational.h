@@ -72,12 +72,12 @@ namespace octet { namespace math {
     }
 
     // the thing on top
-    float numer() {
+    float numer() const {
       return n;
     }
 
     // the thing below
-    float denom() {
+    float denom() const {
       return d;
     }
 
