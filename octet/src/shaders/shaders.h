@@ -25,11 +25,12 @@
 #ifndef OCTET_SHADERS_INCLUDED
 #define OCTET_SHADERS_INCLUDED
 
-// shaders
-#include "../shaders/shader.h"
-#include "../shaders/color_shader.h"
-#include "../shaders/texture_shader.h"
-#include "../shaders/phong_shader.h"
-#include "../shaders/bump_shader.h"
+  // shaders
+  #include "../shaders/shader.h"
+  #include "../shaders/color_shader.h"
+  #include "../shaders/texture_shader.h"
+  #include "../shaders/phong_shader.h"
+  #include "../shaders/bump_shader.h"
+  #include "../shaders/param_shader.h"
 
 #endif

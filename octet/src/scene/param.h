@@ -21,11 +21,13 @@ namespace octet { namespace scene {
     atom_t kind;
     ref<image> img;
     ref<sampler> smpl;
+    ref<param> texcoords;
 
     vec4 color;
 
     // derived
     GLuint gl_texture;
+    GLuint gl_target;
 
   public:
     RESOURCE_META(param)
@@ -33,6 +35,7 @@ namespace octet { namespace scene {
     /// default constructor makes a blank material.
     param() {
       gl_texture = 0;
+      gl_target = GL_TEXTURE_2D;
       kind = atom_color;
       color = vec4(0.5f, 0.5f, 0.5f, 1);
     }
@@ -40,6 +43,7 @@ namespace octet { namespace scene {
     /// Make a solid color parameter.
     param(const vec4 &color) {
       gl_texture = 0;
+      gl_target = GL_TEXTURE_2D;
       this->color = color;
       kind = atom_color;
     }
@@ -47,6 +51,7 @@ namespace octet { namespace scene {
     /// Make an image parameter
     param(image *img, sampler *smpl = 0) {
       gl_texture = 0;
+      gl_target = GL_TEXTURE_2D;
       this->img = img;
       this->smpl = smpl;
       kind = atom_image;
@@ -64,6 +69,7 @@ namespace octet { namespace scene {
       if (!gl_texture) {
         if (kind == atom_image) {
           gl_texture = img->get_gl_texture();
+          gl_target = img->get_gl_target();
         } else {
           char name[16];
           sprintf(name, "#%02x%02x%02x%02x", (int)(color[0]*255.0f+0.5f), (int)(color[1]*255.0f+0.5f), (int)(color[2]*255.0f+0.5f), (int)(color[3]*255.0f+0.5f));
@@ -74,7 +80,7 @@ namespace octet { namespace scene {
     }
 
     /// Get the color for this parameter.
-    vec4 get_color() {
+    vec4 get_color() const {
       return color;
     }
 
@@ -84,23 +90,24 @@ namespace octet { namespace scene {
     }
 
     /// Get the image for this parameter.
-    image *get_image() {
+    image *get_image() const {
       return img;
     }
 
     /// Get the sampler for this parameter.
-    sampler *get_sampler() {
+    sampler *get_sampler() const {
       return smpl;
     }
 
     /// Render this parameter into a texture slot.
-    void render(unsigned slot, unsigned target) {
+    void render(unsigned slot) {
       glActiveTexture(GL_TEXTURE0 + slot);
-      glBindTexture(target, get_gl_texture());
+      glBindTexture(gl_target, get_gl_texture());
       if (smpl) {
-        smpl->render(target);
+        //smpl->render(gl_target);
       }
     }
   };
+
 }}
 

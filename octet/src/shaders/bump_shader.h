@@ -119,7 +119,7 @@ namespace octet { namespace shaders {
         void main() {
           float shininess = texture2D(samplers[5], uv_).x * 255.0;
           vec3 bump = normalize(vec3(texture2D(samplers[4], uv_).xy-vec2(0.5, 0.5), 1));
-          vec3 nnormal = normal_; //normalize(bump.x * tangent_ + bump.y * bitangent_ + bump.z * normal_);
+          vec3 nnormal = normalize(normal_); //normalize(bump.x * tangent_ + bump.y * bitangent_ + bump.z * normal_);
           vec3 diffuse_light = vec3(0.3, 0.3, 0.3);
           vec3 specular_light = vec3(0, 0, 0);
 
@@ -149,12 +149,11 @@ namespace octet { namespace shaders {
             specular_light * specular.xyz
           ;
           gl_FragColor.w = diffuse.w;
-          // how to debug your fragment shader: set gl_FragColor to the value you want to look at!
-          //gl_FragColor = diffuse;
-          //gl_FragColor = texture2D(samplers[5], uv_);
-          //gl_FragColor = vec4(ambient_light, 1);
-          //gl_FragColor = vec4(light_uniforms[2].xyz, 1);
+          //gl_FragColor = emission;
           //gl_FragColor = vec4(diffuse_light, 1);
+          //gl_FragColor = vec4(num_lights, num_lights, num_lights, 1);
+          // how to debug your fragment shader: set gl_FragColor to the value you want to look at!
+          //gl_FragColor = vec4(1, 1, 0, 1);
         }
       );
     
@@ -191,8 +190,8 @@ namespace octet { namespace shaders {
       glUniform1i(num_lights_index, num_lights);
 
       // we use textures 0-3 for material properties.
-      static const GLint samplers[] = { 0, 1, 2, 3, 4 };
-      glUniform1iv(samplers_index, 5, samplers);
+      static const GLint samplers[] = { 0, 1, 2, 3, 4, 5 };
+      glUniform1iv(samplers_index, 6, samplers);
     }
   };
 }}

@@ -15,19 +15,19 @@ namespace octet { namespace scene {
     // rendering information
     //
 
-    // each of these is a set of (scene_node, mesh, material)
+    /// each of these is a set of (scene_node, mesh, material)
     dynarray<ref<mesh_instance> > mesh_instances;
 
-    // animations playing at the moment
+    /// animations playing at the moment
     dynarray<ref<animation_instance> > animation_instances;
 
-    // cameras available
+    /// cameras available
     dynarray<ref<camera_instance> > camera_instances;
 
-    // lights available
+    /// lights available
     dynarray<ref<light_instance> > light_instances;
 
-    // set this to draw bounding boxes
+    /// set this to draw bounding boxes
     bool render_aabbs;
     bool render_debug_lines;
     bool dump_vertices;
@@ -35,7 +35,7 @@ namespace octet { namespace scene {
     dynarray<vec3> debug_line_buffer;
     unsigned debug_in_ptr;
 
-    // derived light information
+    /// derived light information
     enum { max_lights = 4, light_size = 4 };
     int num_light_uniforms;
     int num_lights;
@@ -43,7 +43,7 @@ namespace octet { namespace scene {
 
     int frame_number;
 
-    // shaders to draw triangles
+    /// shaders to draw triangles
     ref<bump_shader> object_shader;
     ref<bump_shader> skin_shader;
 
@@ -65,7 +65,7 @@ namespace octet { namespace scene {
         0, 4, 1, 5, 2, 6, 3, 7
       };
 
-      // render immediate data (this is inefficient!)
+      /// render immediate data (this is inefficient!)
       glBindBuffer(GL_ARRAY_BUFFER, 0);
       glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)pos );
       glEnableVertexAttribArray(attribute_pos);
@@ -149,8 +149,8 @@ namespace octet { namespace scene {
     }
 
     void draw_debug_data(bump_shader &object_shader, camera_instance &cam) {
-      // debug draw the AABBs of the mesh instances in the world.
-      // draw in world space
+      /// debug draw the AABBs of the mesh instances in the world.
+      /// draw in world space
       mat4t worldToCamera;
       mat4t worldToProjection;
       mat4t worldToWorld;
@@ -158,7 +158,7 @@ namespace octet { namespace scene {
       cam.get_matrices(worldToProjection, worldToCamera, worldToWorld);
       debug_material->render(object_shader, worldToProjection, worldToCamera, light_uniforms, num_light_uniforms, num_lights);
 
-      // debug lines are a useful way of showing dynamic behaviour in the scene.
+      /// debug lines are a useful way of showing dynamic behaviour in the scene.
       if (render_debug_lines) {
         render_debug_line_buffer();
       }
@@ -194,12 +194,12 @@ namespace octet { namespace scene {
         cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
 
         if (!skel || !skn) {
-          // normal rendering for single matrix objects
-          // build a projection matrix: model -> world -> camera_instance -> projection
-          // the projection space is the cube -1 <= x/w, y/w, z/w <= 1
+          /// normal rendering for single matrix objects
+          /// build a projection matrix: model -> world -> camera_instance -> projection
+          /// the projection space is the cube -1 <= x/w, y/w, z/w <= 1
           mat->render(object_shader, modelToProjection, modelToCamera, light_uniforms, num_light_uniforms, num_lights);
         } else {
-          // multi-matrix rendering
+          /// multi-matrix rendering
           mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
           int num_bones = skel->get_num_bones();
           if(num_bones > 192) {
@@ -257,25 +257,25 @@ namespace octet { namespace scene {
 
     /// set up OpenGL state
     void begin_render(int vx, int vy, vec4_in clear_color=vec4(0.5f, 0.5f, 0.5f, 1.0f)) {
-      // set a viewport - includes whole window area
+      /// set a viewport - includes whole window area
       glViewport(0, 0, vx, vy);
 
-      // clear the background to black
+      /// clear the background to black
       glClearColor(clear_color.x(), clear_color.y(), clear_color.z(), clear_color.w());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // allow Z buffer depth testing (closer objects are always drawn in front of far ones)
+      /// allow Z buffer depth testing (closer objects are always drawn in front of far ones)
       glEnable(GL_DEPTH_TEST);
 
       GLint param;
       glGetIntegerv(GL_SAMPLE_BUFFERS, &param);
       if (param == 0) {
-        // if multisampling is disabled, we can't use GL_SAMPLE_COVERAGE (which I think is mean)
-        // Instead, allow alpha blend (transparency when alpha channel is 0)
+        /// if multisampling is disabled, we can't use GL_SAMPLE_COVERAGE (which I think is mean)
+        /// Instead, allow alpha blend (transparency when alpha channel is 0)
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       } else {
-        // if multisampling is enabled, use GL_SAMPLE_COVERAGE instead
+        /// if multisampling is enabled, use GL_SAMPLE_COVERAGE instead
         glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         glEnable(GL_SAMPLE_COVERAGE);
       }
@@ -285,9 +285,9 @@ namespace octet { namespace scene {
       return x > y ? x : y;
     }
 
-    // scene often arrive with no camera of lights
+    /// scenes often arrive with no camera of lights
     void create_default_camera_and_lights() {
-      // default camera_instance
+      /// default camera_instance
       if (camera_instances.size() == 0) {
         aabb bb = get_world_aabb();
         bb = bb.get_union(aabb(vec3(0, 0, 0), vec3(5, 5, 5)));
@@ -302,7 +302,7 @@ namespace octet { namespace scene {
         camera_instances.push_back(cam);
       }
 
-      // default light instance
+      /// default light instance
       if (light_instances.size() == 0) {
         scene_node *node = add_scene_node();
         light_instance *li = new light_instance();
@@ -363,17 +363,17 @@ namespace octet { namespace scene {
       return inst;
     }
 
-    // how many mesh instances do we have?
+    /// how many mesh instances do we have?
     int get_num_mesh_instances() {
       return (int)mesh_instances.size();
     }
 
-    // how many camera_instances do we have?
+    /// how many camera_instances do we have?
     int get_num_camera_instances() {
       return (int)camera_instances.size();
     }
 
-    // how many light_instances do we have?
+    /// how many light_instances do we have?
     int get_num_light_instances() {
       return (int)light_instances.size();
     }
@@ -382,38 +382,38 @@ namespace octet { namespace scene {
       return (scene_node*)this;
     }
 
-    // debugging aid to draw boxes around objects
+    /// debugging aid to draw boxes around objects
     void set_render_aabbs(bool value) {
       render_aabbs = value;
     }
 
-    // debugging aid to draw debug lines
+    /// debugging aid to draw debug lines
     void set_render_debug_lines(bool value) {
       render_debug_lines = value;
     }
 
-    // debugging aid to log vertices
+    /// debugging aid to log vertices
     void set_dump_vertices(bool value) {
       dump_vertices = value;
     }
 
-    // access camera_instance information
+    /// access camera_instance information
     camera_instance *get_camera_instance(int index) {
       return camera_instances[index];
     }
 
-    // access mesh_instance information
+    /// access mesh_instance information
     mesh_instance *get_mesh_instance(int index) {
       return mesh_instances[index];
     }
 
-    // access light_instance information
+    /// access light_instance information
     light_instance *get_light_instance(int index) {
       return light_instances[index];
     }
 
-    // advance all the animation instances
-    // note that we want to update before rendering or doing physics and AI actions.
+    /// advance all the animation instances
+    /// note that we want to update before rendering or doing physics and AI actions.
     void update(float delta_time) {
       for (int idx = 0; idx != animation_instances.size(); ++idx) {
         animation_instance *inst = animation_instances[idx];

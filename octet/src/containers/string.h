@@ -177,17 +177,31 @@ namespace octet { namespace containers {
       return *this;
     }
 
+    string &printf(const char *fmt, ...) {
+      va_list v;
+      va_start(v, fmt);
+      vformat(fmt, v);
+      va_end(v);
+      return *this;
+    }
+
     void vformat(const char *fmt, va_list v) {
+      int cur_len = strlen(data_);
       #ifdef WIN32
         int len = _vscprintf(fmt, v);
         if (len) {
-          data_ = (char*)allocator::malloc(len+1);
-          vsprintf_s(data_, len+1, fmt, v);
+          if (cur_len) {
+            data_ = (char*)allocator::realloc(data_, cur_len+1, cur_len + len + 1);
+            vsprintf_s(data_ + cur_len, len+1, fmt, v);
+          } else {
+            data_ = (char*)allocator::malloc(len+1);
+            vsprintf_s(data_, len+1, fmt, v);
+          }
         }
       #else
         char tmp[1024];
         vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
-        *this = tmp;
+        *this += tmp;
       #endif
     }
 

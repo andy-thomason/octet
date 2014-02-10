@@ -12,50 +12,58 @@ namespace octet {
 
     ref<mesh> geom;
 
-    dynarray<ref<polygon> > polygons;
     int max_level;
     random r;
 
-    struct uvgen {
-      static vec2 uv(vec3_in pos) { return vec2(0, 0); }
+    polygon tmp;
+    polygon left[16];
+    polygon road[16];
+    polygon right[16];
+
+    struct grass_uvgen {
+      static vec2 uv(vec3_in pos) { return vec2(5.0f/32, 31.0f/32); }
       static vec3 normal(vec3_in pos) { return vec3(0, 0, 1); }
       static vec3 pos(vec3_in pos) { return pos; }
     };
 
-    void add_polygon(const polygon *poly, int level) {
+    struct pavement_uvgen {
+      static vec2 uv(vec3_in pos) { return vec2(3.0f/32, 31.0f/32); }
+      static vec3 normal(vec3_in pos) { return vec3(0, 0, 1); }
+      static vec3 pos(vec3_in pos) { return pos; }
+    };
+
+    struct road_uvgen {
+      static vec2 uv(vec3_in pos) { return vec2(1.0f/32, 31.0f/32); }
+      static vec3 normal(vec3_in pos) { return vec3(0, 0, 1); }
+      static vec3 pos(vec3_in pos) { return pos - vec3(0, 0.2f, 0); }
+    };
+
+    void add_polygon(const polygon &poly, int level) {
       if (level == max_level) {
-        geom->add_polygon<uvgen>(*poly);
+        poly.grow(tmp, vec3(0, 1, 0), 0.2f);
+        geom->add_polygon<pavement_uvgen>(tmp);
       } else {
-        polygon *left = new polygon();
-        polygon *road = new polygon();
-        polygon *right = new polygon();
-        aabb bb = poly->get_aabb();
-        uint32_t angle = level * 0x40000000; //r.get0xffff() << 16;
+        vec3 center = poly.calc_aabb().get_center();
+        uint32_t angle = level * 0x40000000;
         angle += (r.get0xffff() << 13) - 0x10000000;
         vec3 normal(fast_cos6(angle), 0.0f, fast_sin6(angle));
-        float offset = -dot(normal, bb.get_center());
+        float offset = -dot(normal, center);
         float road_half_width = 2.0f;
         half_space hs1(normal, offset - road_half_width);
-        poly->clip(*left, hs1);
+        poly.clip(left[level], hs1);
         half_space hs2(-normal, -offset - road_half_width);
-        poly->clip(*right, hs2);
+        poly.clip(right[level], hs2);
 
-        /*char buf[512];
-        log("%s l=%d r=%d\n", bb.toString(buf, sizeof(buf)), left->get_num_vertices(), right->get_num_vertices());
-        log("hs1 %s\n", hs1.toString(buf, sizeof(buf)));
-        log("hs2 %s\n", hs2.toString(buf, sizeof(buf)));
-        for (unsigned i = 0; i != poly->get_num_vertices(); ++i) {
-          vec3 pos = poly->get_vertex(i);
-          bool in1 = hs1.intersects(pos);
-          bool in2 = hs2.intersects(pos);
-          log("%s %d %d\n", pos.toString(buf, sizeof(buf)), in1, in2);
-        }*/
+        hs1.flip();
+        hs2.flip();
 
-        //geom->add_polygon<uvgen>(*left);
-        //geom->add_polygon<uvgen>(*right);
+        poly.clip(tmp, hs1);
+        tmp.clip(road[level], hs2);
 
-        add_polygon(left, level + 1);
-        add_polygon(right, level + 1);
+        geom->add_polygon<road_uvgen>(road[level]);
+
+        add_polygon(left[level], level + 1);
+        add_polygon(right[level], level + 1);
       }
     }
   public:
@@ -78,20 +86,20 @@ namespace octet {
       app_scene->get_camera_instance(0)->set_far_plane(20000);
       app_scene->get_camera_instance(0)->set_near_plane(1);
 
-      material *red = new material(vec4(1, 0, 0, 1));
+      material *mat = new material(new image("assets/roads.gif"));
 
       geom = new mesh(0x10000, 0x10000);
-      geom->set_mode(GL_LINES);
+      //geom->set_mode(GL_LINES);
 
       scene_node *node = new scene_node();
       app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, geom, red));
+      app_scene->add_mesh_instance(new mesh_instance(node, geom, mat));
 
-      polygon *top_level = new polygon();
-      top_level->add_vertex(vec3(-1000, 0, -1000));
-      top_level->add_vertex(vec3( 1000, 0, -1000));
-      top_level->add_vertex(vec3( 1000, 0,  1000));
-      top_level->add_vertex(vec3(-1000, 0,  1000));
+      polygon top_level;
+      top_level.add_vertex(vec3(-1000, 0, -1000));
+      top_level.add_vertex(vec3( 1000, 0, -1000));
+      top_level.add_vertex(vec3( 1000, 0,  1000));
+      top_level.add_vertex(vec3(-1000, 0,  1000));
 
       r.set_seed(0x12345678);
       add_polygon(top_level, 0);

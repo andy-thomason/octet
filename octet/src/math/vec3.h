@@ -142,12 +142,12 @@ namespace octet { namespace math {
     // cross product
     vec3 cross(const vec3 &r) const {
       #if OCTET_SSE
-        __m128 lshuf = _mm_shuffle_ps(r.m, r.m, _MM_SHUFFLE(1,2,0,0));
-        __m128 rshuf = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,2,0,0));
+        __m128 lshuf = _mm_shuffle_ps(r.m, r.m, _MM_SHUFFLE(0, 0, 2, 1));
+        __m128 rshuf = _mm_shuffle_ps(m, m, _MM_SHUFFLE(0, 0, 2, 1));
         __m128 lprod = _mm_mul_ps(m, lshuf);
         __m128 rprod = _mm_mul_ps(r.m, rshuf);
         __m128 sum = _mm_sub_ps(lprod, rprod);
-        return vec3(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(1,2,0,0)));
+        return vec3(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(0, 0, 2, 1)));
       #else
         return vec3(
           v[1] * r.v[2] - v[2] * r.v[1],
@@ -160,12 +160,12 @@ namespace octet { namespace math {
     // positive cross product (for box tests)
     vec3 abs_cross(const vec3 &r) const {
       #if OCTET_SSE
-        __m128 lshuf = _mm_shuffle_ps(r.m, r.m, _MM_SHUFFLE(1,2,0,0));
-        __m128 rshuf = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,2,0,0));
+        __m128 lshuf = _mm_shuffle_ps(r.m, r.m, _MM_SHUFFLE(0, 0, 2, 1));
+        __m128 rshuf = _mm_shuffle_ps(m, m, _MM_SHUFFLE(0, 0, 2, 1));
         __m128 lprod = _mm_mul_ps(m, lshuf);
         __m128 rprod = _mm_mul_ps(r.m, rshuf);
         __m128 sum = _mm_add_ps(lprod, rprod);
-        return vec3(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(1,2,0,0)));
+        return vec3(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(0, 0, 2, 1)));
       #else
         return vec3(
           v[1] * r.v[2] + v[2] * r.v[1],

@@ -21,22 +21,53 @@ namespace octet { namespace scene {
     uint16_t texture_min_filter; // GL_LINEAR / GL_NEAREST
     uint16_t texture_wrap_s;     // GL_CLAMP / GL_REPEAT
     uint16_t texture_wrap_t;     // GL_CLAMP / GL_REPEAT
+    uint16_t texture_wrap_r;     // GL_CLAMP / GL_REPEAT
+    uint16_t gl_target;          // GL_TEXTURE_2D, 3D, CUBE_MAP
+    string name;                 // name used internally in shader (ie. diffuse_sampler)
   public:
     RESOURCE_META(sampler)
 
     // default constructor makes a repeating trilinear filter
-    sampler() {
+    sampler(const char *name_=0) {
       texture_mag_filter = GL_LINEAR_MIPMAP_LINEAR;
       texture_min_filter = GL_LINEAR;
       texture_wrap_s = GL_REPEAT;
       texture_wrap_t = GL_REPEAT;
+      texture_wrap_r = GL_REPEAT;
+      gl_target = GL_TEXTURE_2D;
+      name = name_;
     }
 
     void render(unsigned target) {
-      /*glTexParameteri(target, GL_TEXTURE_MAG_FILTER, texture_mag_filter);
+      glTexParameteri(target, GL_TEXTURE_MAG_FILTER, texture_mag_filter);
       glTexParameteri(target, GL_TEXTURE_MIN_FILTER, texture_min_filter);
       glTexParameteri(target, GL_TEXTURE_WRAP_S, texture_wrap_s);
-      glTexParameteri(target, GL_TEXTURE_WRAP_T, texture_wrap_t);*/
+      glTexParameteri(target, GL_TEXTURE_WRAP_T, texture_wrap_t);
+      glTexParameteri(target, GL_TEXTURE_WRAP_R, texture_wrap_r);
+    }
+
+    unsigned get_gl_target() const {
+      return gl_target;
+    }
+
+    const char *get_glsl_type() {
+      switch (gl_target) {
+        case GL_TEXTURE_3D: return "sampler3D";
+        case GL_TEXTURE_CUBE_MAP: return "samplerCube";
+        default: return "sampler2D";
+      }
+    }
+
+    const char *get_glsl_texture_fetch() {
+      switch (gl_target) {
+        case GL_TEXTURE_3D: return "texture3D";
+        case GL_TEXTURE_CUBE_MAP: return "textureCube";
+        default: return "texture2D";
+      }
+    }
+
+    const char *get_name() {
+      return name;
     }
 
     void visit(visitor &v) {

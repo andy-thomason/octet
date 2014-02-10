@@ -31,6 +31,8 @@ namespace octet { namespace math {
 
     /// generate a polygon clipped by a half-space.
     void clip(polygon &result, half_space_in half) const {
+      if (&result == this) return;
+
       result.reset();
 
       if (vertices.size()) {
@@ -49,6 +51,26 @@ namespace octet { namespace math {
             result.add_vertex(p1);
           }
           p0_in = p1_in;
+          p0 = p1;
+        }
+      }
+    }
+
+    /// Grow or shrink a polygon depending on winding order and the up vector.
+    void grow(polygon &result, vec3_in up, float offset) const {
+      if (&result == this) return;
+
+      result.reset();
+
+      if (vertices.size()) {
+        vec3 p0 = vertices[vertices.size()-1];
+        for (unsigned i = 0; i < vertices.size(); ++i) {
+          vec3 p1 = vertices[i];
+          vec3 p2 = vertices[i+1 < vertices.size() ? i+1 : 0];
+          vec3 n0 = cross(p1 - p0, up);
+          vec3 n1 = cross(p2 - p1, up);
+          vec3 normal = normalize(n0 + n1);
+          result.add_vertex(p1 + normal * offset);
           p0 = p1;
         }
       }
@@ -76,7 +98,8 @@ namespace octet { namespace math {
       return (vec3)vertices[i];
     }
 
-    aabb get_aabb() const {
+    /// calculate the aabb of the polygon
+    aabb calc_aabb() const {
       aabb result;
       if (vertices.size()) {
         vec3 vmin = vertices[0];
@@ -90,6 +113,7 @@ namespace octet { namespace math {
       }
       return result;
     }
+
   };
 } }
 

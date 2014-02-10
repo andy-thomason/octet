@@ -33,5 +33,6 @@
   #include "../loaders/jpeg_encoder.h"
   #include "../loaders/tga_decoder.h"
   #include "../loaders/dds_decoder.h"
+  #include "../loaders/nifti_decoder.h"
 
 #endif

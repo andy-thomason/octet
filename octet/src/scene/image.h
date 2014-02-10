@@ -23,8 +23,10 @@ namespace octet { namespace scene {
     dynarray<uint8_t> bytes;
 
     // dimensions
+    uint32_t frames;
     uint16_t width;
     uint16_t height;
+    uint16_t depth;
     uint16_t format;
     uint8_t mip_levels;
     uint8_t cube_faces;
@@ -33,10 +35,14 @@ namespace octet { namespace scene {
     // todo: use gl_resource
     GLuint gl_texture;
 
+    GLuint gl_target;
+
     void init(const char *name) {
       this->url = name;
       width = height = 0;
+      depth = 1;
       gl_texture = 0;
+      gl_target = GL_TEXTURE_2D;
       mip_levels = 1;
       cube_faces = 1;
       format = 0;
@@ -206,6 +212,33 @@ namespace octet { namespace scene {
       mip_levels = new_mip_levels;
     }
 
+    void add_texture() {
+      glBindTexture(gl_target, gl_texture);
+
+      if (mip_levels == 1 || gl_target != GL_TEXTURE_2D) {
+        if (gl_target == GL_TEXTURE_2D) {
+          glTexImage2D(gl_target, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, (void*)&bytes[0]);
+          // this may not work on very old systems, comment it out.
+          glGenerateMipmap(gl_target);
+        } else if (gl_target == GL_TEXTURE_3D) {
+          glTexImage3D(gl_target, 0, format, width, height, 1, 0, format, GL_UNSIGNED_BYTE, (void*)&bytes[0]);
+          printf("err=%08x\n", glGetError());
+        }
+      } else if (gl_target == GL_TEXTURE_2D) {
+        unsigned num_comps = format == RGBA ? 4 : 3;
+        unsigned w = width;
+        unsigned h = height;
+        uint8_t *src = &bytes[0];
+        unsigned level = 0;
+        while (w != 0 && h != 0) {
+          glTexImage2D(gl_target, level++, format, w, h, 0, format, GL_UNSIGNED_BYTE, (void*)src);
+          src += w * h * num_comps;
+          w >>= 1;
+          h >>= 1;
+        }
+      }
+    }
+
   public:
     RESOURCE_META(image)
 
@@ -231,6 +264,21 @@ namespace octet { namespace scene {
     /// height in pixels
     unsigned get_height() const {
       return height;
+    }
+
+    /// depth in voxels for 3d textures
+    unsigned get_depth() const {
+      return depth;
+    }
+
+    /// GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP
+    unsigned get_target() const {
+      return gl_target;
+    }
+
+    /// animated textures have multiple frames. eg. MPEG file. return ~0 for infinite.
+    unsigned get_frames() const {
+      return frames;
     }
 
     /// access attributes by name
@@ -262,6 +310,10 @@ namespace octet { namespace scene {
       } else if (buffer.size() >= 4 && buffer[0] == 'D' && buffer[1] == 'D' && buffer[2] == 'S' && buffer[3] == ' ') {
         dds_decoder dec;
         dec.get_image(bytes, format, width, height, src, src_max);
+      } else if (buffer.size() >= 348 && (!memcmp(&buffer[344], "ni1", 4) || !memcmp(&buffer[344], "n+1", 4))) {
+        nifti_decoder dec;
+        gl_target = GL_TEXTURE_3D;
+        dec.get_image(bytes, format, width, height, depth, frames, src, src_max);
       } else {
         printf("warning: unknown texture format\n");
         return;
@@ -281,28 +333,12 @@ namespace octet { namespace scene {
         // make a new texture handle
         glGenTextures(1, &gl_texture);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gl_texture);
 
         // todo: handle compressed textures
         if (format == GL_RGB || format == GL_RGBA) {
-          if (mip_levels == 1) {
-            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, (void*)&bytes[0]);
-            // this may not work on very old systems, comment it out.
-            glGenerateMipmap(GL_TEXTURE_2D);
-          } else {
-            unsigned num_comps = format == RGBA ? 4 : 3;
-            unsigned w = width;
-            unsigned h = height;
-            uint8_t *src = &bytes[0];
-            unsigned level = 0;
-            while (w != 0 && h != 0) {
-              glTexImage2D(GL_TEXTURE_2D, level++, format, w, h, 0, format, GL_UNSIGNED_BYTE, (void*)src);
-              src += w * h * num_comps;
-              w >>= 1;
-              h >>= 1;
-            }
-          }
+          add_texture();
         } else if (format == COMPRESSED_RGB_S3TC_DXT1_EXT || format == COMPRESSED_RGBA_S3TC_DXT1_EXT || format == COMPRESSED_RGBA_S3TC_DXT3_EXT || format == COMPRESSED_RGBA_S3TC_DXT5_EXT) {
+          glBindTexture(gl_target, gl_texture);
           unsigned w = width;
           unsigned h = height;
           uint8_t *src = &bytes[0];
@@ -312,7 +348,7 @@ namespace octet { namespace scene {
             unsigned wmin = w < 4 ? 4 : w;
             unsigned hmin = h < 4 ? 4 : h;
             unsigned size = ( wmin * hmin ) >> shift;
-            glCompressedTexImage2D(GL_TEXTURE_2D, level++, format, w, h, 0, size, (void*)src);
+            glCompressedTexImage2D(gl_target, level++, format, w, h, 0, size, (void*)src);
             //printf("%d\n", glGetError());
             src += size;
             w >>= 1;
@@ -321,10 +357,15 @@ namespace octet { namespace scene {
           //printf("%d %d\n", src - image_, size);
         }
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(gl_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(gl_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       }
       return gl_texture;
+    }
+
+    /// todo: merge gl_resource with textures.
+    GLuint get_gl_target() const {
+      return gl_target;
     }
   };
 }}

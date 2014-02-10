@@ -974,5 +974,63 @@ namespace octet { namespace scene {
 
       return true;
     }
+
+    /// Add a pair of polygons to the mesh, appending vertices until the buffer size is exceeded.
+    /// returns false if no space is available.
+    /// The polygons must have the same number of vertices.
+    /// If we are in GL_TRIANGLES mode, fill the gap between the polygons.
+    /// If we are in GL_LINES mode, add both polygons as lines.
+    template <class uvgen> bool extrude(const polygon &poly1, const polygon &poly2) {
+      bool is_triangles = get_mode() == GL_TRIANGLES;
+      if (!is_triangles) {
+        return add_polygon(poly1) && add_polygon(poly2);
+      }
+
+      unsigned npv = poly1.get_num_vertices();
+      if (npv != poly2.get_num_vertices()) {
+        return false;
+      }
+
+      if ((num_vertices + npv*2) * sizeof(vertex) > vertices->get_size()) {
+        return false;
+      }
+
+      unsigned ni = npv * 6;
+      if ((num_indices + ni) * sizeof(uint32_t) > indices->get_size()) {
+        return false;
+      }
+
+      gl_resource::rwlock vlock(get_vertices());
+      gl_resource::rwlock ilock(get_indices());
+
+      vertex *vtx = (vertex*)vlock.u8() + num_vertices;
+      unsigned onv = num_vertices;
+      for (unsigned i = 0; i != npv; ++i) {
+        vec3 pos = poly1.get_vertex(i);
+        vtx->pos = uvgen::pos(pos);
+        vtx->normal = uvgen::normal(pos);
+        vtx->uv = uvgen::uv(pos);
+        vtx++;
+        vec3 pos = poly2.get_vertex(i);
+        vtx->pos = uvgen::pos(pos);
+        vtx->normal = uvgen::normal(pos);
+        vtx->uv = uvgen::uv(pos);
+        vtx++;
+      }
+      num_vertices += npv*2;
+
+      uint32_t *idx = ilock.u32() + num_indices;
+      for (unsigned i = 0; i < npv; ++i) {
+        *idx++ = onv + i;
+        *idx++ = onv + i + 1;
+        *idx++ = onv + i + 2;
+        *idx++ = onv + i + 1;
+        *idx++ = onv + i + 3;
+        *idx++ = onv + i + 2;
+      }
+      num_indices += npv * 6;
+
+      return true;
+    }
   };
 }}

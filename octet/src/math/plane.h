@@ -66,6 +66,11 @@ namespace octet { namespace math {
       float distance = abs(dot(normal, rhs.get_center()) + offset);
       return distance <= rhs.get_radius();
     }
+
+    void flip() {
+      normal = -normal;
+      offset = -offset;
+    }
   };
 } }
 

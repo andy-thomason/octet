@@ -6,12 +6,12 @@
 //
 namespace octet {
   /// Scene containing a box with octet.
-  class example_sphere : public app {
+  class example_nifti : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;
   public:
     /// this is called when we construct the class before everything is initialised.
-    example_sphere(int argc, char **argv) : app(argc, argv) {
+    example_nifti(int argc, char **argv) : app(argc, argv) {
     }
 
     /// this is called once OpenGL is initialized
@@ -19,13 +19,12 @@ namespace octet {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
 
-      material *red = new material(vec4(1, 0, 0, 1));
-      mesh_sphere *sphere = new mesh_sphere(vec3(0), 8, 4);
-      sphere->make_wireframe();
-
+      image *img = new image("assets/nifti/Sample_fMR_dataset_BdeGelderLab.nii");
+      material *mat = new material(img);
+      mesh_box *box = new mesh_box(vec3(4));
       scene_node *node = new scene_node();
       app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, sphere, red));
+      app_scene->add_mesh_instance(new mesh_instance(node, box, mat));
     }
 
     /// this is called to draw the world
@@ -40,10 +39,10 @@ namespace octet {
       // draw the scene
       app_scene->render((float)vx / vy);
 
-      // tumble the mesh  (there is only one mesh instance)
+      // tumble the box  (there is only one mesh instance)
       scene_node *node = app_scene->get_mesh_instance(0)->get_node();
-      node->rotate(2.0f/11, vec3(1, 0, 0));
-      node->rotate(2.0f/7, vec3(0, 1, 0));
+      node->rotate(1, vec3(1, 0, 0));
+      node->rotate(1, vec3(0, 1, 0));
     }
   };
 }
