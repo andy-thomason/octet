@@ -25,7 +25,7 @@ namespace octet { namespace loaders {
   private:
     // turn this on to debug the file as it loads
     // 0 = none, 1 = summary, 2 = details
-    enum { debug = 2 };
+    enum { debug = 0 };
 
     TiXmlDocument doc;
     string doc_path;
@@ -366,7 +366,7 @@ namespace octet { namespace loaders {
     }
 
     // get a texture or a solid colour
-    param *get_param(resource_dict &dict, TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const vec4 &deflt) {
+    param *get_param(param_buffer_info &pbi, GLint &texture_slot, resource_dict &dict, TiXmlElement *shader, TiXmlElement *profile_COMMON, const char *value, const vec4 &deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *color = child(section, "color");
       TiXmlElement *texture = child(section, "texture");
@@ -375,7 +375,7 @@ namespace octet { namespace loaders {
         if (temp_floats.size() == 3) {
           temp_floats.push_back(1);
         }
-        return new param(vec4(temp_floats[0], temp_floats[1], temp_floats[2], temp_floats[3]));
+        return new param_color(pbi, vec4(temp_floats[0], temp_floats[1], temp_floats[2], temp_floats[3]), app_utils::get_atom(value), param::stage_fragment);
 
         /*if (temp_floats.size() >= 4) {
           char name[16];
@@ -396,7 +396,7 @@ namespace octet { namespace loaders {
         TiXmlElement *init_from = child(surface, "init_from");
         const char *image_name = text(init_from);
         image *img = dict.get_image(image_name);
-        if (img) return new param(img);
+        if (img) return new param_sampler(pbi, app_utils::get_atom(value), img, new sampler(), param::stage_fragment);
         /*TiXmlElement *image = find_id(image_name);
         const char *url_attr = text(child(image, "init_from"));
         if (url_attr) {
@@ -406,20 +406,20 @@ namespace octet { namespace loaders {
         }*/
       }
       //return resource_dict::get_texture_handle(GL_RGBA, deflt);
-      return new param(deflt);
+      return new param_color(pbi, deflt, app_utils::get_atom(value), param::stage_fragment);
     }
 
     // get a floating point number (or the default)
-    param *get_float(TiXmlElement *shader, const char *value, float deflt) {
+    param_color *get_float(param_buffer_info &pbi, TiXmlElement *shader, const char *value, float deflt) {
       TiXmlElement *section = child(shader, value);
       TiXmlElement *float_ = child(section, "float");
       if (float_) {
         atofv(temp_floats, float_->GetText());
         if (temp_floats.size() >= 1) {
-          return new param(vec4(temp_floats[0], 0, 0, 0));
+          return new param_color(pbi, vec4(temp_floats[0], 0, 0, 0), app_utils::get_atom(value), param::stage_fragment);
         }
       }
-      return new param(vec4(deflt, 0, 0, 0));
+      return new param_color(pbi, vec4(deflt, 0, 0, 0), app_utils::get_atom(value), param::stage_fragment);
     }
 
     // add all the materials from the collada file to the resources collection
@@ -427,8 +427,7 @@ namespace octet { namespace loaders {
       TiXmlElement *lib_mat = child(doc.RootElement(), "library_materials");
 
       if (!dict.has_resource("default_material")) {
-        material *defmat = new material();
-        defmat->make_color(vec4(0.5, 0.5, 0.5, 1), false, false);
+        material *defmat = new material(vec4(0.5, 0.5, 0.5, 1));
         dict.set_resource("default_material", defmat);
       }
 
@@ -444,22 +443,24 @@ namespace octet { namespace loaders {
         TiXmlElement *blinn = child(technique, "blinn");
         TiXmlElement *lambert = child(technique, "lambert");
         TiXmlElement *shader = phong ? phong : blinn ? blinn : lambert;
+        gl_resource *static_buffer = new gl_resource(GL_UNIFORM_BUFFER, 256);
+        param_buffer_info pbi(static_buffer, 1);
+        GLint texture_slot = 0;
         if (shader) {
           url += url[0] == '#';
-          param *emission = get_param(dict, shader, profile_COMMON, "emission", vec4(0, 0, 0, 0));
-          param *ambient = get_param(dict, shader, profile_COMMON, "ambient", vec4(0, 0, 0, 1));
-          param *diffuse = get_param(dict, shader, profile_COMMON, "diffuse", vec4(0.5f, 0.5f, 0.5f, 0));
-          param *specular = get_param(dict, shader, profile_COMMON, "specular", vec4(0, 0, 0, 0));
-          param *bump = get_param(dict, shader, profile_COMMON, "bump", vec4(0.5f, 0.5f, 1.0f, 0));
-          param *shininess = get_float(shader, "shininess", 0);
+          param *emission = get_param(pbi, texture_slot, dict, shader, profile_COMMON, "emission", vec4(0, 0, 0, 0));
+          param *ambient = get_param(pbi, texture_slot, dict, shader, profile_COMMON, "ambient", vec4(0, 0, 0, 1));
+          param *diffuse = get_param(pbi, texture_slot, dict, shader, profile_COMMON, "diffuse", vec4(0.5f, 0.5f, 0.5f, 0));
+          param *specular = get_param(pbi, texture_slot, dict, shader, profile_COMMON, "specular", vec4(0, 0, 0, 0));
+          param *bump = get_param(pbi, texture_slot, dict, shader, profile_COMMON, "bump", vec4(0.5f, 0.5f, 1.0f, 0));
+          param_color *shininess = get_float(pbi, shader, "shininess", 0);
           // this is not strictly correct, but fixes some issues
-          if (shininess->get_color().x() >= 1) shininess->set_color(vec4(shininess->get_color() * 0.01f));
-          material *mat = new material();
-          mat->init(diffuse, ambient, emission, specular, bump, shininess);
+          //if (shininess->get_value(buffer.data()).x() >= 1) shininess->set_value(buffer.data(), vec4(shininess->get_value(buffer.data()) * 0.01f));
+          material *mat = new material(diffuse, ambient, emission, specular, bump, shininess);
+          //mat->init(diffuse, ambient, emission, specular, bump, shininess);
           dict.set_resource(attr(mat_elem, "id"), mat);
         } else {
-          material *mat = new material();
-          mat->make_color(vec4(0.5, 0.5, 0.5, 0), false, false);
+          material *mat = new material(vec4(0.5, 0.5, 0.5, 0));
           dict.set_resource(attr(mat_elem, "id"), mat);
         }
       }

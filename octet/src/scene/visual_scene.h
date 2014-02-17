@@ -148,7 +148,7 @@ namespace octet { namespace scene {
       }
     }
 
-    void draw_debug_data(bump_shader &object_shader, camera_instance &cam) {
+    void draw_debug_data(camera_instance &cam) {
       /// debug draw the AABBs of the mesh instances in the world.
       /// draw in world space
       mat4t worldToCamera;
@@ -156,7 +156,7 @@ namespace octet { namespace scene {
       mat4t worldToWorld;
       worldToWorld.loadIdentity();
       cam.get_matrices(worldToProjection, worldToCamera, worldToWorld);
-      debug_material->render(object_shader, worldToProjection, worldToCamera, light_uniforms, num_light_uniforms, num_lights);
+      debug_material->render(worldToProjection, worldToCamera, light_uniforms, num_light_uniforms, num_lights);
 
       /// debug lines are a useful way of showing dynamic behaviour in the scene.
       if (render_debug_lines) {
@@ -179,7 +179,7 @@ namespace octet { namespace scene {
       cam.set_cameraToWorld(cameraToWorld, aspect_ratio);
       mat4t cameraToProjection = cam.get_cameraToProjection();
 
-      draw_debug_data(object_shader, cam);
+      draw_debug_data(cam);
 
       for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
         mesh_instance *mi = mesh_instances[mesh_index];
@@ -197,7 +197,7 @@ namespace octet { namespace scene {
           /// normal rendering for single matrix objects
           /// build a projection matrix: model -> world -> camera_instance -> projection
           /// the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-          mat->render(object_shader, modelToProjection, modelToCamera, light_uniforms, num_light_uniforms, num_lights);
+          mat->render(modelToProjection, modelToCamera, light_uniforms, num_light_uniforms, num_lights);
         } else {
           /// multi-matrix rendering
           mat4t *transforms = skel->calc_transforms(modelToCamera, skn);
@@ -207,7 +207,7 @@ namespace octet { namespace scene {
             //glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &mvuv);
             printf("warning: too many bones (%d/%d)\n", num_bones, mvuv/4);
           } else {
-            mat->render_skinned(skin_shader, cameraToProjection, transforms, num_bones, light_uniforms, num_light_uniforms, num_lights);
+            mat->render_skinned(cameraToProjection, transforms, num_bones, light_uniforms, num_light_uniforms, num_lights);
           }
         }
 

@@ -264,5 +264,41 @@ namespace octet { namespace containers {
       capacity_ = 0;
     }
   };
+
+  inline void vformat(dynarray <char> &ary, const char *fmt, va_list v) {
+    unsigned old_size = ary.size();
+    #ifdef WIN32
+      int len = _vscprintf(fmt, v);
+      if (len) {
+        if (old_size) {
+          ary.resize(old_size + len);
+          vsprintf_s(&ary[old_size-1], len+1, fmt, v);
+        } else {
+          ary.resize(len + 1);
+          vsprintf_s(&ary[0], len+1, fmt, v);
+        }
+      }
+    #else
+      char tmp[1024];
+      size_t len = vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
+      if (len) {
+        if (old_size) {
+          ary.resize(old_size + len);
+          strcpy(&ary[old_size-1], tmp);
+        } else {
+          ary.resize(len + 1);
+          strcpy(&ary[0], tmp);
+        }
+      }
+    #endif
+  }
+
+  inline void format(dynarray <char> &ary, const char *fmt, ...) {
+    va_list v;
+    va_start(v, fmt);
+    vformat(ary, fmt, v);
+    va_end(v);
+  }
+
 } }
 

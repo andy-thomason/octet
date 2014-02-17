@@ -24,6 +24,8 @@ namespace octet { namespace scene {
     uint16_t texture_wrap_r;     // GL_CLAMP / GL_REPEAT
     uint16_t gl_target;          // GL_TEXTURE_2D, 3D, CUBE_MAP
     string name;                 // name used internally in shader (ie. diffuse_sampler)
+    GLuint gl_texture;           // allocted texture
+
   public:
     RESOURCE_META(sampler)
 
@@ -35,6 +37,7 @@ namespace octet { namespace scene {
       texture_wrap_t = GL_REPEAT;
       texture_wrap_r = GL_REPEAT;
       gl_target = GL_TEXTURE_2D;
+      gl_texture = 0;
       name = name_;
     }
 
@@ -48,6 +51,19 @@ namespace octet { namespace scene {
 
     unsigned get_gl_target() const {
       return gl_target;
+    }
+
+    unsigned get_gl_texture(image *img) {
+      if (!gl_texture) {
+        gl_texture = img->get_gl_texture();
+
+        glTexParameteri(gl_target, GL_TEXTURE_MAG_FILTER, texture_mag_filter);
+        glTexParameteri(gl_target, GL_TEXTURE_MIN_FILTER, texture_min_filter);
+        glTexParameteri(gl_target, GL_TEXTURE_WRAP_S, texture_wrap_s);
+        glTexParameteri(gl_target, GL_TEXTURE_WRAP_T, texture_wrap_t);
+        glTexParameteri(gl_target, GL_TEXTURE_WRAP_R, texture_wrap_r);
+      }
+      return gl_texture;
     }
 
     const char *get_glsl_type() {

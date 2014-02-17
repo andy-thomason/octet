@@ -20,6 +20,19 @@ namespace octet { namespace resources {
     GLuint target;
 
   public:
+    /// Helper class to make a write-only lock
+    class wolock {
+      gl_resource *res;
+      void *ptr;
+    public:
+      wolock(gl_resource *res) { this->res = res; ptr = res->lock_write_only(); }
+      ~wolock() { res->unlock_write_only(); }
+      uint8_t *u8() const { return (uint8_t*)ptr; }
+      uint16_t *u16() const { return (uint16_t*)ptr; }
+      uint32_t *u32() const { return (uint32_t*)ptr; }
+      float *f32() const { return (float*)ptr; }
+    };
+
     /// Helper class to make a read-write lock
     class rwlock {
       gl_resource *res;
@@ -92,12 +105,13 @@ namespace octet { namespace resources {
       return target;
     }
 
-    /// get the buffer number
+    /// get the buffer size
     unsigned get_size() const {
       return bytes.size();
     }
 
     /// get a read-only lock on this buffer
+    /// deprecated
     const void *lock_read_only() const {
       return (const void*)&bytes[0];
       //glBindBuffer(target, buffer);
@@ -105,20 +119,39 @@ namespace octet { namespace resources {
     }
 
     /// release read-only lock on this buffer
+    /// deprecated
     void unlock_read_only() const {
       //glBindBuffer(target, buffer);
       //glUnmapBuffer(target);
     }
 
-    /// get a read-write lock on this buffer
+    /// get a read-write lock on this buffer. Do not use this by preference.
+    /// deprecated
     void *lock() const {
+      return (void*)&bytes[0];
+      //glBindBuffer(target, buffer);
+      //return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT|GL_MAP_WRITE_BIT);
+    }
+
+    /// release a read-write lock
+    /// deprecated
+    void unlock() const {
+      glBindBuffer(target, buffer);
+      glBufferSubData(target, 0, bytes.size(), &bytes[0]);
+      //glUnmapBuffer(target);
+    }
+
+    /// get a read-write lock on this buffer
+    /// deprecated
+    void *lock_write_only() const {
       return (void*)&bytes[0];
       //glBindBuffer(target, buffer);
       //return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT);
     }
 
     /// release a read-write lock
-    void unlock() const {
+    /// deprecated
+    void unlock_write_only() const {
       glBindBuffer(target, buffer);
       glBufferSubData(target, 0, bytes.size(), &bytes[0]);
       //glUnmapBuffer(target);

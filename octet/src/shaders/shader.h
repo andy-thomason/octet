@@ -35,7 +35,9 @@ namespace octet { namespace shaders {
       GLsizei length;
       char buf[256];
       glGetProgramInfoLog(program, sizeof(buf), &length, buf);
-      puts(buf);
+      if (length) {
+        puts(buf);
+      }
     }
   public:
     shader() {}
@@ -52,14 +54,18 @@ namespace octet { namespace shaders {
       glShaderSource(vertex_shader, 1, &vs, NULL);
       glCompileShader(vertex_shader);
       glGetShaderInfoLog(vertex_shader, sizeof(buf), &length, buf);
-      puts(buf);
+      if (length) {
+        log("Vertex shader error:\n%s\n%s\n\n\n\n", buf, vs);
+      }
     
       // create our fragment shader and compile it
       GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
       glShaderSource(fragment_shader, 1, &fs, NULL);
       glCompileShader(fragment_shader);
       glGetShaderInfoLog(fragment_shader, sizeof(buf), &length, buf);
-      puts(buf);
+      if (length) {
+        log("Fragment shader error:\n%s\n%s\n\n\n\n", buf, fs);
+      }
 
       link(vertex_shader, fragment_shader);
     }
@@ -82,6 +88,11 @@ namespace octet { namespace shaders {
     // use the program we have compiled in init()
     void render() {
       glUseProgram(program_);
+    }
+
+    /// get the OpenGL program object.
+    GLuint get_program() const {
+      return program_;
     }
   };
 

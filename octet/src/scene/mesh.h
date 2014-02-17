@@ -858,7 +858,7 @@ namespace octet { namespace scene {
       const uint32_t *sip = idx_lock.u32();
       gl_resource *new_indices = new gl_resource();
       new_indices->allocate(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * get_num_indices() * 2);
-      gl_resource::rwlock new_idx_lock(new_indices);
+      gl_resource::wolock new_idx_lock(new_indices);
       uint32_t *dip = new_idx_lock.u32();
 
       for (unsigned i = 0; i < num_indices; i += 3) {
@@ -938,8 +938,8 @@ namespace octet { namespace scene {
         return false;
       }
 
-      gl_resource::rwlock vlock(get_vertices());
-      gl_resource::rwlock ilock(get_indices());
+      gl_resource::wolock vlock(get_vertices());
+      gl_resource::wolock ilock(get_indices());
 
       vertex *vtx = (vertex*)vlock.u8() + num_vertices;
       unsigned onv = num_vertices;
@@ -1000,8 +1000,8 @@ namespace octet { namespace scene {
         return false;
       }
 
-      gl_resource::rwlock vlock(get_vertices());
-      gl_resource::rwlock ilock(get_indices());
+      gl_resource::wolock vlock(get_vertices());
+      gl_resource::wolock ilock(get_indices());
 
       vertex *vtx = (vertex*)vlock.u8() + num_vertices;
       unsigned onv = num_vertices;

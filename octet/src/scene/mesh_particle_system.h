@@ -163,9 +163,9 @@ namespace octet { namespace scene {
       unsigned vsize = billboard_particles.capacity() * sizeof(vertex) * 4;
       unsigned isize = billboard_particles.capacity() * sizeof(uint32_t) * 4;
 
-      gl_resource::rwlock vlock(get_vertices());
+      gl_resource::wolock vlock(get_vertices());
       vertex *vtx = (vertex*)vlock.u8();
-      gl_resource::rwlock ilock(get_indices());
+      gl_resource::wolock ilock(get_indices());
       uint32_t *idx = ilock.u32();
       unsigned num_vertices = 0;
       unsigned num_indices = 0;

@@ -35,7 +35,7 @@ namespace octet { namespace scene {
     void update() {
       allocate(sizeof(vertex)*points.size(), 0);
 
-      gl_resource::rwlock vtx_lock(get_vertices());
+      gl_resource::wolock vtx_lock(get_vertices());
       vertex *vtx = (vertex *)vtx_lock.u8();
 
       for (unsigned i = 0; i != points.size(); ++i) {
