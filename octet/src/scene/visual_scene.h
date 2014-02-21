@@ -36,10 +36,10 @@ namespace octet { namespace scene {
     unsigned debug_in_ptr;
 
     /// derived light information
-    enum { max_lights = 4, light_size = 4 };
+    enum { max_lights = material::max_lights, light_size = material::light_size, ambient_size = material::ambient_size };
     int num_light_uniforms;
     int num_lights;
-    vec4 light_uniforms[1 + max_lights * light_size ];
+    vec4 light_uniforms[ambient_size + max_lights * light_size ];
 
     int frame_number;
 
@@ -82,19 +82,21 @@ namespace octet { namespace scene {
       int num_ambient = 0;
       for (unsigned i = 0; i != light_instances.size() && num_lights != max_lights; ++i) {
         light_instance *li = light_instances[i];
-        atom_t kind = li->get_kind();
+        light *light = li->get_light();
+        scene_node *node = li->get_node();
+        atom_t kind = light->get_kind();
         if (kind == atom_ambient) {
-          ambient += li->get_color();
+          ambient += light->get_color();
           num_ambient++;
         } else {
-          li->get_fragment_uniforms(&light_uniforms[1+num_lights*light_size], worldToCamera);
+          light->get_fragment_uniforms(node, &light_uniforms[ambient_size+num_lights*light_size], worldToCamera);
           num_lights++;
         }
       }
       if (num_ambient == 0) {
         ambient = vec4(0.5f, 0.5f, 0.5f, 1);
       }
-      num_light_uniforms = 1 + num_lights * light_size;
+      num_light_uniforms = ambient_size + num_lights * light_size;
     }
 
     void render_mesh_aabbs() {
@@ -305,13 +307,15 @@ namespace octet { namespace scene {
       /// default light instance
       if (light_instances.size() == 0) {
         scene_node *node = add_scene_node();
+        light *_light = new light();
         light_instance *li = new light_instance();
         node->access_nodeToParent().translate(100, 100, 100);
         node->access_nodeToParent().rotateX(45);
         node->access_nodeToParent().rotateY(45);
-        li->set_color(vec4(1, 1, 1, 1));
-        li->set_kind(atom_directional);
+        _light->set_color(vec4(1, 1, 1, 1));
+        _light->set_kind(atom_directional);
         li->set_node(node);
+        li->set_light(_light);
         light_instances.push_back(li);
       }
 

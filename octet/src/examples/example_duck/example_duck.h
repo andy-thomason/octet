@@ -35,6 +35,13 @@ namespace octet {
         node->translate(vec3(-50, -50, 0));
         app_scene->add_child(node);
         app_scene->add_mesh_instance(new mesh_instance(node, duck, mat));
+
+        scene_node *light_node = new scene_node();
+        light *_light = new light();
+        _light->set_attenuation(1, 0, -1);
+        light_node->rotate(-45, vec3(1, 0, 0));
+        light_node->translate(vec3(0, 0, 100));
+        app_scene->add_light_instance(new light_instance(light_node, _light));
       }
 
       app_scene->create_default_camera_and_lights();

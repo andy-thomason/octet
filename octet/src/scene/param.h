@@ -21,6 +21,8 @@ namespace octet { namespace scene {
     enum op_type {
       op_texture2D,
 
+      op_normalize,
+
       op_mul,
       op_cast,
       op_copy,
@@ -52,8 +54,12 @@ namespace octet { namespace scene {
 
     const char *compose_glue(param_compose_info &pci, stage_type dest_stage, char *tmp, size_t size);
 
-    const char *get_name() const {
+    const char *get_atom_name() const {
       return app_utils::get_atom_name(name);
+    }
+
+    atom_t get_name() const {
+      return name;
     }
 
     uint16_t get_gl_type() {
@@ -102,6 +108,11 @@ namespace octet { namespace scene {
   struct param_compose_info {
     dynarray <char> decls[param::stage_max];
     dynarray <char> code[param::stage_max];
+    dynarray<ref<param> > &params;
+
+    param_compose_info(dynarray<ref<param> > &_params) : params(_params) {}
+
+    param *get_param(atom_t name);
   };
 
   struct param_buffer_info {
@@ -121,14 +132,14 @@ namespace octet { namespace scene {
 
   /// generate glue between stages
   inline const char *param::compose_glue(param_compose_info &pci, stage_type dest_stage, char *tmp, size_t size) {
-    if (get_stage() == dest_stage) return get_name();
+    if (get_stage() == dest_stage) return get_atom_name();
 
     // todo: handle more than one stage!
-    format(pci.decls[get_stage()], "varying %s %s_;\n", get_param_type(), get_name());
-    format(pci.code[get_stage()], "  %s_ = %s;\n", get_name(), get_name());
-    format(pci.decls[dest_stage], "varying %s %s_;\n", get_param_type(), get_name());
+    format(pci.decls[get_stage()], "varying %s %s_;\n", get_param_type(), get_atom_name());
+    format(pci.code[get_stage()], "  %s_ = %s;\n", get_atom_name(), get_atom_name());
+    format(pci.decls[dest_stage], "varying %s %s_;\n", get_param_type(), get_atom_name());
 
-    snprintf(tmp, size, "%s_", get_name());
+    snprintf(tmp, size, "%s_", get_atom_name());
     return tmp;
   }
 
@@ -206,13 +217,17 @@ namespace octet { namespace scene {
 
     /// generate source code for the shader
     void compose(param_compose_info &pci) {
-      format(pci.decls[get_stage()], "uniform %s %s;\n", get_param_type(), get_name());
+      if (repeat > 1) {
+        format(pci.decls[get_stage()], "uniform %s %s[%d];\n", get_param_type(), get_atom_name(), repeat);
+      } else {
+        format(pci.decls[get_stage()], "uniform %s %s;\n", get_param_type(), get_atom_name());
+      }
     }
 
     /// connect the parameter to the shader
     void bind(param_bind_info &pbi) {
-      uniform = glGetUniformLocation(pbi.program, get_name());
-      //log("bind %d %s\n", uniform, get_name());
+      uniform = glGetUniformLocation(pbi.program, get_atom_name());
+      //log("bind %d %s\n", uniform, get_atom_name());
     }
 
     /// get the uniform location
@@ -283,7 +298,7 @@ namespace octet { namespace scene {
 
     /// Build the shader given this attribute parameter.
     void compose(param_compose_info &pci) {
-      format(pci.decls[get_stage()], "attribute %s %s;\n", get_param_type(), get_name());
+      format(pci.decls[get_stage()], "attribute %s %s;\n", get_param_type(), get_atom_name());
     }
   };
 
@@ -336,14 +351,14 @@ namespace octet { namespace scene {
       glActiveTexture(GL_TEXTURE0 + texture_slot);
       glBindTexture(sampler_->get_gl_target(), sampler_->get_gl_texture(image_));
 
-      log("%s: %d=%d %04x %d\n", get_name(), get_uniform(), texture_slot, sampler_->get_gl_target(), sampler_->get_gl_texture(image_));
+      //log("%s: %d=%d %04x %d\n", get_atom_name(), get_uniform(), texture_slot, sampler_->get_gl_target(), sampler_->get_gl_texture(image_));
     }
   };
 
   /// General purpose operation "parameter"
   class param_op : public param {
-    ref<param> lhs;
-    ref<param> rhs;
+    atom_t lhs;
+    atom_t rhs;
     param::op_type op;
   public:
     RESOURCE_META(param_op)
@@ -352,7 +367,7 @@ namespace octet { namespace scene {
       op = param::op_copy;
     }
 
-    param_op(atom_t name, uint16_t type, param *_lhs, param *_rhs, param::op_type _op, stage_type _stage) :
+    param_op(atom_t name, uint16_t type, atom_t _lhs, atom_t _rhs, param::op_type _op, stage_type _stage) :
       param(name, type, _stage), lhs(_lhs), rhs(_rhs), op(_op)
     {
     }
@@ -361,35 +376,64 @@ namespace octet { namespace scene {
     void compose(param_compose_info &pci) {
       const char *func = "";
       char tmp[2][256];
-      const char *lhs_name = lhs->compose_glue(pci, get_stage(), tmp[0], sizeof(tmp[0]));
-      const char *rhs_name = rhs ? rhs->compose_glue(pci, get_stage(), tmp[1], sizeof(tmp[1])) : "";
+      param *lhs_param = pci.get_param(lhs);
+      param *rhs_param = pci.get_param(rhs);
+      assert(lhs_param && "missing lhs parameter");
+      const char *lhs_name = lhs_param->compose_glue(pci, get_stage(), tmp[0], sizeof(tmp[0]));
+      const char *rhs_name = rhs_param ? rhs_param->compose_glue(pci, get_stage(), tmp[1], sizeof(tmp[1])) : "";
       switch (op) {
+        case op_normalize: func = "normalize"; goto func1;
+        func1: {
+          format(pci.code[get_stage()], "  %s %s = %s(%s);\n", get_param_type(), get_atom_name(), func, lhs_name);
+        } break;
+
         case op_texture2D: func = "texture2D"; goto func2;
         func2: {
-          format(pci.code[get_stage()], "  %s %s = %s(%s, %s);\n", get_param_type(), get_name(), func, lhs_name, rhs_name);
+          format(pci.code[get_stage()], "  %s %s = %s(%s, %s);\n", get_param_type(), get_atom_name(), func, lhs_name, rhs_name);
         } break;
 
         case op_mul: func = "*"; goto op2;
         op2: {
-          format(pci.code[get_stage()], "  %s %s = %s %s %s;\n", get_param_type(), get_name(), lhs_name, func, rhs_name);
+          format(pci.code[get_stage()], "  %s %s = %s %s %s;\n", get_param_type(), get_atom_name(), lhs_name, func, rhs_name);
         } break;
 
         case op_cast: {
           if (rhs) {
-            format(pci.code[get_stage()], "  %s %s = %s(%s, %s);\n", get_param_type(), get_name(), get_param_type(), lhs_name, rhs_name);
+            format(pci.code[get_stage()], "  %s %s = %s(%s, %s);\n", get_param_type(), get_atom_name(), get_param_type(), lhs_name, rhs_name);
           } else {
-            format(pci.code[get_stage()], "  %s %s = %s(%s);\n", get_param_type(), get_name(), get_param_type(), lhs_name);
+            format(pci.code[get_stage()], "  %s %s = %s(%s);\n", get_param_type(), get_atom_name(), get_param_type(), lhs_name);
           }
         } break;
 
         case op_copy: {
-          format(pci.code[get_stage()], "  %s %s = %s;\n", get_param_type(), get_name(), lhs_name);
+          format(pci.code[get_stage()], "  %s %s = %s;\n", get_param_type(), get_atom_name(), lhs_name);
         } break;
 
         default: {
           abort();
         } break;
       }
+    }
+  };
+
+  /// custom parameter: insert your own shader code here
+  class param_custom : public param {
+    string decls;
+    string code;
+  public:
+    RESOURCE_META(param_custom)
+
+    param_custom() {
+    }
+
+    param_custom(atom_t _name, uint16_t _type, const char *_decls, const char *_code, param::stage_type _stage) :
+      param(_name, _type, _stage), decls(_decls), code(_code)
+    {
+    }
+
+    void compose(param_compose_info &pci) {
+      format(pci.decls[get_stage()], "%s", decls.c_str());
+      format(pci.code[get_stage()], "%s", code.c_str());
     }
   };
 
@@ -406,7 +450,7 @@ namespace octet { namespace scene {
       const char *vertex = "%s\nvoid main() {\n%s\n}\n",
       const char *fragment = "%s\nvoid main() {\n%s\n}\n"
     ) {
-      param_compose_info pci;
+      param_compose_info pci(params);
 
       for (unsigned i = 0; i != param::stage_max; ++i) {
         pci.decls[i].reserve(0x1000);
@@ -435,5 +479,14 @@ namespace octet { namespace scene {
     }
   };
 
+
+  inline param *param_compose_info::get_param(atom_t name) {
+    for (unsigned i = 0; i != params.size(); ++i) {
+      if (params[i]->get_name() == name) {
+        return params[i];
+      }
+    }
+    return NULL;
+  }
 }}
 

@@ -40,12 +40,13 @@ namespace octet { namespace shaders {
       }
     }
   public:
-    shader() {}
+    shader() {
+    }
 
     GLuint program() { return program_; }
   
     void init(const char *vs, const char *fs) {
-      printf("creating shader program\n");
+      //printf("creating shader program\n");
 
       GLsizei length;
       char buf[256];

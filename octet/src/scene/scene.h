@@ -19,6 +19,7 @@
 #include "../scene/sampler.h"
 #include "../scene/param.h"
 #include "../scene/material.h"
+#include "../scene/light.h"
 #include "../scene/camera_instance.h"
 #include "../scene/light_instance.h"
 #include "../scene/mesh_instance.h"

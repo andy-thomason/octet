@@ -604,24 +604,24 @@ namespace octet { namespace loaders {
     // add a light to the scene
     void add_instance_light(TiXmlElement *elem, scene_node *node, resource_dict &dict, visual_scene &s) {
       const char *url = elem->Attribute("url");
-      TiXmlElement *light = find_id(url);
-      if (!light) return;
+      TiXmlElement *light_elem = find_id(url);
+      if (!light_elem) return;
 
-      light_instance *il = new light_instance();
-      il->set_node(node);
+      light *_light = new light();
+      light_instance *il = new light_instance(node, _light);
       s.add_light_instance(il);
       
-      TiXmlElement *technique_common = child(light, "technique_common");
+      TiXmlElement *technique_common = child(light_elem, "technique_common");
       TiXmlElement *ambient = child(technique_common, "ambient");
       TiXmlElement *directional = child(technique_common, "directional");
       TiXmlElement *spot = child(technique_common, "spot");
       TiXmlElement *point = child(technique_common, "point");
       TiXmlElement *params = ambient ? ambient : directional ? directional : spot ? spot : point;
 
-      il->set_color(vec4(1, 1, 1, 1));
+      _light->set_color(vec4(1, 1, 1, 1));
       if (params) {
         vec4 color = quick_vec(params, "color");
-        il->set_color(color);
+        _light->set_color(color);
       }
 
       if (directional || spot || point) {
@@ -630,8 +630,8 @@ namespace octet { namespace loaders {
         float quadratic_attenuation = quick_float(params, "quadratic_attenuation", 0);
         float falloff_angle = quick_float(params, "falloff_angle", 180);
         float falloff_exponent = quick_float(params, "falloff_exponent", 0);
-        il->set_attenuation(constant_attenuation, linear_attenuation, quadratic_attenuation);
-        il->set_falloff(falloff_angle, falloff_exponent);
+        _light->set_attenuation(constant_attenuation, linear_attenuation, quadratic_attenuation);
+        _light->set_falloff(falloff_angle, falloff_exponent);
       }
     }
 
