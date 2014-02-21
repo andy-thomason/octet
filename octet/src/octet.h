@@ -76,6 +76,9 @@
     /// The shaders namespace contains a number of stock shaders.
     namespace shaders {}
 
+    /// Functions and classes used to interact with physics systems
+    namespace physics {}
+
     using namespace containers;
     using namespace resources;
     using namespace scene;
@@ -83,6 +86,7 @@
     using namespace helpers;
     using namespace loaders;
     using namespace shaders;
+    using namespace physics;
   }
 
   // defines and configuration

@@ -115,6 +115,22 @@
   #include "LinearMath/btSerializer.cpp"
 #endif
 
-#include "physics_world.h"
+//#include "physics_world.h"
+
+namespace octet { namespace physics {
+  inline btVector3 get_btVector3(vec3_in v) {
+    return btVector3(v[0], v[1], v[2]);
+  }
+
+  inline btMatrix3x3 get_btMatrix3x3(mat4t_in m) {
+    return btMatrix3x3(
+      m[0][0], m[0][1], m[0][2],
+      m[1][0], m[1][1], m[1][2],
+      m[2][0], m[2][1], m[2][2]
+    );
+  }
+} }
+
+
 
 
