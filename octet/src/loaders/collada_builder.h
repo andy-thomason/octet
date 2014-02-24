@@ -1217,13 +1217,22 @@ namespace octet { namespace loaders {
     bool load_xml(const char *url) {
       doc_path = url;
       doc_path.truncate(doc_path.filename_pos());
-      doc.LoadFile(app_utils::get_path(url));
+      const char *path = app_utils::get_path(url);
+      char buf[256];
+      getcwd(buf, sizeof(buf));
+      doc.LoadFile(path);
 
       TiXmlElement *top = doc.RootElement();
-      if (!top || strcmp(top->Value(), "COLLADA")) {
+      if (!top) {
+        printf("file %s not found\n", path);
+        return false;
+      }
+
+      if (strcmp(top->Value(), "COLLADA")) {
         printf("warning: not a collada file");
         return false;
       }
+
       find_ids(top);
       return true;
     }
