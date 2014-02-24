@@ -21,7 +21,10 @@ namespace octet {
       app_scene =  new visual_scene();
 
       resource_dict dict;
-      loader.load_xml("assets/duck_triangulate.dae");
+      if (!loader.load_xml("assets/duck_triangulate.dae")) {
+        // failed to load file
+        return;
+      }
       loader.get_resources(dict);
 
       dynarray<resource*> meshes;
@@ -60,9 +63,12 @@ namespace octet {
       app_scene->render((float)vx / vy);
 
       // tumble the duck  (there is only one mesh instance)
-      scene_node *node = app_scene->get_mesh_instance(0)->get_node();
-      node->rotate(1, vec3(1, 0, 0));
-      node->rotate(1, vec3(0, 1, 0));
+      mesh_instance *mi = app_scene->get_mesh_instance(0);
+      if (mi) {
+        scene_node *node = mi->get_node();
+        node->rotate(1, vec3(1, 0, 0));
+        node->rotate(1, vec3(0, 1, 0));
+      }
     }
   };
 }
