@@ -17,7 +17,7 @@
 /// Create a box with octet
 int main(int argc, char **argv) {
   // path from bin\Debug to octet directory
-  octet::app_utils::prefix("../../");
+  octet::app_utils::prefix("../../../");
 
   // set up the platform.
   octet::app::init_all(argc, argv);
