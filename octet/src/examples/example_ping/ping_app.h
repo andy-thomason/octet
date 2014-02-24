@@ -4,9 +4,7 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
-// Triangle example: The most basic OpenGL application
-//
-// Level: 1
+// The game of ping with a little pong.
 //
 // Demonstrates:
 //   Basic framework app
