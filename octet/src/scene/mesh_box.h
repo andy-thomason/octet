@@ -102,7 +102,7 @@ namespace octet { namespace scene {
         vtx++;
         fs += 8;
       }
-      assert((intptr_t)fs - (intptr_t)box_vertices() == get_vertices()->get_size());
+      //assert((intptr_t)fs - (intptr_t)box_vertices() == get_vertices()->get_size());
 
       memcpy(idx, box_indices(), sizeof(uint32_t)*6*6);
 

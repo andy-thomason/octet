@@ -16,14 +16,14 @@ namespace octet { namespace math {
     #if OCTET_SSE
       union {
         __m128 m;
-        float v[2];
+        float v[4];
       };
 
       vec2(__m128 m) {
         this->m = m;
       }
     #else
-      float v[3];
+      float v[2];
     #endif
   public:
     // default constructor: note does not initialize!

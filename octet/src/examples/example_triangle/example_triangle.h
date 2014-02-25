@@ -62,7 +62,7 @@ namespace octet {
       glBindBuffer(GL_ARRAY_BUFFER, vertices);
 
       // tell OpenGL what kind of vertices we have
-      glVertexAttribPointer(0, 3, GL_FLOAT, FALSE, 3*sizeof(float), NULL);
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), NULL);
 
       // draw a triangle
       glDrawArrays(GL_TRIANGLES, 0, 3);
