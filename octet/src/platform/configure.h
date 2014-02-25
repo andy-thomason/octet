@@ -31,9 +31,13 @@
   #pragma warning(disable : 4996)
 #endif
 
-#if !OCTET_VOXEL_TEST && !OCTET_VITA
+#if !OCTET_VITA && !OCTET_MAC
   #define OCTET_BULLET 1
   #define OCTET_BOX2D 1
+#endif
+
+#if OCTET_MAC
+  #define GL_UNIFORM_BUFFER 0
 #endif
 
 // use <> to include from standard directories
@@ -45,7 +49,9 @@
 #include <stdarg.h>
 #include <math.h>
 #include <assert.h>
-#include <direct.h>
+#if defined(WIN32)
+  #include <direct.h>
+#endif
 
 namespace octet {
   /// write some text to log.txt

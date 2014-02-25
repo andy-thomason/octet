@@ -408,7 +408,7 @@ namespace octet { namespace scene {
 
     /// access mesh_instance information
     mesh_instance *get_mesh_instance(int index) {
-      return mesh_instances[index];
+      return (unsigned)index < mesh_instances.size() ? (mesh_instance*)mesh_instances[index] : (mesh_instance*)NULL;
     }
 
     /// access light_instance information

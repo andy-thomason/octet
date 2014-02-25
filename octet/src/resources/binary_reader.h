@@ -62,7 +62,7 @@ namespace octet { namespace resources {
       return get_error();
     }
 
-    bool check_size(unsigned size) {
+    bool check_size(size_t size) {
       if (!get_error()) {
         int test = read_int();
         log("%*scheck_size %d\n", get_depth()*2, "", size);

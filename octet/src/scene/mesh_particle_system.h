@@ -159,9 +159,9 @@ namespace octet { namespace scene {
 
     /// Generate mesh from particles
     virtual void update() {
-      unsigned np = billboard_particles.size();
-      unsigned vsize = billboard_particles.capacity() * sizeof(vertex) * 4;
-      unsigned isize = billboard_particles.capacity() * sizeof(uint32_t) * 4;
+      //unsigned np = billboard_particles.size();
+      //unsigned vsize = billboard_particles.capacity() * sizeof(vertex) * 4;
+      //unsigned isize = billboard_particles.capacity() * sizeof(uint32_t) * 4;
 
       gl_resource::wolock vlock(get_vertices());
       vertex *vtx = (vertex*)vlock.u8();

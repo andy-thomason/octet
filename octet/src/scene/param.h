@@ -274,9 +274,9 @@ namespace octet { namespace scene {
         case GL_BOOL_VEC3: case GL_INT_VEC3: glUniform3iv(uni, repeat, (GLint*)(buffer + offset)); break;
         case GL_BOOL_VEC4: case GL_INT_VEC4: glUniform4iv(uni, repeat, (GLint*)(buffer + offset)); break;
 
-        case GL_FLOAT_MAT2: glUniformMatrix2fv(uni, repeat, FALSE, (float*)(buffer + offset)); break;
-        case GL_FLOAT_MAT3: glUniformMatrix3fv(uni, repeat, FALSE, (float*)(buffer + offset)); break;
-        case GL_FLOAT_MAT4: glUniformMatrix4fv(uni, repeat, FALSE, (float*)(buffer + offset)); break;
+        case GL_FLOAT_MAT2: glUniformMatrix2fv(uni, repeat, GL_FALSE, (float*)(buffer + offset)); break;
+        case GL_FLOAT_MAT3: glUniformMatrix3fv(uni, repeat, GL_FALSE, (float*)(buffer + offset)); break;
+        case GL_FLOAT_MAT4: glUniformMatrix4fv(uni, repeat, GL_FALSE, (float*)(buffer + offset)); break;
 
         default: abort();
       }

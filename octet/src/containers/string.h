@@ -186,8 +186,8 @@ namespace octet { namespace containers {
     }
 
     void vformat(const char *fmt, va_list v) {
-      int cur_len = strlen(data_);
       #ifdef WIN32
+        int cur_len = strlen(data_);
         int len = _vscprintf(fmt, v);
         if (len) {
           if (cur_len) {

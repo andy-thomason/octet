@@ -283,10 +283,10 @@ namespace octet { namespace containers {
       size_t len = vsnprintf(tmp, sizeof(tmp)-1, fmt, v);
       if (len) {
         if (old_size) {
-          ary.resize(old_size + len);
+          ary.resize((int)(old_size + len));
           strcpy(&ary[old_size-1], tmp);
         } else {
-          ary.resize(len + 1);
+          ary.resize((int)len + 1);
           strcpy(&ary[0], tmp);
         }
       }

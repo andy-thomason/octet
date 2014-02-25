@@ -29,8 +29,8 @@ namespace octet { namespace scene {
 
     // create the parameters that change frequently such as the matrices and lighting
     void create_dynamic_params() {
-      static_buffer = new gl_resource(GL_UNIFORM_BUFFER, 0x100);
-      dynamic_buffer = new gl_resource(GL_UNIFORM_BUFFER, 0x400);
+      static_buffer = new gl_resource(0, 0x100);
+      dynamic_buffer = new gl_resource(0, 0x400);
       param_buffer_info dynamic_pbi(dynamic_buffer, 0);
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToProjection, GL_FLOAT_MAT4, 1, param::stage_vertex));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToCamera, GL_FLOAT_MAT4, 1, param::stage_vertex));

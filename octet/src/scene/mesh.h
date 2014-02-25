@@ -841,7 +841,7 @@ namespace octet { namespace scene {
         vec4 pos_in = vec4((vec3)*(const vec3p*)(vp + ip[i] * stride + pos_offset), 1.0f );
         vec4 pos_out = pos_in * modelToProjection;
         vec3 res = pos_out.perspectiveDivide();
-        vec3 ares = abs(res);
+        //vec3 ares = abs(res);
         bool err = any(abs(res) > vec3(1));
         char tmp[2][256];
         log("%5d %s -> %s %s\n", i, pos_in.toString(tmp[0], sizeof(tmp[0])), res.toString(tmp[1], sizeof(tmp[1])), err ? "FAIL" : "");
@@ -983,7 +983,7 @@ namespace octet { namespace scene {
     template <class uvgen> bool extrude(const polygon &poly1, const polygon &poly2) {
       bool is_triangles = get_mode() == GL_TRIANGLES;
       if (!is_triangles) {
-        return add_polygon(poly1) && add_polygon(poly2);
+        return add_polygon<uvgen>(poly1) && add_polygon<uvgen>(poly2);
       }
 
       unsigned npv = poly1.get_num_vertices();
@@ -1011,7 +1011,7 @@ namespace octet { namespace scene {
         vtx->normal = uvgen::normal(pos);
         vtx->uv = uvgen::uv(pos);
         vtx++;
-        vec3 pos = poly2.get_vertex(i);
+        pos = poly2.get_vertex(i);
         vtx->pos = uvgen::pos(pos);
         vtx->normal = uvgen::normal(pos);
         vtx->uv = uvgen::uv(pos);
