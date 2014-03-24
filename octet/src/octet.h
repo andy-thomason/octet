@@ -120,7 +120,9 @@
   #include "shaders/shaders.h"
 
   // physics
-  //#include "physics/physics.h"
+  #if OCTET_BULLET
+    #include "physics/physics.h"
+  #endif
 
   // scene (layer2)
   #include "scene/scene.h"
