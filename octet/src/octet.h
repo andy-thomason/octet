@@ -120,7 +120,7 @@
   #include "shaders/shaders.h"
 
   // physics
-  #if OCTET_BULLET
+  #ifdef OCTET_BULLET
     #include "physics/physics.h"
   #endif
 
