@@ -5,7 +5,7 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 namespace octet {
-  /// Scene containing a box with octet.
+  /// Scene using bullet for physics effects.
   class example_physics : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;

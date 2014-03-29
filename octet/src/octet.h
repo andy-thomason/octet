@@ -98,6 +98,11 @@
   // target specific support: Windows, Mac, Linux, PS Vita
   #include "platform/machine_specific.h"
 
+  #ifdef OCTET_OPENCL
+    #include "external/CL/cl.h"
+    #include "platform/opencl.h"
+  #endif
+
   // math library
   #include "math/math.h"
 
@@ -121,7 +126,7 @@
 
   // physics
   #ifdef OCTET_BULLET
-    #include "physics/physics.h"
+    #include "external/bullet/bullet.h"
   #endif
 
   // scene (layer2)

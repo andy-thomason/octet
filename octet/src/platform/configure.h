@@ -31,11 +31,6 @@
   #pragma warning(disable : 4996)
 #endif
 
-#if !OCTET_VITA && !OCTET_MAC
-  #define OCTET_BULLET 1
-  #define OCTET_BOX2D 1
-#endif
-
 #if OCTET_MAC
   #define GL_UNIFORM_BUFFER 0
 #endif
