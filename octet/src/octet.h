@@ -98,11 +98,6 @@
   // target specific support: Windows, Mac, Linux, PS Vita
   #include "platform/machine_specific.h"
 
-  #ifdef OCTET_OPENCL
-    #include "external/CL/cl.h"
-    #include "platform/opencl.h"
-  #endif
-
   // math library
   #include "math/math.h"
 
@@ -132,6 +127,11 @@
   // scene (layer2)
   #include "scene/scene.h"
 
+  #ifdef OCTET_OPENCL
+    #include "platform/CL/cl.h"
+    #include "platform/opencl.h"
+  #endif
+
   // high level helpers (layer2)
   #include "helpers/mouse_ball.h"
   #include "helpers/http_server.h"
@@ -144,5 +144,6 @@
   // forward references
   #include "resources/resources.inl"
   #include "resources/mesh_builder.inl"
+
 
 #endif

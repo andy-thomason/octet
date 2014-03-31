@@ -110,6 +110,11 @@ namespace octet { namespace resources {
       return bytes.size();
     }
 
+    /// get the GL buffer object we are wrapping.
+    GLuint get_buffer() const {
+      return buffer;
+    }
+
     /// get a read-only lock on this buffer
     /// deprecated
     const void *lock_read_only() const {

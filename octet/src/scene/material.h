@@ -159,7 +159,9 @@ namespace octet { namespace scene {
     }
 
     /// create a material from an existing image
-    material(image *img) {
+    material(image *img, sampler *smpl=NULL) {
+      if (!smpl) smpl = new sampler();
+
       params.reserve(16);
 
       create_dynamic_params();
@@ -167,7 +169,7 @@ namespace octet { namespace scene {
       create_transform();
 
       param_buffer_info static_pbi(static_buffer, 1);
-      params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, new sampler(), param::stage_fragment));
+      params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, smpl, param::stage_fragment));
       params.push_back(new param_op(atom_diffuse, GL_FLOAT_VEC4, atom_diffuse_sampler, atom_uv, param::op_texture2D, param::stage_fragment));
 
       create_lighting();

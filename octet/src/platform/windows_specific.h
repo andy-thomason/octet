@@ -40,7 +40,12 @@
 
 // compute - opencl
 #if OCTET_OPENCL
-  #pragma comment(lib, "OpenCL.lib")
+  #ifdef WIN32
+    #pragma comment(lib, "../../../lib/x86/OpenCL.lib")
+  #else
+    #pragma comment(lib, "../../../lib/x86_64/OpenCL.lib")
+  #endif
+
   #include "CL/cl.h"
   #include "CL/cl_gl.h"
 #endif

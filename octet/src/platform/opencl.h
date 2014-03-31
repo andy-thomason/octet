@@ -25,20 +25,16 @@
 #include "CL/cl.h"
 
 namespace octet {
+  /// wrapper for building opencl programs and executing them.
   class opencl {
     cl_int error_code;
-    cl_int num_args;
     cl_context context;
     cl_command_queue queue;
-    cl_device_id device_id;
-    cl_mem mem;
+    dynarray<cl_device_id> devices;
+    
     cl_program program;
 
-    dynarray<cl_kernel> kernels;
-    dynarray<cl_mem> mems;
-    dynarray<char> source;
-
-    static const char *cl_error_name(cl_int error) {
+    static const char *get_cl_error_name(cl_int error) {
       switch (error) {
         case CL_SUCCESS: return "CL_SUCCESS";
         case CL_DEVICE_NOT_FOUND: return "CL_DEVICE_NOT_FOUND";
@@ -94,84 +90,86 @@ namespace octet {
         default: return "UNKNOWN";
       }
     }
-  public:
-    opencl(const char *cl_filename) {
-      error_code = 0;
-      context = 0;
-      queue = 0;
-      program = 0;
-      num_args = 0;
 
+    // If we have many platforms, choose just one.
+    cl_platform_id get_prefered_platform(const char *prefered_platform) {
 	    cl_uint numPlatforms;	//the NO. of platforms
 	    error_code = clGetPlatformIDs(0, NULL, &numPlatforms);
 	    if (error_code != CL_SUCCESS) {
-        return;
+        return 0;
 	    }
 
 		  dynarray<cl_platform_id> platforms(numPlatforms);
 		  error_code = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
 	    if (error_code != CL_SUCCESS) {
-        return;
+        return 0;
 	    }
 
-      dynarray<cl_device_id> devices;
-
       cl_platform_id best_platform = platforms[0];
-      for (cl_int i = 0; i != numPlatforms; ++i) {
+      for (cl_uint i = 1; i < numPlatforms; ++i) {
 		    cl_platform_id platform = platforms[i];
         char buf[512];
         clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(buf), buf, NULL);
-        printf("platform %d: %s\n", i, buf);
-        if (strstr("NVIDIA", buf)) {
+        if (strstr(buf, prefered_platform)) {
           best_platform = platform;
         }
       }
 
+      return best_platform;
+    }
+
+    void init_devices_and_queues(cl_platform_id best_platform) {
+      // check GPU before CPU
 	    cl_uint numDevices = 0;
-      for (cl_uint devtype = CL_DEVICE_TYPE_GPU; devtype != CL_DEVICE_TYPE_CPU; devtype = CL_DEVICE_TYPE_CPU) {
+      cl_uint devtype = 0;
+      for (devtype = CL_DEVICE_TYPE_GPU; devtype != CL_DEVICE_TYPE_CPU; devtype = CL_DEVICE_TYPE_CPU) {
 	      error_code = clGetDeviceIDs(best_platform, devtype, 0, NULL, &numDevices);	
         if (numDevices != 0) {
-          devices.resize(numDevices);
-	        error_code = clGetDeviceIDs(best_platform, devtype, numDevices, &devices[0], NULL);	
-	        if (error_code != CL_SUCCESS) {
-            return;
-	        }
           break;
         }
       }
 
-      printf("platform %d devices\n", numDevices);
+      #ifdef WIN32
+        const cl_context_properties props[] = {
+          CL_CONTEXT_PLATFORM, (cl_context_properties)best_platform,
+          CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
+          CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
+          0
+        };
+      #else
+        const cl_context_properties *props = NULL;
+      #endif
 
-      // create a compute context with GPU device
-      context = clCreateContext(NULL, devices.size(), &devices[0], NULL, NULL, &error_code);
+      // for now, assume all devices are gl/cl capable.
+      devices.resize(numDevices);
+  	  error_code = clGetDeviceIDs(best_platform, devtype, numDevices, devices.data(), NULL);	
+
+      /*size_t size = 0;
+      error_code = clGetGLContextInfoKHR(props, CL_DEVICES_FOR_GL_CONTEXT_KHR, 0, NULL, &size);
+      devices.resize(size / sizeof(cl_device_id));
+      error_code = clGetGLContextInfoKHR(props, CL_DEVICES_FOR_GL_CONTEXT_KHR, size, devices.data(), NULL);
+      */
+
+      context = clCreateContext(props, devices.size(), devices.data(), NULL, NULL, &error_code);
       if (!context) return;
  
       queue = clCreateCommandQueue(context, devices[0], 0, NULL);
       if (!queue) return;
- 
-      FILE *src = fopen(cl_filename, "rb");
-      if (!src) {
-        char cwd[256];
-        _getcwd(cwd, 256);
-        fprintf(stderr, "could not open kernel %s/%s\n", cwd, cl_filename);
-        return;
-      }
+    }
 
-      fseek(src, 0, SEEK_END);
-      size_t source_size = ftell(src);
-      printf("size=%d\n", source_size);
-      source.resize(source_size+1);
-      fseek(src, 0, SEEK_SET);
-      fread(&source[0], 1, source_size, src);
-      source[source_size] = 0;
-      fclose(src);
+    void build_program(const char *cl_filename, const char *defines = "") {
+      dynarray<uint8_t> source;
+      app_utils::get_url(source, cl_filename);
+      source.push_back(0);
 
       // create the compute program
-      const char *source_ptr = (const char*)&source[0];
-      puts(source_ptr);
+      const char *source_ptr[] = { defines, (const char*)&source[0] };
+      size_t source_sizes[] = { strlen(defines), (size_t)source.size() };
+      //fputs(source_ptr, log("opencl source\n"));
 
-      program = clCreateProgramWithSource(context, 1, &source_ptr, &source_size, &error_code);
+      program = clCreateProgramWithSource(context, 2, source_ptr, source_sizes, &error_code);
       if (!program || error_code) {
+        log("unable to create program\n");
         return;
       }
  
@@ -179,14 +177,196 @@ namespace octet {
       //printf("program=%p\n", program);
       error_code = clBuildProgram(program, devices.size(), &devices[0], NULL, NULL, NULL);
       if (error_code) {
-        char log[2048];
-        clGetProgramBuildInfo(program, devices[0], CL_PROGRAM_BUILD_LOG, sizeof(log), &log, NULL);
-        fputs(log, stderr);
+        char build_log[2048];
+        clGetProgramBuildInfo(program, devices[0], CL_PROGRAM_BUILD_LOG, sizeof(build_log), &build_log, NULL);
+        fputs(build_log, log("build errors:\n"));
         return;
       }
 
-      num_args = 0;
-      printf("done\n");
+      //printf("done\n");
+      log("done creating opencl context\n");
+    }
+
+  public:
+
+    class mem {
+    protected:
+      cl_mem obj;
+      int ref_count;
+      opencl &cl;
+    public:
+      mem(opencl &_cl) : cl(_cl) {
+        ref_count = 0;
+        obj = 0;
+      }
+
+      /// create an opencl memory from cpu memory
+      mem(opencl &_cl, unsigned flags, const void *ptr, size_t size) : cl(_cl) {
+        obj = clCreateBuffer(cl.context, flags, size, (void*)ptr, &cl.error_code);
+      }
+
+      /// queue a copy from a buffer to cpu memory
+      cl_event read(size_t size, void *ptr, cl_event event=0, bool want_res_event=false) {
+        cl_event res_event = 0;
+        cl.error_code = clEnqueueReadBuffer(cl.queue, obj, CL_FALSE, 0, size, ptr, event != 0, &event, want_res_event ? &res_event : NULL);
+        return res_event;
+      }
+
+      /// queue a copy from cpu memory to a buffer
+      cl_event write(size_t size, const void *ptr, cl_event event=0, bool want_res_event=false) {
+        cl_event res_event = 0;
+        cl.error_code = clEnqueueWriteBuffer(cl.queue, obj, CL_FALSE, 0, size, ptr, event != 0, &event, want_res_event ? &res_event : NULL);
+        return res_event;
+      }
+
+      void add_ref() { ++ref_count; }
+      void release() { if (!--ref_count) { clReleaseMemObject(obj); obj = 0; } }
+      cl_mem get_obj() const { return obj; }
+    };
+
+    class gl_object : public mem {
+    public:
+      gl_object(opencl &_cl) : mem(cl) {
+      }
+
+      /// acquire an opengl object for reading/writing
+      cl_event gl_acquire(cl_event event = 0, bool want_res_event=false) {
+        cl_event res_event = 0;
+        cl.error_code = clEnqueueAcquireGLObjects(cl.queue, 1, &obj, event != 0, &event, want_res_event ? &res_event : NULL);
+        return res_event;
+      }
+
+      /// release an opengl object for reading/writing
+      cl_event gl_release(cl_event event = 0, bool want_res_event=false) {
+        cl_event res_event = 0;
+        cl.error_code = clEnqueueReleaseGLObjects(cl.queue, 1, &obj, event != 0, &event, want_res_event ? &res_event : NULL);
+        return res_event;
+      }
+    };
+
+    class image : public gl_object {
+    public:
+      /// create an opencl memory from an octet image object
+      image(opencl &_cl, unsigned flags, octet::scene::image *img, int mip_level=0) : gl_object(_cl) {
+        GLuint target = img->get_target();
+        GLuint texture = img->get_gl_texture();
+        obj =
+          target == GL_TEXTURE_3D ? clCreateFromGLTexture3D(cl.context, flags, target, mip_level, texture, &cl.error_code) :
+          clCreateFromGLTexture2D(cl.context, flags, target, mip_level, texture, &cl.error_code)
+        ;
+      }
+    };
+
+    class gl_resource : public gl_object {
+    public:
+      /// create an opencl memory from an octet gl_resource
+      gl_resource(opencl &_cl, unsigned flags, octet::resources::gl_resource *res) : gl_object(_cl) {
+        obj = clCreateFromGLBuffer(cl.context, flags, res->get_buffer(), &cl.error_code);
+      }
+    };
+
+    class kernel {
+      cl_kernel obj;
+      int ref_count;
+      cl_int num_args;
+      opencl &cl;
+    public:
+      kernel(opencl &_cl, const char *kernel_name) : cl(_cl) {
+        obj = clCreateKernel(cl.program, kernel_name, NULL);
+        ref_count = 0;
+        num_args = 0;
+      }
+
+      /// begin pushing arguments
+      void begin() {
+        num_args = 0;
+      }
+
+      /// push an argument
+      template<class arg_t> void push(arg_t value) {
+        cl.error_code = clSetKernelArg(obj, num_args++, sizeof(value), (void *)&value);
+        if (cl.error_code) { log("push: error %s\n", cl.get_cl_error_name(cl.error_code)); }
+      }
+
+      /// queue a call
+      cl_event call(size_t num_work_items, size_t work_group_size, cl_event event=0, bool want_res_event=false) {
+  	    size_t global_work_size[1] = {num_work_items};
+  	    size_t local_work_size[1] = {work_group_size};
+        cl_event res_event;
+        cl.error_code = clEnqueueNDRangeKernel(cl.queue, obj, 1, NULL, global_work_size, local_work_size, event != 0, &event, want_res_event ? &res_event : NULL);
+        num_args = 0;
+        if (cl.error_code) { log("call: error %s\n", cl.get_cl_error_name(cl.error_code)); }
+        return res_event;
+      }
+
+      void add_ref() { ++ref_count; }
+      void release() { if (!--ref_count) { clReleaseKernel(obj); obj = 0; } }
+      cl_kernel get_obj() const { return obj; }
+    };
+
+  public:
+    opencl() {
+      init(NULL, NULL);
+    }
+
+    /// Create a context, queue and program for opencl.
+    /// The program may contain multiple kernels.
+    void init(const char *cl_filename, const char *prefered_platform = "NVIDIA", const char *defines = "") {
+      error_code = 0;
+      context = 0;
+      queue = 0;
+      program = 0;
+
+      if (!cl_filename || !prefered_platform) {
+        return;
+      }
+
+      cl_platform_id best_platform = get_prefered_platform(prefered_platform);
+	    if (error_code != CL_SUCCESS) {
+        return;
+	    }
+
+      init_devices_and_queues(best_platform);
+	    if (error_code != CL_SUCCESS) {
+        return;
+	    }
+
+      if (cl_filename) {
+        build_program(cl_filename, defines);
+      }
+    }
+
+    /// clean up resources
+    ~opencl() {
+      clReleaseProgram(program);
+      clReleaseCommandQueue(queue);
+      clReleaseContext(context);
+    }
+
+    /// start any opencl activities in the queue.
+    void flush() {
+      clFlush(queue);
+    }
+
+    /// wait until all opencl activities have finished. (inefficient!)
+    void finish() {
+      clFinish(queue);
+    }
+
+    /// wait (stopping the host cpu) for an event
+    void wait(cl_event event) {
+      clWaitForEvents(1, &event);
+    }
+
+    /// return a string representing any error that has occured or NULL.
+    const char *get_error() {
+      if (error_code) {
+        return get_cl_error_name(error_code);
+      }
+      if (!context) return "no context";
+      if (!queue) return "no queue";
+      if (!program) return "no program";
+      return 0;
     }
   };
 }

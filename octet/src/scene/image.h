@@ -252,6 +252,15 @@ namespace octet { namespace scene {
       init(name);
     }
 
+    /// generate an image from an opengl texture
+    image(GLuint _target, GLuint _texture, unsigned _width, unsigned _height, unsigned _depth=1) {
+      gl_target = _target;
+      gl_texture = _texture;
+      width = _width;
+      height = _height;
+      depth = _depth; // for 3D textures
+    }
+
     /// release resources.
     ~image() {
     }
@@ -366,6 +375,14 @@ namespace octet { namespace scene {
     /// todo: merge gl_resource with textures.
     GLuint get_gl_target() const {
       return gl_target;
+    }
+
+    /// fast reload once get_gl_target has been called.
+    void reload(GLuint format, GLuint type, void *pixels) {
+      if (gl_target == 0) return;
+
+      glBindTexture(gl_target, gl_texture);
+      glTexSubImage2D(gl_target, 0, 0, 0, width, height, format, type, pixels);
     }
   };
 }}

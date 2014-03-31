@@ -96,7 +96,9 @@ namespace octet { namespace resources {
           printf("file %s not found. cwd=%s\n", path, getcwd(tmp, sizeof(tmp)));
         } else {
           fseek(file, 0, SEEK_END);
-          buffer.resize((unsigned)ftell(file));
+          unsigned size = (unsigned)ftell(file);
+          buffer.reserve(size+1); // 1 more byte for zero terminator on a text file
+          buffer.resize(size);
           fseek(file, 0, SEEK_SET);
           fread(buffer.data(), 1, buffer.size(), file);
           fclose(file);
