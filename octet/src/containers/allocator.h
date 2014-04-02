@@ -52,7 +52,7 @@ namespace octet { namespace containers {
   class allocator {
     // singleton state, a bit like an old-world global variable
     struct state_t {
-      int num_bytes;
+      size_t num_bytes;
     };
 
     static state_t &state() {

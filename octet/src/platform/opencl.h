@@ -22,8 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#include "CL/cl.h"
-
 namespace octet {
   /// wrapper for building opencl programs and executing them.
   class opencl {
@@ -106,15 +104,31 @@ namespace octet {
 	    }
 
       cl_platform_id best_platform = platforms[0];
-      for (cl_uint i = 1; i < numPlatforms; ++i) {
+      for (cl_uint i = 0; i < numPlatforms; ++i) {
 		    cl_platform_id platform = platforms[i];
+        cl_int mcu;
+  	    cl_uint numDevices = 0;
+        cl_int devtype = CL_DEVICE_TYPE_GPU;
+        size_t gms, lms;
+	      error_code = clGetDeviceIDs(best_platform, devtype, 0, NULL, &numDevices);	
+        devices.resize(numDevices);
+  	    error_code = clGetDeviceIDs(best_platform, devtype, numDevices, devices.data(), NULL);
+        clGetDeviceInfo(devices[0], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(mcu), &mcu, NULL);
+        clGetDeviceInfo(devices[0], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(gms), &gms, NULL);
+        clGetDeviceInfo(devices[0], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(lms), &lms, NULL);
         char buf[512];
         clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(buf), buf, NULL);
+        printf("%-40s:   %2d devs  %2d cus  %5d MB global  %5d local\n", buf, numDevices, mcu, (unsigned)gms/0x100000, (unsigned)lms);
         if (strstr(buf, prefered_platform)) {
           best_platform = platform;
         }
       }
 
+      {
+        char buf[512];
+        clGetPlatformInfo(best_platform, CL_PLATFORM_VENDOR, sizeof(buf), buf, NULL);
+        printf("best platform %s\n", buf);
+      }
       return best_platform;
     }
 
@@ -129,15 +143,21 @@ namespace octet {
         }
       }
 
+      cl_context_properties fullprops[] = {
+        CL_CONTEXT_PLATFORM, (cl_context_properties)best_platform,
+        CL_GL_CONTEXT_KHR, (cl_context_properties)0,
+        CL_WGL_HDC_KHR, (cl_context_properties)0,
+        0
+      };
+      const cl_context_properties *props = NULL;
       #ifdef WIN32
-        const cl_context_properties props[] = {
-          CL_CONTEXT_PLATFORM, (cl_context_properties)best_platform,
-          CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
-          CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
-          0
-        };
+        HGLRC wglcontext = wglGetCurrentContext();
+        if (wglcontext) {
+          fullprops[3] = (cl_context_properties)wglcontext;
+          fullprops[5] = (cl_context_properties)wglGetCurrentDC();
+          props = fullprops;
+        }
       #else
-        const cl_context_properties *props = NULL;
       #endif
 
       // for now, assume all devices are gl/cl capable.
@@ -188,93 +208,159 @@ namespace octet {
     }
 
   public:
-
-    class mem {
-    protected:
-      cl_mem obj;
-      int ref_count;
-      opencl &cl;
+    template<class obj_t> class container {
+      obj_t obj;
+      opencl *cl;
     public:
-      mem(opencl &_cl) : cl(_cl) {
-        ref_count = 0;
+      container() {
         obj = 0;
+        cl = 0;
+      }
+      container(opencl *_cl, obj_t _obj) {
+        cl = _cl;
+        obj = _obj;
+      }
+      container(const container &rhs) {
+        cl = rhs.cl;
+        set_obj(rhs.obj);
+      }
+      container &operator=(const container &rhs) {
+        cl = rhs.cl;
+        set_obj(rhs.obj);
+        return *this;
+      }
+      container &operator=(obj_t _obj) {
+        set_obj(_obj);
+        return *this;
+      }
+      ~container() {
+        set_obj(0);
+      }
+      void set_obj(obj_t _obj) {
+        if (_obj) retain(_obj);
+        if (obj) release(obj);
+        obj = _obj;
+      }
+      obj_t get_obj() const {
+        return obj;
+      }
+      opencl *get_cl() const {
+        return cl;
+      }
+    };
+
+    static void retain(cl_mem obj) { clRetainMemObject(obj); }
+    static void release(cl_mem obj) { clReleaseMemObject(obj); }
+    static void retain(cl_kernel obj) { clRetainKernel(obj); }
+    static void release(cl_kernel obj) { clReleaseKernel(obj); }
+    static void retain(cl_event obj) { clRetainEvent(obj); }
+    static void release(cl_event obj) { clReleaseEvent(obj); }
+
+    class mem : public container<cl_mem> {
+    public:
+      mem(opencl *_cl=0, cl_mem _obj=0) : container(_cl, _obj) {
       }
 
-      /// create an opencl memory from cpu memory
-      mem(opencl &_cl, unsigned flags, const void *ptr, size_t size) : cl(_cl) {
-        obj = clCreateBuffer(cl.context, flags, size, (void*)ptr, &cl.error_code);
+      mem(opencl *_cl, unsigned flags, size_t size, void *ptr) : container(_cl, 0) {
+        set_obj(
+          clCreateBuffer(_cl->context, flags, size, ptr, &_cl->error_code)
+        );
       }
 
       /// queue a copy from a buffer to cpu memory
       cl_event read(size_t size, void *ptr, cl_event event=0, bool want_res_event=false) {
         cl_event res_event = 0;
-        cl.error_code = clEnqueueReadBuffer(cl.queue, obj, CL_FALSE, 0, size, ptr, event != 0, &event, want_res_event ? &res_event : NULL);
+        opencl *cl = get_cl();
+        cl->error_code = clEnqueueReadBuffer(cl->queue, get_obj(), CL_FALSE, 0, size, ptr, event != 0, &event, want_res_event ? &res_event : NULL);
         return res_event;
       }
 
       /// queue a copy from cpu memory to a buffer
       cl_event write(size_t size, const void *ptr, cl_event event=0, bool want_res_event=false) {
         cl_event res_event = 0;
-        cl.error_code = clEnqueueWriteBuffer(cl.queue, obj, CL_FALSE, 0, size, ptr, event != 0, &event, want_res_event ? &res_event : NULL);
+        opencl *cl = get_cl();
+        cl->error_code = clEnqueueWriteBuffer(cl->queue, get_obj(), CL_FALSE, 0, size, ptr, event != 0, &event, want_res_event ? &res_event : NULL);
         return res_event;
       }
-
-      void add_ref() { ++ref_count; }
-      void release() { if (!--ref_count) { clReleaseMemObject(obj); obj = 0; } }
-      cl_mem get_obj() const { return obj; }
     };
 
-    class gl_object : public mem {
+    class gl_buffer : public container<cl_mem> {
     public:
-      gl_object(opencl &_cl) : mem(cl) {
+      gl_buffer(opencl *_cl, cl_mem _obj) : container(_cl, _obj) {
       }
 
       /// acquire an opengl object for reading/writing
       cl_event gl_acquire(cl_event event = 0, bool want_res_event=false) {
         cl_event res_event = 0;
-        cl.error_code = clEnqueueAcquireGLObjects(cl.queue, 1, &obj, event != 0, &event, want_res_event ? &res_event : NULL);
+        cl_mem memobj = get_obj();
+        opencl *cl = get_cl();
+        cl->error_code = clEnqueueAcquireGLObjects(cl->queue, 1, &memobj, event != 0, &event, want_res_event ? &res_event : NULL);
         return res_event;
       }
 
       /// release an opengl object for reading/writing
       cl_event gl_release(cl_event event = 0, bool want_res_event=false) {
         cl_event res_event = 0;
-        cl.error_code = clEnqueueReleaseGLObjects(cl.queue, 1, &obj, event != 0, &event, want_res_event ? &res_event : NULL);
+        cl_mem memobj = get_obj();
+        opencl *cl = get_cl();
+        cl->error_code = clEnqueueReleaseGLObjects(cl->queue, 1, &memobj, event != 0, &event, want_res_event ? &res_event : NULL);
         return res_event;
       }
     };
 
-    class image : public gl_object {
+    class image : public gl_buffer {
     public:
       /// create an opencl memory from an octet image object
-      image(opencl &_cl, unsigned flags, octet::scene::image *img, int mip_level=0) : gl_object(_cl) {
+      image(opencl *_cl, unsigned flags, octet::scene::image *img, int mip_level=0) : gl_buffer(_cl, 0) {
         GLuint target = img->get_target();
         GLuint texture = img->get_gl_texture();
-        obj =
-          target == GL_TEXTURE_3D ? clCreateFromGLTexture3D(cl.context, flags, target, mip_level, texture, &cl.error_code) :
-          clCreateFromGLTexture2D(cl.context, flags, target, mip_level, texture, &cl.error_code)
-        ;
+        opencl *cl = get_cl();
+        set_obj(
+          target == GL_TEXTURE_3D ? clCreateFromGLTexture3D(cl->context, flags, target, mip_level, texture, &cl->error_code) :
+          clCreateFromGLTexture2D(cl->context, flags, target, mip_level, texture, &cl->error_code)
+        );
       }
     };
 
-    class gl_resource : public gl_object {
+    class gl_resource : public gl_buffer {
     public:
       /// create an opencl memory from an octet gl_resource
-      gl_resource(opencl &_cl, unsigned flags, octet::resources::gl_resource *res) : gl_object(_cl) {
-        obj = clCreateFromGLBuffer(cl.context, flags, res->get_buffer(), &cl.error_code);
+      gl_resource(opencl *_cl, unsigned flags, octet::resources::gl_resource *res) : gl_buffer(_cl, 0) {
+        opencl *cl = get_cl();
+        set_obj(
+          clCreateFromGLBuffer(cl->context, flags, res->get_buffer(), &cl->error_code)
+        );
       }
     };
 
-    class kernel {
-      cl_kernel obj;
-      int ref_count;
+    class kernel : public container<cl_kernel> {
       cl_int num_args;
-      opencl &cl;
+      size_t local_mem_size;
+      size_t prefered_workgroup_size;
+      size_t max_work_items;
     public:
-      kernel(opencl &_cl, const char *kernel_name) : cl(_cl) {
-        obj = clCreateKernel(cl.program, kernel_name, NULL);
-        ref_count = 0;
+      kernel() : container(0, 0) {
+      }
+
+      kernel(opencl *cl, const char *kernel_name) : container(cl, 0) {
+        set_obj(
+          clCreateKernel(cl->program, kernel_name, NULL)
+        );
         num_args = 0;
+        prefered_workgroup_size = 32;
+        local_mem_size = 0;
+
+        clGetKernelWorkGroupInfo(get_obj(), cl->devices[0], CL_KERNEL_LOCAL_MEM_SIZE, sizeof(local_mem_size), &local_mem_size, NULL);
+        clGetKernelWorkGroupInfo(get_obj(), cl->devices[0], CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(prefered_workgroup_size), &prefered_workgroup_size, NULL);
+        max_work_items = prefered_workgroup_size * 32;
+      }
+
+      size_t get_local_mem_size() const {
+        return local_mem_size;
+      }
+
+      size_t get_prefered_workgroup_size() const {
+        return prefered_workgroup_size;
       }
 
       /// begin pushing arguments
@@ -283,25 +369,60 @@ namespace octet {
       }
 
       /// push an argument
-      template<class arg_t> void push(arg_t value) {
-        cl.error_code = clSetKernelArg(obj, num_args++, sizeof(value), (void *)&value);
-        if (cl.error_code) { log("push: error %s\n", cl.get_cl_error_name(cl.error_code)); }
+      template<class arg_t> void push(const arg_t &value) {
+        opencl *cl = get_cl();
+        if (cl->error_code) return;
+        cl->error_code = clSetKernelArg(get_obj(), num_args++, sizeof(value), (void *)&value);
+        if (cl->error_code) { log("push: error %s\n", cl->get_cl_error_name(cl->error_code)); }
+      }
+
+      // push a memory argument
+      template<> void push<mem>(const mem &_value) {
+        push(_value.get_obj());
       }
 
       /// queue a call
       cl_event call(size_t num_work_items, size_t work_group_size, cl_event event=0, bool want_res_event=false) {
-  	    size_t global_work_size[1] = {num_work_items};
-  	    size_t local_work_size[1] = {work_group_size};
         cl_event res_event;
-        cl.error_code = clEnqueueNDRangeKernel(cl.queue, obj, 1, NULL, global_work_size, local_work_size, event != 0, &event, want_res_event ? &res_event : NULL);
+        work_group_size = work_group_size ? work_group_size : prefered_workgroup_size;
+        opencl *cl = get_cl();
+        if (cl->error_code) return 0;
+
+        size_t offset = 0;
+        //printf("%08x work items\n", num_work_items);
+        while (num_work_items) {
+          size_t cur_work_items = num_work_items > max_work_items ? max_work_items : num_work_items;
+          if (cur_work_items < work_group_size) {
+            work_group_size = 1;
+          } else if (cur_work_items % work_group_size) {
+            cur_work_items = cur_work_items / work_group_size * work_group_size;
+          }
+          //printf("  %08x %08x %08x\n", offset, cur_work_items, work_group_size);
+
+  	      size_t global_work_offset[1] = {offset};
+  	      size_t global_work_size[1] = {cur_work_items};
+  	      size_t local_work_size[1] = {work_group_size};
+          cl->error_code = clEnqueueNDRangeKernel(
+            cl->queue, get_obj(), 1, global_work_offset, global_work_size, local_work_size,
+            event != 0, &event, want_res_event ? &res_event : NULL
+          );
+          if (cl->error_code) {
+            log("call: error %s\n", cl->get_cl_error_name(cl->error_code));
+          }
+          cl->flush();
+
+          offset += cur_work_items;
+          num_work_items -= cur_work_items;
+        }
         num_args = 0;
-        if (cl.error_code) { log("call: error %s\n", cl.get_cl_error_name(cl.error_code)); }
         return res_event;
       }
+    };
 
-      void add_ref() { ++ref_count; }
-      void release() { if (!--ref_count) { clReleaseKernel(obj); obj = 0; } }
-      cl_kernel get_obj() const { return obj; }
+    class event : public container<cl_event> {
+    public:
+      event(opencl *_cl, cl_event _event) : container(_cl, _event) {
+      }
     };
 
   public:

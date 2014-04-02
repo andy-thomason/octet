@@ -27,6 +27,8 @@ namespace octet { namespace containers {
   template <class item_t, class allocator_t=allocator, bool use_new_delete=true> class dynarray {
     item_t *data_;
     typedef unsigned int_size_t;
+
+    // note we don't use size_t for these as we don't expect to use arrays > 4G and we care about performance!
     int_size_t size_;
     int_size_t capacity_;
     enum { min_capacity = 8 };
@@ -151,10 +153,10 @@ namespace octet { namespace containers {
     }
   
     /// Access an element in the array.
-    item_t &operator[](int_size_t elem) { return data_[elem]; }
+    item_t &operator[](size_t elem) { return data_[elem]; }
 
     /// Read an element in the array.
-    const item_t &operator[](int_size_t elem) const { return data_[elem]; }
+    const item_t &operator[](size_t elem) const { return data_[elem]; }
   
     /// Return number of elements in the array
     int_size_t size() const { return size_; }
@@ -169,7 +171,7 @@ namespace octet { namespace containers {
     item_t *data() { return data_; }
   
     /// Resize the array to make it bigger or smaller.
-    void resize(int_size_t new_length) {
+    void resize(size_t new_length) {
       bool trace = false; // hack this for detailed traces
       dynarray_dummy_t x;
       if (new_length >= size_ && new_length <= capacity_) {
@@ -181,10 +183,10 @@ namespace octet { namespace containers {
             ++len;
           }
         }
-        size_ = new_length;
+        size_ = (int_size_t)new_length;
       } else if (new_length > capacity_) {
         if (trace) printf("case 2: growing dynarray beyond capacity_\n");
-        int_size_t new_capacity = new_length < size_ ? size_ : new_length;
+        int_size_t new_capacity = ((int_size_t)new_length < size_ ? size_ : (int_size_t)new_length);
 
         if (new_length == size_ + 1) {
           // growing array by 1: round up to power of two.
@@ -201,7 +203,7 @@ namespace octet { namespace containers {
           }
         }
 
-        size_ = new_length;
+        size_ = (int_size_t)new_length;
       } else {
         if (trace) printf("case 3: shrinking dynarray\n");
 
@@ -212,7 +214,7 @@ namespace octet { namespace containers {
             data_[len].~item_t();
           }
         }
-        size_ = new_length;
+        size_ = (int_size_t)new_length;
         //if (size_ == 0) reset();
       }
     }

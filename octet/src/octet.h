@@ -79,6 +79,9 @@
     /// Functions and classes used to interact with physics systems
     namespace physics {}
 
+    /// System utilities and hardware
+    namespace platform {}
+
     using namespace containers;
     using namespace resources;
     using namespace scene;
@@ -87,6 +90,7 @@
     using namespace loaders;
     using namespace shaders;
     using namespace physics;
+    using namespace platform;
   }
 
   // defines and configuration
@@ -97,6 +101,7 @@
 
   // target specific support: Windows, Mac, Linux, PS Vita
   #include "platform/machine_specific.h"
+  #include "platform/args_parser.h"
 
   // math library
   #include "math/math.h"
@@ -129,6 +134,7 @@
 
   #ifdef OCTET_OPENCL
     #include "platform/CL/cl.h"
+    #include "platform/CL/cl_gl.h"
     #include "platform/opencl.h"
   #endif
 
@@ -144,6 +150,4 @@
   // forward references
   #include "resources/resources.inl"
   #include "resources/mesh_builder.inl"
-
-
 #endif

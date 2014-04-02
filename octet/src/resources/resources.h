@@ -17,6 +17,7 @@
   }
 
   // resources
+  #include "../resources/file_map.h"
   #include "../resources/zip_file.h"
   #include "../resources/app_utils.h"
   #include "../resources/visitor.h"

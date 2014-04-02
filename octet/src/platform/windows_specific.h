@@ -269,11 +269,11 @@ namespace octet {
           app *app = m[msg.hwnd];
           if (app) {
             if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-              app->set_key(app::translate(msg.wParam), msg.message == WM_KEYDOWN);
+              app->set_key(app::translate((unsigned)msg.wParam), msg.message == WM_KEYDOWN);
             } else if (msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP) {
-              app->set_key(app::translate(msg.wParam), msg.message == WM_SYSKEYDOWN);
+              app->set_key(app::translate((unsigned)msg.wParam), msg.message == WM_SYSKEYDOWN);
             } else if (msg.message == WM_MOUSEMOVE) {
-              app->set_mouse_pos(msg.lParam & 0xffff, msg.lParam >> 16);
+              app->set_mouse_pos((unsigned)msg.lParam & 0xffff, (unsigned)msg.lParam >> 16);
             } else if (msg.message == WM_MOUSEWHEEL) {
               app->set_mouse_wheel(app->get_mouse_wheel() + (int)msg.wParam);
             } else if (msg.message == WM_LBUTTONDOWN || msg.message == WM_LBUTTONUP) {

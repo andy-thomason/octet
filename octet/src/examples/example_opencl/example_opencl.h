@@ -11,8 +11,8 @@ namespace octet {
     ref<visual_scene> app_scene;
     GLuint texture;
     int width, height, time, workgroup_size;
-    ref<opencl::mem> image_mem;
-    ref<opencl::kernel> kernel;
+    opencl::mem image_mem;
+    opencl::kernel kernel;
     dynarray<uint32_t> pixels;
     image *img;
 
@@ -48,8 +48,8 @@ namespace octet {
       img = new image(GL_TEXTURE_2D, texture, width, height);
 
       // NOTE: we are using the dma kernel here. If the sample does not run, 
-      image_mem = new opencl::mem(cl, CL_MEM_WRITE_ONLY, 0, width*height*4);
-      kernel = new opencl::kernel(cl, "dma_kernel");
+      image_mem = opencl::mem(&cl, CL_MEM_WRITE_ONLY, width*height*4, NULL);
+      kernel = opencl::kernel(&cl, "dma_kernel");
       pixels.resize(width * height);
 
       material *mat = new material(img);
@@ -62,15 +62,15 @@ namespace octet {
     /// update the texture using opencl
     void update_texture() {
       // call the kernel
-      kernel->begin();
-      kernel->push(image_mem->get_obj());
-      kernel->push(width);
-      kernel->push(height);
-      kernel->push(time);
-      cl_event call = kernel->call(height, workgroup_size, 0, true);
+      kernel.begin();
+      kernel.push(image_mem);
+      kernel.push(width);
+      kernel.push(height);
+      kernel.push(time);
+      cl_event call = kernel.call(height, workgroup_size, 0, true);
 
       // read into CPU memory (after call is finished)
-      cl_event read = image_mem->read(width*height*4, pixels.data(), call, true);
+      cl_event read = image_mem.read(width*height*4, pixels.data(), call, true);
 
       // pause the CPU (until read is finished)
       cl.wait(read);

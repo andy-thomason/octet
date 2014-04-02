@@ -113,7 +113,7 @@ namespace octet { namespace helpers {
       dict = dict_;
 
       // create a socket to listen for connections
-      listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+      listen_socket = (int)socket(AF_INET, SOCK_STREAM, 0);
 
       // bind the socket to a specific port
       sockaddr_in addr;
@@ -138,7 +138,7 @@ namespace octet { namespace helpers {
     // called once per frame
     void update() {
       // establish new sessions
-      int client_socket = accept(listen_socket, 0, 0);
+      int client_socket = (int)accept(listen_socket, 0, 0);
       if (client_socket >= 0) {
         log("http: new connection socket %d\n", client_socket);
         set_non_blocking(client_socket);
