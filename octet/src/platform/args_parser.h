@@ -44,7 +44,6 @@ namespace octet { namespace platform {
     }
 
     void init(int argc, const char * const * argv, const char * const * _opts) {
-      int free_arg = -1;
       opts = _opts;
       error = 0;
 
@@ -78,7 +77,6 @@ namespace octet { namespace platform {
             error = "bad argument";
             return;
           }
-          const char *src = opts[opt_idx*2 + 1];
           size_t opt_len = opt_lengths[opt_idx];
           bool has_equals = arg[opt_len] == '=';
           if (opt_has_arg(opt_idx)) {

@@ -22,7 +22,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#if 0
 namespace octet {
+  /// push an argument
+  template<class arg_t> void push(const arg_t &value) {
+    opencl *cl = get_cl();
+    if (cl->error_code) return;
+    cl->error_code = clSetKernelArg(get_obj(), num_args++, sizeof(value), (void *)&value);
+    if (cl->error_code) { log("push: error %s\n", cl->get_cl_error_name(cl->error_code)); }
+  }
+
+  // push a memory argument
+  template<> void push<mem>(const mem &_value) {
+    push(_value.get_obj());
+  }
+
+  
   /// wrapper for building opencl programs and executing them.
   class opencl {
     cl_int error_code;
@@ -368,19 +383,6 @@ namespace octet {
         num_args = 0;
       }
 
-      /// push an argument
-      template<class arg_t> void push(const arg_t &value) {
-        opencl *cl = get_cl();
-        if (cl->error_code) return;
-        cl->error_code = clSetKernelArg(get_obj(), num_args++, sizeof(value), (void *)&value);
-        if (cl->error_code) { log("push: error %s\n", cl->get_cl_error_name(cl->error_code)); }
-      }
-
-      // push a memory argument
-      template<> void push<mem>(const mem &_value) {
-        push(_value.get_obj());
-      }
-
       /// queue a call
       cl_event call(size_t num_work_items, size_t work_group_size, cl_event event=0, bool want_res_event=false) {
         cl_event res_event;
@@ -491,4 +493,5 @@ namespace octet {
     }
   };
 }
+#endif
 
