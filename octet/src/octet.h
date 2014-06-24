@@ -126,7 +126,7 @@
 
   // physics
   #ifdef OCTET_BULLET
-    #include "external/bullet/bullet.h"
+    #include "../external/bullet/bullet.h"
   #endif
 
   // scene (layer2)

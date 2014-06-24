@@ -14,7 +14,7 @@ namespace octet {
     btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
     btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
     btSequentialImpulseConstraintSolver *solver;  /// handler to resolve collisions
-    btContinuousDynamicsWorld *world;             /// physics world, contains rigid bodies
+    btDiscreteDynamicsWorld *world;             /// physics world, contains rigid bodies
 
     dynarray<btRigidBody*> rigid_bodies;
     dynarray<scene_node*> nodes;
@@ -51,7 +51,7 @@ namespace octet {
       dispatcher = new btCollisionDispatcher(&config);
       broadphase = new btDbvtBroadphase();
       solver = new btSequentialImpulseConstraintSolver();
-      world = new btContinuousDynamicsWorld(dispatcher, broadphase, solver, &config);
+      world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, &config);
     }
 
     ~example_physics() {
