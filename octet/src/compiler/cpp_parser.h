@@ -664,7 +664,7 @@ namespace octet
           curScope = saveScope;
 
           if( !expect( tok_rparen ) ) {
-            return false;
+            return NULL;
           }
           getNext();
         }

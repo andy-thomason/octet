@@ -477,6 +477,7 @@ struct btMultibodyLink
 
 		switch(m_jointType)
 		{
+			default: break;
 			case eRevolute:
 			{
 				m_cachedRotParentToThis = btQuaternion(getAxisTop(0),-pJointPos[0]) * m_zeroRotParentToThis;

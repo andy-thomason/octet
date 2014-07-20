@@ -1304,6 +1304,7 @@ void btMultiBody::stepVelocitiesMultiDof(btScalar dt,
         btScalar *invDi = &invD[m_links[i].m_dofOffset*m_links[i].m_dofOffset];
 		switch(m_links[i].m_jointType)
 		{
+			default: break;
 			case btMultibodyLink::ePrismatic:
 			case btMultibodyLink::eRevolute:
 			{
@@ -2561,6 +2562,7 @@ void btMultiBody::stepPositionsMultiDof(btScalar dt, btScalar *pq, btScalar *pqd
 
 		switch(m_links[i].m_jointType)
 		{
+			default: break;
 			case btMultibodyLink::ePrismatic:
 			case btMultibodyLink::eRevolute:
 			{
@@ -2676,6 +2678,7 @@ void btMultiBody::filConstraintJacobianMultiDof(int link,
 			// calculate the jacobian entry
 			switch(m_links[i].m_jointType)
 			{
+				default: break;
 				case btMultibodyLink::eRevolute:
 				{
 					results[m_links[i].m_dofOffset] = n_local_lin[i+1].dot(m_links[i].getAxisTop(0).cross(p_minus_com_local[i+1]) + m_links[i].getAxisBottom(0));

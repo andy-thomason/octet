@@ -28,6 +28,17 @@ to a folder under the "xcode" folder in your project.
 By default, the framework travels up two directories before looking for
 files.
 
+Make (on any system):
+
+The simplet way of building is to use "make". But you have to have installed
+some unix utilities (such as unxutils on sourceforge) if you are using Windows.
+
+Just typing
+
+$ make
+
+will build all the examples in bin/
+
 
 Example projects are in src\examples
 
