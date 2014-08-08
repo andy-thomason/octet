@@ -146,15 +146,15 @@ namespace octet {
       HICON icon = LoadIcon(0, IDI_ASTERISK);
       HCURSOR cursor = LoadCursor(0, IDC_ARROW);
 
-      static WNDCLASS wndclass = {
+      static WNDCLASSW wndclass = {
         CS_HREDRAW | CS_VREDRAW, DefWindowProc, 0, 0, instance,
-        icon, cursor, brush, 0, "MyClass"
+        icon, cursor, brush, 0, L"MyClass"
       };
-      RegisterClass (&wndclass);
+      RegisterClassW (&wndclass);
 
       gl_context = 0;
      
-      window_handle = CreateWindow("MyClass", "octet",
+      window_handle = CreateWindowW(L"MyClass", L"octet",
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
       );
