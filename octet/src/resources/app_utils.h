@@ -31,7 +31,6 @@ namespace octet { namespace resources {
     /// Set and get the file prefix. This is used to find resource files in the game.
     static const char *prefix(const char *new_prefix=NULL) {
       static const char *value = NULL;
-      printf("prefix %s\n", value);
       if (new_prefix) {
         value = new_prefix;
       } else if (value == NULL) {
