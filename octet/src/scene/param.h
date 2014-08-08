@@ -28,7 +28,6 @@ namespace octet { namespace scene {
     stage_type stage_;
     uint16_t type;
   public:
-
     param(atom_t _name=atom_, uint16_t _type=0, stage_type _stage=stage_fragment) : name(_name), type(_type), stage_(_stage) {
     }
 
@@ -304,18 +303,11 @@ namespace octet { namespace scene {
 
   /// Shader that uses parameters.
   class param_shader : public shader {
-  public:
-    RESOURCE_META(param_shader)
+    std::string vertex_shader;
+    std::string fragment_shader;
+    dynarray<ref<param> > params;
 
-    param_shader() {
-    }
-
-    param_shader(dynarray<ref<param> > &params, const char *vertex_begin, const char *vertex_end, const char *fragment_begin, const char *fragment_end) {
-      std::string vertex_shader;
-      std::string fragment_shader;
-      vertex_shader.assign(vertex_begin, vertex_end);
-      fragment_shader.assign(fragment_begin, fragment_end);
-
+    void init() {
       shader::init(vertex_shader.data(), fragment_shader.data());
 
       param_bind_info pbi;
@@ -324,6 +316,16 @@ namespace octet { namespace scene {
       for (unsigned i = 0; i != params.size(); ++i) {
         params[i]->bind(pbi);
       }
+    }
+  public:
+    RESOURCE_META(param_shader)
+
+    param_shader() {
+    }
+
+    param_shader(dynarray<ref<param> > &params, const char *vertex_begin, const char *vertex_end, const char *fragment_begin, const char *fragment_end) : params(params) {
+      vertex_shader.assign(vertex_begin, vertex_end);
+      fragment_shader.assign(fragment_begin, fragment_end);
     }
   };
 }}

@@ -41,7 +41,7 @@ namespace octet { namespace containers {
     }
 
     /// copy constructor - avoid using this if possible.
-    ref(ref &rhs) {
+    ref(const ref &rhs) {
       item = rhs.item;
       if (item) item->add_ref();
     }

@@ -62,7 +62,7 @@ namespace octet { namespace containers {
       if (use_new_delete) {
         dynarray_dummy_t x;
         for (int_size_t i = 0; i != size_; ++i) {
-          new (data_ + i, x)item_t(rhs.data_);
+          new (data_ + i, x)item_t(rhs.data_[i]);
         }
       } else {
         memcpy(data_, rhs.data_, rhs.size_ * sizeof(item_t));
