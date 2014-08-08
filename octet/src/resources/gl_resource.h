@@ -44,6 +44,7 @@ namespace octet { namespace resources {
       uint16_t *u16() const { return (uint16_t*)ptr; }
       uint32_t *u32() const { return (uint32_t*)ptr; }
       float *f32() const { return (float*)ptr; }
+      vec4 *v4() const { return (vec4*)ptr; }
     };
 
     /// Helper class to make a read-only lock
@@ -57,6 +58,7 @@ namespace octet { namespace resources {
       const uint16_t *u16() const { return (const uint16_t*)ptr; }
       const uint32_t *u32() const { return (const uint32_t*)ptr; }
       const float *f32() const { return (const float*)ptr; }
+      const vec4 *v4() const { return (const vec4*)ptr; }
     };
   public:
     RESOURCE_META(gl_resource)

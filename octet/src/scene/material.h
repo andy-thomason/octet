@@ -22,9 +22,11 @@ namespace octet { namespace scene {
     dynarray<ref<param> > params;
 
     // storage for static uniforms such as colours and samplers
+    // these will be uniform buffers in future incarnations
     ref<gl_resource> static_buffer;
 
     // storage for dynamic uniforms such as matrices and lighting
+    // these will be uniform buffers in future incarnations
     ref<gl_resource> dynamic_buffer;
 
     // create the parameters that change frequently such as the matrices and lighting
@@ -45,87 +47,6 @@ namespace octet { namespace scene {
       params.push_back(new param_attribute(atom_normal, GL_FLOAT_VEC3));
     }
 
-    // create the final output of the vertex shader
-    void create_transform() {
-      //param *modelToProjection = get_param(atom_modelToProjection);
-      params.push_back(new param_op(atom_gl_Position, 0, atom_modelToProjection, atom_pos, param::op_mul, param::stage_vertex));
-
-      if (get_param(atom_modelToCamera) && get_param(atom_normal)) {
-        params.push_back(new param_custom(atom_tnormal, GL_FLOAT_VEC3, "", "  vec3 tnormal = (modelToCamera * vec4(normal, 0.0)).xyz;\n", param::stage_vertex));
-        //params.push_back(new param_op(atom_tnormal, GL_FLOAT_VEC3, atom_modelToCamera, atom_pos, param::op_mul, param::stage_vertex));
-      }
-
-      params.push_back(new param_custom(atom_tpos, GL_FLOAT_VEC3, "", "  vec3 tpos = (modelToCamera * pos).xyz;\n", param::stage_vertex));
-    }
-
-    // create the loop for generating the lighting
-    void create_lighting() {
-      if (!get_param(atom_lighting) || !get_param(atom_num_lights)) return;
-
-      if (get_param(atom_tnormal) && get_param(atom_diffuse)) {
-        if (!get_param(atom_nnormal)) {
-          params.push_back(new param_op(atom_nnormal, GL_FLOAT_VEC3, atom_tnormal, atom_, param::op_normalize, param::stage_fragment));
-        }
-        params.push_back(new param_op(atom_npos, GL_FLOAT_VEC3, atom_tpos, atom_, param::op_copy, param::stage_fragment));
-
-        params.push_back(
-          new param_custom(
-            atom_diffuse_light,
-            GL_FLOAT_VEC3,
-            "",
-            "  vec3 diffuse_light = lighting[0].xyz;\n"
-            "  for (int i = 0; i != num_lights; ++i) {\n"
-            "    vec3 light_pos = lighting[i * 4 + 1].xyz;\n"
-            "    vec3 light_direction = lighting[i * 4 + 2].xyz;\n"
-            "    vec3 light_color = lighting[i * 4 + 3].xyz;\n"
-            "    vec3 light_atten = lighting[i * 4 + 4].xyz;\n"
-            "    float diffuse_factor = max(dot(light_direction, nnormal), 0.0);\n"
-            //"    float atten = 1.0 / (0.0001 * dot(light_pos - npos, light_pos - npos));\n"
-            //"    float atten = dot(light_pos - npos, light_pos - npos) > 1000.0 ? 0.0 : 1.0;\n"
-            "    diffuse_light += diffuse_factor * light_color;\n"
-            "  }\n",
-            param::stage_fragment
-          )
-        );
-      }
-
-      if (get_param(atom_normal) && get_param(atom_specular) && get_param(atom_shininess)) {
-        if (!get_param(atom_nnormal)) {
-          params.push_back(new param_op(atom_nnormal, GL_FLOAT_VEC3, atom_normal, atom_, param::op_normalize, param::stage_fragment));
-        }
-        params.push_back(
-          new param_custom(
-            atom_specular_light,
-            GL_FLOAT_VEC3,
-            "",
-            "  vec3 specular_light = vec3(0.0, 0.0, 0.0);\n"
-            "  for (int i = 0; i != num_lights; ++i) {\n"
-            "    vec3 light_direction = lighting[i * 4 + 2].xyz;\n"
-            "    vec3 light_color = lighting[i * 4 + 3].xyz;\n"
-            "    vec3 half_direction = normalize(light_direction + vec3(0, 0, 1));\n"
-            "    float specular_factor = pow(max(dot(half_direction, nnormal), 0.0), shininess);\n"
-            "    specular_light += specular_factor * light_color;\n"
-            "  }\n",
-            param::stage_fragment
-          )
-        );
-      }
-    }
-
-    // create the final output of the fragment shader
-    void create_combiner() {
-      if (get_param(atom_diffuse_light) && get_param(atom_diffuse)) {
-        params.push_back(
-          new param_custom(atom_gl_FragColor, GL_FLOAT_VEC4, "", "  gl_FragColor = vec4(diffuse.xyz * diffuse_light, 1.0);\n", param::stage_fragment)
-          //new param_custom(atom_gl_FragColor, GL_FLOAT_VEC4, "", "  gl_FragColor = vec4(lighting[3].xyz, 1.0);\n", param::stage_fragment)
-        );
-      } else {
-        params.push_back(
-          new param_custom(atom_gl_FragColor, GL_FLOAT_VEC4, "", "  gl_FragColor = vec4(diffuse.xyz, 1.0);\n", param::stage_fragment)
-        );
-      }
-    }
-
   public:
     RESOURCE_META(material)
 
@@ -140,42 +61,51 @@ namespace octet { namespace scene {
     }
 
     /// Alternative constructor.
-    material(const vec4 &color) {
+    material(const vec4 &color, const char *vs_url = "shaders/default.vs", const char *fs_url = "shaders/default_solid.fs") {
       // materials are constructed from parameters which build the final shader.
       // this allows us to use OpenGLES2 (uniforms) and 3 (buffers) as well as new shader features.
       params.reserve(16);
 
       create_dynamic_params();
       create_attribute_params();
-      create_transform();
 
       param_buffer_info static_pbi(static_buffer, 1);
       params.push_back(new param_color(static_pbi, color, atom_diffuse, param::stage_fragment));
 
-      create_lighting();
-      create_combiner();
+      dynarray<uint8_t> vs;
+      dynarray<uint8_t> fs;
+      app_utils::get_url(vs, vs_url);
+      app_utils::get_url(fs, fs_url);
 
-      custom_shader = new param_shader(params);
+      custom_shader = new param_shader(
+        params,
+        (const char*)vs.data(), (const char*)(vs.data() + vs.size()),
+        (const char*)fs.data(), (const char*)(fs.data() + fs.size())
+      );
     }
 
     /// create a material from an existing image
-    material(image *img, sampler *smpl=NULL) {
+    material(image *img, sampler *smpl=NULL, const char *vs_url = "shaders/default.vs", const char *fs_url = "shaders/default_textured.fs") {
       if (!smpl) smpl = new sampler();
 
       params.reserve(16);
 
       create_dynamic_params();
       create_attribute_params();
-      create_transform();
 
       param_buffer_info static_pbi(static_buffer, 1);
       params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, smpl, param::stage_fragment));
-      params.push_back(new param_op(atom_diffuse, GL_FLOAT_VEC4, atom_diffuse_sampler, atom_uv, param::op_texture2D, param::stage_fragment));
 
-      create_lighting();
-      create_combiner();
+      dynarray<uint8_t> vs;
+      dynarray<uint8_t> fs;
+      app_utils::get_url(vs, vs_url);
+      app_utils::get_url(fs, fs_url);
 
-      custom_shader = new param_shader(params);
+      custom_shader = new param_shader(
+        params,
+        (const char*)vs.data(), (const char*)(vs.data() + vs.size()),
+        (const char*)fs.data(), (const char*)(fs.data() + fs.size())
+      );
     }
 
     material(param *diffuse, param *ambient, param *emission, param *specular, param *bump, param *shininess) {
@@ -235,6 +165,7 @@ namespace octet { namespace scene {
       //bind_textures();
     }
 
+    /// get a named parameter
     param *get_param(atom_t name) {
       for (unsigned i = 0; i != params.size(); ++i) {
         if (params[i]->get_name() == name) {
@@ -244,9 +175,18 @@ namespace octet { namespace scene {
       return NULL;
     }
 
+    /// get a named parameter that is a uniform
     param_uniform *get_param_uniform(atom_t name) {
       param *param = get_param(name);
       return param ? param->get_param_uniform() : NULL;
+    }
+
+    /// set the diffuse color parameter (if it exists)
+    void set_diffuse(const vec4 &color) {
+      if (param *p = get_param_uniform(atom_diffuse)) {
+        gl_resource::wolock static_lock(static_buffer);
+        p->get_param_uniform()->set_value(static_lock.u8(), &color, sizeof(color));
+      }
     }
   };
 }}
