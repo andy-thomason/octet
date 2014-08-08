@@ -27,8 +27,11 @@ namespace octet { namespace helpers {
       // that works in screen pixels.
       text_scene = new visual_scene();
 
+      param_shader *shader = new param_shader("shaders/default.vs", "shaders/text.fs");
+
       // Make a material from the font image.
-      mat = new material(page);
+      mat = new material(page, NULL, shader);
+      shader->init(mat->get_params());
 
       // Make a default node for the scene (no transformation)
       node = text_scene->add_scene_node();

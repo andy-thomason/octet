@@ -61,7 +61,7 @@ namespace octet { namespace scene {
     }
 
     /// Alternative constructor.
-    material(const vec4 &color, const char *vs_url = "shaders/default.vs", const char *fs_url = "shaders/default_solid.fs") {
+    material(const vec4 &color, param_shader *shader = NULL) {
       // materials are constructed from parameters which build the final shader.
       // this allows us to use OpenGLES2 (uniforms) and 3 (buffers) as well as new shader features.
       params.reserve(16);
@@ -72,20 +72,15 @@ namespace octet { namespace scene {
       param_buffer_info static_pbi(static_buffer, 1);
       params.push_back(new param_color(static_pbi, color, atom_diffuse, param::stage_fragment));
 
-      dynarray<uint8_t> vs;
-      dynarray<uint8_t> fs;
-      app_utils::get_url(vs, vs_url);
-      app_utils::get_url(fs, fs_url);
-
-      custom_shader = new param_shader(
-        params,
-        (const char*)vs.data(), (const char*)(vs.data() + vs.size()),
-        (const char*)fs.data(), (const char*)(fs.data() + fs.size())
-      );
+      if (shader == NULL) {
+        shader = new param_shader("shaders/default.vs", "shaders/default_solid.fs");
+        shader->init(params);
+      }
+      custom_shader = shader;
     }
 
     /// create a material from an existing image
-    material(image *img, sampler *smpl=NULL, const char *vs_url = "shaders/default.vs", const char *fs_url = "shaders/default_textured.fs") {
+    material(image *img, sampler *smpl=NULL, param_shader *shader = NULL) {
       if (!smpl) smpl = new sampler();
 
       params.reserve(16);
@@ -96,16 +91,11 @@ namespace octet { namespace scene {
       param_buffer_info static_pbi(static_buffer, 1);
       params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, smpl, param::stage_fragment));
 
-      dynarray<uint8_t> vs;
-      dynarray<uint8_t> fs;
-      app_utils::get_url(vs, vs_url);
-      app_utils::get_url(fs, fs_url);
-
-      custom_shader = new param_shader(
-        params,
-        (const char*)vs.data(), (const char*)(vs.data() + vs.size()),
-        (const char*)fs.data(), (const char*)(fs.data() + fs.size())
-      );
+      if (shader == NULL) {
+        shader = new param_shader("shaders/default.vs", "shaders/default_textured.fs");
+        shader->init(params);
+      }
+      custom_shader = shader;
     }
 
     material(param *diffuse, param *ambient, param *emission, param *specular, param *bump, param *shininess) {
@@ -187,6 +177,10 @@ namespace octet { namespace scene {
         gl_resource::wolock static_lock(static_buffer);
         p->get_param_uniform()->set_value(static_lock.u8(), &color, sizeof(color));
       }
+    }
+
+    dynarray<ref<param> > &get_params() {
+      return params;
     }
   };
 }}

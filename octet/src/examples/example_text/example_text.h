@@ -64,6 +64,8 @@ namespace octet {
       // write some text to the overlay
       char buf[3][256];
       const mat4t &mx = node->access_nodeToParent();
+
+      text->clear();
       text->format(
         "matrix x: %s\n"
         "matrix y: %s\n"

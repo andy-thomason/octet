@@ -11,18 +11,21 @@ uniform mat4 modelToCamera;
 attribute vec4 pos;
 attribute vec2 uv;
 attribute vec3 normal;
+attribute vec4 color;
 
 // outputs
-varying vec3 tnormal_;
-varying vec3 tpos_;
-varying vec2 tuv_;
+varying vec3 normal_;
+varying vec3 pos_;
+varying vec2 uv_;
+varying vec4 color_;
 
 void main() {
   gl_Position = modelToProjection * pos;
   vec3 tnormal = (modelToCamera * vec4(normal, 0.0)).xyz;
   vec3 tpos = (modelToCamera * pos).xyz;
-  tnormal_ = tnormal;
-  tpos_ = tpos;
-  tuv_ = uv;
+  normal_ = tnormal;
+  pos_ = tpos;
+  uv_ = uv;
+  color_ = color;
 }
 

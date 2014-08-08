@@ -33,6 +33,10 @@ namespace octet { namespace scene {
       if (text.size()) update();
     }
 
+    void clear() {
+      text = "";
+    }
+
     void format(const char *fmt, ...) {
       va_list list;
       va_start(list, fmt);

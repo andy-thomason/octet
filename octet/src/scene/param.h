@@ -305,9 +305,24 @@ namespace octet { namespace scene {
   class param_shader : public shader {
     std::string vertex_shader;
     std::string fragment_shader;
-    dynarray<ref<param> > params;
 
-    void init() {
+  public:
+    RESOURCE_META(param_shader)
+
+    param_shader() {
+    }
+
+    param_shader(const char *vs_url, const char *fs_url) {
+      dynarray<uint8_t> vs;
+      dynarray<uint8_t> fs;
+      app_utils::get_url(vs, vs_url);
+      app_utils::get_url(fs, fs_url);
+
+      vertex_shader.assign((const char*)vs.data(), (const char*)(vs.data() + vs.size()));
+      fragment_shader.assign((const char*)fs.data(), (const char*)(fs.data() + fs.size()));
+    }
+
+    void init(dynarray<ref<param> > &params) {
       shader::init(vertex_shader.data(), fragment_shader.data());
 
       param_bind_info pbi;
@@ -316,17 +331,6 @@ namespace octet { namespace scene {
       for (unsigned i = 0; i != params.size(); ++i) {
         params[i]->bind(pbi);
       }
-    }
-  public:
-    RESOURCE_META(param_shader)
-
-    param_shader() {
-    }
-
-    param_shader(dynarray<ref<param> > &params, const char *vertex_begin, const char *vertex_end, const char *fragment_begin, const char *fragment_end) : params(params) {
-      vertex_shader.assign(vertex_begin, vertex_end);
-      fragment_shader.assign(fragment_begin, fragment_end);
-      init();
     }
   };
 }}
