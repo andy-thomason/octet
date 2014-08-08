@@ -193,7 +193,7 @@ private:
     }
 
     // draw a word by creating a serues of quads.
-    unsigned render_chars(unsigned num_quads, int xdraw, int ydraw, vertex *vtx, uint32_t *idx, const char *src, const char *src_max, bool left_to_right, unsigned color) {
+    unsigned render_chars(unsigned num_quads, int xdraw, int ydraw, vertex *vtx, uint32_t *idx, const char *src, const char *src_max, bool left_to_right, unsigned &color) {
       vtx += num_quads * 4;
       idx += num_quads * 6;
       while (src < src_max) {

@@ -66,6 +66,7 @@ namespace octet {
       const mat4t &mx = node->access_nodeToParent();
 
       text->clear();
+
       text->format(
         "matrix x: %s\n"
         "matrix y: %s\n"
