@@ -281,12 +281,12 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(param_sampler)
 
-    param_sampler() {
+      param_sampler() {
     }
 
     /// constuct a sampler parameter, allocating a texture slot and adding it to a prototype uniform buffer.
     param_sampler(param_buffer_info &pbi, atom_t name, image *_image, sampler *_sampler, stage_type _stage) :
-      param_uniform(pbi, &pbi.texture_slot, name, GL_SAMPLER_2D, 1, _stage), image_(_image), sampler_(_sampler)
+      param_uniform(pbi, &pbi.texture_slot, name, _sampler->get_sampler_type(), 1, _stage), image_(_image), sampler_(_sampler)
     {
       texture_slot = pbi.texture_slot++;
     }

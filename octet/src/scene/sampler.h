@@ -23,22 +23,27 @@ namespace octet { namespace scene {
     uint16_t texture_wrap_t;     // GL_CLAMP / GL_REPEAT
     uint16_t texture_wrap_r;     // GL_CLAMP / GL_REPEAT
     uint16_t gl_target;          // GL_TEXTURE_2D, 3D, CUBE_MAP
-    string name;                 // name used internally in shader (ie. diffuse_sampler)
     GLuint gl_texture;           // allocted texture
 
   public:
     RESOURCE_META(sampler)
 
     // default constructor makes a repeating trilinear filter
-    sampler(const char *name_=0) {
-      texture_mag_filter = GL_LINEAR_MIPMAP_LINEAR;
-      texture_min_filter = GL_LINEAR;
-      texture_wrap_s = GL_REPEAT;
-      texture_wrap_t = GL_REPEAT;
-      texture_wrap_r = GL_REPEAT;
-      gl_target = GL_TEXTURE_2D;
+    sampler(
+      uint16_t _texture_mag_filter = GL_LINEAR_MIPMAP_LINEAR,
+      uint16_t _texture_min_filter = GL_LINEAR,
+      uint16_t _texture_wrap_s = GL_REPEAT,
+      uint16_t _texture_wrap_t = GL_REPEAT,
+      uint16_t _texture_wrap_r = GL_REPEAT,
+      uint16_t _gl_target = GL_TEXTURE_2D
+    ) {
+      texture_mag_filter = _texture_mag_filter;
+      texture_min_filter = _texture_min_filter;
+      texture_wrap_s = _texture_wrap_s;
+      texture_wrap_t = _texture_wrap_t;
+      texture_wrap_r = _texture_wrap_r;
+      gl_target = _gl_target;
       gl_texture = 0;
-      name = name_;
     }
 
     void render(unsigned target) {
@@ -66,6 +71,14 @@ namespace octet { namespace scene {
       return gl_texture;
     }
 
+    unsigned get_sampler_type() {
+      switch (gl_target) {
+        case GL_TEXTURE_3D: return GL_SAMPLER_3D;
+        case GL_TEXTURE_CUBE_MAP: return GL_SAMPLER_CUBE;
+        default: return GL_SAMPLER_2D;
+      }
+    }
+
     const char *get_glsl_type() {
       switch (gl_target) {
         case GL_TEXTURE_3D: return "sampler3D";
@@ -80,10 +93,6 @@ namespace octet { namespace scene {
         case GL_TEXTURE_CUBE_MAP: return "textureCube";
         default: return "texture2D";
       }
-    }
-
-    const char *get_name() {
-      return name;
     }
 
     void visit(visitor &v) {

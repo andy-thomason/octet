@@ -525,8 +525,11 @@ namespace octet { namespace loaders {
           int stride = width * 4;
 
           unsigned size = width * height * 4;
-          image.resize(size);
+          size_t base = image.size();
+          image.resize(base + size);
           format = 0x1908; // GL_RGBA
+
+          uint8_t *image_base = image.data() + base;
 
           for (unsigned y = 0; y != ymax; ++y) {
             for (unsigned x = 0; x != xmax; ++x) {
@@ -539,13 +542,13 @@ namespace octet { namespace loaders {
               }
               if (num_mcu_blocks == 1) {
                 // assume 4:4:4 Greyscale
-                color_convert_444_greyscale(&image[( ( height - 1 - y * 8 ) * stride ) + ( x * 8 * 4 )], -stride, dct_coeffs);
+                color_convert_444_greyscale(&image_base[((height - 1 - y * 8) * stride) + (x * 8 * 4)], -stride, dct_coeffs);
               } else if (num_mcu_blocks == 3) {
                 // assume 4:4:4 YCbCr
-                color_convert_444(&image[( ( height - 1 - y * 8 ) * stride ) + ( x * 8 * 4 )], -stride, dct_coeffs);
+                color_convert_444(&image_base[((height - 1 - y * 8) * stride) + (x * 8 * 4)], -stride, dct_coeffs);
               } else if (num_mcu_blocks == 6) {
                 // assume 4:1:1 YCbCr
-                color_convert_411(&image[((height - 1 - y * 16) * stride) + (x * 16 * 4)], -stride, dct_coeffs);
+                color_convert_411(&image_base[((height - 1 - y * 16) * stride) + (x * 16 * 4)], -stride, dct_coeffs);
               }
             }
           }

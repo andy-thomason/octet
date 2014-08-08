@@ -19,7 +19,8 @@ namespace octet {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
 
-      image *img = new image("assets/andyt.gif");
+      //image *img = new image("assets/andyt.gif");
+      image *img = new image("assets/reije081.home.xs4all.nl/top.jpg");
       material *red = new material(img);
       mesh_box *box = new mesh_box(vec3(4));
       scene_node *node = new scene_node();

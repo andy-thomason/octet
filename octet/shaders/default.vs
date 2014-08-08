@@ -15,17 +15,19 @@ attribute vec4 color;
 
 // outputs
 varying vec3 normal_;
-varying vec3 pos_;
+varying vec3 camera_pos_;
 varying vec2 uv_;
 varying vec4 color_;
+varying vec3 model_pos_;
 
 void main() {
   gl_Position = modelToProjection * pos;
   vec3 tnormal = (modelToCamera * vec4(normal, 0.0)).xyz;
   vec3 tpos = (modelToCamera * pos).xyz;
   normal_ = tnormal;
-  pos_ = tpos;
+  camera_pos_ = tpos;
   uv_ = uv;
   color_ = color;
+  model_pos_ = pos.xyz;
 }
 

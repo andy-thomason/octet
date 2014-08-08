@@ -80,7 +80,7 @@ namespace octet { namespace scene {
     }
 
     /// create a material from an existing image
-    material(image *img, sampler *smpl=NULL, param_shader *shader = NULL) {
+    material(image *img, sampler *smpl = NULL, param_shader *shader = NULL) {
       if (!smpl) smpl = new sampler();
 
       params.reserve(16);

@@ -38,13 +38,14 @@ namespace octet { namespace scene {
     GLuint gl_target;
 
     void init(const char *name) {
+      bool is_cubemap = strstr(name, "%s") != 0;
       this->url = name;
       width = height = 0;
       depth = 1;
       gl_texture = 0;
-      gl_target = GL_TEXTURE_2D;
+      gl_target = is_cubemap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
       mip_levels = 1;
-      cube_faces = 1;
+      cube_faces = is_cubemap ? 6 : 1;
       format = 0;
     }
 
@@ -223,6 +224,15 @@ namespace octet { namespace scene {
         } else if (gl_target == GL_TEXTURE_3D) {
           glTexImage3D(gl_target, 0, format, width, height, 1, 0, format, GL_UNSIGNED_BYTE, (void*)&bytes[0]);
           printf("err=%08x\n", glGetError());
+        } else if (gl_target == GL_TEXTURE_CUBE_MAP) {
+          unsigned num_comps = format == RGBA ? 4 : 3;
+          for (int i = 0; i != 6; ++i) {
+            size_t offset = width * height * num_comps * i;
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, (void*)&bytes[offset]);
+            //static const unsigned cols[6] = { 0xff0000ff, 0xffff00ff, 0xffffffff, 0xff00ffff, 0x0000ffff, 0x00ffffff };
+            //glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, 1, 1, 0, format, GL_UNSIGNED_BYTE, (void*)&cols[i]);
+          }
+          glGenerateMipmap(gl_target);
         }
       } else if (gl_target == GL_TEXTURE_2D) {
         unsigned num_comps = format == RGBA ? 4 : 3;
@@ -303,8 +313,30 @@ namespace octet { namespace scene {
 
     /// load the image from a url
     void load() {
+      string x;
+      if (cube_faces == 6) {
+        bytes.resize(0);
+        x.format(url, "left");
+        load_part(x.c_str());
+        x.format(url, "right");
+        load_part(x.c_str());
+        x.format(url, "top");
+        load_part(x.c_str());
+        x.format(url, "bottom");
+        load_part(x.c_str());
+        x.format(url, "front");
+        load_part(x.c_str());
+        x.format(url, "back");
+        load_part(x.c_str());
+      } else {
+        bytes.resize(0);
+        load_part(url.c_str());
+      }
+    }
+
+    void load_part(const char *_url) {
       dynarray<uint8_t> buffer;
-      app_utils::get_url(buffer, url);
+      app_utils::get_url(buffer, _url);
       const unsigned char *src = &buffer[0];
       const unsigned char *src_max = src + buffer.size();
       if (buffer.size() >= 6 && !memcmp(&buffer[0], "GIF89a", 6)) {
