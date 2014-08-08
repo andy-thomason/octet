@@ -1,33 +1,5 @@
 Getting started:
 
-Windows:
-
-To build and run on windows you must install at least Visual
-Studio Express 2010 C++ edition.
-
-http://www.microsoft.com/visualstudio/eng/downloads#d-2010-express
-
-Later, it might be worth downloading your Vendor's OpenCL implementation
-
-AMD
-http://developer.amd.com/tools-and-sdks/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/downloads/
-
-NVidia
-https://developer.nvidia.com/opencl
-
-Intel
-http://software.intel.com/en-us/vcsource/tools/opencl-sdk-2013
-
-
-Xcode:
-
-All libraries come as standard with Xcode, but you must use the
-"Product -> Edit Scheme -> Options" dialogue to set the working directory
-to a folder under the "xcode" folder in your project.
-
-By default, the framework travels up two directories before looking for
-files.
-
 Make (on any system):
 
 The simplet way of building is to use "make". But you have to have installed
@@ -57,4 +29,32 @@ make_example.py project_name
 This will put the solution, vcproj, main.cpp and header into src\examples
 
 
+
+Windows IDE:
+
+To build and run on windows you must install at least Visual
+Studio Express 2012 C++ edition.
+
+http://www.microsoft.com/visualstudio/eng/downloads#d-2010-express
+
+Later, it might be worth downloading your Vendor's OpenCL implementation
+
+AMD
+http://developer.amd.com/tools-and-sdks/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/downloads/
+
+NVidia
+https://developer.nvidia.com/opencl
+
+Intel
+http://software.intel.com/en-us/vcsource/tools/opencl-sdk-2013
+
+
+Xcode IDE:
+
+All libraries come as standard with Xcode, but you must use the
+"Product -> Edit Scheme -> Options" dialogue to set the working directory
+to a folder under the "xcode" folder in your project.
+
+By default, the framework travels up two directories before looking for
+files.
 

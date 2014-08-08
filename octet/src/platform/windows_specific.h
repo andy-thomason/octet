@@ -148,13 +148,13 @@ namespace octet {
 
       static WNDCLASS wndclass = {
         CS_HREDRAW | CS_VREDRAW, DefWindowProc, 0, 0, instance,
-        icon, cursor, brush, 0, L"MyClass"
+        icon, cursor, brush, 0, "MyClass"
       };
       RegisterClass (&wndclass);
 
       gl_context = 0;
      
-      window_handle = CreateWindow(L"MyClass", L"octet",
+      window_handle = CreateWindow("MyClass", "octet",
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 768, 768,
         NULL, NULL, wndclass.hInstance, (LPVOID)this
       );
@@ -253,7 +253,7 @@ namespace octet {
       unsigned num_files = DragQueryFileW(drop, 0xFFFFFFFF, 0, 0);
       for (unsigned i = 0; i != num_files; ++i) {
         TCHAR utf16_filename[MAX_PATH];
-        DragQueryFileW(drop, i, utf16_filename, sizeof(utf16_filename));
+        DragQueryFile(drop, i, utf16_filename, sizeof(utf16_filename));
         queue.push_back(utf16_filename);
       }
       DragFinish(drop);
