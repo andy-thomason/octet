@@ -9,12 +9,12 @@ uniform int num_lights;
 uniform sampler2D diffuse_sampler;
 
 // inputs
-varying vec2 uv_;
+varying vec2 tuv_;
 varying vec3 tnormal_;
 varying vec3 tpos_;
 
 void main() {
-  vec4 diffuse = texture2D(diffuse_sampler, uv_);
+  vec4 diffuse = texture2D(diffuse_sampler, tuv_);
   vec3 nnormal = normalize(tnormal_);
   vec3 npos = tpos_;
   vec3 diffuse_light = lighting[0].xyz;

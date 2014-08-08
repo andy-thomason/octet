@@ -298,7 +298,7 @@ namespace octet { namespace scene {
       glActiveTexture(GL_TEXTURE0 + texture_slot);
       glBindTexture(sampler_->get_gl_target(), sampler_->get_gl_texture(image_));
 
-      //log("%s: %d=%d %04x %d\n", get_atom_name(), get_uniform(), texture_slot, sampler_->get_gl_target(), sampler_->get_gl_texture(image_));
+      //log("%s: u%d=ts%d targ=%04x tex=%d\n", get_atom_name(), get_uniform(), texture_slot, sampler_->get_gl_target(), sampler_->get_gl_texture(image_));
     }
   };
 

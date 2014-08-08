@@ -15,6 +15,7 @@ attribute vec3 normal;
 // outputs
 varying vec3 tnormal_;
 varying vec3 tpos_;
+varying vec2 tuv_;
 
 void main() {
   gl_Position = modelToProjection * pos;
@@ -22,5 +23,6 @@ void main() {
   vec3 tpos = (modelToCamera * pos).xyz;
   tnormal_ = tnormal;
   tpos_ = tpos;
+  tuv_ = uv;
 }
 
