@@ -274,6 +274,23 @@ namespace octet { namespace loaders {
       return (uint8_t)( ( clamp0 - fabsf( clamp0 - (255.999f * 2) ) ) * 0.25f + 128 );
     }
 
+    // convert from Y to RGB
+    // The 0.125 scaling factor is because the DCT data has a scale of 8
+    void color_convert_444_greyscale(uint8_t *outptr, int stride, float *inptr) {
+      for (unsigned j = 0; j != 8; ++j) {
+        for (unsigned i = 0; i != 8; ++i) {
+          float y = inptr[0];
+          inptr++;
+          outptr[0] = clamp(128 + y * 0.125f);
+          outptr[1] = clamp(128 + y * 0.125f);
+          outptr[2] = clamp(128 + y * 0.125f);
+          outptr[3] = 0xff;
+          outptr += 4;
+        }
+        outptr += stride - 32;
+      }
+    }
+
     // convert from YCrCb to RGB
     // See http://en.wikipedia.org/wiki/YCbCr
     // The 0.125 scaling factor is because the DCT data has a scale of 8
@@ -287,12 +304,48 @@ namespace octet { namespace loaders {
           outptr[0] = clamp(128 + y * 0.125f + cr * (1.402f * 0.125f));
           outptr[1] = clamp(128 + y * 0.125f - cb * (0.34414f * 0.125f) - cr * (0.71414f * 0.125f));
           outptr[2] = clamp(128 + y * 0.125f + cb * (1.772f * 0.125f));
-          //static int times;
-          //if (++times < 100) printf("cr=%f y=%f cb=%f  r=%d g=%d b=%d\n", cr * 0.125 + 128, y * 0.125 + 128, cb * 0.125 + 128, outptr[0], outptr[1], outptr[2]);
           outptr[3] = 0xff;
           outptr += 4;
         }
         outptr += stride - 32;
+      }
+    }
+
+    // convert from YCrCb to RGB
+    // See http://en.wikipedia.org/wiki/YCbCr
+    // The 0.125 scaling factor is because the DCT data has a scale of 8
+    void color_convert_411(uint8_t *outptr, int stride, float *inptr) {
+      for (unsigned j = 0; j != 8; ++j) {
+        for (unsigned i = 0; i != 8; ++i) {
+          float y0 = inptr[0x00];
+          float y1 = inptr[0x40];
+          float y2 = inptr[0x80];
+          float y3 = inptr[0xc0];
+          float cb = inptr[0x100];
+          float cr = inptr[0x140];
+          inptr++;
+          outptr[0] = clamp(128 + y0 * 0.125f + cr * (1.402f * 0.125f));
+          outptr[1] = clamp(128 + y0 * 0.125f - cb * (0.34414f * 0.125f) - cr * (0.71414f * 0.125f));
+          outptr[2] = clamp(128 + y0 * 0.125f + cb * (1.772f * 0.125f));
+          outptr[3] = 0xff;
+          outptr += 4;
+          outptr[0] = clamp(128 + y1 * 0.125f + cr * (1.402f * 0.125f));
+          outptr[1] = clamp(128 + y1 * 0.125f - cb * (0.34414f * 0.125f) - cr * (0.71414f * 0.125f));
+          outptr[2] = clamp(128 + y1 * 0.125f + cb * (1.772f * 0.125f));
+          outptr[3] = 0xff;
+          outptr += stride - 4;
+          outptr[0] = clamp(128 + y2 * 0.125f + cr * (1.402f * 0.125f));
+          outptr[1] = clamp(128 + y2 * 0.125f - cb * (0.34414f * 0.125f) - cr * (0.71414f * 0.125f));
+          outptr[2] = clamp(128 + y2 * 0.125f + cb * (1.772f * 0.125f));
+          outptr[3] = 0xff;
+          outptr += 4;
+          outptr[0] = clamp(128 + y3 * 0.125f + cr * (1.402f * 0.125f));
+          outptr[1] = clamp(128 + y3 * 0.125f - cb * (0.34414f * 0.125f) - cr * (0.71414f * 0.125f));
+          outptr[2] = clamp(128 + y3 * 0.125f + cb * (1.772f * 0.125f));
+          outptr[3] = 0xff;
+          outptr += -stride + 4;
+        }
+        outptr += stride*2 - 64;
       }
     }
 
@@ -317,12 +370,18 @@ namespace octet { namespace loaders {
             return 0;
           }
 
-          if (precision != 8 || width == 0 || height == 0 || num_components > 4) return 0;
+          if (precision != 8 || width == 0 || height == 0 || num_components > 4) {
+            printf("warning: precision=%d width=%d height=%d num_components=%d\n", precision, width, height, num_components);
+            return 0;
+          }
 
           if (debug) printf("SOF w=%d h=%d nc=%d\n", width, height, num_components);
 
           // ycrcb only
-          if (num_components != 3) return 0;
+          if (num_components != 1 && num_components != 3) {
+            printf("warning: num_components=%d\n", num_components);
+            return 0;
+          }
 
           for (unsigned i = 0; i != num_components; ++i) {
             component &c = components[i];
@@ -418,7 +477,10 @@ namespace octet { namespace loaders {
             if (debug) printf("SOS comp=%d ac=%d dc=%d\n", comp, sc.ac_table, sc.dc_table);
             unsigned samps = c.hsamp * c.vsamp;
 
-            if (num_mcu_blocks + samps > sizeof(mcu_blocks)/sizeof(mcu_blocks[0])) return 0;
+            if (num_mcu_blocks + samps > sizeof(mcu_blocks)/sizeof(mcu_blocks[0])) {
+              printf("too many mcu blocks\n");
+              return 0;
+            }
 
             for (unsigned j = 0; j != samps; ++j) {
               mcu_block &m = mcu_blocks[num_mcu_blocks++];
@@ -431,8 +493,9 @@ namespace octet { namespace loaders {
             sc.last_dc = 0;
           }
 
-          // at present, we only support YCrCb
-          if (num_mcu_blocks != 3) {
+          // at present, we only support YCrCb in 4:4:4
+          if (num_mcu_blocks != 1 && num_mcu_blocks != 3 && num_mcu_blocks != 6) {
+            printf("only 4:4:4 and 4:1:1 greyscale and ycrcb supported (%d mcu blocks)\n", num_mcu_blocks);
             return 0;
           }
 
@@ -449,6 +512,9 @@ namespace octet { namespace loaders {
             sc.height_in_blocks = height * c.hsamp / max_hsamp;
           }
 
+          width = (width + max_hsamp * 8 - 1) & ~(max_hsamp * 8 - 1);
+          height = (height + max_vsamp * 8 - 1) & ~(max_vsamp * 8 - 1);
+
           unsigned xmax = ( width + max_hsamp * 8 - 1 ) / (max_hsamp * 8);
           unsigned ymax = ( height + max_vsamp * 8 - 1 ) / (max_vsamp * 8);
 
@@ -457,11 +523,11 @@ namespace octet { namespace loaders {
           skip_bits(16, acc, src, shift);
           
           int stride = width * 4;
-          if (num_mcu_blocks == 3) {
-            unsigned size = width * height * 4;
-            image.resize(size);
-            format = 0x1908; // GL_RGBA
-          }
+
+          unsigned size = width * height * 4;
+          image.resize(size);
+          format = 0x1908; // GL_RGBA
+
           for (unsigned y = 0; y != ymax; ++y) {
             for (unsigned x = 0; x != xmax; ++x) {
               float *coeffs = dct_coeffs;
@@ -471,9 +537,15 @@ namespace octet { namespace loaders {
                 inverse_dct(coeffs);
                 coeffs += 64;
               }
-              if (num_mcu_blocks == 3) {
+              if (num_mcu_blocks == 1) {
+                // assume 4:4:4 Greyscale
+                color_convert_444_greyscale(&image[( ( height - 1 - y * 8 ) * stride ) + ( x * 8 * 4 )], -stride, dct_coeffs);
+              } else if (num_mcu_blocks == 3) {
                 // assume 4:4:4 YCbCr
                 color_convert_444(&image[( ( height - 1 - y * 8 ) * stride ) + ( x * 8 * 4 )], -stride, dct_coeffs);
+              } else if (num_mcu_blocks == 6) {
+                // assume 4:1:1 YCbCr
+                color_convert_411(&image[((height - 1 - y * 16) * stride) + (x * 16 * 4)], -stride, dct_coeffs);
               }
             }
           }
@@ -522,7 +594,7 @@ namespace octet { namespace loaders {
         }
         unsigned length = decode_chunk(src, image, format);
         if (!length) {
-          printf("warning: bad JPEG file\n");
+          printf("warning: bad JPEG file @ chunk %02x\n", src[1]);
           return;
         }
         src += length;
