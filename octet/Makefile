@@ -3,7 +3,7 @@
 ifeq ($(OS),Windows_NT)
     SRC = $(shell find src)
     CC = cl
-    CCFLAGS += -D WIN32 gdi32.lib user32.lib shell32.lib -D OCTET_PREFIX
+    CCFLAGS += -D WIN32 gdi32.lib user32.lib shell32.lib
     O = /Fe
     EXE = .exe
 else
