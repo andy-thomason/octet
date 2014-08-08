@@ -326,6 +326,7 @@ namespace octet { namespace scene {
     param_shader(dynarray<ref<param> > &params, const char *vertex_begin, const char *vertex_end, const char *fragment_begin, const char *fragment_end) : params(params) {
       vertex_shader.assign(vertex_begin, vertex_end);
       fragment_shader.assign(fragment_begin, fragment_end);
+      init();
     }
   };
 }}
