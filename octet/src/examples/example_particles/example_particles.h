@@ -24,7 +24,7 @@ namespace octet {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
 
-      material *sprites = new material("assets/particles.gif");
+      material *sprites = new material(new image("assets/particles.gif"));
       system = new mesh_particle_system();
 
       scene_node *node = new scene_node();

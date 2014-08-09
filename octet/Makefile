@@ -21,16 +21,19 @@ else
 endif
 
 # add your binary here
-BINARIES = bin/example_box$(EXE) \
-	bin/example_duck$(EXE)  \
-	bin/example_invaderers$(EXE)  \
-	bin/example_physics$(EXE)  \
-	bin/example_ping$(EXE)  \
-	bin/example_polygon$(EXE)  \
-	bin/example_sphere$(EXE)  \
-	bin/example_text$(EXE)  \
-	bin/example_triangle$(EXE)  \
-	#bin/example_particles$(EXE)  \
+BINARIES = \
+	bin/example_box$(EXE) \
+	bin/example_duck$(EXE) \
+	bin/example_invaderers$(EXE) \
+	bin/example_particles$(EXE) \
+	bin/example_physics$(EXE) \
+	bin/example_ping$(EXE) \
+	bin/example_polygon$(EXE) \
+	bin/example_shader$(EXE) \
+	bin/example_sphere$(EXE) \
+	bin/example_text$(EXE) \
+	bin/example_texture$(EXE) \
+	bin/example_triangle$(EXE) \
 
 
 all: $(BINARIES)
@@ -67,5 +70,8 @@ bin/example_text$(EXE): src/examples/example_text/main.cpp $(SRC)
 	$(CC) $(CCFLAGS) $< $O$@
 
 bin/example_triangle$(EXE): src/examples/example_triangle/main.cpp $(SRC)
+	$(CC) $(CCFLAGS) $< $O$@
+
+bin/example_shader$(EXE): src/examples/example_shader/main.cpp $(SRC)
 	$(CC) $(CCFLAGS) $< $O$@
 

@@ -19,7 +19,9 @@ namespace octet {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
 
-      material *red = new material(vec4(1, 0, 0, 1), "shaders/default.vs", "shaders/spots.fs");
+      param_shader *shader = new param_shader("shaders/default.vs", "shaders/spots.fs");
+      material *red = new material(vec4(1, 0, 0, 1), shader);
+
       mesh_box *box = new mesh_box(vec3(4));
       scene_node *node = new scene_node();
       app_scene->add_child(node);
