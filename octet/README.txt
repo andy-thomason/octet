@@ -1,5 +1,42 @@
 Getting started:
 
+
+Windows:
+
+To build and run on windows you must install at least Visual
+Studio Express 2013 C++ edition.
+
+http://www.visualstudio.com/downloads/download-visual-studio-vs#d-express-windows-desktop
+
+Download git for windows (or some other variant) avoid GUI-based git clients.
+
+Get the latest revision:
+
+git clone git://git.code.sf.net/p/octetframework/code octet
+
+
+
+Xcode:
+
+Get the latest revision:
+
+git clone git://git.code.sf.net/p/octetframework/code octet
+
+
+You will need to make some xcode projects for the examples. Only add "src/main.cpp"
+do not add *all* the source files.
+
+You will need to add the OpenAL, OpenGL and OpenCL frameworks.
+
+All libraries come as standard with Xcode, but you must use the
+"Product -> Edit Scheme -> Options" dialogue to set the working directory
+to a folder under the "xcode" folder in your project.
+
+By default, the framework travels up two directories before looking for
+files.
+
+
+
 Make (on any system):
 
 The simplet way of building is to use "make". But you have to have installed
@@ -29,14 +66,6 @@ make_example.py project_name
 This will put the solution, vcproj, main.cpp and header into src\examples
 
 
-
-Windows IDE:
-
-To build and run on windows you must install at least Visual
-Studio Express 2012 C++ edition.
-
-http://www.microsoft.com/visualstudio/eng/downloads#d-2010-express
-
 Later, it might be worth downloading your Vendor's OpenCL implementation
 
 AMD
@@ -48,13 +77,4 @@ https://developer.nvidia.com/opencl
 Intel
 http://software.intel.com/en-us/vcsource/tools/opencl-sdk-2013
 
-
-Xcode IDE:
-
-All libraries come as standard with Xcode, but you must use the
-"Product -> Edit Scheme -> Options" dialogue to set the working directory
-to a folder under the "xcode" folder in your project.
-
-By default, the framework travels up two directories before looking for
-files.
 
