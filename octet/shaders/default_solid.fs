@@ -11,12 +11,12 @@ uniform vec4 diffuse;
 // inputs
 varying vec2 uv_;
 varying vec3 normal_;
-varying vec3 pos_;
+varying vec3 camera_pos_;
 varying vec4 color_;
 
 void main() {
   vec3 nnormal = normalize(normal_);
-  vec3 npos = pos_;
+  vec3 npos = camera_pos_;
   vec3 diffuse_light = lighting[0].xyz;
   for (int i = 0; i != num_lights; ++i) {
     vec3 light_pos = lighting[i * 4 + 1].xyz;

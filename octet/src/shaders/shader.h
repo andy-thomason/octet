@@ -33,10 +33,10 @@ namespace octet { namespace shaders {
 
       program_ = program;
       GLsizei length;
-      char buf[256];
+      char buf[0x10000];
       glGetProgramInfoLog(program, sizeof(buf), &length, buf);
       if (length) {
-        puts(buf);
+        fputs(buf, log("program errors\n"));
       }
     }
   public:
