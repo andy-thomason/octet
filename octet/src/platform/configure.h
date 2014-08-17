@@ -48,6 +48,7 @@
 #include <stdarg.h>
 #include <math.h>
 #include <assert.h>
+#include <string>
 #if defined(WIN32)
   #include <direct.h>
 #endif
