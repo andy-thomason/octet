@@ -783,6 +783,181 @@ enum {
   GL_MAX_ELEMENT_INDEX = 0x8D6B,
   GL_NUM_SAMPLE_COUNTS = 0x9380,
   GL_TEXTURE_IMMUTABLE_LEVELS = 0x8D63,
+
+  // GLES 3.1
+  GL_COMPUTE_SHADER = 0x91B9,
+  GL_MAX_COMPUTE_UNIFORM_BLOCKS = 0x91BB,
+  GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS = 0x91BC,
+  GL_MAX_COMPUTE_IMAGE_UNIFORMS = 0x91BD,
+  GL_MAX_COMPUTE_SHARED_MEMORY_SIZE = 0x8262,
+  GL_MAX_COMPUTE_UNIFORM_COMPONENTS = 0x8263,
+  GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS = 0x8264,
+  GL_MAX_COMPUTE_ATOMIC_COUNTERS = 0x8265,
+  GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS = 0x8266,
+  GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS = 0x90EB,
+  GL_MAX_COMPUTE_WORK_GROUP_COUNT = 0x91BE,
+  GL_MAX_COMPUTE_WORK_GROUP_SIZE = 0x91BF,
+  GL_COMPUTE_WORK_GROUP_SIZE = 0x8267,
+  GL_DISPATCH_INDIRECT_BUFFER = 0x90EE,
+  GL_DISPATCH_INDIRECT_BUFFER_BINDING = 0x90EF,
+  GL_COMPUTE_SHADER_BIT = 0x00000020,
+  GL_DRAW_INDIRECT_BUFFER = 0x8F3F,
+  GL_DRAW_INDIRECT_BUFFER_BINDING = 0x8F43,
+  GL_MAX_UNIFORM_LOCATIONS = 0x826E,
+  GL_FRAMEBUFFER_DEFAULT_WIDTH = 0x9310,
+  GL_FRAMEBUFFER_DEFAULT_HEIGHT = 0x9311,
+  GL_FRAMEBUFFER_DEFAULT_SAMPLES = 0x9313,
+  GL_FRAMEBUFFER_DEFAULT_FIXED_SAMPLE_LOCATIONS = 0x9314,
+  GL_MAX_FRAMEBUFFER_WIDTH = 0x9315,
+  GL_MAX_FRAMEBUFFER_HEIGHT = 0x9316,
+  GL_MAX_FRAMEBUFFER_SAMPLES = 0x9318,
+  GL_UNIFORM = 0x92E1,
+  GL_UNIFORM_BLOCK = 0x92E2,
+  GL_PROGRAM_INPUT = 0x92E3,
+  GL_PROGRAM_OUTPUT = 0x92E4,
+  GL_BUFFER_VARIABLE = 0x92E5,
+  GL_SHADER_STORAGE_BLOCK = 0x92E6,
+  GL_ATOMIC_COUNTER_BUFFER = 0x92C0,
+  GL_TRANSFORM_FEEDBACK_VARYING = 0x92F4,
+  GL_ACTIVE_RESOURCES = 0x92F5,
+  GL_MAX_NAME_LENGTH = 0x92F6,
+  GL_MAX_NUM_ACTIVE_VARIABLES = 0x92F7,
+  GL_NAME_LENGTH = 0x92F9,
+  GL_TYPE = 0x92FA,
+  GL_ARRAY_SIZE = 0x92FB,
+  GL_OFFSET = 0x92FC,
+  GL_BLOCK_INDEX = 0x92FD,
+  GL_ARRAY_STRIDE = 0x92FE,
+  GL_MATRIX_STRIDE = 0x92FF,
+  GL_IS_ROW_MAJOR = 0x9300,
+  GL_ATOMIC_COUNTER_BUFFER_INDEX = 0x9301,
+  GL_BUFFER_BINDING = 0x9302,
+  GL_BUFFER_DATA_SIZE = 0x9303,
+  GL_NUM_ACTIVE_VARIABLES = 0x9304,
+  GL_ACTIVE_VARIABLES = 0x9305,
+  GL_REFERENCED_BY_VERTEX_SHADER = 0x9306,
+  GL_REFERENCED_BY_FRAGMENT_SHADER = 0x930A,
+  GL_REFERENCED_BY_COMPUTE_SHADER = 0x930B,
+  GL_TOP_LEVEL_ARRAY_SIZE = 0x930C,
+  GL_TOP_LEVEL_ARRAY_STRIDE = 0x930D,
+  GL_LOCATION = 0x930E,
+  GL_VERTEX_SHADER_BIT = 0x00000001,
+  GL_FRAGMENT_SHADER_BIT = 0x00000002,
+  GL_ALL_SHADER_BITS = 0xFFFFFFFF,
+  GL_PROGRAM_SEPARABLE = 0x8258,
+  GL_ACTIVE_PROGRAM = 0x8259,
+  GL_PROGRAM_PIPELINE_BINDING = 0x825A,
+  GL_ATOMIC_COUNTER_BUFFER_BINDING = 0x92C1,
+  GL_ATOMIC_COUNTER_BUFFER_START = 0x92C2,
+  GL_ATOMIC_COUNTER_BUFFER_SIZE = 0x92C3,
+  GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS = 0x92CC,
+  GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS = 0x92D0,
+  GL_MAX_COMBINED_ATOMIC_COUNTER_BUFFERS = 0x92D1,
+  GL_MAX_VERTEX_ATOMIC_COUNTERS = 0x92D2,
+  GL_MAX_FRAGMENT_ATOMIC_COUNTERS = 0x92D6,
+  GL_MAX_COMBINED_ATOMIC_COUNTERS = 0x92D7,
+  GL_MAX_ATOMIC_COUNTER_BUFFER_SIZE = 0x92D8,
+  GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS = 0x92DC,
+  GL_ACTIVE_ATOMIC_COUNTER_BUFFERS = 0x92D9,
+  GL_UNSIGNED_INT_ATOMIC_COUNTER = 0x92DB,
+  GL_MAX_IMAGE_UNITS = 0x8F38,
+  GL_MAX_VERTEX_IMAGE_UNIFORMS = 0x90CA,
+  GL_MAX_FRAGMENT_IMAGE_UNIFORMS = 0x90CE,
+  GL_MAX_COMBINED_IMAGE_UNIFORMS = 0x90CF,
+  GL_IMAGE_BINDING_NAME = 0x8F3A,
+  GL_IMAGE_BINDING_LEVEL = 0x8F3B,
+  GL_IMAGE_BINDING_LAYERED = 0x8F3C,
+  GL_IMAGE_BINDING_LAYER = 0x8F3D,
+  GL_IMAGE_BINDING_ACCESS = 0x8F3E,
+  GL_IMAGE_BINDING_FORMAT = 0x906E,
+  GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT = 0x00000001,
+  GL_ELEMENT_ARRAY_BARRIER_BIT = 0x00000002,
+  GL_UNIFORM_BARRIER_BIT = 0x00000004,
+  GL_TEXTURE_FETCH_BARRIER_BIT = 0x00000008,
+  GL_SHADER_IMAGE_ACCESS_BARRIER_BIT = 0x00000020,
+  GL_COMMAND_BARRIER_BIT = 0x00000040,
+  GL_PIXEL_BUFFER_BARRIER_BIT = 0x00000080,
+  GL_TEXTURE_UPDATE_BARRIER_BIT = 0x00000100,
+  GL_BUFFER_UPDATE_BARRIER_BIT = 0x00000200,
+  GL_FRAMEBUFFER_BARRIER_BIT = 0x00000400,
+  GL_TRANSFORM_FEEDBACK_BARRIER_BIT = 0x00000800,
+  GL_ATOMIC_COUNTER_BARRIER_BIT = 0x00001000,
+  GL_ALL_BARRIER_BITS = 0xFFFFFFFF,
+  GL_IMAGE_2D = 0x904D,
+  GL_IMAGE_3D = 0x904E,
+  GL_IMAGE_CUBE = 0x9050,
+  GL_IMAGE_2D_ARRAY = 0x9053,
+  GL_INT_IMAGE_2D = 0x9058,
+  GL_INT_IMAGE_3D = 0x9059,
+  GL_INT_IMAGE_CUBE = 0x905B,
+  GL_INT_IMAGE_2D_ARRAY = 0x905E,
+  GL_UNSIGNED_INT_IMAGE_2D = 0x9063,
+  GL_UNSIGNED_INT_IMAGE_3D = 0x9064,
+  GL_UNSIGNED_INT_IMAGE_CUBE = 0x9066,
+  GL_UNSIGNED_INT_IMAGE_2D_ARRAY = 0x9069,
+  GL_IMAGE_FORMAT_COMPATIBILITY_TYPE = 0x90C7,
+  GL_IMAGE_FORMAT_COMPATIBILITY_BY_SIZE = 0x90C8,
+  GL_IMAGE_FORMAT_COMPATIBILITY_BY_CLASS = 0x90C9,
+  GL_READ_ONLY = 0x88B8,
+  GL_WRITE_ONLY = 0x88B9,
+  GL_READ_WRITE = 0x88BA,
+  GL_SHADER_STORAGE_BUFFER = 0x90D2,
+  GL_SHADER_STORAGE_BUFFER_BINDING = 0x90D3,
+  GL_SHADER_STORAGE_BUFFER_START = 0x90D4,
+  GL_SHADER_STORAGE_BUFFER_SIZE = 0x90D5,
+  GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS = 0x90D6,
+  GL_MAX_FRAGMENT_SHADER_STORAGE_BLOCKS = 0x90DA,
+  GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS = 0x90DB,
+  GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS = 0x90DC,
+  GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS = 0x90DD,
+  GL_MAX_SHADER_STORAGE_BLOCK_SIZE = 0x90DE,
+  GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT = 0x90DF,
+  GL_SHADER_STORAGE_BARRIER_BIT = 0x00002000,
+  GL_MAX_COMBINED_SHADER_OUTPUT_RESOURCES = 0x8F39,
+  GL_DEPTH_STENCIL_TEXTURE_MODE = 0x90EA,
+  //GL_STENCIL_INDEX = 0x1901,
+  GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET = 0x8E5E,
+  GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET = 0x8E5F,
+  GL_SAMPLE_POSITION = 0x8E50,
+  GL_SAMPLE_MASK = 0x8E51,
+  GL_SAMPLE_MASK_VALUE = 0x8E52,
+  GL_TEXTURE_2D_MULTISAMPLE = 0x9100,
+  GL_MAX_SAMPLE_MASK_WORDS = 0x8E59,
+  GL_MAX_COLOR_TEXTURE_SAMPLES = 0x910E,
+  GL_MAX_DEPTH_TEXTURE_SAMPLES = 0x910F,
+  GL_MAX_INTEGER_SAMPLES = 0x9110,
+  GL_TEXTURE_BINDING_2D_MULTISAMPLE = 0x9104,
+  GL_TEXTURE_SAMPLES = 0x9106,
+  GL_TEXTURE_FIXED_SAMPLE_LOCATIONS = 0x9107,
+  //GL_TEXTURE_WIDTH = 0x1000,
+  //GL_TEXTURE_HEIGHT = 0x1001,
+  GL_TEXTURE_DEPTH = 0x8071,
+  //GL_TEXTURE_INTERNAL_FORMAT = 0x1003,
+  //GL_TEXTURE_RED_SIZE = 0x805C,
+  //GL_TEXTURE_GREEN_SIZE = 0x805D,
+  //GL_TEXTURE_BLUE_SIZE = 0x805E,
+  //GL_TEXTURE_ALPHA_SIZE = 0x805F,
+  GL_TEXTURE_DEPTH_SIZE = 0x884A,
+  GL_TEXTURE_STENCIL_SIZE = 0x88F1,
+  GL_TEXTURE_SHARED_SIZE = 0x8C3F,
+  GL_TEXTURE_RED_TYPE = 0x8C10,
+  GL_TEXTURE_GREEN_TYPE = 0x8C11,
+  GL_TEXTURE_BLUE_TYPE = 0x8C12,
+  GL_TEXTURE_ALPHA_TYPE = 0x8C13,
+  GL_TEXTURE_DEPTH_TYPE = 0x8C16,
+  GL_TEXTURE_COMPRESSED = 0x86A1,
+  GL_SAMPLER_2D_MULTISAMPLE = 0x9108,
+  GL_INT_SAMPLER_2D_MULTISAMPLE = 0x9109,
+  GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE = 0x910A,
+  GL_VERTEX_ATTRIB_BINDING = 0x82D4,
+  GL_VERTEX_ATTRIB_RELATIVE_OFFSET = 0x82D5,
+  GL_VERTEX_BINDING_DIVISOR = 0x82D6,
+  GL_VERTEX_BINDING_OFFSET = 0x82D7,
+  GL_VERTEX_BINDING_STRIDE = 0x82D8,
+  GL_VERTEX_BINDING_BUFFER = 0x8F4F,
+  GL_MAX_VERTEX_ATTRIB_RELATIVE_OFFSET = 0x82D9,
+  GL_MAX_VERTEX_ATTRIB_BINDINGS = 0x82DA,
+  GL_MAX_VERTEX_ATTRIB_STRIDE = 0x82E5,
 };
 
 typedef void           (GL_APIENTRY *glActiveTexture_t) (GLenum texture);
@@ -1035,6 +1210,75 @@ typedef void           (GL_APIENTRY *glTexStorage2D_t) (GLenum target, GLsizei l
 typedef void           (GL_APIENTRY *glTexStorage3D_t) (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
 typedef void           (GL_APIENTRY *glGetInternalformativ_t) (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
 
+typedef void (GL_APIENTRY *glDispatchCompute_t)(GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z);
+typedef void (GL_APIENTRY *glDispatchComputeIndirect_t)(GLintptr indirect);
+typedef void (GL_APIENTRY *glDrawArraysIndirect_t)(GLenum mode, const void *indirect);
+typedef void (GL_APIENTRY *glDrawElementsIndirect_t)(GLenum mode, GLenum type, const void *indirect);
+typedef void (GL_APIENTRY *glFramebufferParameteri_t)(GLenum target, GLenum pname, GLint param);
+typedef void (GL_APIENTRY *glGetFramebufferParameteriv_t)(GLenum target, GLenum pname, GLint *params);
+typedef void (GL_APIENTRY *glGetProgramInterfaceiv_t)(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
+typedef GLuint (GL_APIENTRY *glGetProgramResourceIndex_t)(GLuint program, GLenum programInterface, const GLchar *name);
+typedef void (GL_APIENTRY *glGetProgramResourceName_t)(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
+typedef void (GL_APIENTRY *glGetProgramResourceiv_t)(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
+typedef GLint (GL_APIENTRY *glGetProgramResourceLocation_t)(GLuint program, GLenum programInterface, const GLchar *name);
+typedef void (GL_APIENTRY *glUseProgramStages_t)(GLuint pipeline, GLbitfield stages, GLuint program);
+typedef void (GL_APIENTRY *glActiveShaderProgram_t)(GLuint pipeline, GLuint program);
+typedef GLuint (GL_APIENTRY *glCreateShaderProgramv_t)(GLenum type, GLsizei count, const GLchar *const*strings);
+typedef void (GL_APIENTRY *glBindProgramPipeline_t)(GLuint pipeline);
+typedef void (GL_APIENTRY *glDeleteProgramPipelines_t)(GLsizei n, const GLuint *pipelines);
+typedef void (GL_APIENTRY *glGenProgramPipelines_t)(GLsizei n, GLuint *pipelines);
+typedef GLboolean (GL_APIENTRY *glIsProgramPipeline_t)(GLuint pipeline);
+typedef void (GL_APIENTRY *glGetProgramPipelineiv_t)(GLuint pipeline, GLenum pname, GLint *params);
+typedef void (GL_APIENTRY *glProgramUniform1i_t)(GLuint program, GLint location, GLint v0);
+typedef void (GL_APIENTRY *glProgramUniform2i_t)(GLuint program, GLint location, GLint v0, GLint v1);
+typedef void (GL_APIENTRY *glProgramUniform3i_t)(GLuint program, GLint location, GLint v0, GLint v1, GLint v2);
+typedef void (GL_APIENTRY *glProgramUniform4i_t)(GLuint program, GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+typedef void (GL_APIENTRY *glProgramUniform1ui_t)(GLuint program, GLint location, GLuint v0);
+typedef void (GL_APIENTRY *glProgramUniform2ui_t)(GLuint program, GLint location, GLuint v0, GLuint v1);
+typedef void (GL_APIENTRY *glProgramUniform3ui_t)(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2);
+typedef void (GL_APIENTRY *glProgramUniform4ui_t)(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
+typedef void (GL_APIENTRY *glProgramUniform1f_t)(GLuint program, GLint location, GLfloat v0);
+typedef void (GL_APIENTRY *glProgramUniform2f_t)(GLuint program, GLint location, GLfloat v0, GLfloat v1);
+typedef void (GL_APIENTRY *glProgramUniform3f_t)(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+typedef void (GL_APIENTRY *glProgramUniform4f_t)(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+typedef void (GL_APIENTRY *glProgramUniform1iv_t)(GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY *glProgramUniform2iv_t)(GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY *glProgramUniform3iv_t)(GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY *glProgramUniform4iv_t)(GLuint program, GLint location, GLsizei count, const GLint *value);
+typedef void (GL_APIENTRY *glProgramUniform1uiv_t)(GLuint program, GLint location, GLsizei count, const GLuint *value);
+typedef void (GL_APIENTRY *glProgramUniform2uiv_t)(GLuint program, GLint location, GLsizei count, const GLuint *value);
+typedef void (GL_APIENTRY *glProgramUniform3uiv_t)(GLuint program, GLint location, GLsizei count, const GLuint *value);
+typedef void (GL_APIENTRY *glProgramUniform4uiv_t)(GLuint program, GLint location, GLsizei count, const GLuint *value);
+typedef void (GL_APIENTRY *glProgramUniform1fv_t)(GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniform2fv_t)(GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniform3fv_t)(GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniform4fv_t)(GLuint program, GLint location, GLsizei count, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix2fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix3fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix4fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix2x3fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix3x2fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix2x4fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix4x2fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix3x4fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glProgramUniformMatrix4x3fv_t)(GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void (GL_APIENTRY *glValidateProgramPipeline_t)(GLuint pipeline);
+typedef void (GL_APIENTRY *glGetProgramPipelineInfoLog_t)(GLuint pipeline, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+typedef void (GL_APIENTRY *glBindImageTexture_t)(GLuint unit, GLuint texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format);
+typedef void (GL_APIENTRY *glGetBooleani_v_t)(GLenum target, GLuint index, GLboolean *data);
+typedef void (GL_APIENTRY *glMemoryBarrier_t)(GLbitfield barriers);
+typedef void (GL_APIENTRY *glMemoryBarrierByRegion_t)(GLbitfield barriers);
+typedef void (GL_APIENTRY *glTexStorage2DMultisample_t)(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
+typedef void (GL_APIENTRY *glGetMultisamplefv_t)(GLenum pname, GLuint index, GLfloat *val);
+typedef void (GL_APIENTRY *glSampleMaski_t)(GLuint maskNumber, GLbitfield mask);
+typedef void (GL_APIENTRY *glGetTexLevelParameteriv_t)(GLenum target, GLint level, GLenum pname, GLint *params);
+typedef void (GL_APIENTRY *glGetTexLevelParameterfv_t)(GLenum target, GLint level, GLenum pname, GLfloat *params);
+typedef void (GL_APIENTRY *glBindVertexBuffer_t)(GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride);
+typedef void (GL_APIENTRY *glVertexAttribFormat_t)(GLuint attribindex, GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset);
+typedef void (GL_APIENTRY *glVertexAttribIFormat_t)(GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset);
+typedef void (GL_APIENTRY *glVertexAttribBinding_t)(GLuint attribindex, GLuint bindingindex);
+typedef void (GL_APIENTRY *glVertexBindingDivisor_t)(GLuint bindingindex, GLuint divisor);
+
 #ifdef WIN32
   glActiveTexture_t glActiveTexture;
   glAttachShader_t glAttachShader;
@@ -1286,6 +1530,74 @@ typedef void           (GL_APIENTRY *glGetInternalformativ_t) (GLenum target, GL
   glTexStorage3D_t glTexStorage3D;
   glGetInternalformativ_t glGetInternalformativ;
 
+  glDispatchCompute_t glDispatchCompute;
+  glDispatchComputeIndirect_t glDispatchComputeIndirect;
+  glDrawArraysIndirect_t glDrawArraysIndirect;
+  glDrawElementsIndirect_t glDrawElementsIndirect;
+  glFramebufferParameteri_t glFramebufferParameteri;
+  glGetFramebufferParameteriv_t glGetFramebufferParameteriv;
+  glGetProgramInterfaceiv_t glGetProgramInterfaceiv;
+  glGetProgramResourceIndex_t glGetProgramResourceIndex;
+  glGetProgramResourceName_t glGetProgramResourceName;
+  glGetProgramResourceiv_t glGetProgramResourceiv;
+  glGetProgramResourceLocation_t glGetProgramResourceLocation;
+  glUseProgramStages_t glUseProgramStages;
+  glActiveShaderProgram_t glActiveShaderProgram;
+  glCreateShaderProgramv_t glCreateShaderProgramv;
+  glBindProgramPipeline_t glBindProgramPipeline;
+  glDeleteProgramPipelines_t glDeleteProgramPipelines;
+  glGenProgramPipelines_t glGenProgramPipelines;
+  glIsProgramPipeline_t glIsProgramPipeline;
+  glGetProgramPipelineiv_t glGetProgramPipelineiv;
+  glProgramUniform1i_t glProgramUniform1i;
+  glProgramUniform2i_t glProgramUniform2i;
+  glProgramUniform3i_t glProgramUniform3i;
+  glProgramUniform4i_t glProgramUniform4i;
+  glProgramUniform1ui_t glProgramUniform1ui;
+  glProgramUniform2ui_t glProgramUniform2ui;
+  glProgramUniform3ui_t glProgramUniform3ui;
+  glProgramUniform4ui_t glProgramUniform4ui;
+  glProgramUniform1f_t glProgramUniform1f;
+  glProgramUniform2f_t glProgramUniform2f;
+  glProgramUniform3f_t glProgramUniform3f;
+  glProgramUniform4f_t glProgramUniform4f;
+  glProgramUniform1iv_t glProgramUniform1iv;
+  glProgramUniform2iv_t glProgramUniform2iv;
+  glProgramUniform3iv_t glProgramUniform3iv;
+  glProgramUniform4iv_t glProgramUniform4iv;
+  glProgramUniform1uiv_t glProgramUniform1uiv;
+  glProgramUniform2uiv_t glProgramUniform2uiv;
+  glProgramUniform3uiv_t glProgramUniform3uiv;
+  glProgramUniform4uiv_t glProgramUniform4uiv;
+  glProgramUniform1fv_t glProgramUniform1fv;
+  glProgramUniform2fv_t glProgramUniform2fv;
+  glProgramUniform3fv_t glProgramUniform3fv;
+  glProgramUniform4fv_t glProgramUniform4fv;
+  glProgramUniformMatrix2fv_t glProgramUniformMatrix2fv;
+  glProgramUniformMatrix3fv_t glProgramUniformMatrix3fv;
+  glProgramUniformMatrix4fv_t glProgramUniformMatrix4fv;
+  glProgramUniformMatrix2x3fv_t glProgramUniformMatrix2x3fv;
+  glProgramUniformMatrix3x2fv_t glProgramUniformMatrix3x2fv;
+  glProgramUniformMatrix2x4fv_t glProgramUniformMatrix2x4fv;
+  glProgramUniformMatrix4x2fv_t glProgramUniformMatrix4x2fv;
+  glProgramUniformMatrix3x4fv_t glProgramUniformMatrix3x4fv;
+  glProgramUniformMatrix4x3fv_t glProgramUniformMatrix4x3fv;
+  glValidateProgramPipeline_t glValidateProgramPipeline;
+  glGetProgramPipelineInfoLog_t glGetProgramPipelineInfoLog;
+  glBindImageTexture_t glBindImageTexture;
+  glGetBooleani_v_t glGetBooleani_v;
+  glMemoryBarrier_t glMemoryBarrier;
+  glMemoryBarrierByRegion_t glMemoryBarrierByRegion;
+  glTexStorage2DMultisample_t glTexStorage2DMultisample;
+  glGetMultisamplefv_t glGetMultisamplefv;
+  glSampleMaski_t glSampleMaski;
+  //glGetTexLevelParameteriv_t glGetTexLevelParameteriv;
+  //glGetTexLevelParameterfv_t glGetTexLevelParameterfv;
+  glBindVertexBuffer_t glBindVertexBuffer;
+  glVertexAttribFormat_t glVertexAttribFormat;
+  glVertexAttribIFormat_t glVertexAttribIFormat;
+  glVertexAttribBinding_t glVertexAttribBinding;
+  glVertexBindingDivisor_t glVertexBindingDivisor;
 
 
   void *get_proc_address(int &num_checked, int &num_ok, const char *name) {
@@ -1550,12 +1862,83 @@ typedef void           (GL_APIENTRY *glGetInternalformativ_t) (GLenum target, GL
     glTexStorage3D = (glTexStorage3D_t)get_proc_address(num_checked, num_ok, "glTexStorage3D");
     glGetInternalformativ = (glGetInternalformativ_t)get_proc_address(num_checked, num_ok, "glGetInternalformativ");
 
-    printf("nc/ok=%d/%d\n", num_checked, num_ok); num_checked = num_ok = 0;
+    //printf("OpenGL 3.0: nc/ok=%d/%d\n", num_checked, num_ok); num_checked = num_ok = 0;
 
     glInvalidateSubFramebuffer = (glInvalidateSubFramebuffer_t)get_proc_address(num_checked, num_ok, "glInvalidateSubFramebuffer");
     glInvalidateFramebuffer = (glInvalidateFramebuffer_t)get_proc_address(num_checked, num_ok, "glInvalidateFramebuffer");
 
-    printf("nc/ok=%d/%d\n", num_checked, num_ok); num_checked = num_ok = 0;
+    //printf("OpenGL 3.0x: nc/ok=%d/%d\n", num_checked, num_ok); num_checked = num_ok = 0;
+
+    glDispatchCompute = (glDispatchCompute_t)get_proc_address(num_checked, num_ok, "glDispatchCompute");
+    glDispatchComputeIndirect = (glDispatchComputeIndirect_t)get_proc_address(num_checked, num_ok, "glDispatchComputeIndirect");
+    glDrawArraysIndirect = (glDrawArraysIndirect_t)get_proc_address(num_checked, num_ok, "glDrawArraysIndirect");
+    glDrawElementsIndirect = (glDrawElementsIndirect_t)get_proc_address(num_checked, num_ok, "glDrawElementsIndirect");
+    glFramebufferParameteri = (glFramebufferParameteri_t)get_proc_address(num_checked, num_ok, "glFramebufferParameteri");
+    glGetFramebufferParameteriv = (glGetFramebufferParameteriv_t)get_proc_address(num_checked, num_ok, "glGetFramebufferParameteriv");
+    glGetProgramInterfaceiv = (glGetProgramInterfaceiv_t)get_proc_address(num_checked, num_ok, "glGetProgramInterfaceiv");
+    glGetProgramResourceIndex = (glGetProgramResourceIndex_t)get_proc_address(num_checked, num_ok, "glGetProgramResourceIndex");
+    glGetProgramResourceName = (glGetProgramResourceName_t)get_proc_address(num_checked, num_ok, "glGetProgramResourceName");
+    glGetProgramResourceiv = (glGetProgramResourceiv_t)get_proc_address(num_checked, num_ok, "glGetProgramResourceiv");
+    glGetProgramResourceLocation = (glGetProgramResourceLocation_t)get_proc_address(num_checked, num_ok, "glGetProgramResourceLocation");
+    glUseProgramStages = (glUseProgramStages_t)get_proc_address(num_checked, num_ok, "glUseProgramStages");
+    glActiveShaderProgram = (glActiveShaderProgram_t)get_proc_address(num_checked, num_ok, "glActiveShaderProgram");
+    glCreateShaderProgramv = (glCreateShaderProgramv_t)get_proc_address(num_checked, num_ok, "glCreateShaderProgramv");
+    glBindProgramPipeline = (glBindProgramPipeline_t)get_proc_address(num_checked, num_ok, "glBindProgramPipeline");
+    glDeleteProgramPipelines = (glDeleteProgramPipelines_t)get_proc_address(num_checked, num_ok, "glDeleteProgramPipelines");
+    glGenProgramPipelines = (glGenProgramPipelines_t)get_proc_address(num_checked, num_ok, "glGenProgramPipelines");
+    glIsProgramPipeline = (glIsProgramPipeline_t)get_proc_address(num_checked, num_ok, "glIsProgramPipeline");
+    glGetProgramPipelineiv = (glGetProgramPipelineiv_t)get_proc_address(num_checked, num_ok, "glGetProgramPipelineiv");
+    glProgramUniform1i = (glProgramUniform1i_t)get_proc_address(num_checked, num_ok, "glProgramUniform1i");
+    glProgramUniform2i = (glProgramUniform2i_t)get_proc_address(num_checked, num_ok, "glProgramUniform2i");
+    glProgramUniform3i = (glProgramUniform3i_t)get_proc_address(num_checked, num_ok, "glProgramUniform3i");
+    glProgramUniform4i = (glProgramUniform4i_t)get_proc_address(num_checked, num_ok, "glProgramUniform4i");
+    glProgramUniform1ui = (glProgramUniform1ui_t)get_proc_address(num_checked, num_ok, "glProgramUniform1ui");
+    glProgramUniform2ui = (glProgramUniform2ui_t)get_proc_address(num_checked, num_ok, "glProgramUniform2ui");
+    glProgramUniform3ui = (glProgramUniform3ui_t)get_proc_address(num_checked, num_ok, "glProgramUniform3ui");
+    glProgramUniform4ui = (glProgramUniform4ui_t)get_proc_address(num_checked, num_ok, "glProgramUniform4ui");
+    glProgramUniform1f = (glProgramUniform1f_t)get_proc_address(num_checked, num_ok, "glProgramUniform1f");
+    glProgramUniform2f = (glProgramUniform2f_t)get_proc_address(num_checked, num_ok, "glProgramUniform2f");
+    glProgramUniform3f = (glProgramUniform3f_t)get_proc_address(num_checked, num_ok, "glProgramUniform3f");
+    glProgramUniform4f = (glProgramUniform4f_t)get_proc_address(num_checked, num_ok, "glProgramUniform4f");
+    glProgramUniform1iv = (glProgramUniform1iv_t)get_proc_address(num_checked, num_ok, "glProgramUniform1iv");
+    glProgramUniform2iv = (glProgramUniform2iv_t)get_proc_address(num_checked, num_ok, "glProgramUniform2iv");
+    glProgramUniform3iv = (glProgramUniform3iv_t)get_proc_address(num_checked, num_ok, "glProgramUniform3iv");
+    glProgramUniform4iv = (glProgramUniform4iv_t)get_proc_address(num_checked, num_ok, "glProgramUniform4iv");
+    glProgramUniform1uiv = (glProgramUniform1uiv_t)get_proc_address(num_checked, num_ok, "glProgramUniform1uiv");
+    glProgramUniform2uiv = (glProgramUniform2uiv_t)get_proc_address(num_checked, num_ok, "glProgramUniform2uiv");
+    glProgramUniform3uiv = (glProgramUniform3uiv_t)get_proc_address(num_checked, num_ok, "glProgramUniform3uiv");
+    glProgramUniform4uiv = (glProgramUniform4uiv_t)get_proc_address(num_checked, num_ok, "glProgramUniform4uiv");
+    glProgramUniform1fv = (glProgramUniform1fv_t)get_proc_address(num_checked, num_ok, "glProgramUniform1fv");
+    glProgramUniform2fv = (glProgramUniform2fv_t)get_proc_address(num_checked, num_ok, "glProgramUniform2fv");
+    glProgramUniform3fv = (glProgramUniform3fv_t)get_proc_address(num_checked, num_ok, "glProgramUniform3fv");
+    glProgramUniform4fv = (glProgramUniform4fv_t)get_proc_address(num_checked, num_ok, "glProgramUniform4fv");
+    glProgramUniformMatrix2fv = (glProgramUniformMatrix2fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix2fv");
+    glProgramUniformMatrix3fv = (glProgramUniformMatrix3fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix3fv");
+    glProgramUniformMatrix4fv = (glProgramUniformMatrix4fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix4fv");
+    glProgramUniformMatrix2x3fv = (glProgramUniformMatrix2x3fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix2x3fv");
+    glProgramUniformMatrix3x2fv = (glProgramUniformMatrix3x2fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix3x2fv");
+    glProgramUniformMatrix2x4fv = (glProgramUniformMatrix2x4fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix2x4fv");
+    glProgramUniformMatrix4x2fv = (glProgramUniformMatrix4x2fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix4x2fv");
+    glProgramUniformMatrix3x4fv = (glProgramUniformMatrix3x4fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix3x4fv");
+    glProgramUniformMatrix4x3fv = (glProgramUniformMatrix4x3fv_t)get_proc_address(num_checked, num_ok, "glProgramUniformMatrix4x3fv");
+    glValidateProgramPipeline = (glValidateProgramPipeline_t)get_proc_address(num_checked, num_ok, "glValidateProgramPipeline");
+    glGetProgramPipelineInfoLog = (glGetProgramPipelineInfoLog_t)get_proc_address(num_checked, num_ok, "glGetProgramPipelineInfoLog");
+    glBindImageTexture = (glBindImageTexture_t)get_proc_address(num_checked, num_ok, "glBindImageTexture");
+    glGetBooleani_v = (glGetBooleani_v_t)get_proc_address(num_checked, num_ok, "glGetBooleani_v");
+    glMemoryBarrier = (glMemoryBarrier_t)get_proc_address(num_checked, num_ok, "glMemoryBarrier");
+    glMemoryBarrierByRegion = (glMemoryBarrierByRegion_t)get_proc_address(num_checked, num_ok, "glMemoryBarrierByRegion");
+    glTexStorage2DMultisample = (glTexStorage2DMultisample_t)get_proc_address(num_checked, num_ok, "glTexStorage2DMultisample");
+    glGetMultisamplefv = (glGetMultisamplefv_t)get_proc_address(num_checked, num_ok, "glGetMultisamplefv");
+    glSampleMaski = (glSampleMaski_t)get_proc_address(num_checked, num_ok, "glSampleMaski");
+    //glGetTexLevelParameteriv = (glGetTexLevelParameteriv_t)get_proc_address(num_checked, num_ok, "glGetTexLevelParameteriv");
+    //glGetTexLevelParameterfv = (glGetTexLevelParameterfv_t)get_proc_address(num_checked, num_ok, "glGetTexLevelParameterfv");
+    glBindVertexBuffer = (glBindVertexBuffer_t)get_proc_address(num_checked, num_ok, "glBindVertexBuffer");
+    glVertexAttribFormat = (glVertexAttribFormat_t)get_proc_address(num_checked, num_ok, "glVertexAttribFormat");
+    glVertexAttribIFormat = (glVertexAttribIFormat_t)get_proc_address(num_checked, num_ok, "glVertexAttribIFormat");
+    glVertexAttribBinding = (glVertexAttribBinding_t)get_proc_address(num_checked, num_ok, "glVertexAttribBinding");
+    glVertexBindingDivisor = (glVertexBindingDivisor_t)get_proc_address(num_checked, num_ok, "glVertexBindingDivisor");
+
+    //printf("OpenGL 3.1: nc/ok=%d/%d\n", num_checked, num_ok); num_checked = num_ok = 0;
   }
 
 #endif
