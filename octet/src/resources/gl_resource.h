@@ -85,17 +85,18 @@ namespace octet { namespace resources {
     }
 
     /// Allocate a new OpenGL object.
-    void allocate(GLuint target, unsigned size) {
+    void allocate(GLuint target, size_t size, GLuint kind = GL_STATIC_DRAW) {
       reset();
       glGenBuffers(1, &buffer);
       glBindBuffer(target, buffer);
-      glBufferData(target, size, NULL, GL_STATIC_DRAW);
+      glBufferData(target, size, NULL, kind);
       #ifdef OCTET_GLES2
         bytes.resize(size);
       #else
         this->size = size;
       #endif
       this->target = target;
+      glBindBuffer(target, 0);
     }
 
     /// Clear the OpenGL object
@@ -120,7 +121,7 @@ namespace octet { namespace resources {
     }
 
     /// get the buffer size
-    unsigned get_size() const {
+    size_t get_size() const {
       #ifdef OCTET_GLES2
         return bytes.size();
       #else
@@ -203,7 +204,7 @@ namespace octet { namespace resources {
     }
 
     /// copy data into the resource
-    void assign(void *ptr, unsigned offset, unsigned size) {
+    void assign(void *ptr, size_t offset, size_t size) {
       assert(offset + size <= this->get_size());
 
       memcpy((void*)((char*)lock() + offset), ptr, size);

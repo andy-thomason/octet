@@ -19,7 +19,7 @@ namespace octet {
 
     // this function converts three floats into a RGBA 8 bit color
     static uint32_t make_color(float r, float g, float b) {
-      return 0xff000000 + ((int)(r*255.0f) << 16) + ((int)(g*255.0f) << 8) + ((int)(b*255.0f) << 0);
+      return 0xff000000 + ((int)(r*255.0f) << 0) + ((int)(g*255.0f) << 8) + ((int)(b*255.0f) << 16);
     }
   public:
     /// this is called when we construct the class before everything is initialised.
@@ -65,7 +65,7 @@ namespace octet {
         float height = 24.0f;
         float num_twists = 4.0f;
         for (size_t i = 0; i != num_steps+1; ++i) {
-          float r = 1.0f, g = 1.0f * i / num_steps, b = 0.0f;
+          float r = 0.0f, g = 1.0f * i / num_steps, b = 1.0f;
           float y = i * (height / num_steps) - height * 0.5f;
           float angle = i * (num_twists * 2.0f * 3.14159265f / num_steps);
           vtx->pos = vec3p(cosf(angle) * radius1, y, sinf(angle) * radius1);

@@ -21,14 +21,14 @@ namespace octet { namespace scene {
 
     // attribute formats
     enum { max_slots = 16 };
-    unsigned format[max_slots];
+    uint32_t format[max_slots];
 
-    unsigned num_indices;
-    unsigned num_vertices;
-    unsigned short stride;
-    unsigned short mode;
-    unsigned short index_type;
-    unsigned short normalized;
+    uint32_t num_indices;
+    uint32_t num_vertices;
+    uint16_t stride;
+    uint16_t mode;
+    uint16_t index_type;
+    uint16_t normalized;
 
     uint8_t num_slots;
 
@@ -364,7 +364,7 @@ namespace octet { namespace scene {
     unsigned get_index(unsigned index) const {
       unsigned result = 0;
       if (index_type == GL_UNSIGNED_SHORT) {
-        unsigned short *src = (unsigned short*)((uint8_t*)indices->lock_read_only() + index*2);
+        uint16_t *src = (uint16_t*)((uint8_t*)indices->lock_read_only() + index*2);
         result = *src;
         indices->unlock_read_only();
       } else if (index_type == GL_UNSIGNED_INT) {
@@ -376,22 +376,22 @@ namespace octet { namespace scene {
     }
 
     /// Allocate VBO and IBO objects together.
-    void allocate(unsigned vsize, unsigned isize) {
+    void allocate(size_t vsize, size_t isize) {
       vertices->allocate(GL_ARRAY_BUFFER, vsize);
       indices->allocate(GL_ELEMENT_ARRAY_BUFFER, isize);
     }
 
     /// allocate and assign data to IBO and VBO
-    void assign(unsigned vsize, unsigned isize, uint8_t *vsrc, uint8_t *isrc) {
+    void assign(size_t vsize, size_t isize, uint8_t *vsrc, uint8_t *isrc) {
       vertices->assign(vsrc, 0, vsize);
       indices->assign(isrc, 0, isize);
     }
 
     /// set standard parameters of the mesh together.
-    void set_params(unsigned stride_, unsigned num_indices_, unsigned num_vertices_, unsigned mode_, unsigned index_type_) {
-      stride = stride_;
-      num_indices = num_indices_;
-      num_vertices = num_vertices_;
+    void set_params(size_t stride_, size_t num_indices_, size_t num_vertices_, unsigned mode_, unsigned index_type_) {
+      stride = (uint16_t)stride_;
+      num_indices = (uint32_t)num_indices_;
+      num_vertices = (uint32_t)num_vertices_;
       mode = mode_;
       index_type = index_type_;
     }
@@ -551,8 +551,8 @@ namespace octet { namespace scene {
       unsigned tangent_slot = add_attribute(attribute_tangent, 3, GL_FLOAT, stride);
       unsigned bitangent_slot = add_attribute(attribute_bitangent, 3, GL_FLOAT, stride + 12);
 
-      unsigned vsize = (stride + 24) * source.get_num_vertices();
-      unsigned isize = source.get_indices()->get_size(); //mesh::kind_size(get_index_type()) * source.get_num_indices();
+      size_t vsize = (stride + 24) * source.get_num_vertices();
+      size_t isize = source.get_indices()->get_size(); //mesh::kind_size(get_index_type()) * source.get_num_indices();
       allocate(vsize, isize);
       set_params(stride + 24, source.get_num_indices(), source.get_num_vertices(), source.get_mode(), source.get_index_type());
       indices = source.get_indices();
