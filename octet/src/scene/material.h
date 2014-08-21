@@ -21,19 +21,15 @@ namespace octet { namespace scene {
     // Parameters connect colors and other values to uniform buffers.
     dynarray<ref<param> > params;
 
-    // storage for static uniforms such as colours and samplers
-    // these will be uniform buffers in future incarnations
-    ref<gl_resource> static_buffer;
-
-    // storage for dynamic uniforms such as matrices and lighting
-    // these will be uniform buffers in future incarnations
-    ref<gl_resource> dynamic_buffer;
+    dynarray<uint8_t> static_buffer;
+    dynarray<uint8_t> dynamic_buffer;
 
     // create the parameters that change frequently such as the matrices and lighting
     void create_dynamic_params() {
-      static_buffer = new gl_resource(0, 0x100);
-      dynamic_buffer = new gl_resource(0, 0x400);
-      param_buffer_info dynamic_pbi(dynamic_buffer, 0);
+      static_buffer.resize(0x100);
+      dynamic_buffer.resize(0x400);
+      param_buffer_info dynamic_pbi(dynamic_buffer.data(), 0);
+
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToProjection, GL_FLOAT_MAT4, 1, param::stage_vertex));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToCamera, GL_FLOAT_MAT4, 1, param::stage_vertex));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_lighting, GL_FLOAT_VEC4, ambient_size + max_lights * light_size, param::stage_fragment));
@@ -69,7 +65,7 @@ namespace octet { namespace scene {
       create_dynamic_params();
       create_attribute_params();
 
-      param_buffer_info static_pbi(static_buffer, 1);
+      param_buffer_info static_pbi(static_buffer.data(), 1);
       params.push_back(new param_color(static_pbi, color, atom_diffuse, param::stage_fragment));
 
       if (shader == NULL) {
@@ -88,7 +84,7 @@ namespace octet { namespace scene {
       create_dynamic_params();
       create_attribute_params();
 
-      param_buffer_info static_pbi(static_buffer, 1);
+      param_buffer_info static_pbi(static_buffer.data(), 1);
       params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, smpl, param::stage_fragment));
 
       if (shader == NULL) {
@@ -114,35 +110,31 @@ namespace octet { namespace scene {
       log("lu[3] = %s\n", light_uniforms[3].toString(tmp, sizeof(tmp)));*/
       {
         // matrices and lighting go in the dynamic uniform buffer
-        gl_resource::wolock dynamic_lock(dynamic_buffer);
         param_uniform *modelToProjection_param = get_param_uniform(atom_modelToProjection);
-        if (modelToProjection_param) modelToProjection_param->set_value(dynamic_lock.u8(), modelToProjection.get(), sizeof(modelToProjection));
+        if (modelToProjection_param) modelToProjection_param->set_value(dynamic_buffer.data(), modelToProjection.get(), sizeof(modelToProjection));
 
         param_uniform *modelToCamera_param = get_param_uniform(atom_modelToCamera);
-        if (modelToCamera_param) modelToCamera_param->set_value(dynamic_lock.u8(), modelToCamera.get(), sizeof(modelToCamera));
+        if (modelToCamera_param) modelToCamera_param->set_value(dynamic_buffer.data(), modelToCamera.get(), sizeof(modelToCamera));
 
         param_uniform *lighting_param = get_param_uniform(atom_lighting);
-        if (lighting_param) lighting_param->set_value(dynamic_lock.u8(), light_uniforms, sizeof(vec4) * num_light_uniforms);
+        if (lighting_param) lighting_param->set_value(dynamic_buffer.data(), light_uniforms, sizeof(vec4) * num_light_uniforms);
 
         param_uniform *num_lights_param = get_param_uniform(atom_num_lights);
-        if (num_lights_param) num_lights_param->set_value(dynamic_lock.u8(), &num_lights, sizeof(int32_t));
+        if (num_lights_param) num_lights_param->set_value(dynamic_buffer.data(), &num_lights, sizeof(int32_t));
       }
 
       custom_shader->render();
 
       {
         // colours and textures go in the static uniform buffer
-        gl_resource::rolock static_lock(static_buffer);
-        gl_resource::rolock dynamic_lock(dynamic_buffer);
-
         for (unsigned i = 0; i != params.size(); ++i) {
           param_uniform *pu = params[i]->get_param_uniform();
           if (pu) {
             //printf("%s: %d\n", pu->get_name(), pu->get_uniform_buffer_index());
             if (pu->get_uniform_buffer_index()) {
-              pu->render(static_lock.u8());
+              pu->render(static_buffer.data());
             } else {
-              pu->render(dynamic_lock.u8());
+              pu->render(dynamic_buffer.data());
             }
           }
         }
@@ -174,8 +166,7 @@ namespace octet { namespace scene {
     /// set the diffuse color parameter (if it exists)
     void set_diffuse(const vec4 &color) {
       if (param *p = get_param_uniform(atom_diffuse)) {
-        gl_resource::wolock static_lock(static_buffer);
-        p->get_param_uniform()->set_value(static_lock.u8(), &color, sizeof(color));
+        p->get_param_uniform()->set_value(static_buffer.data(), &color, sizeof(color));
       }
     }
 
