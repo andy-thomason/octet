@@ -34,4 +34,5 @@ OCTET_CLASS(scene, mesh_particle_system)
   OCTET_CLASS(scene, mesh_voxel_subcube)
 #endif
 OCTET_CLASS(scene, mesh_points)
+OCTET_CLASS(scene, mesh_cylinder)
 //OCTET_CLASS(scene, value)

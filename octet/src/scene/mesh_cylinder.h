@@ -9,38 +9,35 @@
 
 namespace octet { namespace scene {
   /// Box mesh. Generate triangles for an AABB.
-  class mesh_box : public mesh {
+  class mesh_cylinder : public mesh {
+    zcylinder cylinder;
     mat4t transform;
+    int steps;
 
-    void init(aabb_in size, mat4t_in transform = mat4t())
-    {
+    void init(zcylinder_in cylinder, mat4t_in transform, int steps) {
       this->transform = transform;
+      this->cylinder = cylinder;
+      this->steps = steps;
       set_default_attributes();
-      set_aabb(size);
+      set_aabb(cylinder.get_aabb().get_transform(transform));
       update();
     }
 
   public:
-    RESOURCE_META(mesh_box)
+    RESOURCE_META(mesh_cylinder)
 
-    /// Default constructor: 1x1x1
-    mesh_box() {
-      init(aabb(vec3(0, 0, 0), vec3(1, 1, 1)));
+    /// Construct cylinder mesh from shape
+    mesh_cylinder(zcylinder_in cylinder=zcylinder(), mat4t_in transform = mat4t(), int steps=16) {
+      init(cylinder, transform, steps);
     }
 
-    /// Construct box from size
-    mesh_box(vec3_in size, mat4t_in transform=mat4t()) {
-      init(aabb(vec3(0, 0, 0), size), transform);
-    }
-
-    void set_size(vec3_in size, mat4t_in transform=mat4t()) {
-      init(aabb(vec3(0, 0, 0), size), transform);
-      update();
+    void set_size(zcylinder_in cylinder=zcylinder(), mat4t_in transform = mat4t(), int steps=16) {
+      init(cylinder, transform, steps);
     }
 
     /// Generate mesh from parameters.
     virtual void update() {
-      mesh::set_shape<aabb, mesh::vertex>(get_aabb(), transform, 1);
+      mesh::set_shape<zcylinder, mesh::vertex>(cylinder, transform, steps);
     }
 
     /// Serialise the box
