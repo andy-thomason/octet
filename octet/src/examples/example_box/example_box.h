@@ -20,8 +20,7 @@ namespace octet {
       app_scene->create_default_camera_and_lights();
 
       material *red = new material(vec4(1, 0, 0, 1));
-      //mesh *box = new mesh_box(vec3(4));
-      mesh *box = new mesh_cylinder();
+      mesh *box = new mesh_box(vec3(4));
       scene_node *node = new scene_node();
       app_scene->add_child(node);
       app_scene->add_mesh_instance(new mesh_instance(node, box, red));
