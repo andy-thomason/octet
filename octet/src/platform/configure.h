@@ -35,10 +35,6 @@
   #define GL_UNIFORM_BUFFER 0
 #endif
 
-#ifndef OCTET_PREFIX
-  #define OCTET_PREFIX "../../../"
-#endif
-
 // use <> to include from standard directories
 // use "" to include from our own project
 #include <stdio.h>
@@ -49,6 +45,7 @@
 #include <math.h>
 #include <assert.h>
 #include <string>
+
 #if defined(WIN32)
   #include <direct.h>
 #endif

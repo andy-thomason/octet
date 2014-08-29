@@ -1042,43 +1042,44 @@ namespace octet { namespace scene {
       return true;
     }
 
+    template <class vertex_t> struct sink {
+      mesh *mesh_;
+      dynarray<vertex_t> vertices;
+      dynarray<uint32_t> indices;
+      mat4t transform;
+
+      sink(mesh *mesh_, mat4t_in transform) :
+        mesh_(mesh_), transform(transform)
+      {
+      }
+
+      ~sink() {
+        mesh_->allocate(sizeof(vertex_t) * vertices.size(), sizeof(uint32_t) * indices.size());
+        mesh_->get_vertices()->assign(vertices.data(), 0, sizeof(vertex_t) * vertices.size());
+        mesh_->get_indices()->assign(indices.data(), 0, sizeof(uint32_t) * indices.size());
+      }
+
+      void reserve(uint32_t num_vertices, uint32_t num_indices) {
+        mesh_->set_num_vertices(num_vertices);
+        mesh_->set_num_indices(num_indices);
+      }
+
+      void add_vertex(vec3_in pos, vec3_in normal, vec3_in uvw) {
+        vec3 tpos = pos * transform;
+        vec3 tnormal = normal.x() * transform.x().xyz() + normal.y() * transform.y().xyz() + normal.z() * transform.z().xyz();
+        vertices.push_back(vertex_t(tpos, tnormal, uvw));
+      }
+
+      void add_triangle(uint32_t a, uint32_t b, uint32_t c) {
+        indices.push_back(a);
+        indices.push_back(b);
+        indices.push_back(c);
+      }
+    };
+
     template <class shape_t, class vertex_t> void set_shape(shape_t &shape, mat4t_in transform, int steps) {
-      struct sink {
-        mesh *mesh_;
-        dynarray<vertex_t> vertices;
-        dynarray<uint32_t> indices;
-        mat4t transform;
-
-        sink(mesh *mesh_, mat4t_in transform) :
-          mesh_(mesh_), transform(transform)
-        {
-        }
-
-        ~sink() {
-          mesh_->allocate(sizeof(vertex_t) * vertices.size(), sizeof(uint32_t) * indices.size());
-          mesh_->get_vertices()->assign(vertices.data(), 0, sizeof(vertex_t) * vertices.size());
-          mesh_->get_indices()->assign(indices.data(), 0, sizeof(uint32_t) * indices.size());
-        }
-
-        void reserve(uint32_t num_vertices, uint32_t num_indices) {
-          mesh_->set_num_vertices(num_vertices);
-          mesh_->set_num_indices(num_indices);
-        }
-
-        void add_vertex(vec3_in pos, vec3_in normal, vec3_in uvw) {
-          vec3 tpos = pos * transform;
-          vec3 tnormal = normal.x() * transform.x().xyz() + normal.y() * transform.y().xyz() + normal.z() * transform.z().xyz();
-          vertices.push_back(vertex_t(tpos, tnormal, uvw));
-        }
-
-        void add_triangle(uint32_t a, uint32_t b, uint32_t c) {
-          indices.push_back(a);
-          indices.push_back(b);
-          indices.push_back(c);
-        }
-      };
-
-      shape.get_geometry(sink(this, transform), steps);
+      sink<vertex_t> sink_(this, transform);
+      shape.get_geometry(sink_, steps);
     }
   };
 }}

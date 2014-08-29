@@ -36,6 +36,12 @@
   #if OCTET_OPENCL
     #include <OpenCL/opencl.h>
   #endif
+#elif defined(OCTET_LINUX)
+  #define GL_GLEXT_PROTOTYPES
+  #include <GL/glut.h>
+  #include <GL/glext.h>
+  #include <AL/alc.h>
+  #include <AL/al.h>
 #endif
 
 // include cross platform app helpers, such as texture loaders
