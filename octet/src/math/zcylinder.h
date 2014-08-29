@@ -34,7 +34,7 @@ namespace octet { namespace math {
       return dest;
     }
 
-	  template <class sink_t> void get_geometry(sink_t &sink, int steps) {
+    template <class sink_t> void get_geometry(sink_t &sink, int steps) const {
       sink.reserve(steps * 4, steps * 6 + (steps - 2) * 6);
 
       float k = (3.14159265f * 2) / steps;

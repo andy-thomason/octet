@@ -8,6 +8,7 @@
 //
 
 // condensed version of Khronos gl3.h
+namespace {
 typedef void GLvoid;
 typedef char GLchar;
 typedef unsigned int GLenum;
@@ -1940,5 +1941,6 @@ typedef void (GL_APIENTRY *glVertexBindingDivisor_t)(GLuint bindingindex, GLuint
 
     //printf("OpenGL 3.1: nc/ok=%d/%d\n", num_checked, num_ok); num_checked = num_ok = 0;
   }
+}
 
 #endif

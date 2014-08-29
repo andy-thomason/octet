@@ -37,7 +37,7 @@ static char *get_sprintf_buffer() {
   //#include "glut_specific.h"
 #elif defined(OCTET_VITA)
   #include "../../external/src/vita_specific.h"
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(OCTET_LINUX)
   #include <unistd.h>
   #include <sys/socket.h>
   #include <sys/ioctl.h>

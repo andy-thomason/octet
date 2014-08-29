@@ -40,7 +40,8 @@ namespace octet { namespace scene {
 
     /// Generate mesh from parameters.
     virtual void update() {
-      mesh::set_shape<aabb, mesh::vertex>(get_aabb(), transform, 1);
+      aabb aabb_ = get_aabb();
+      mesh::set_shape<math::aabb, mesh::vertex>(aabb_, transform, 1);
     }
 
     /// Serialise the box
