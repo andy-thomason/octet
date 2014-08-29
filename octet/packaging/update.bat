@@ -11,4 +11,5 @@ packaging\make_example.py example_sphere
 packaging\make_example.py example_text
 packaging\make_example.py example_texture
 packaging\make_example.py example_triangle
+packaging\make_example.py example_compute
 
