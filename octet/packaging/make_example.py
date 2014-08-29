@@ -3,7 +3,7 @@ import os
 import dircache
 import string
 
-proto_dir = 'packaging/make_example_prototype/'
+proto_dir = 'src/examples/example_prototype/'
 target_dir = 'src/examples/'
 
 def make_example(projname):
