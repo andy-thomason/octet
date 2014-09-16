@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <title>Octet Game Framework</title>
+  </head>
+  <body>
+    <img src="logo.gif"/><br/>
+    <a href="index.html">contents</a><br/>
+    <h1>Overiew of Octet</h1>
+    <h2>Introduction</h2>
+    <p>Octet is not a game engine. Octet is a framework for teaching low level programming
+    in games and is far less complex than a game engine. We aim to teach the fundamentals of
+    game technology construction, not how to call APIs. If you want a pre-built engine,
+    use Unity - it is well supported and idiot-proof.</p>
+    <p>Octet supports only one graphics API - OpenGL and then only the mobile subset "GLES".
+    This enables the user to get down and dirty with the closest layer to the hardware available
+    on the platform. GLES runs on PC, MAC, iOS, Android, Raspberry Pi, Panda boards, toasters,
+    nuclear missiles and toy rabbits. By contrast, DirectX runs on PCs only.</p>
+    <p>Octet supports only one Audio API - OpenAL. There is also a fake OpenAL for running on
+    PCs where the real OpenAL is not installed, this makes Octet have fewer dependencies.</p>
+    <p>For GPGPU support, you can use OpenCL or compute shaders. If you want your application
+    to only run on PCs, use CUDA. We will provide support for SPIR and SYCL in due course
+    also as these standards emerge.</p>
+    <h2>Containers</h2>
+    <p>Octet containers behave much like STL containers. Game programmers usually avoid STL
+    because of the poor implementation, but this is becomming less of a problem with time and
+    we may switch to using STL in the future.
+    <p>The dynarray class behaves like std::vector, but has additional support for serialization.
+    The most common error is to use dynarray (or std::vector) with complex classes. Many classes
+    do not have copy constructors, which are required to do this and will probbaly crash at runime.
+    Instead use <b>dynarray&lt;myclass*&gt; or dynarray&lt;ref&lt;myclass&gt; &gt;</b> with myclass
+    derived from <b>resource</b>.</p>
+    <p>The dictonary class maps ASCII strings to any object, this is about two orders of magnitude faster
+    than std::map&lt;std::string, ...&gt;</p>
+    <p>The ref class is like the boost intrusive_ptr class and manages reference counted objects.
+    If the object is derived from <b>resource</b> then this happens automagicly. Try to avoid
+    using naked new and delete operators. That is very dangerous...</p>
+    <h2>Exceptions and iostreams</h2>
+    <p>Game programmers do not use exceptions - these
+    are the frequent cause of bugs and bloat the code as much as two times reducing performance
+    correspondingly. The principle of "handle your errors at source" is utterly important. Do not throw
+    exceptions, the Ariane 5 spacecraft is a good example of why you should do this!</p>
+    <p>Use "defensive programming" if possible. Use assertions which will blow up in debug mode,
+    but check pointers and return harmlessly if things are not as expected</p>
+    We also avoid "cout &lt;&lt; x;" (iostreams) as this leads to very large,
+    low performance code.<p>
+    <h2>Logging</h2>
+    <p>Octet has a "log" function in app_utils.h that can be used to trace errors and progress.
+    Use this to debug data structures and userstand internal processes.</p>
+    The log function returns a file pointer to the output stream that can be used with fprintf
+    or dumps.<p>
+    <h2>Scene structure</h2>
+    <p>Octet has a heirachical node structure, like Unity, but uses nodes to render "mesh instances"
+    which associate mesh data (attributes) with materials (uniforms).
+    This is designed for high performance rendering where typically the scene will be sorted
+    in various ways to minimise state changes and overdraw. At present, there is no
+    LOD, occluders, conditional rendering, multithread scene optimization or other things
+    common in game engines, but it is easy to implement these things. To Add them as part
+    of Octet would make it harder to understand. If you want to see this in action, look
+    at OGRE. It is unlikely that students will create scenes that are complex enough
+    to requite these things, and I am happy to provide examples when necessary.</p>
+    <p>See example_box and example_duck to see how to construct scenes.</p>
+    <h2>Procedural geometry</h2>
+    <p>Octet makes it easy to generate procedural geometry which makes for interesting worlds
+    such as Micecraft clones, lego seascapes and procedural cities. Take a look at example_geometry
+    to show how to make your own shapes. For example, you could build trees by creating cylinder
+    trunks and branches with quads for leaves.</p>
+    <h2>Physics</h2>
+    <p>Octet can use the Bullet physics system for physics based animation. See example_physics
+    to see this in action. Bullet allows you to create rigid bodies and constraints to make
+    worlds with physics.</p>
+    <h2>Open projects</h2>
+    <p>Currently the vehicle and cubemap projects need completion. I would be very happy
+    to recieve patches for these for review.</p>
+    <p>We are very much in need of a continuous integration system for Octet. We need to be able
+    to build the examples on Mac, Linux and PC on every checkin. If build errors occur, or tests
+    (to be done!) fail, we need to send a mail. We could use buildbot, for example.</p>
+    <h2>Ports</h2>
+    <p>Help with ports would be appreciated. We would like to target Android, Google NaCl,
+    iOS, emscripten and others with the absolute minimum of glue. Please consult before trying this as
+    we need to see how little we can get away with.</p>
+    <h2>Submitting patches</h2>
+    <p>If something doesn't work, please don't complain, but fix the problem and submit a patch.</p>
+    <p>If you use git to check out the project and edit files until they work, you can use
+    <b>git diff</b> to generate a patch. I will review the patches and commit the smallest,
+    tidiest ones. Monster patches may be eliminated. If you submit a couple of good patches,
+    I'll give you commit access on the project, but reserve the right to roll back.</p>
+  </body>
+</head>
