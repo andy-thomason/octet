@@ -443,8 +443,8 @@ namespace octet { namespace loaders {
         TiXmlElement *blinn = child(technique, "blinn");
         TiXmlElement *lambert = child(technique, "lambert");
         TiXmlElement *shader = phong ? phong : blinn ? blinn : lambert;
-        gl_resource *static_buffer = new gl_resource(0, 256);
-        param_buffer_info pbi(static_buffer, 1);
+        dynarray<uint8_t> static_buffer(256);
+        param_buffer_info pbi(static_buffer.data(), 1);
         GLint texture_slot = 0;
         if (shader) {
           url += url[0] == '#';

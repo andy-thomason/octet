@@ -32,7 +32,6 @@ namespace octet {
 
       if (meshes.size()) {
         material *mat = new material(new image("assets/duckCM.gif"));
-        //material *mat = new material(vec4(1, 0, 0, 1));
         mesh *duck = meshes[0]->get_mesh();
         scene_node *node = new scene_node();
         node->translate(vec3(-50, -50, 0));

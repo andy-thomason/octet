@@ -10,8 +10,12 @@
 namespace octet { namespace resources {
   /// Wrapper for an OpenGL resource.
   class gl_resource : public resource {
-    // in GLES2, we need to have a second buffer containing the data
-    dynarray<uint8_t> bytes;
+    #ifdef OCTET_GLES2
+      // in GLES2, we need to have a second buffer containing the data
+      dynarray<uint8_t> bytes;
+    #else
+      size_t size;
+    #endif
 
     // This buffer object contains the bytes in GPU memory
     GLuint buffer;
@@ -74,18 +78,25 @@ namespace octet { namespace resources {
 
     /// serialize this object.
     void visit(visitor &v) {
-      v.visit(bytes, atom_bytes);
+      #ifdef OCTET_GLES2
+        v.visit(bytes, atom_bytes);
+      #endif
       v.visit(target, atom_target);
     }
 
     /// Allocate a new OpenGL object.
-    void allocate(GLuint target, unsigned size) {
+    void allocate(GLuint target, size_t size, GLuint kind = GL_STATIC_DRAW) {
       reset();
       glGenBuffers(1, &buffer);
       glBindBuffer(target, buffer);
-      glBufferData(target, size, NULL, GL_STATIC_DRAW);
-      bytes.resize(size);
+      glBufferData(target, size, NULL, kind);
+      #ifdef OCTET_GLES2
+        bytes.resize(size);
+      #else
+        this->size = size;
+      #endif
       this->target = target;
+      glBindBuffer(target, 0);
     }
 
     /// Clear the OpenGL object
@@ -93,7 +104,9 @@ namespace octet { namespace resources {
       if (buffer != 0) {
         glDeleteBuffers(1, &buffer);
       }
-      bytes.reset();
+      #ifdef OCTET_GLES2
+        bytes.reset();
+      #endif
       buffer = 0;
     }
 
@@ -108,8 +121,12 @@ namespace octet { namespace resources {
     }
 
     /// get the buffer size
-    unsigned get_size() const {
-      return bytes.size();
+    size_t get_size() const {
+      #ifdef OCTET_GLES2
+        return bytes.size();
+      #else
+        return size;
+      #endif
     }
 
     /// get the GL buffer object we are wrapping.
@@ -120,48 +137,65 @@ namespace octet { namespace resources {
     /// get a read-only lock on this buffer
     /// deprecated
     const void *lock_read_only() const {
-      return (const void*)&bytes[0];
-      //glBindBuffer(target, buffer);
-      //return glMapBufferRange(target, 0, size, GL_MAP_READ_BIT);
+      #ifdef OCTET_GLES2
+        return (const void*)&bytes[0];
+      #else
+        glBindBuffer(target, buffer);
+        return glMapBufferRange(target, 0, size, GL_MAP_READ_BIT);
+      #endif
     }
 
     /// release read-only lock on this buffer
     /// deprecated
     void unlock_read_only() const {
-      //glBindBuffer(target, buffer);
-      //glUnmapBuffer(target);
+      #ifndef OCTET_GLES2
+        glBindBuffer(target, buffer);
+        glUnmapBuffer(target);
+      #endif
     }
 
     /// get a read-write lock on this buffer. Do not use this by preference.
     /// deprecated
     void *lock() const {
-      return (void*)&bytes[0];
-      //glBindBuffer(target, buffer);
-      //return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT|GL_MAP_WRITE_BIT);
+      #ifdef OCTET_GLES2
+        return (void*)&bytes[0];
+      #else
+        glBindBuffer(target, buffer);
+        return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT|GL_MAP_WRITE_BIT);
+      #endif
     }
 
     /// release a read-write lock
     /// deprecated
     void unlock() const {
-      glBindBuffer(target, buffer);
-      glBufferSubData(target, 0, bytes.size(), &bytes[0]);
-      //glUnmapBuffer(target);
+      #ifdef OCTET_GLES2
+        glBindBuffer(target, buffer);
+        glBufferSubData(target, 0, bytes.size(), &bytes[0]);
+      #else
+        glUnmapBuffer(target);
+      #endif
     }
 
     /// get a read-write lock on this buffer
     /// deprecated
     void *lock_write_only() const {
-      return (void*)&bytes[0];
-      //glBindBuffer(target, buffer);
-      //return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT);
+      #ifdef OCTET_GLES2
+        return (void*)&bytes[0];
+      #else
+        glBindBuffer(target, buffer);
+        return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT);
+      #endif
     }
 
     /// release a read-write lock
     /// deprecated
     void unlock_write_only() const {
-      glBindBuffer(target, buffer);
-      glBufferSubData(target, 0, bytes.size(), &bytes[0]);
-      //glUnmapBuffer(target);
+      #ifdef OCTET_GLES2
+        glBindBuffer(target, buffer);
+        glBufferSubData(target, 0, bytes.size(), &bytes[0]);
+      #else
+        glUnmapBuffer(target);
+      #endif
     }
 
     /// bind the resource to the target
@@ -170,7 +204,7 @@ namespace octet { namespace resources {
     }
 
     /// copy data into the resource
-    void assign(void *ptr, unsigned offset, unsigned size) {
+    void assign(void *ptr, size_t offset, size_t size) {
       assert(offset + size <= this->get_size());
 
       memcpy((void*)((char*)lock() + offset), ptr, size);

@@ -1,0 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// default frament shader for solid colours
+//
+
+// inputs
+varying vec4 color_;
+
+void main() {
+  gl_FragColor = color_;
+}
+

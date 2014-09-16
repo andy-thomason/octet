@@ -89,14 +89,13 @@ namespace octet { namespace scene {
   };
 
   struct param_buffer_info {
-    gl_resource *buffer;
     GLint texture_slot;
     unsigned size;
-    gl_resource::rwlock lock;
+    //gl_resource::rwlock lock;
+    uint8_t *uniform_data;
     uint8_t uniform_buffer;
 
-    param_buffer_info(gl_resource *_buffer, uint8_t _uniform_buffer) : lock(_buffer) {
-      buffer =_buffer;
+    param_buffer_info(uint8_t *data, uint8_t _uniform_buffer) : uniform_data(data) {
       texture_slot = 0;
       size = 0;
       uniform_buffer = _uniform_buffer;
@@ -141,13 +140,11 @@ namespace octet { namespace scene {
 
       pbi.size += size;
 
-      assert(pbi.size <= pbi.buffer->get_size() && "Increase the uniform buffer size for this material");
-
       // if data is non-null, we add to the "buffer" part of pbi. (eg. colors)
       // otherwise we just grow the buffer size (eg. matrices, lighting)
       if (!data) return;
 
-      int32_t *idest = (int32_t*)(pbi.lock.u8() + offset);
+      int32_t *idest = (int32_t*)(pbi.uniform_data + offset);
       const int32_t *isrc = (const int32_t*)data;
 
       switch (get_gl_type()) {
