@@ -12,7 +12,11 @@ def make_example(projname):
   except:
     pass
   for fname in dircache.listdir(proto_dir):
-    dest_name = string.replace(fname, 'prototype', projname)
+    if 'prototype' in fname:
+      dest_name = string.replace(fname, 'prototype', projname)
+    else:
+      dest_name = fname
+    print(target_dir + projname + '/' + dest_name)
     try:
       test = open(target_dir + projname + '/' + dest_name, "rb")
       test.close()
