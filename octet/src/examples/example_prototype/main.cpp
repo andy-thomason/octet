@@ -9,7 +9,7 @@
 
 #include "../../octet.h"
 
-#include "example_prototype.h"
+#include "prototype.h"
 
 /// Create a box with octet
 int main(int argc, char **argv) {
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
   octet::app::init_all(argc, argv);
 
   // our application.
-  octet::example_prototype app(argc, argv);
+  octet::prototype app(argc, argv);
   app.init();
 
   // open windows
