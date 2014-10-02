@@ -892,26 +892,35 @@ namespace octet { namespace scene {
       dynarray<uint32_t> dest_indices;
       dest_indices.reserve(get_num_indices());
 
-      gl_resource::rolock idx_lock(get_indices());
-      gl_resource::rolock vtx_lock(get_vertices());
-      const uint32_t *ip = idx_lock.u32();
-      const uint8_t *vp = vtx_lock.u8();
+      //The code below is inside a new scope { ... } with the purpose of be sure that outside the scope idx_lock will be deleted
+      //  why do we want to delete idx_lock? When the object is created it locks indices to read only, and we want to unlock it after using it
+      //  the unlocking of indices at the end of this scope will help us while trying to write to indices again
+      {
+        // This is the begining of a scope, every instance declared inside will be deleted at the end of the scope
+        gl_resource::rolock idx_lock(get_indices());
+        gl_resource::rolock vtx_lock(get_vertices());
+        const uint32_t *ip = idx_lock.u32();
+        const uint8_t *vp = vtx_lock.u8();
 
-      unsigned stride = get_stride();
-      unsigned num_vertices = 0;
-      for (unsigned i = 0; i != get_num_indices(); ++i) {
-        uint32_t idx = ip[i];
-        general_vertex v = { vp + idx * stride, stride };
-        unsigned &e = vertex_to_index[v];
-        if (e == 0) { // hash_map inits to zero
-          // vertex is unique.
-          e = ++num_vertices;
-          unsigned old_size = dest_vertices.size();
-          dest_vertices.resize(old_size + stride);
-          memcpy(&dest_vertices[old_size], vp + idx * stride, stride);
+        unsigned stride = get_stride();
+        unsigned num_vertices = 0;
+        for (unsigned i = 0; i != get_num_indices(); ++i) {
+          uint32_t idx = ip[i];
+          general_vertex v = { vp + idx * stride, stride };
+          unsigned &e = vertex_to_index[v];
+          if (e == 0) { // hash_map inits to zero
+            // vertex is unique.
+            e = ++num_vertices;
+            unsigned old_size = dest_vertices.size();
+            dest_vertices.resize(old_size + stride);
+            memcpy(&dest_vertices[old_size], vp + idx * stride, stride);
+          }
+          dest_indices.push_back(e - 1);
         }
-        dest_indices.push_back(e - 1);
       }
+
+      // This is the end of the scope, not the end of the reindex() function, hence idx_lock, vtx_lock... will be deleted at this point
+      //    and in the case of idx_lock (check gl_resources.h), it will unlock indices, letting us to write in it
 
       // if we have fewer vertices now, update the index and vertices.
       if (num_vertices != get_num_vertices()) {
