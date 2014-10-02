@@ -59,9 +59,9 @@ or "clang" (mac) and rarely these days "gcc" (linux, mac, android).
 
 
 You can make a new project by using the python script in "packaging".
-cd into packaging and run:
+From the project root run:
 
-make_example.py project_name
+packaging\make_example.py project_name
 
 This will put the solution, vcproj, main.cpp and header into src\examples
 
