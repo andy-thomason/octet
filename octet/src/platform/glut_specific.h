@@ -32,6 +32,9 @@
   #include <OpenAL/alc.h>
   #include <OpenAL/al.h>
   #include <OpenCL/cl.h>
+  #include <OpenGL/gl.h>
+  #include <OpenGL/glext.h>
+  //#define GL_GLEXT_PROTOTYPES
   #include <GLUT/glut.h>
   #if OCTET_OPENCL
     #include <OpenCL/opencl.h>
