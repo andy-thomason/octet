@@ -12,6 +12,7 @@
 *.opensdf
 *.obj
 .DS_Store
+xcuserdata
 log.txt
 batch/
 external/

@@ -7,8 +7,8 @@ import stat
 proto_dir = 'src/examples/example_prototype/'
 target_dir = 'src/examples/'
 
-def make_example(src_dir, dest_dir, projname):
-  print("make", src_dir, dest_dir)
+def make_example(src_dir, dest_dir, projname, depth):
+  print(depth,"make", src_dir, dest_dir)
   try:
     os.mkdir(dest_dir)
   except:
@@ -19,11 +19,11 @@ def make_example(src_dir, dest_dir, projname):
       dest_name = string.replace(fname, 'prototype', projname)
     else:
       dest_name = fname
-    print("fname", fname)
+    print(depth, "fname", fname)
     if stat.S_ISDIR(mode):
-      make_example(src_dir + fname + '/', dest_dir + '/' + dest_name + '/', projname)
+      make_example(src_dir + fname + '/', dest_dir + '/' + dest_name + '/', projname, depth+"  ")
     else:
-      print(dest_dir + '/' + dest_name)
+      print(depth, dest_dir + '/' + dest_name)
       try:
         test = open(dest_dir + '/' + dest_name, "rb")
         test.close()
@@ -33,6 +33,11 @@ def make_example(src_dir, dest_dir, projname):
           line = string.replace(line, 'prototype', projname)
           out.write(line)
 
+def update():
+  for dirname in dircache.listdir("src/examples/"):
+    if dirname[0:8] == "example_" and dirname != "example_prototype":
+      print("updating " + dirname)
+      make_example(proto_dir, target_dir + dirname, dirname, "")
 
 num_args = len(sys.argv)
 
@@ -44,7 +49,10 @@ if num_args == 1 or "--help" in sys.argv:
 for i in range(1,num_args):
   arg = sys.argv[i];
   if arg[0] != '-':
-    make_example(proto_dir, target_dir + arg, arg)
+    make_example(proto_dir, target_dir + arg, arg, "")
   else:
-    print("unrecognised option " + arg)
-    exit()
+    if arg == '--update':
+      update()
+    else:
+      print("unrecognised option " + arg)
+      exit()
