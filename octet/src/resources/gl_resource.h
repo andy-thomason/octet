@@ -168,7 +168,8 @@ namespace octet { namespace resources {
         glBindBuffer(target, buffer);
         #ifdef __APPLE__
           // OSX does not support glMapBufferRange 
-          return glMapBuffer(target, GL_READ_WRITE);
+          void *res = glMapBuffer(target, GL_READ_WRITE);
+          return res;
         #else
           return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT|GL_MAP_WRITE_BIT);
         #endif
@@ -195,7 +196,7 @@ namespace octet { namespace resources {
         glBindBuffer(target, buffer);
         #ifdef __APPLE__
           // OSX does not support glMapBufferRange 
-          return glMapBuffer(target, GL_READ_WRITE);
+          return glMapBuffer(target, GL_WRITE_ONLY);
         #else
           return glMapBufferRange(target, 0, size, GL_MAP_WRITE_BIT);
         #endif

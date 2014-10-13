@@ -30,11 +30,15 @@
 		813E369619EB374400E122B9 /* example_prototype */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = example_prototype; sourceTree = BUILT_PRODUCTS_DIR; };
 		813E36A719EB381300E122B9 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
 		813E36AA19EB39D900E122B9 /* octet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = octet.h; path = ../../octet.h; sourceTree = "<group>"; };
-		813E36AB19EB3A3100E122B9 /* glut_specific.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = glut_specific.h; path = ../../platform/glut_specific.h; sourceTree = "<group>"; };
 		81E4F20C19EB3ECD00EACF8C /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		81E4F20E19EB3ED300EACF8C /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
 		81E4F21019EB3EDB00EACF8C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		81E4F21219EB3EF100EACF8C /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		81E4F21419EB42BF00EACF8C /* scene */ = {isa = PBXFileReference; lastKnownFileType = text; name = scene; path = ../../scene; sourceTree = "<group>"; };
+		81E4F21519EB42EE00EACF8C /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; name = resources; path = ../../resources; sourceTree = "<group>"; };
+		81E4F21619EB432300EACF8C /* shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shaders; path = ../../../shaders; sourceTree = "<group>"; };
+		81E4F21719EB434100EACF8C /* math */ = {isa = PBXFileReference; lastKnownFileType = text; name = math; path = ../../math; sourceTree = "<group>"; };
+		81E4F21819EB44E700EACF8C /* platform */ = {isa = PBXFileReference; lastKnownFileType = text; name = platform; path = ../../platform; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,8 +79,12 @@
 		813E369919EB374400E122B9 /* example_prototype */ = {
 			isa = PBXGroup;
 			children = (
-				813E36AB19EB3A3100E122B9 /* glut_specific.h */,
+				81E4F21819EB44E700EACF8C /* platform */,
+				81E4F21719EB434100EACF8C /* math */,
+				81E4F21619EB432300EACF8C /* shaders */,
+				81E4F21519EB42EE00EACF8C /* resources */,
 				813E36AA19EB39D900E122B9 /* octet.h */,
+				81E4F21419EB42BF00EACF8C /* scene */,
 				813E36A719EB381300E122B9 /* main.cpp */,
 			);
 			path = example_prototype;
@@ -195,6 +203,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -202,6 +211,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Release;
 		};
