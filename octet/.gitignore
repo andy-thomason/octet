@@ -19,6 +19,8 @@ external/
 install/
 maple/
 bin/
+build/
+DerivedData/
 vita/PSVita_Debug
 vc2010/layer1/Debug
 vc2010/layer1/Release
