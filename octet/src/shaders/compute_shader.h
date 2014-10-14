@@ -32,24 +32,26 @@ namespace octet { namespace shaders {
     GLuint program() { return program_; }
   
     compute_shader(const char *url) {
-      dynarray<uint8_t> cs;
-      app_utils::get_url(cs, url);
-      cs.push_back(0);
-      const GLchar *csp = (const GLchar *)cs.data();
+      #ifndef __APPLE__
+        dynarray<uint8_t> cs;
+        app_utils::get_url(cs, url);
+        cs.push_back(0);
+        const GLchar *csp = (const GLchar *)cs.data();
 
-      GLsizei length;
-      char buf[256];
-      // create our vertex shader and compile it
-      GLuint shader_object = glCreateShader(GL_COMPUTE_SHADER);
-      glShaderSource(shader_object, 1, &csp, NULL);
-      glCompileShader(shader_object);
-      glGetShaderInfoLog(shader_object, sizeof(buf), &length, buf);
-      if (length) {
-        log("%s\nCompute shader error:\n%s\n\n\n\n", cs.data(), buf);
-        printf("see log.txt for shader errors\n");
-      }
-    
-      link(shader_object);
+        GLsizei length;
+        char buf[256];
+        // create our vertex shader and compile it
+        GLuint shader_object = glCreateShader(GL_COMPUTE_SHADER);
+        glShaderSource(shader_object, 1, &csp, NULL);
+        glCompileShader(shader_object);
+        glGetShaderInfoLog(shader_object, sizeof(buf), &length, buf);
+        if (length) {
+          log("%s\nCompute shader error:\n%s\n\n\n\n", cs.data(), buf);
+          printf("see log.txt for shader errors\n");
+        }
+      
+        link(shader_object);
+      #endif
     }
 
     // start using the program
@@ -59,7 +61,9 @@ namespace octet { namespace shaders {
 
     // use the program we have compiled in init()
     void dispatch(size_t x, size_t y = 1, size_t z = 1) {
-      glDispatchCompute((GLuint)x, (GLuint)y, (GLuint)z);
+      #ifndef __APPLE__
+        glDispatchCompute((GLuint)x, (GLuint)y, (GLuint)z);
+      #endif
     }
 
     /// get the OpenGL program object.

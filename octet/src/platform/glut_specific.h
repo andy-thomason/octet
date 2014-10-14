@@ -29,9 +29,12 @@
     #include <CL/cl.h>
   #endif
 #elif defined(__APPLE__)
+  //#define OCTET_GLES2 1
   #include <OpenAL/alc.h>
   #include <OpenAL/al.h>
   #include <OpenCL/cl.h>
+  #include <OpenGL/gl.h>
+  #include <OpenGL/glext.h>
   #include <GLUT/glut.h>
   #if OCTET_OPENCL
     #include <OpenCL/opencl.h>
