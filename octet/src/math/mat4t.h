@@ -566,6 +566,16 @@ namespace octet { namespace math {
       return length > 0.000001f ? axis / length : vec3(0, 0, 1);
     }
 
+    mat4t &lookat(vec3_in target, vec3_in up=vec3(0, 1, 0)) {
+      vec3 z = normalize(v[3].xyz() - target);
+      vec3 x = normalize(cross(up, z));
+      vec3 y = cross(z, x);
+      v[2] = vec4(z, 0);
+      v[0] = vec4(x, 0);
+      v[1] = vec4(y, 0);
+      return *this;
+    }
+
     /// get 2x2 sub-matrix
     mat4t xy() const { return mat4t(v[0].xy00(), v[1].xy00(), vec4(0, 0, 1, 0), vec4(0, 0, 0, 1)); }
 
