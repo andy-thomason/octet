@@ -26,6 +26,14 @@ namespace octet { namespace math {
       return aabb(center, vec3(radius, radius, half_extent));
     }
 
+    float get_radius() const {
+      return radius;
+    }
+
+    float get_half_extent() const {
+      return half_extent;
+    }
+
     // Get a string representation of the object.
     // Requires a buffer (dest, len)
     const char *toString(char *dest, size_t len) const {
@@ -42,10 +50,10 @@ namespace octet { namespace math {
       for (unsigned i = 0; i != steps; ++i) {
         float c = cosf(i * k);
         float s = sinf(i * k);
-        sink.add_vertex(center + vec3(c, s, -1), vec3(c, s, 0), vec3(i * ku, 0, 0));
-        sink.add_vertex(center + vec3(c, s,  1), vec3(c, s, 0), vec3(i * ku, 1, 0));
-        sink.add_vertex(center + vec3(c, s, -1), vec3(0, 0, -1), vec3(c, s, -1));
-        sink.add_vertex(center + vec3(c, s,  1), vec3(0, 0,  1), vec3(c, s,  1));
+        sink.add_vertex(center + vec3(c*radius, s*radius, -half_extent), vec3(c, s, 0), vec3(i * ku, 0, 0));
+        sink.add_vertex(center + vec3(c*radius, s*radius,  half_extent), vec3(c, s, 0), vec3(i * ku, 1, 0));
+        sink.add_vertex(center + vec3(c*radius, s*radius, -half_extent), vec3(0, 0, -1), vec3(c, s, -1));
+        sink.add_vertex(center + vec3(c*radius, s*radius,  half_extent), vec3(0, 0,  1), vec3(c, s,  1));
       }
 
       // sides

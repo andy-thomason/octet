@@ -22,7 +22,7 @@ namespace octet { namespace math {
       union {
         __m128 m;
         float v[4];
-        float i[4];
+        int i[4];
       };
     #else
       float v[3];

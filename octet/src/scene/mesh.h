@@ -300,6 +300,13 @@ namespace octet { namespace scene {
       return false;
     }
 
+    #ifdef OCTET_BULLET
+      /// Get a bullet shape object for this mesh
+      virtual btCollisionShape *get_bullet_shape() {
+        return NULL;
+      }
+    #endif
+
     /// get which slot a particular attribute is in. (does a search).
     unsigned get_slot(unsigned attr) const {
       for (unsigned i = 0; i != max_slots; ++i) {
@@ -1073,16 +1080,22 @@ namespace octet { namespace scene {
         mesh_->set_num_indices(num_indices);
       }
 
-      void add_vertex(vec3_in pos, vec3_in normal, vec3_in uvw) {
+      size_t add_vertex(vec3_in pos, vec3_in normal, vec3_in uvw) {
         vec3 tpos = pos * transform;
         vec3 tnormal = normal.x() * transform.x().xyz() + normal.y() * transform.y().xyz() + normal.z() * transform.z().xyz();
+        size_t index = vertices.size();
         vertices.push_back(vertex_t(tpos, tnormal, uvw));
+        return index;
       }
 
       void add_triangle(uint32_t a, uint32_t b, uint32_t c) {
         indices.push_back(a);
         indices.push_back(b);
         indices.push_back(c);
+      }
+
+      const vertex_t &get_vertex(size_t index) const {
+        return vertices[index];
       }
     };
 

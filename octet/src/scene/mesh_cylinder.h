@@ -27,11 +27,11 @@ namespace octet { namespace scene {
     RESOURCE_META(mesh_cylinder)
 
     /// Construct cylinder mesh from shape
-    mesh_cylinder(zcylinder_in cylinder=zcylinder(), mat4t_in transform = mat4t(), int steps=16) {
+    mesh_cylinder(zcylinder_in cylinder=zcylinder(), mat4t_in transform = mat4t(), int steps=32) {
       init(cylinder, transform, steps);
     }
 
-    void set_size(zcylinder_in cylinder=zcylinder(), mat4t_in transform = mat4t(), int steps=16) {
+    void set_size(zcylinder_in cylinder=zcylinder(), mat4t_in transform = mat4t(), int steps=32) {
       init(cylinder, transform, steps);
     }
 
@@ -47,6 +47,13 @@ namespace octet { namespace scene {
         update();
       }
     }
+
+    #ifdef OCTET_BULLET
+      /// Get a bullet shape object for this mesh
+      btCollisionShape *get_bullet_shape() {
+        return new btCylinderShapeZ(btVector3(cylinder.get_radius(), cylinder.get_radius(), cylinder.get_half_extent()));
+      }
+    #endif
   };
 }}
 
