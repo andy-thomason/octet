@@ -29,6 +29,7 @@ OCTET_CLASS(scene, sampler)
 OCTET_CLASS(scene, mesh_box)
 OCTET_CLASS(scene, mesh_sphere)
 OCTET_CLASS(scene, mesh_particle_system)
+OCTET_CLASS(scene, mesh_voxel_grid)
 #ifdef OCTET_VOXEL_TEST
   OCTET_CLASS(scene, mesh_voxels)
   OCTET_CLASS(scene, mesh_voxel_subcube)

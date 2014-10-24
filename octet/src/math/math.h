@@ -85,5 +85,6 @@ namespace octet {
 #include "ray.h"
 #include "polygon.h"
 #include "zcylinder.h"
+#include "voxel_grid.h"
 
 #endif

@@ -39,6 +39,7 @@
 #endif
 #include "../scene/mesh_points.h"
 #include "../scene/wireframe.h"
+#include "../scene/mesh_voxel_grid.h"
 
 namespace octet {
   using namespace scene;

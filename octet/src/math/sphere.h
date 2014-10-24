@@ -107,9 +107,9 @@ namespace octet { namespace math {
         vec3 bc = normalize((pb + pc) * 0.5f);
         vec3 ca = normalize((pc + pa) * 0.5f);
 
-        int nab = sink.add_vertex(pos(ab), ab, uv(ab));
-        int nbc = sink.add_vertex(pos(bc), bc, uv(bc));
-        int nca = sink.add_vertex(pos(ca), ca, uv(ca));
+        int nab = (int)sink.add_vertex(pos(ab), ab, uv(ab));
+        int nbc = (int)sink.add_vertex(pos(bc), bc, uv(bc));
+        int nca = (int)sink.add_vertex(pos(ca), ca, uv(ca));
 
         add_triangle(sink, a, nab, nca, level+1, max_level);
         add_triangle(sink, b, nbc, nab, level+1, max_level);
