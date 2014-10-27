@@ -1,0 +1,8 @@
+﻿Build started 01/10/2014 23:42:20.
+     1>Project "C:\projects\octet\octet\src\examples\example_box\example_box.vcxproj" on node 2 (ClCompile target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Platforms\Android\Microsoft.Cpp.Android.targets(475,5): error MSB8008: Specified platform toolset (v120) is not installed or invalid. Please make sure that a supported PlatformToolset value is selected.
+     1>Done Building Project "C:\projects\octet\octet\src\examples\example_box\example_box.vcxproj" (ClCompile target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.09
