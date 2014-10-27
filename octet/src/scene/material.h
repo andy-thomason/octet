@@ -24,6 +24,9 @@ namespace octet { namespace scene {
     dynarray<uint8_t> static_buffer;
     dynarray<uint8_t> dynamic_buffer;
 
+    int dynamic_size;
+    int static_size;
+
     // create the parameters that change frequently such as the matrices and lighting
     void create_dynamic_params() {
       static_buffer.resize(0x100);
@@ -34,6 +37,8 @@ namespace octet { namespace scene {
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToCamera, GL_FLOAT_MAT4, 1, param::stage_vertex));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_lighting, GL_FLOAT_VEC4, ambient_size + max_lights * light_size, param::stage_fragment));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_num_lights, GL_INT, 1, param::stage_fragment));
+
+      dynamic_size = dynamic_pbi.size;
     }
 
     // create the attribute parameters
@@ -67,6 +72,7 @@ namespace octet { namespace scene {
 
       param_buffer_info static_pbi(static_buffer.data(), 1);
       params.push_back(new param_color(static_pbi, color, atom_diffuse, param::stage_fragment));
+      static_size = static_pbi.size;
 
       if (shader == NULL) {
         shader = new param_shader("shaders/default.vs", "shaders/default_solid.fs");
@@ -86,6 +92,7 @@ namespace octet { namespace scene {
 
       param_buffer_info static_pbi(static_buffer.data(), 1);
       params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, smpl, param::stage_fragment));
+      static_size = static_pbi.size;
 
       if (shader == NULL) {
         shader = new param_shader("shaders/default.vs", "shaders/default_textured.fs");
@@ -170,8 +177,25 @@ namespace octet { namespace scene {
       }
     }
 
+    void set_uniform(param_uniform *param, void *data, size_t size) {
+      memcpy(dynamic_buffer.data() + param->get_offset(), data, size);
+    }
+
     dynarray<ref<param> > &get_params() {
       return params;
+    }
+
+    param_uniform *add_uniform(const void *data, atom_t name, uint16_t _type, uint16_t _repeat, param::stage_type _stage=param::stage_fragment) {
+      param_buffer_info pbi(dynamic_buffer.data(), 0);
+      pbi.size = dynamic_size;
+      param_uniform *result = new param_uniform(pbi, data, name, _type, _repeat, _stage);
+      params.push_back(result);
+      dynamic_size = pbi.size;
+
+      param_bind_info pbind;
+      pbind.program = custom_shader->get_program();
+      result->bind(pbind);
+      return result;
     }
   };
 }}

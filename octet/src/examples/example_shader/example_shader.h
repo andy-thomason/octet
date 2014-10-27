@@ -9,6 +9,11 @@ namespace octet {
   class example_shader : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;
+
+    ref<material> custom_mat;
+
+    ref<param_uniform> num_spots;
+
   public:
     /// this is called when we construct the class before everything is initialised.
     example_shader(int argc, char **argv) : app(argc, argv) {
@@ -20,12 +25,15 @@ namespace octet {
       app_scene->create_default_camera_and_lights();
 
       param_shader *shader = new param_shader("shaders/default.vs", "shaders/spots.fs");
-      material *red = new material(vec4(1, 0, 0, 1), shader);
+      custom_mat = new material(vec4(1, 1, 1, 1), shader);
+      atom_t atom_num_spots = app_utils::get_atom("num_spots");
+      float val = 4;
+      num_spots = custom_mat->add_uniform(&val, atom_num_spots, GL_FLOAT, 1, param::stage_fragment);
 
       mesh_box *box = new mesh_box(vec3(4));
       scene_node *node = new scene_node();
       app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, box, red));
+      app_scene->add_mesh_instance(new mesh_instance(node, box, custom_mat));
     }
 
     /// this is called to draw the world
@@ -33,6 +41,10 @@ namespace octet {
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
+
+      // change the number of spots dynamically
+      float nf = (float)(get_frame_number()/33)+8;
+      custom_mat->set_uniform(num_spots, &nf, sizeof(nf));
 
       // update matrices. assume 30 fps.
       app_scene->update(1.0f/30);

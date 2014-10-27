@@ -183,6 +183,10 @@ namespace octet { namespace scene {
       return uniform;
     }
 
+    unsigned get_offset() const {
+      return offset;
+    }
+
     /// if buffer is a pointer to a uniform buffer, set the value in the correct place.
     void set_value(uint8_t *buffer, const void *value, unsigned size) {
       memcpy(buffer + offset, value, size);
