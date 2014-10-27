@@ -53,6 +53,11 @@ namespace octet { namespace scene {
       btCollisionShape *get_bullet_shape() {
         return new btCylinderShapeZ(btVector3(cylinder.get_radius(), cylinder.get_radius(), cylinder.get_half_extent()));
       }
+
+      /// Get a static bullet shape object for this mesh
+      btCollisionShape *get_static_bullet_shape() {
+        return new btCylinderShapeZ(btVector3(cylinder.get_radius(), cylinder.get_radius(), cylinder.get_half_extent()));
+      }
     #endif
   };
 }}

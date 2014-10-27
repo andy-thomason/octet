@@ -25,7 +25,7 @@ namespace octet {
       btMatrix3x3 matrix(get_btMatrix3x3(mat));
       btVector3 pos(get_btVector3(mat[3].xyz()));
 
-      btCollisionShape *shape = msh->get_bullet_shape();
+      btCollisionShape *shape = is_dynamic ? msh->get_bullet_shape() : msh->get_static_bullet_shape();
       if (shape) {
         btTransform transform(matrix, pos);
 
@@ -33,7 +33,7 @@ namespace octet {
         btScalar mass = is_dynamic ? 1.0f : 0.0f;
         btVector3 inertiaTensor;
    
-        shape->calculateLocalInertia(mass, inertiaTensor);
+        if (is_dynamic) shape->calculateLocalInertia(mass, inertiaTensor);
     
         btRigidBody * rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
         world->addRigidBody(rigid_body);

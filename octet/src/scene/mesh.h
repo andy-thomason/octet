@@ -305,6 +305,30 @@ namespace octet { namespace scene {
       virtual btCollisionShape *get_bullet_shape() {
         return NULL;
       }
+
+      /// Get a bullet shape object for this mesh for static use only!
+      virtual btCollisionShape *get_static_bullet_shape() {
+        // note that it is your responsibility to deallocate resources!
+        btTriangleMesh *trimesh = new btTriangleMesh();
+        btIndexedMesh mesh;
+        mesh.m_numTriangles = get_num_indices() / 3;
+        mesh.m_triangleIndexBase = (const unsigned char *)malloc(get_indices()->get_size());
+        mesh.m_triangleIndexStride = 4;
+        mesh.m_numVertices = get_num_vertices();
+        mesh.m_vertexBase = (const unsigned char *)malloc(get_vertices()->get_size());
+        mesh.m_vertexStride = get_stride();
+
+        {
+          gl_resource::rolock idx_lock(get_indices());
+          gl_resource::rolock vtx_lock(get_vertices());
+          memcpy((void*)mesh.m_triangleIndexBase, idx_lock.u8(), get_indices()->get_size());
+          memcpy((void*)mesh.m_vertexBase, vtx_lock.u8(), get_vertices()->get_size());
+        }
+
+        trimesh->addIndexedMesh(mesh);
+        btBvhTriangleMeshShape *result = new btBvhTriangleMeshShape(trimesh, true);
+        return result;
+      }
     #endif
 
     /// get which slot a particular attribute is in. (does a search).
@@ -1073,11 +1097,13 @@ namespace octet { namespace scene {
         mesh_->allocate(sizeof(vertex_t) * vertices.size(), sizeof(uint32_t) * indices.size());
         mesh_->get_vertices()->assign(vertices.data(), 0, sizeof(vertex_t) * vertices.size());
         mesh_->get_indices()->assign(indices.data(), 0, sizeof(uint32_t) * indices.size());
+        mesh_->set_num_vertices(vertices.size());
+        mesh_->set_num_indices(indices.size());
       }
 
       void reserve(uint32_t num_vertices, uint32_t num_indices) {
-        mesh_->set_num_vertices(num_vertices);
-        mesh_->set_num_indices(num_indices);
+        vertices.reserve(num_vertices);
+        indices.reserve(num_indices);
       }
 
       size_t add_vertex(vec3_in pos, vec3_in normal, vec3_in uvw) {
