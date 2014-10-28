@@ -151,6 +151,24 @@ namespace octet { namespace resources {
         }
       }
     }
+
+    // dump the assets in the dictionary as code.
+    void dump_assets(FILE *log) {
+      unsigned num_indices = dict.get_num_indices();
+      for (unsigned i = 0; i != num_indices; ++i) {
+        const char *key = dict.get_key(i);
+        if (key) {
+          resource *res = dict.get_value(i);
+          const char *type = app_utils::get_atom_name(res->get_type());
+          string c_name = key;
+          for (char *p = c_name.data(); *p; ++p) {
+            if (*p == '-' || *p == '+') *p = '_';
+          }
+          fprintf(log, "    %s *%s = dict.get_%s(\"%s\");\n", type, c_name.c_str(), type, key);
+        }
+      }
+      fflush(log);
+    }
   };
 
 } }

@@ -45,10 +45,6 @@ namespace octet {
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
 
-      // change the number of spots dynamically
-      float nf = (float)(get_frame_number()/33)+8;
-      custom_mat->set_uniform(num_spots, &nf, sizeof(nf));
-
       // update matrices. assume 30 fps.
       app_scene->update(1.0f/30);
 

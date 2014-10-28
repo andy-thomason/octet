@@ -71,7 +71,7 @@ namespace octet {
       add_shape(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, true);
 
       mat.loadIdentity();
-      mat.translate(0, 3, 0);
+      mat.translate(0, 10, 0);
       add_shape(mat, new mesh_box(vec3(2, 2, 2)), red, true);
 
       mat.loadIdentity();

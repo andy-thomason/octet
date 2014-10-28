@@ -369,6 +369,11 @@ namespace octet { namespace containers {
     /// Get a C string from this string.
     operator const char *() { return data_; }
 
+    /// raw data access
+    char *data() const {
+      return data_;
+    }
+
     /// Get/set a byte from the string.
     char &operator[](int index) { return data_[index]; }
     
