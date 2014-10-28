@@ -197,6 +197,20 @@ namespace octet { namespace scene {
       result->bind(pbind);
       return result;
     }
+
+    param_sampler *add_sampler(GLint texture_slot, atom_t name, image *_image, sampler *_sampler, param::stage_type _stage=param::stage_fragment) {
+      param_buffer_info pbi(static_buffer.data(), 1);
+      pbi.texture_slot = texture_slot;
+      pbi.size = static_size;
+      param_sampler *result = new param_sampler(pbi, name, _image, _sampler, _stage);
+      params.push_back(result);
+      static_size = pbi.size;
+
+      param_bind_info pbind;
+      pbind.program = custom_shader->get_program();
+      result->bind(pbind);
+      return result;
+    }
   };
 }}
 
