@@ -38,13 +38,9 @@ namespace octet {
       scene_node *Lamp = dict.get_scene_node("Lamp");
       scene_node *start = dict.get_scene_node("start");
 
-      btCollisionShape *coll = trough_mesh_Material_material->get_static_bullet_shape();
-
+      mat4t location;
       material *red = new material(vec4(1, 0, 0, 1));
-      //mesh_box *box = new mesh_box(vec3(4));
-      scene_node *node = new scene_node();
-      app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, trough_mesh_Material_material, red));
+      app_scene->add_shape(location, trough_mesh_Material_material, red, false);
     }
 
     /// this is called to draw the world

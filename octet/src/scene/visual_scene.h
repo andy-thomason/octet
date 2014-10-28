@@ -47,6 +47,12 @@ namespace octet { namespace scene {
     ref<bump_shader> object_shader;
     ref<bump_shader> skin_shader;
 
+    btDefaultCollisionConfiguration config;       /// setup for the world
+    btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
+    btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
+    btSequentialImpulseConstraintSolver *solver;  /// handler to resolve collisions
+    btDiscreteDynamicsWorld *world;             /// physics world, contains rigid bodies
+
     void draw_aabb(const aabb &bb) {
       vec3 pos[8];
       for (int i = 0; i != 8; ++i) {
@@ -245,6 +251,52 @@ namespace octet { namespace scene {
       assert(is_power_of_two(debug_line_buffer.size()));
       memset(&debug_line_buffer[0], 0, debug_line_buffer.size() * sizeof(debug_line_buffer[0]));
       debug_in_ptr = 0;
+
+      #ifdef OCTET_BULLET
+        dispatcher = new btCollisionDispatcher(&config);
+        broadphase = new btDbvtBroadphase();
+        solver = new btSequentialImpulseConstraintSolver();
+        world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, &config);
+      #endif
+    }
+
+    ~visual_scene() {
+      #ifdef OCTET_BULLET
+        delete world;
+        delete solver;
+        delete broadphase;
+        delete dispatcher;
+      #endif
+    }
+
+    /// helper to add a mesh to a scene and also to create the corresponding physics object
+    mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false) {
+      scene_node *node = new scene_node();
+      node->access_nodeToParent() = mat;
+      add_child(node);
+      mesh_instance *result = new mesh_instance(node, msh, mtl);
+      add_mesh_instance(result);
+
+      #ifdef OCTET_BULLET
+        btMatrix3x3 matrix(get_btMatrix3x3(mat));
+        btVector3 pos(get_btVector3(mat[3].xyz()));
+
+        btCollisionShape *shape = is_dynamic ? msh->get_bullet_shape() : msh->get_static_bullet_shape();
+        if (shape) {
+          btTransform transform(matrix, pos);
+
+          btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+          btScalar mass = is_dynamic ? 1.0f : 0.0f;
+          btVector3 inertiaTensor;
+   
+          if (is_dynamic) shape->calculateLocalInertia(mass, inertiaTensor);
+    
+          btRigidBody * rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
+          world->addRigidBody(rigid_body);
+          rigid_body->setUserPointer(node);
+        }
+      #endif
+      return result;
     }
 
     /// Serialization

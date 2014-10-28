@@ -126,6 +126,7 @@
 
   // physics
   #ifdef OCTET_BULLET
+    #pragma warning(disable : 4267)
     #include "../open_source/bullet/bullet.h"
   #endif
 
