@@ -309,11 +309,10 @@ namespace octet { namespace scene {
       /// Get a bullet shape object for this mesh for static use only!
       virtual btCollisionShape *get_static_bullet_shape() {
         // note that it is your responsibility to deallocate resources!
-        btTriangleMesh *trimesh = new btTriangleMesh();
         btIndexedMesh mesh;
         mesh.m_numTriangles = get_num_indices() / 3;
         mesh.m_triangleIndexBase = (const unsigned char *)malloc(get_indices()->get_size());
-        mesh.m_triangleIndexStride = 4;
+        mesh.m_triangleIndexStride = sizeof(uint32_t) * 3;
         mesh.m_numVertices = get_num_vertices();
         mesh.m_vertexBase = (const unsigned char *)malloc(get_vertices()->get_size());
         mesh.m_vertexStride = get_stride();
@@ -325,6 +324,7 @@ namespace octet { namespace scene {
           memcpy((void*)mesh.m_vertexBase, vtx_lock.u8(), get_vertices()->get_size());
         }
 
+        btTriangleIndexVertexArray *trimesh = new btTriangleIndexVertexArray();
         trimesh->addIndexedMesh(mesh);
         btBvhTriangleMeshShape *result = new btBvhTriangleMeshShape(trimesh, true);
         return result;

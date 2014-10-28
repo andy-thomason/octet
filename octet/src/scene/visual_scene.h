@@ -471,6 +471,19 @@ namespace octet { namespace scene {
     /// advance all the animation instances
     /// note that we want to update before rendering or doing physics and AI actions.
     void update(float delta_time) {
+      #ifdef OCTET_BULLET
+        world->stepSimulation(delta_time, 1, delta_time);
+        btCollisionObjectArray &array = world->getCollisionObjectArray();
+        for (int i = 0; i != array.size(); ++i) {
+          btCollisionObject *co = array[i];
+          scene_node *node = (scene_node *)co->getUserPointer();
+          if (node) {
+            mat4t &mat = node->access_nodeToParent();
+            co->getWorldTransform().getOpenGLMatrix(mat.get());
+          }
+        }
+      #endif
+
       for (int idx = 0; idx != animation_instances.size(); ++idx) {
         animation_instance *inst = animation_instances[idx];
         inst->update(delta_time);

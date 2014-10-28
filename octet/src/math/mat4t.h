@@ -139,6 +139,11 @@ namespace octet { namespace math {
       return *this;
     }
   
+    mat4t &translate(vec3_in value) {
+      v[3] = lmul(vec4(value, 1.0f));
+      return *this;
+    }
+  
     /// Multiply operator: note this treats matrices as row-major unlike gl matrices which are column-major
     mat4t operator*(const mat4t &r) const
     {
