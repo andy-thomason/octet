@@ -160,6 +160,16 @@ namespace octet { namespace scene {
       return ray(ray_start.xyz(), ray_end.xyz());
     }
 
+    /// return a point in world space from screen (x,y -1..1 z=near..far)
+    vec3 get_screen_to_world(vec3_in screen) {
+      // convert projection space ray to world space
+      if (is_ortho) {
+        return vec4(xscale * screen.x(), yscale * screen.y(), -screen.z(), 1) * cameraToWorld;
+      } else {
+        return vec4(xscale * screen.z() * screen.x(), yscale * screen.z() * screen.y(), -screen.z(), 1) * cameraToWorld;
+      }
+    }
+
     /// Get the world to projection matrix for this camera.
     mat4t get_worldToProjection() const {
       mat4t result;

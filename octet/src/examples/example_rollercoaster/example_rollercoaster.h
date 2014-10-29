@@ -54,7 +54,7 @@ namespace octet {
       for (int i = -10; i <= 10; ++i) {
         for (int j = -10; j <= 10; ++j) {
           mat4t location;
-          location.translate(i, 5, j);
+          location.translate((float)i, 5, (float)j);
           app_scene->add_shape(location, sphere, blue, true);
         }
       }

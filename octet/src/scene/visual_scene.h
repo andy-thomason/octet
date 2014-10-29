@@ -270,7 +270,7 @@ namespace octet { namespace scene {
     }
 
     /// helper to add a mesh to a scene and also to create the corresponding physics object
-    mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false) {
+    mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false, float mass=1, btCollisionShape *shape=NULL) {
       scene_node *node = new scene_node();
       node->access_nodeToParent() = mat;
       add_child(node);
@@ -281,19 +281,24 @@ namespace octet { namespace scene {
         btMatrix3x3 matrix(get_btMatrix3x3(mat));
         btVector3 pos(get_btVector3(mat[3].xyz()));
 
-        btCollisionShape *shape = is_dynamic ? msh->get_bullet_shape() : msh->get_static_bullet_shape();
+        if (shape == NULL) {
+          shape = is_dynamic ? msh->get_bullet_shape() : msh->get_static_bullet_shape();
+        }
+
         if (shape) {
           btTransform transform(matrix, pos);
 
           btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-          btScalar mass = is_dynamic ? 1.0f : 0.0f;
           btVector3 inertiaTensor;
+
+          if (!is_dynamic) mass = 0;
    
           if (is_dynamic) shape->calculateLocalInertia(mass, inertiaTensor);
     
           btRigidBody * rigid_body = new btRigidBody(mass, motionState, shape, inertiaTensor);
           world->addRigidBody(rigid_body);
           rigid_body->setUserPointer(node);
+          node->set_rigid_body(rigid_body);
         }
       #endif
       return result;

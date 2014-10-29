@@ -23,6 +23,7 @@ namespace octet { namespace scene {
 
     // sid used to target animations
     atom_t sid;
+
   public:
     RESOURCE_META(scene_node)
 
@@ -152,5 +153,45 @@ namespace octet { namespace scene {
         }
       }
     }
+
+    #ifdef OCTET_BULLET
+    private:
+      btRigidBody *rigid_body;
+    public:
+      /// get the rigid body associated with this node (used for physics)
+      btRigidBody *get_rigid_body() const {
+        return rigid_body;
+      }
+
+      /// set the rigid body associated with this node (used for physics)      
+      void set_rigid_body(btRigidBody *value) {
+        rigid_body = value;
+      }
+
+      /// set the mass and inertia tensor
+      void set_mass(float mass, vec3_in inertia) {
+        rigid_body->setMassProps(mass, get_btVector3(inertia));
+      }
+
+      /// set the linear and angular damping
+      void set_damping(float linear_damping, float angular_damping) {
+        rigid_body->setDamping(linear_damping, angular_damping);
+      }
+
+      /// apply a force at the centre of gravity of the object (so it does not spin)
+      void apply_central_force(vec3_in value) {
+        rigid_body->applyCentralForce(get_btVector3(value));
+      }
+
+      /// apply a force at a position local to the object
+      void apply_model_force(vec3_in value, vec3_in model_pos) {
+        rigid_body->applyForce(get_btVector3(value), get_btVector3(model_pos));
+      }
+
+      /// apply a torque to the object
+      void apply_torque(vec3_in value) {
+        rigid_body->applyTorque(get_btVector3(value));
+      }
+    #endif
   };
 }}
