@@ -47,11 +47,16 @@ namespace octet { namespace scene {
     ref<bump_shader> object_shader;
     ref<bump_shader> skin_shader;
 
-    btDefaultCollisionConfiguration config;       /// setup for the world
-    btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
-    btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
-    btSequentialImpulseConstraintSolver *solver;  /// handler to resolve collisions
-    btDiscreteDynamicsWorld *world;             /// physics world, contains rigid bodies
+    #ifdef OCTET_BULLET
+      btDefaultCollisionConfiguration config;       /// setup for the world
+      btCollisionDispatcher *dispatcher;            /// handler for collisions between objects
+      btDbvtBroadphase *broadphase;                 /// handler for broadphase (rough) collision
+      btSequentialImpulseConstraintSolver *solver;  /// handler to resolve collisions
+      btDiscreteDynamicsWorld *world;             /// physics world, contains rigid bodies
+      typedef btCollisionShape collison_shape_t;
+    #else
+      typedef void collison_shape_t;
+    #endif
 
     void draw_aabb(const aabb &bb) {
       vec3 pos[8];
@@ -270,7 +275,7 @@ namespace octet { namespace scene {
     }
 
     /// helper to add a mesh to a scene and also to create the corresponding physics object
-    mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false, float mass=1, btCollisionShape *shape=NULL) {
+    mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false, float mass=1, collison_shape_t *shape=NULL) {
       scene_node *node = new scene_node();
       node->access_nodeToParent() = mat;
       add_child(node);

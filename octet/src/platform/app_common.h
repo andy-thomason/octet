@@ -68,7 +68,8 @@ namespace octet {
   };
 
   class app_common {
-    unsigned char keys[256];
+    bitset<256> keys;
+    bitset<256> prev_keys;
     int mouse_x;
     int mouse_y;
     int mouse_wheel;
@@ -83,8 +84,9 @@ namespace octet {
 
   public:
     app_common() {
+      keys.clear();
+      prev_keys.clear();
       // this memset writes 0 to every byte of keys[]
-      memset(keys, 0, sizeof(keys));
       mouse_x = mouse_y = 0;
       is_gles3 = false;
       frame_number = 0;
@@ -93,12 +95,52 @@ namespace octet {
     virtual ~app_common() {
     }
 
+    void begin_frame() {
+      //char buf[256+5];
+      //printf("p %s\n", prev_keys.toString(buf, sizeof(buf)));
+      //printf("k %s\n\n", keys.toString(buf, sizeof(buf)));
+    }
+
+    void end_frame() {
+      prev_keys = keys;
+    }
+
     virtual void draw_world(int x, int y, int w, int h) = 0;
     virtual void app_init() = 0;
 
-    // returns true if a key is down
+    /// returns true if a key is down
     bool is_key_down(unsigned key) {
-      return keys[key & 0xff] == 1;
+      return keys[key & 0xff] != 0;
+    }
+
+    /// returns true if a key has gone down this frame
+    bool is_key_going_down(unsigned key) {
+      return keys[key & 0xff] != 0 && prev_keys[key & 0xff] == 0;
+    }
+
+    /// returns true if a key has gone down this frame
+    bool is_key_going_up(unsigned key) {
+      return keys[key & 0xff] != 0 && prev_keys[key & 0xff] == 0;
+    }
+
+    /// return the current set of keys down.
+    bitset<256> get_keys() const {
+      return keys;
+    }
+
+    /// return the previous set of keys down
+    bitset<256> get_prev_keys() const {
+      return prev_keys;
+    }
+
+    /// return the previous set of keys down
+    bitset<256> get_keys_going_down() const {
+      return keys & ~prev_keys;
+    }
+
+    /// return the previous set of keys down
+    bitset<256> get_keys_going_up() const {
+      return ~keys & prev_keys;
     }
 
     void get_mouse_pos(int &x, int &y) {
@@ -133,7 +175,11 @@ namespace octet {
 
     // used by the platform to set a key
     void set_key(unsigned key, bool is_down) {
-      keys[key & 0xff] = is_down ? 1 : 0;
+      if (is_down) {
+        keys.setbit(key & 0xff);
+      } else {
+        keys.clearbit(key & 0xff);
+      }
     }
 
     // used by the platform to set mouse positions

@@ -80,12 +80,21 @@ namespace octet {
     }
 
     void render() {
+      begin_frame();
+
       //printf("render %d\n", glutGetWindow());
       int vx, vy;
       get_viewport_size(vx, vy);
       draw_world(0, 0, vx, vy);
       inc_frame_number();
+      end_frame();
       glutSwapBuffers();
+    }
+
+    void disable_cursor() const {
+    }
+
+    void enable_cursor() const {
     }
 
     static unsigned translate_special(unsigned key) {

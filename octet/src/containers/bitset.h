@@ -71,7 +71,7 @@ namespace octet { namespace containers {
     }
 
     /// Return 1 if a specific bit is set.
-    unsigned operator[] ( unsigned index )
+    unsigned operator[] ( size_t index ) const
     {
       return ( bits_[ index >> 5 ] >> ( index & 31 ) ) & 1;
     }
@@ -100,7 +100,7 @@ namespace octet { namespace containers {
     }
 
     /// Make the union of sets a and b into a.
-    void make_union( const bitset &b )
+    void operator |( const bitset &b )
     {
       for( unsigned i = 0; i < ( size_ + 31 ) / 32; ++i )
       {
@@ -109,7 +109,7 @@ namespace octet { namespace containers {
     }
 
     /// Make the intersection of sets a and b into a.
-    bitset make_intersect( const bitset &b ) const
+    bitset operator &( const bitset &b ) const
     {
       bitset result;
       for( unsigned i = 0; i < ( size_ + 31 ) / 32; ++i )
@@ -119,5 +119,35 @@ namespace octet { namespace containers {
       return result;
     }
 
+    /// Make the union of sets a and b into a.
+    bitset operator ~() const
+    {
+      bitset result;
+      for( unsigned i = 0; i < ( size_ + 31 ) / 32; ++i )
+      {
+        result.bits_[ i ] = ~bits_[ i ];
+      }
+      return result;
+    }
+
+    operator bool() const {
+      unsigned tot = 0;
+      for( unsigned i = 0; i < ( size_ + 31 ) / 32; ++i )
+      {
+        tot |= bits_[ i ];
+      }
+      return tot != 0;
+    }
+
+    const char *toString(char *buf, size_t size) {
+      const char *result = buf;
+      *buf++ = '[';
+      for (size_t i = 0; i != size_ && i != size-3; ++i) {
+        *buf++ = (*this)[i] ? 'X' : '.';
+      }
+      *buf++ = ']';
+      *buf = 0;
+      return result;
+    }
   };
 } }

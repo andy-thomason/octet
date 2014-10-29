@@ -180,17 +180,35 @@ namespace octet {
       HDC hdc = GetDC(window_handle);
       wglMakeCurrent (hdc, gl_context);
 
+      POINT mouse_pos;
+      GetCursorPos(&mouse_pos);
+
+      ScreenToClient(window_handle, &mouse_pos);
+      set_mouse_pos(mouse_pos.x, mouse_pos.y);
+
       RECT rect;
       GetClientRect(window_handle, &rect);
       set_viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
+      begin_frame();
+
       draw_world(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
       inc_frame_number();
+
+      end_frame();
 
       SwapBuffers(hdc);
 
       wglMakeCurrent (hdc, NULL);
       ReleaseDC(window_handle, hdc);
+    }
+
+    void disable_cursor() const {
+      ShowCursor(FALSE);
+    }
+
+    void enable_cursor() const {
+      ShowCursor(TRUE);
     }
 
     static unsigned translate(unsigned key) {
@@ -272,8 +290,8 @@ namespace octet {
               app->set_key(app::translate((unsigned)msg.wParam), msg.message == WM_KEYDOWN);
             } else if (msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP) {
               app->set_key(app::translate((unsigned)msg.wParam), msg.message == WM_SYSKEYDOWN);
-            } else if (msg.message == WM_MOUSEMOVE) {
-              app->set_mouse_pos((unsigned)msg.lParam & 0xffff, (unsigned)msg.lParam >> 16);
+            //} else if (msg.message == WM_MOUSEMOVE) {
+              //app->set_mouse_pos((unsigned)msg.lParam & 0xffff, (unsigned)msg.lParam >> 16);
             } else if (msg.message == WM_MOUSEWHEEL) {
               app->set_mouse_wheel(app->get_mouse_wheel() + (int)msg.wParam);
             } else if (msg.message == WM_LBUTTONDOWN || msg.message == WM_LBUTTONUP) {
@@ -294,7 +312,9 @@ namespace octet {
 
         for (int i = 0; i != m.size(); ++i) {
           // note: because Win8 generates an invisible window, we need to check m.value(i)
-          if (m.get_key(i) && m.get_value(i)) m.get_value(i)->render();
+          if (m.get_key(i) && m.get_value(i)) {
+            m.get_value(i)->render();
+          }
         }
 
         Fake_AL_context()->update();
