@@ -321,6 +321,13 @@ namespace octet { namespace scene {
       v.visit(light_instances, atom_light_instances);
     }
 
+    /// reset the scene.
+    void reset() {
+      mesh_instances.reset();
+      animation_instances.reset();
+      camera_instances.reset();
+      light_instances.reset();
+    }
 
     /// set up OpenGL state
     void begin_render(int vx, int vy, vec4_in clear_color=vec4(0.5f, 0.5f, 0.5f, 1.0f)) {
