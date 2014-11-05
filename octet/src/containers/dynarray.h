@@ -133,6 +133,18 @@ namespace octet { namespace containers {
       }
       resize(size_-1);
     }
+
+    /// Erase items by value; move subsequent items down to fill the gap.
+    void erase_by_value(const item_t &old_item) {
+      int j = 0;
+      for (int_size_t i = 0; i < size_; ++i) {
+        if (data_[i] != old_item) {
+          if (i != j) data_[j] = data_[i];
+          ++j;
+        }
+      }
+      resize(j);
+    }
   
     /// Add an item at the back of the array.
     void push_back(const item_t &new_item) {

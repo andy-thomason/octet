@@ -18,11 +18,14 @@ namespace octet { namespace scene {
     // child nodes
     dynarray<ref<scene_node> > children;
 
-    // array of relative transforms (indexed by scene_node index)
+    // this node's transform relative to parent
     mat4t nodeToParent;
 
     // sid used to target animations
     atom_t sid;
+
+    // is this node and all its children renderable?
+    bool enabled;
 
   public:
     RESOURCE_META(scene_node)
@@ -31,12 +34,14 @@ namespace octet { namespace scene {
     scene_node() {
       nodeToParent.loadIdentity();
       sid = atom_;
+      enabled = true;
     }
 
     /// Construct a scene node with a matrix and an identifying sid atom.
     scene_node(const mat4t &nodeToParent, atom_t sid) {
       this->nodeToParent = nodeToParent;
       this->sid = sid;
+      enabled = true;
     }
 
     /// the virtual add_ref on animation_target gets passed to here and we pass iton (delegate it) to the resource
@@ -98,6 +103,14 @@ namespace octet { namespace scene {
       return result;
     }
 
+    // calculate whether this node is enabled (recursively)
+    bool calcEnabled() {
+      for (scene_node *p = parent; p != NULL; p = p->parent) {
+        if (!p->enabled) return false;
+      }
+      return true;
+    }
+
     /// read the node to parent transform matrix
     const mat4t &get_nodeToParent() const {
       return nodeToParent;
@@ -106,6 +119,16 @@ namespace octet { namespace scene {
     /// access the node to parent transform matrix for writing.
     mat4t &access_nodeToParent() {
       return nodeToParent;
+    }
+
+    /// get enabled state
+    bool get_enabled() const {
+      return enabled;
+    }
+
+    /// set enabled state
+    void set_enabled(bool value) {
+      enabled = value;
     }
 
     /// reset the matrix
