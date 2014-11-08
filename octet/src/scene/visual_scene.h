@@ -197,17 +197,35 @@ namespace octet { namespace scene {
       for (unsigned mesh_index = 0; mesh_index != mesh_instances.size(); ++mesh_index) {
         mesh_instance *mi = mesh_instances[mesh_index];
 
-        if (!mi->get_node()->calcEnabled()) continue;
+        scene_node *node = mi->get_node();
+        unsigned flags = mi->get_flags();
+
+        if (
+          !(flags & mesh_instance::flag_enabled) ||
+          !node->calcEnabled()
+        ) continue;
 
         mesh *msh = mi->get_mesh();
         skin *skn = msh->get_skin();
         skeleton *skel = mi->get_skeleton();
         material *mat = mi->get_material();
 
-        mat4t modelToWorld = mi->get_node()->calcModelToWorld();
+        mat4t modelToWorld = node->calcModelToWorld();
         mat4t modelToCamera;
         mat4t modelToProjection;
         cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
+
+        // selecting LOD meshes by distance
+        if (flags & mesh_instance::flag_lod) {
+          float distance = -modelToCamera.w().z();
+          //printf("%f %f %f\n", distance, mi->get_min_draw_distance(), mi->get_max_draw_distance());
+          if (
+            distance < mi->get_min_draw_distance() ||
+            distance >= mi->get_max_draw_distance()
+          ) {
+            continue;
+          }
+        }
 
         if (!skel || !skn) {
           /// normal rendering for single matrix objects

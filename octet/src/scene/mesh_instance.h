@@ -11,7 +11,7 @@ namespace octet { namespace scene {
   /// Instance of a mesh in a game world; node, mesh, material and skin.
   class mesh_instance : public resource {
   public:
-    enum { flag_selected = 1 << 0 };
+    enum { flag_selected = 1 << 0, flag_enabled = 1 << 1, flag_lod = 1 << 2 };
 
   private:
     // which scene_node (model to world matrix) to use in the scene
@@ -29,6 +29,12 @@ namespace octet { namespace scene {
     // assorted mesh instance booleans (see flag_*)
     unsigned flags;
 
+    // if the object is closer than this from the camera, do not draw.
+    float min_draw_distance;
+
+    // if the object is further than this from the camera, do not draw.
+    float max_draw_distance;
+
   public:
     RESOURCE_META(mesh_instance)
 
@@ -38,7 +44,9 @@ namespace octet { namespace scene {
       this->msh = msh;
       this->mat = mat;
       this->skel = skel;
-      flags = 0;
+      flags = flag_enabled;
+      min_draw_distance = -8.507059e37f;
+      max_draw_distance = 8.507059e37f;
     }
 
     /// metadata visitor. Used for serialisation and script interface.
@@ -116,6 +124,12 @@ namespace octet { namespace scene {
     /// Get the flags for this instance.
     unsigned get_flags() const { return flags; }
 
+    /// Get the LOD min distance
+    float get_min_draw_distance() const { return min_draw_distance; }
+
+    /// Get the LOD max distance
+    float get_max_draw_distance() const { return max_draw_distance; }
+
     /// Set the transformation for this instance.
     void set_node(scene_node *value) { node = value; }
 
@@ -130,6 +144,12 @@ namespace octet { namespace scene {
 
     /// Set the flags for this instance.
     void set_flags(unsigned value) { flags = value; }
+
+    /// Set the flags for this instance.
+    void set_min_draw_distance(float value) { min_draw_distance = value; }
+
+    /// Set the flags for this instance.
+    void set_max_draw_distance(float value) { max_draw_distance = value; }
   };
 }}
 
