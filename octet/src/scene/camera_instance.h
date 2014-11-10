@@ -164,9 +164,9 @@ namespace octet { namespace scene {
     vec3 get_screen_to_world(vec3_in screen) {
       // convert projection space ray to world space
       if (is_ortho) {
-        return vec4(xscale * screen.x(), yscale * screen.y(), -screen.z(), 1) * cameraToWorld;
+        return vec3(xscale * screen.x(), yscale * screen.y(), -screen.z()) * cameraToWorld;
       } else {
-        return vec4(xscale * screen.z() * screen.x(), yscale * screen.z() * screen.y(), -screen.z(), 1) * cameraToWorld;
+        return vec3(xscale * screen.z() * screen.x(), yscale * screen.z() * screen.y(), -screen.z()) * cameraToWorld;
       }
     }
 
