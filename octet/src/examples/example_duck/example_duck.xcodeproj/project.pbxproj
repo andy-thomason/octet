@@ -7,14 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8421CD2518BCDAD100180927 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8421CD2418BCDAD100180927 /* main.cpp */; };
-		8421CD2718BCDCBA00180927 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8421CD2618BCDCBA00180927 /* OpenGL.framework */; };
-		8421CD2918BCDCC200180927 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8421CD2818BCDCC200180927 /* OpenAL.framework */; };
-		8421CD2B18BCDCD700180927 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8421CD2A18BCDCD700180927 /* GLUT.framework */; };
+		813E36A819EB381300E122B9 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 813E36A719EB381300E122B9 /* main.cpp */; };
+		81E4F20D19EB3ECD00EACF8C /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81E4F20C19EB3ECD00EACF8C /* OpenAL.framework */; };
+		81E4F20F19EB3ED300EACF8C /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81E4F20E19EB3ED300EACF8C /* OpenCL.framework */; };
+		81E4F21119EB3EDB00EACF8C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81E4F21019EB3EDB00EACF8C /* OpenGL.framework */; };
+		81E4F21319EB3EF100EACF8C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81E4F21219EB3EF100EACF8C /* GLUT.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		84609E6618BCA0D7005456E4 /* CopyFiles */ = {
+		813E369419EB374400E122B9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -26,66 +27,79 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8421CD1D18BCDAD100180927 /* example_duck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example_duck.h; sourceTree = "<group>"; };
-		8421CD2418BCDAD100180927 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		8421CD2618BCDCBA00180927 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		8421CD2818BCDCC200180927 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		8421CD2A18BCDCD700180927 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
-		84609E6818BCA0D7005456E4 /* example_duck */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = example_duck; sourceTree = BUILT_PRODUCTS_DIR; };
+		813E369619EB374400E122B9 /* example_duck */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = example_duck; sourceTree = BUILT_PRODUCTS_DIR; };
+		813E36A719EB381300E122B9 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
+		813E36AA19EB39D900E122B9 /* octet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = octet.h; path = ../../octet.h; sourceTree = "<group>"; };
+		81E4F20C19EB3ECD00EACF8C /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		81E4F20E19EB3ED300EACF8C /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
+		81E4F21019EB3EDB00EACF8C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		81E4F21219EB3EF100EACF8C /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		81E4F21419EB42BF00EACF8C /* scene */ = {isa = PBXFileReference; lastKnownFileType = text; name = scene; path = ../../scene; sourceTree = "<group>"; };
+		81E4F21519EB42EE00EACF8C /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; name = resources; path = ../../resources; sourceTree = "<group>"; };
+		81E4F21619EB432300EACF8C /* shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shaders; path = ../../../shaders; sourceTree = "<group>"; };
+		81E4F21719EB434100EACF8C /* math */ = {isa = PBXFileReference; lastKnownFileType = text; name = math; path = ../../math; sourceTree = "<group>"; };
+		81E4F21819EB44E700EACF8C /* platform */ = {isa = PBXFileReference; lastKnownFileType = text; name = platform; path = ../../platform; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		84609E6518BCA0D7005456E4 /* Frameworks */ = {
+		813E369319EB374400E122B9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8421CD2B18BCDCD700180927 /* GLUT.framework in Frameworks */,
-				8421CD2918BCDCC200180927 /* OpenAL.framework in Frameworks */,
-				8421CD2718BCDCBA00180927 /* OpenGL.framework in Frameworks */,
+				81E4F21319EB3EF100EACF8C /* GLUT.framework in Frameworks */,
+				81E4F21119EB3EDB00EACF8C /* OpenGL.framework in Frameworks */,
+				81E4F20F19EB3ED300EACF8C /* OpenCL.framework in Frameworks */,
+				81E4F20D19EB3ECD00EACF8C /* OpenAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8421CD1C18BCDAD100180927 /* example_duck */ = {
+		813E368B19EB374400E122B9 = {
 			isa = PBXGroup;
 			children = (
-				8421CD1D18BCDAD100180927 /* example_duck.h */,
-				8421CD2418BCDAD100180927 /* main.cpp */,
-			);
-			name = example_duck;
-			sourceTree = "<group>";
-		};
-		84609E5D18BCA0D7005456E4 = {
-			isa = PBXGroup;
-			children = (
-				8421CD2A18BCDCD700180927 /* GLUT.framework */,
-				8421CD2818BCDCC200180927 /* OpenAL.framework */,
-				8421CD2618BCDCBA00180927 /* OpenGL.framework */,
-				84609E6918BCA0D7005456E4 /* Products */,
-				8421CD1C18BCDAD100180927 /* example_duck */,
+				81E4F21219EB3EF100EACF8C /* GLUT.framework */,
+				81E4F21019EB3EDB00EACF8C /* OpenGL.framework */,
+				81E4F20E19EB3ED300EACF8C /* OpenCL.framework */,
+				81E4F20C19EB3ECD00EACF8C /* OpenAL.framework */,
+				813E369919EB374400E122B9 /* example_duck */,
+				813E369719EB374400E122B9 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		84609E6918BCA0D7005456E4 /* Products */ = {
+		813E369719EB374400E122B9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				84609E6818BCA0D7005456E4 /* example_duck */,
+				813E369619EB374400E122B9 /* example_duck */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		813E369919EB374400E122B9 /* example_duck */ = {
+			isa = PBXGroup;
+			children = (
+				81E4F21819EB44E700EACF8C /* platform */,
+				81E4F21719EB434100EACF8C /* math */,
+				81E4F21619EB432300EACF8C /* shaders */,
+				81E4F21519EB42EE00EACF8C /* resources */,
+				813E36AA19EB39D900E122B9 /* octet.h */,
+				81E4F21419EB42BF00EACF8C /* scene */,
+				813E36A719EB381300E122B9 /* main.cpp */,
+			);
+			path = example_duck;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		84609E6718BCA0D7005456E4 /* example_duck */ = {
+		813E369519EB374400E122B9 /* example_duck */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 84609E7218BCA0D7005456E4 /* Build configuration list for PBXNativeTarget "example_duck" */;
+			buildConfigurationList = 813E36A019EB374400E122B9 /* Build configuration list for PBXNativeTarget "example_duck" */;
 			buildPhases = (
-				84609E6418BCA0D7005456E4 /* Sources */,
-				84609E6518BCA0D7005456E4 /* Frameworks */,
-				84609E6618BCA0D7005456E4 /* CopyFiles */,
+				813E369219EB374400E122B9 /* Sources */,
+				813E369319EB374400E122B9 /* Frameworks */,
+				813E369419EB374400E122B9 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -93,48 +107,48 @@
 			);
 			name = example_duck;
 			productName = example_duck;
-			productReference = 84609E6818BCA0D7005456E4 /* example_duck */;
+			productReference = 813E369619EB374400E122B9 /* example_duck */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		84609E5F18BCA0D7005456E4 /* Project object */ = {
+		813E368D19EB374400E122B9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0450;
-				ORGANIZATIONNAME = admin;
+				ORGANIZATIONNAME = "Andy Thomason";
 			};
-			buildConfigurationList = 84609E6218BCA0D7005456E4 /* Build configuration list for PBXProject "example_duck" */;
+			buildConfigurationList = 813E369019EB374400E122B9 /* Build configuration list for PBXProject "example_duck" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 84609E5D18BCA0D7005456E4;
-			productRefGroup = 84609E6918BCA0D7005456E4 /* Products */;
+			mainGroup = 813E368B19EB374400E122B9;
+			productRefGroup = 813E369719EB374400E122B9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				84609E6718BCA0D7005456E4 /* example_duck */,
+				813E369519EB374400E122B9 /* example_duck */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		84609E6418BCA0D7005456E4 /* Sources */ = {
+		813E369219EB374400E122B9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8421CD2518BCDAD100180927 /* main.cpp in Sources */,
+				813E36A819EB381300E122B9 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		84609E7018BCA0D7005456E4 /* Debug */ = {
+		813E369E19EB374400E122B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -148,21 +162,23 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = "OCTET_MAC=1";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../src/physics;
-				"HEADER_SEARCH_PATHS[arch=*]" = "";
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		84609E7118BCA0D7005456E4 /* Release */ = {
+		813E369F19EB374400E122B9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -175,53 +191,58 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "OCTET_MAC=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../src/physics;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
-		84609E7318BCA0D7005456E4 /* Debug */ = {
+		813E36A119EB374400E122B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = "OCTET_MAC=1";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../../open_source/bullet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Debug;
 		};
-		84609E7418BCA0D7005456E4 /* Release */ = {
+		813E36A219EB374400E122B9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = "OCTET_MAC=1";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../../open_source/bullet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		84609E6218BCA0D7005456E4 /* Build configuration list for PBXProject "example_duck" */ = {
+		813E369019EB374400E122B9 /* Build configuration list for PBXProject "example_duck" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				84609E7018BCA0D7005456E4 /* Debug */,
-				84609E7118BCA0D7005456E4 /* Release */,
+				813E369E19EB374400E122B9 /* Debug */,
+				813E369F19EB374400E122B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		84609E7218BCA0D7005456E4 /* Build configuration list for PBXNativeTarget "example_duck" */ = {
+		813E36A019EB374400E122B9 /* Build configuration list for PBXNativeTarget "example_duck" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				84609E7318BCA0D7005456E4 /* Debug */,
-				84609E7418BCA0D7005456E4 /* Release */,
+				813E36A119EB374400E122B9 /* Debug */,
+				813E36A219EB374400E122B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 84609E5F18BCA0D7005456E4 /* Project object */;
+	rootObject = 813E368D19EB374400E122B9 /* Project object */;
 }

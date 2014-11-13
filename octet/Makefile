@@ -35,7 +35,7 @@ BINARIES = \
 	bin/example_duck$(EXE) \
 	bin/example_invaderers$(EXE) \
 	bin/example_particles$(EXE) \
-	bin/example_physics$(EXE) \
+	bin/example_shapes$(EXE) \
 	bin/example_ping$(EXE) \
 	bin/example_polygon$(EXE) \
 	bin/example_shader$(EXE) \
@@ -43,6 +43,9 @@ BINARIES = \
 	bin/example_text$(EXE) \
 	bin/example_texture$(EXE) \
 	bin/example_triangle$(EXE) \
+	bin/example_cellular$(EXE) \
+	bin/example_lod$(EXE) \
+	bin/example_rollercoaster$(EXE) \
 
 
 all: $(BINARIES)
@@ -63,7 +66,7 @@ bin/example_invaderers$(EXE): src/examples/example_invaderers/main.cpp $(SRC)
 bin/example_particles$(EXE): src/examples/example_particles/main.cpp $(SRC)
 	$(CC) $(CCFLAGS) $< $O$@
 
-bin/example_physics$(EXE): src/examples/example_physics/main.cpp $(SRC)
+bin/example_shapes$(EXE): src/examples/example_shapes/main.cpp $(SRC)
 	$(CC) $(CCFLAGS) $< $O$@
 
 bin/example_ping$(EXE): src/examples/example_ping/main.cpp $(SRC)
@@ -91,5 +94,8 @@ bin/example_compute$(EXE): src/examples/example_compute/main.cpp $(SRC)
 	$(CC) $(CCFLAGS) $< $O$@
 
 bin/example_cubemap$(EXE): src/examples/example_cubemap/main.cpp $(SRC)
+	$(CC) $(CCFLAGS) $< $O$@
+
+bin/example_rollercoaster$(EXE): src/examples/example_rollercoaster/main.cpp $(SRC)
 	$(CC) $(CCFLAGS) $< $O$@
 
