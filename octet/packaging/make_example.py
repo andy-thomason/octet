@@ -3,6 +3,7 @@ import os
 import dircache
 import string
 import stat
+import shutil
 
 proto_dir = 'src/examples/example_prototype/'
 target_dir = 'src/examples/'
@@ -39,6 +40,16 @@ def update():
       print("updating " + dirname)
       make_example(proto_dir, target_dir + dirname, dirname, "")
 
+def clean():
+  for dirname in dircache.listdir("src/examples/"):
+    if dirname[0:8] == "example_" and dirname != "example_prototype":
+      print("clean " + dirname)
+      for dirname2 in dircache.listdir(target_dir + dirname):
+        if ".sln" in dirname2 or ".vcxproj" in dirname2:
+          os.remove(target_dir + dirname + "/" + dirname2)
+        elif ".xcodeproj" in dirname2:
+          shutil.rmtree(target_dir + dirname + "/" + dirname2)
+
 num_args = len(sys.argv)
 
 if num_args == 1 or "--help" in sys.argv:
@@ -53,6 +64,8 @@ for i in range(1,num_args):
   else:
     if arg == '--update':
       update()
+    elif arg == '--clean':
+      clean()
     else:
       print("unrecognised option " + arg)
       exit()

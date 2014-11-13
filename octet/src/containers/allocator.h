@@ -64,7 +64,10 @@ namespace octet { namespace containers {
     // todo: implement this from scratch using a pool allocator
     static void *malloc(size_t size) {
       state().num_bytes += size;
-      #if OCTET_SSE
+      #if OCTET_MAC
+        void *res = 0;
+        posix_memalign(&res, 16, size);
+      #elif OCTET_SSE
         void *res = ::_aligned_malloc(size, 16);
       #elif OCTET_VITA
         void *res = ::memalign(size, 16);
@@ -78,7 +81,9 @@ namespace octet { namespace containers {
     static void free(void *ptr, size_t size) {
       state().num_bytes -= size;
       //printf("free %p[%d] -> %d\n", ptr, size, state().num_bytes);
-      #if OCTET_SSE
+      #if OCTET_MAC
+        return ::free(ptr);
+      #elif OCTET_SSE
         return ::_aligned_free(ptr);
       #else
         return ::free(ptr);
@@ -87,7 +92,9 @@ namespace octet { namespace containers {
 
     static void *realloc(void *ptr, size_t old_size, size_t size) {
       state().num_bytes += size - old_size;
-      #if OCTET_SSE
+      #if OCTET_MAC
+        void *res = ::realloc(ptr, size);
+      #elif OCTET_SSE
         void *res = ::_aligned_realloc(ptr, size, 16);
       #else
         void *res = ::realloc(ptr, size);

@@ -204,6 +204,7 @@
 		813E36A119EB374400E122B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = "OCTET_MAC=1";
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../../open_source/bullet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = build;
@@ -213,6 +214,7 @@
 		813E36A219EB374400E122B9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = "OCTET_MAC=1";
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../../open_source/bullet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = build;
