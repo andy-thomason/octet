@@ -31,10 +31,13 @@ namespace octet { namespace scene {
     RESOURCE_META(scene_node)
 
     /// Construct a scene node with an identity transform and no parent.
-    scene_node() {
+    scene_node(scene_node *parent = 0) {
       nodeToParent.loadIdentity();
       sid = atom_;
       enabled = true;
+      if (parent) {
+        parent->add_child(this);
+      }
     }
 
     /// Construct a scene node with a matrix and an identifying sid atom.

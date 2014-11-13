@@ -164,6 +164,12 @@ namespace octet {
       // enable drag and drop of files
       DragAcceptFiles(window_handle, TRUE);
 
+      // register interest in USB devices (this may include game controllers)
+      static const RAWINPUTDEVICE devices[] = {
+        { usUsagePage: 1, usUsage: 2 }, // mouse input device (see http://www.usb.org/developers/hidpage/Hut1_12v2.pdf)
+      };
+      RegisterRawInputDevices(
+
       init_gl_context(window_handle);
 
       RECT rect;

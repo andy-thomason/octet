@@ -130,7 +130,7 @@
     #include "../open_source/bullet/bullet.h"
   #endif
 
-  // scene (layer2)
+  // scene
   #include "scene/scene.h"
 
   #ifdef OCTET_OPENCL
@@ -139,8 +139,9 @@
     #include "platform/opencl.h"
   #endif
 
-  // high level helpers (layer2)
+  // high level helpers
   #include "helpers/mouse_ball.h"
+  #include "helpers/mouse_look.h"
   #include "helpers/http_server.h"
   #include "helpers/text_overlay.h"
   #include "helpers/object_picker.h"

@@ -40,13 +40,14 @@ namespace octet {
       // distances where LOD values change
       static const float distances[] = {
         //-1e37f, 3, 6, 18, 1e37f   // high performance, low quality
-        //-1e37f, 5, 15, 45, 1e37f  // medium performance and quality
-        -1e37f, 5, 25, 125, 1e37f // low performance, high quality
+        //-1e37f, 3, 6, 18, 1e37f   // high performance, low quality
+        -1e37f, 5, 15, 45, 1e37f  // medium performance and quality
+        //-1e37f, 5, 25, 125, 1e37f // low performance, high quality
       };
 
       // materials for LODs (it is common to have simpler shaders for further objects).
       material *mats[] = {
-        mat, mat, mat, mat2  // show smallest lod in different colour
+        mat, mat, mat, mat  // show smallest lod in different cocalclour
         //mat, mat, mat, mat // regular setting
       };
 

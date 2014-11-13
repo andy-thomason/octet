@@ -32,7 +32,7 @@ namespace octet { namespace scene {
     bool render_debug_lines;
     bool dump_vertices;
     ref<material> debug_material;
-    dynarray<vec3> debug_line_buffer;
+    dynarray<vec3p> debug_line_buffer;
     unsigned debug_in_ptr;
 
     /// derived light information
@@ -60,9 +60,9 @@ namespace octet { namespace scene {
 
     void draw_aabb(const aabb &bb) {
       vec3 pos[8];
+      vec3 center = bb.get_center();
+      vec3 half = bb.get_half_extent();
       for (int i = 0; i != 8; ++i) {
-        vec3 center = bb.get_center();
-        vec3 half = bb.get_half_extent();
         pos[i] = center + half * vec3(
           (i & 1 ? 1.0f : -1.0f),
           (i & 2 ? 1.0f : -1.0f),
@@ -121,7 +121,7 @@ namespace octet { namespace scene {
 
     void render_debug_line_buffer() {
       glBindBuffer(GL_ARRAY_BUFFER, 0);
-      glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)debug_line_buffer.data() );
+      glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 12, (void*)debug_line_buffer.data() );
       glEnableVertexAttribArray(attribute_pos);
     
       glDrawArrays(GL_LINES, 0, debug_line_buffer.size());
@@ -214,6 +214,7 @@ namespace octet { namespace scene {
         mat4t modelToCamera;
         mat4t modelToProjection;
         cam.get_matrices(modelToProjection, modelToCamera, modelToWorld);
+        //printf("%d %f\n", mesh_index, modelToWorld.w().y());
 
         // selecting LOD meshes by distance
         if (flags & mesh_instance::flag_lod) {
@@ -297,11 +298,14 @@ namespace octet { namespace scene {
 
     /// helper to add a mesh to a scene and also to create the corresponding physics object
     mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false, float mass=1, collison_shape_t *shape=NULL) {
-      scene_node *node = new scene_node();
+      scene_node *node = new scene_node(this);
       node->access_nodeToParent() = mat;
-      add_child(node);
-      mesh_instance *result = new mesh_instance(node, msh, mtl);
-      add_mesh_instance(result);
+
+      mesh_instance *result = NULL;
+      if (msh && mtl) {
+        result = new mesh_instance(node, msh, mtl);
+        add_mesh_instance(result);
+      }
 
       #ifdef OCTET_BULLET
         btMatrix3x3 matrix(get_btMatrix3x3(mat));
@@ -534,6 +538,7 @@ namespace octet { namespace scene {
           if (node) {
             mat4t &mat = node->access_nodeToParent();
             co->getWorldTransform().getOpenGLMatrix(mat.get());
+            //printf("%d %f\n", i, mat.w().y());
           }
         }
       #endif

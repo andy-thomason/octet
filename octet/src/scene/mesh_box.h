@@ -23,9 +23,8 @@ namespace octet { namespace scene {
   public:
     RESOURCE_META(mesh_box)
 
-    /// Default constructor: 1x1x1
+    /// Default constructor: empty box
     mesh_box() {
-      init(aabb(vec3(0, 0, 0), vec3(1, 1, 1)));
     }
 
     /// Construct box from size
@@ -42,6 +41,7 @@ namespace octet { namespace scene {
     virtual void update() {
       aabb aabb_ = get_aabb();
       mesh::set_shape<math::aabb, mesh::vertex>(aabb_, transform, 1);
+      //dump(log("zzz\n"));
     }
 
     /// Serialise the box
