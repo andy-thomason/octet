@@ -458,19 +458,19 @@ namespace octet { namespace scene {
     }
 
     void delete_mesh_instance(mesh_instance *inst) {
-      mesh_instances.erase_by_value(inst);
+      //mesh_instances.erase_by_value(inst);
     }
 
     void delete_animation_instance(animation_instance *inst) {
-      animation_instances.erase_by_value(inst);
+      //animation_instances.erase_by_value(inst);
     }
 
     void delete_camera_instance(camera_instance *inst) {
-      camera_instances.erase_by_value(inst);
+      //camera_instances.erase_by_value(inst);
     }
 
     void delete_light_instance(light_instance *inst) {
-      light_instances.erase_by_value(inst);
+      //light_instances.erase_by_value(inst);
     }
 
     /// how many mesh instances do we have?
