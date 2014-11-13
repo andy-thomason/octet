@@ -439,7 +439,11 @@ namespace octet { namespace math {
     vec3p(const vec3 &in) {
       #if OCTET_SSE
         static const u_m128_i4 mask = { -1, -1, -1, 0 };
-        _mm_maskmoveu_si128(in.get_m(), (__m128i&)mask.m, (char*)v);
+        #ifdef OCTET_MAC
+          _mm_maskmoveu_si128(in.get_m(), (__m128i&)mask.m, (char*)v);
+        #else
+          _mm_maskmoveu_si128((__m128i&)in.get_m(), (__m128i&)mask.m, (char*)v);
+        #endif
       #else
         v[0] = in[0]; v[1] = in[1]; v[2] = in[2];
       #endif
