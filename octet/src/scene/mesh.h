@@ -799,9 +799,31 @@ namespace octet { namespace scene {
       vertices = value;
     }
 
+    /// assign a vector to the vertex buffer and set params
+    template <class elem_t> void set_vertices(const dynarray<elem_t> &rhs) {
+      if (vertices == NULL || vertices->get_size() != rhs.size() * sizeof(elem_t)) {
+        vertices = new gl_resource();
+        vertices->allocate(GL_ARRAY_BUFFER, rhs.size() * sizeof(elem_t));
+      }
+      vertices->assign(rhs.data(), 0, rhs.size() * sizeof(elem_t));
+      set_stride(sizeof(elem_t));
+      set_num_vertices(rhs.size());
+    }
+
     /// set a new IBO object
     void set_indices(gl_resource *value) {
       indices = value;
+    }
+
+    /// assign a vector to the index buffer and set params
+    template <class elem_t> void set_indices(const dynarray<elem_t> &rhs) {
+      if (indices == NULL || indices->get_size() != rhs.size() * sizeof(elem_t)) {
+        indices = new gl_resource();
+        indices->allocate(GL_ELEMENT_ARRAY_BUFFER, rhs.size() * sizeof(elem_t));
+      }
+      indices->assign(rhs.data(), 0, rhs.size() * sizeof(elem_t));
+      set_index_type(sizeof(elem_t) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
+      set_num_indices(rhs.size());
     }
 
     /// Get all the edges in a hash map to avoid duplicates.

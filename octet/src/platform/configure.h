@@ -46,6 +46,8 @@
 #include <math.h>
 #include <assert.h>
 #include <string>
+#include <vector>
+#include <algorithm>
 
 #if defined(WIN32)
   #include <direct.h>

@@ -220,18 +220,18 @@ namespace octet { namespace resources {
     }
 
     /// copy data into the resource
-    void assign(void *ptr, size_t offset, size_t size) {
+    void assign(const void *ptr, size_t offset, size_t size) {
       assert(offset + size <= this->get_size());
 
-      memcpy((void*)((char*)lock() + offset), ptr, size);
-      unlock();
+      memcpy((void*)((char*)lock_write_only() + offset), ptr, size);
+      unlock_write_only();
     }
 
     /// copy data from another gl resource.
     void copy(const gl_resource *rhs) {
       allocate(rhs->get_target(), rhs->get_size());
-      assign(rhs->lock(), 0, rhs->get_size());
-      rhs->unlock();
+      assign(rhs->lock_read_only(), 0, rhs->get_size());
+      rhs->unlock_read_only();
     }
   };
 } }
