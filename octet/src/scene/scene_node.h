@@ -114,6 +114,20 @@ namespace octet { namespace scene {
       return true;
     }
 
+    /// transform a point from model space to world space
+    vec3 transform(vec3_in world_pos) {
+      mat4t model_to_world = calcModelToWorld();
+      return world_pos * model_to_world;
+    }
+
+    /// transform a point from world space to model space
+    vec3 inverse_transform(vec3_in world_pos) {
+      mat4t model_to_world = calcModelToWorld();
+      // this can be done more efficiently
+      mat4t world_to_model = model_to_world.inverse3x4();
+      return world_pos * world_to_model;
+    }
+
     /// read the node to parent transform matrix
     const mat4t &get_nodeToParent() const {
       return nodeToParent;

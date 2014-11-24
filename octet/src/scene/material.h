@@ -137,7 +137,7 @@ namespace octet { namespace scene {
         for (unsigned i = 0; i != params.size(); ++i) {
           param_uniform *pu = params[i]->get_param_uniform();
           if (pu) {
-            //printf("%s: %d\n", pu->get_name(), pu->get_uniform_buffer_index());
+            //printf("%s: %d off=%x\n", app_utils::get_atom_name(pu->get_name()), pu->get_uniform_buffer_index(), pu->get_offset());
             if (pu->get_uniform_buffer_index()) {
               pu->render(static_buffer.data());
             } else {
@@ -178,7 +178,11 @@ namespace octet { namespace scene {
     }
 
     void set_uniform(param_uniform *param, void *data, size_t size) {
-      memcpy(dynamic_buffer.data() + param->get_offset(), data, size);
+      if (param->get_uniform_buffer_index()) {
+        memcpy(static_buffer.data() + param->get_offset(), data, size);
+      } else {
+        memcpy(dynamic_buffer.data() + param->get_offset(), data, size);
+      }
     }
 
     dynarray<ref<param> > &get_params() {
