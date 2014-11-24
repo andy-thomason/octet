@@ -801,12 +801,12 @@ namespace octet { namespace scene {
 
     /// assign a vector to the vertex buffer and set params
     template <class elem_t> void set_vertices(const dynarray<elem_t> &rhs) {
-      if (vertices == NULL || vertices->get_size() != rhs.size() * sizeof(elem_t)) {
+      if (!vertices || vertices->get_size() != rhs.size() * sizeof(elem_t)) {
         vertices = new gl_resource();
         vertices->allocate(GL_ARRAY_BUFFER, rhs.size() * sizeof(elem_t));
       }
       vertices->assign(rhs.data(), 0, rhs.size() * sizeof(elem_t));
-      set_stride(sizeof(elem_t));
+      stride = sizeof(elem_t);
       set_num_vertices(rhs.size());
     }
 
@@ -817,7 +817,7 @@ namespace octet { namespace scene {
 
     /// assign a vector to the index buffer and set params
     template <class elem_t> void set_indices(const dynarray<elem_t> &rhs) {
-      if (indices == NULL || indices->get_size() != rhs.size() * sizeof(elem_t)) {
+      if (!indices || indices->get_size() != rhs.size() * sizeof(elem_t)) {
         indices = new gl_resource();
         indices->allocate(GL_ELEMENT_ARRAY_BUFFER, rhs.size() * sizeof(elem_t));
       }

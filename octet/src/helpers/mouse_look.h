@@ -12,10 +12,14 @@ namespace octet { namespace helpers {
     app *the_app;
     float sensitivity;
     bool invert_mouse;
+    int mouse_center_x;
+    int mouse_center_y;
   public:
     mouse_look() {
-      sensitivity = 200;
+      sensitivity = 200.0f / 360.0f;
       invert_mouse = false;
+      mouse_center_x = 0;
+      mouse_center_y = 0;
     }
 
     void init(app *the_app, float sensitivity, bool invert_mouse) {
@@ -25,20 +29,36 @@ namespace octet { namespace helpers {
       the_app->disable_cursor();
     }
 
+    /// set this to reset the camera look (for example at the start of a level).
+    void set_mouse_center(int x, int y) {
+      mouse_center_x = x;
+      mouse_center_y = y;
+    }
+
+    /// set this to invert the mouse movement
+    void set_invert_mouse(bool value) {
+      invert_mouse = value;
+    }
+
+    /// set the sensitivity of the mouse look
+    /// this is in degrees per mouse pixel
+    void set_sensitivity(float value) {
+      sensitivity = value;
+    }
+
+    /// called every frame to update the camera
     void update(mat4t &cameraToWorld) {
       cameraToWorld.x() = vec4(1, 0, 0, 0);
       cameraToWorld.y() = vec4(0, 1, 0, 0);
       cameraToWorld.z() = vec4(0, 0, 1, 0);
 
-      int x = 0, y = 0;
-      int vx = 0, vy = 0;
-      the_app->get_mouse_pos(x, y);
-      the_app->get_viewport_size(vx, vy);
-      float cx = vx * 0.5f;
-      float cy = vy * 0.5f;
-
-      cameraToWorld.rotateY((cx - x) / vx * sensitivity);
-      cameraToWorld.rotateX((invert_mouse ? -1 : 1) * (cy - y) / vy * sensitivity);
+      int rx = 0, ry = 0;
+      the_app->get_absolute_mouse_movement(rx, ry);
+      float angle_x = (float)(mouse_center_x - rx) * sensitivity;
+      float angle_y = (float)(mouse_center_y - ry) * sensitivity;
+      angle_y = std::max(-90.0f, std::min(angle_y, 90.0f));
+      cameraToWorld.rotateY(angle_x);
+      cameraToWorld.rotateX(invert_mouse ? -angle_y : angle_y);
     }
   };
 }}

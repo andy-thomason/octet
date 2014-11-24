@@ -165,10 +165,10 @@ namespace octet {
       DragAcceptFiles(window_handle, TRUE);
 
       // register interest in USB devices (this may include game controllers)
-      //static const RAWINPUTDEVICE devices[] = {
-      //  { usUsagePage: 1, usUsage: 2 }, // mouse input device (see http://www.usb.org/developers/hidpage/Hut1_12v2.pdf)
-      //};
-      //RegisterRawInputDevices(
+      RAWINPUTDEVICE devices[1];
+      // mouse input device (see http://www.usb.org/developers/hidpage/Hut1_12v2.pdf)
+      devices[0].usUsagePage = 1; devices[0].usUsage = 2; devices[0].dwFlags = 0; devices[0].hwndTarget = 0;
+      RegisterRawInputDevices(devices, 1, sizeof(RAWINPUTDEVICE));
 
       init_gl_context(window_handle);
 
@@ -211,6 +211,7 @@ namespace octet {
 
     void disable_cursor() const {
       ShowCursor(FALSE);
+      SetCapture(window_handle);
     }
 
     void enable_cursor() const {
@@ -283,6 +284,25 @@ namespace octet {
       DragFinish(drop);
     }
 
+    // usb 
+    static void handle_usb_input(app *app, MSG &msg) {
+      UINT size = 0;
+      GetRawInputData((HRAWINPUT)msg.lParam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+      //printf("gri %d\n", size);
+      if (size < 0x1000) {
+        uint8_t buffer[0x1000];
+        GetRawInputData((HRAWINPUT)msg.lParam, RID_INPUT, buffer, &size, sizeof(RAWINPUTHEADER));
+        RAWINPUT *ri = (RAWINPUT*)buffer;
+        switch (ri->header.dwType) {
+          case RIM_TYPEKEYBOARD: {
+          } break;
+          case RIM_TYPEMOUSE: {
+            app->accumulate_absolute_mouse_movement(ri->data.mouse.lLastX, ri->data.mouse.lLastY);
+          } break;
+        }
+      }
+    }
+
     static void run_all_apps() {
       map_t &m = map();
       MSG msg;     
@@ -308,6 +328,8 @@ namespace octet {
               app->set_key(key_rmb, msg.message == WM_RBUTTONDOWN);
             } else if (msg.message == WM_DROPFILES) {
               handle_file_drop(app, (HDROP)msg.wParam);
+            } else if (msg.message == WM_INPUT) {
+              handle_usb_input(app, msg);
             }
           }
           DispatchMessage (&msg);

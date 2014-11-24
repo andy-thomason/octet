@@ -73,6 +73,8 @@ namespace octet {
     int mouse_x;
     int mouse_y;
     int mouse_wheel;
+    int mouse_abs_x;
+    int mouse_abs_y;
     int viewport_x;
     int viewport_y;
     int frame_number;
@@ -88,6 +90,7 @@ namespace octet {
       prev_keys.clear();
       // this memset writes 0 to every byte of keys[]
       mouse_x = mouse_y = 0;
+      mouse_abs_x = mouse_abs_y = 0;
       is_gles3 = false;
       frame_number = 0;
     }
@@ -186,6 +189,18 @@ namespace octet {
     void set_mouse_pos(int x, int y) {
       mouse_x = x;
       mouse_y = y;
+    }
+
+    // we may recieve several WM_INPUT messages during the frame,
+    // so accumulate.
+    void accumulate_absolute_mouse_movement(int x, int y) {
+      mouse_abs_x += x;
+      mouse_abs_y += y;
+    }
+
+    void get_absolute_mouse_movement(int &x, int &y) {
+      x = mouse_abs_x;
+      y = mouse_abs_y;
     }
 
     // used by the platform to set mouse wheel clicks
