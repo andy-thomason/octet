@@ -36,7 +36,10 @@ namespace octet { namespace shaders {
       char buf[0x10000];
       glGetProgramInfoLog(program, sizeof(buf), &length, buf);
       if (length) {
-        fputs(buf, log("program errors\n"));
+        fputs(buf, log("program errors during linking\n"));
+        printf("program errors during linking: check log\n");
+      } else {
+        printf("linked ok\n");
       }
     }
   public:
@@ -49,7 +52,7 @@ namespace octet { namespace shaders {
       //printf("creating shader program\n");
 
       GLsizei length;
-      char buf[256];
+      char buf[0x10000];
       // create our vertex shader and compile it
       GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
       glShaderSource(vertex_shader, 1, &vs, NULL);

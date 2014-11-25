@@ -6,7 +6,7 @@
 //
 namespace octet {
   /// Scene containing a box with octet.
-  class example_raycast : public app {
+  class example_metaspheres : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;
 
@@ -16,7 +16,7 @@ namespace octet {
 
   public:
     /// this is called when we construct the class before everything is initialised.
-    example_raycast(int argc, char **argv) : app(argc, argv) {
+    example_metaspheres(int argc, char **argv) : app(argc, argv) {
     }
 
     /// this is called once OpenGL is initialized
@@ -24,7 +24,7 @@ namespace octet {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
 
-      param_shader *shader = new param_shader("shaders/default.vs", "shaders/raycast.fs");
+      param_shader *shader = new param_shader("shaders/default.vs", "shaders/raycast_meta.fs");
       custom_mat = new material(vec4(1, 1, 1, 1), shader);
       atom_t atom_camera_pos = app_utils::get_atom("camera_pos");
       vec3 val(0, 0, 0);
@@ -47,7 +47,6 @@ namespace octet {
 
       // camera position in model space
       vec3 pos = box_node->inverse_transform(camera_node->get_position());
-      //char tmp[256]; printf("%s\n", pos.toString(tmp, 256));
       custom_mat->set_uniform(camera_pos, &pos, sizeof(pos));
 
       // update matrices. assume 30 fps.
