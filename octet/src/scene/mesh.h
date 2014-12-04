@@ -24,6 +24,15 @@ namespace octet { namespace scene {
         this->uv = uvw.xy();
       }
     };
+
+    // sortable edge
+    struct edge {
+      int32_t idx0;
+      int32_t idx1;
+      int32_t tri0;
+      int32_t tri1;
+      bool operator<(const edge &rhs) const { return idx0 == rhs.idx0 ? idx1 < rhs.idx1 : idx0 < rhs.idx0; }
+    };
   private:
     ref<gl_resource> vertices;
     ref<gl_resource> indices;
@@ -34,6 +43,7 @@ namespace octet { namespace scene {
 
     uint32_t num_indices;
     uint32_t num_vertices;
+    uint32_t first_index;
     uint16_t stride;
     uint16_t mode;
     uint16_t index_type;
@@ -76,25 +86,9 @@ namespace octet { namespace scene {
     };
 
     // add a new edge to a hash map. (index, index) -> (triangle+1, triangle+1)
-    static void add_edge(hash_map<uint64_t, uint64_t> &edges, unsigned tri_idx, unsigned i0, unsigned i1) {
-      if (i0 == i1) return; // note: (0, 0) means empty
-
-      if (i0 > i1) { swap(i0, i1); }
-      uint64_t key = ((uint64_t)i1 << 32) | i0;
-
-      uint64_t &edge = edges[key];
-      uint32_t upper = (uint32_t)(edge >> 32);
-      //uint32_t lower = (uint32_t)(edge);
-
-      if (edge == 0) {
-        // first triangle
-        edge = tri_idx+1;
-      } else if (upper == 0) {
-        // second triangle
-        edge = ((uint64_t)upper << 32) | (tri_idx+1);
-      } else {
-        // three triangles join here... ignore.
-      }
+    static void add_edge(dynarray<edge> &edges, unsigned tri_idx, unsigned i0, unsigned i1) {
+      edge e = { std::min(i0, i1), std::max(i0, i1), tri_idx, ~0 };
+      edges.push_back(e);
     }
 
     // return true if the triangle tri is visible from the viewpoint (in model space)
@@ -112,6 +106,45 @@ namespace octet { namespace scene {
       return dot(normal, dir) <= 0;
     }
 
+    /// Get a vec4 value of an attribute.
+    vec4 get_value(const uint8_t *bytes, unsigned slot, unsigned index) const {
+      unsigned size = get_size(slot);
+      vec4 result = vec4(0, 0, 0, 0);
+      bytes += stride * index + get_offset(slot);
+    
+      switch (get_kind(slot)) {
+        case GL_FLOAT: {
+          const float *src = (const float*)(bytes);
+          result = vec4(src[0], size > 1 ? src[1] : 0, size > 2 ? src[2] : 0, size > 3 ? src[3] : 1);
+     	  } break;
+        case GL_BYTE: {
+          const int8_t *src = (const int8_t*)(bytes);
+          result = vec4((float)src[0], size > 1 ? (float)src[1] : 0, size > 2 ? (float)src[2] : 0, size > 3 ? (float)src[3] : 255) * (1.0f/255);
+     	  } break;
+        case GL_UNSIGNED_BYTE: {
+          const uint8_t *src = (const uint8_t*)(bytes);
+          result = vec4((float)src[0], size > 1 ? (float)src[1] : 0, size > 2 ? (float)src[2] : 0, size > 3 ? (float)src[3] : 255) * (1.0f/255);
+     	  } break;
+        case GL_SHORT: {
+          const int16_t *src = (const int16_t*)(bytes);
+          result = vec4((float)src[0], size > 1 ? (float)src[1] : 0, size > 2 ? (float)src[2] : 0, size > 3 ? (float)src[3] : 0xffff) * (1.0f/0xffff);
+     	  } break;
+        case GL_UNSIGNED_SHORT: {
+          const uint16_t *src = (const uint16_t*)(bytes);
+          result = vec4((float)src[0], size > 1 ? (float)src[1] : 0, size > 2 ? (float)src[2] : 0, size > 3 ? (float)src[3] : 0xffff) * (1.0f/0xffff);
+     	  } break;
+        case GL_INT: {
+          const int32_t *src = (const int32_t*)(bytes);
+          result = vec4((float)src[0], size > 1 ? (float)src[1] : 0, size > 2 ? (float)src[2] : 0, size > 3 ? (float)src[3] : 0xffff) * (1.0f/0xffff);
+     	  } break;
+        case GL_UNSIGNED_INT: {
+          const uint32_t *src = (const uint32_t*)(bytes);
+          result = vec4((float)src[0], size > 1 ? (float)src[1] : 0, size > 2 ? (float)src[2] : 0, size > 3 ? (float)src[3] : 0xffff) * (1.0f/0xffff);
+     	  } break;
+      }
+      return result;
+    }
+
   public:
     RESOURCE_META(mesh)
 
@@ -124,27 +157,29 @@ namespace octet { namespace scene {
       init(0, num_vertices, num_indices);
     }
 
-    /// Serialize.
-    void visit(visitor &v) {
-      v.visit(vertices, atom_vertices);
-      v.visit(indices, atom_indices);
-      v.visit(format, atom_format);
-      v.visit(num_indices, atom_num_indices);
-      v.visit(num_vertices, atom_num_vertices);
-      v.visit(stride, atom_stride);
-      v.visit(mode, atom_mode);
-      v.visit(index_type, atom_index_type);
-      v.visit(normalized, atom_normalized);
-      v.visit(num_slots, atom_num_slots);
-      v.visit(mesh_skin, atom_mesh_skin);
-      v.visit(mesh_aabb, atom_aabb);
+    /// clone a mesh. Note that this does not also clone the vertices and indices.
+    mesh(const mesh &rhs) {
+      vertices = rhs.vertices;
+      indices = rhs.indices;
+
+      memcpy(format, rhs.format, sizeof(format));
+
+      num_indices = rhs.num_indices;
+      num_vertices = rhs.num_vertices;
+      first_index = rhs.first_index;
+      stride = rhs.stride;
+      mode = rhs.mode;
+      index_type = rhs.index_type;
+      normalized = rhs.normalized;
+
+      num_slots = rhs.num_slots;
+      index_type = rhs.index_type;
+      mode = rhs.mode;
+
+      mesh_skin = rhs.mesh_skin;
     }
 
-    // Destructor
-    ~mesh() {
-    }
-
-    // Init function used for aggregated meshes. (Deprecated).
+    /// Init function used for aggregated meshes.
     void init(skin *_skin=0, unsigned max_vertices=0, unsigned max_indices=0) {
       vertices = new gl_resource();
       indices = new gl_resource();
@@ -153,6 +188,7 @@ namespace octet { namespace scene {
 
       num_indices = 0;
       num_vertices = 0;
+      first_index = 0;
       stride = 0;
       mode = 0;
       index_type = 0;
@@ -168,6 +204,27 @@ namespace octet { namespace scene {
         set_default_attributes();
         allocate(max_vertices * sizeof(vertex), max_indices * sizeof(uint32_t));
       }
+    }
+
+    /// Serialize.
+    void visit(visitor &v) {
+      v.visit(vertices, atom_vertices);
+      v.visit(indices, atom_indices);
+      v.visit(format, atom_format);
+      v.visit(num_indices, atom_num_indices);
+      v.visit(num_vertices, atom_num_vertices);
+      v.visit(first_index, atom_first_index);
+      v.visit(stride, atom_stride);
+      v.visit(mode, atom_mode);
+      v.visit(index_type, atom_index_type);
+      v.visit(normalized, atom_normalized);
+      v.visit(num_slots, atom_num_slots);
+      v.visit(mesh_skin, atom_mesh_skin);
+      v.visit(mesh_aabb, atom_aabb);
+    }
+
+    // Destructor
+    ~mesh() {
     }
 
     /// Set the defuault mesh parameters, used for boxes, spheres etc.
@@ -232,6 +289,11 @@ namespace octet { namespace scene {
       return num_indices;
     }
 
+    /// Get the first index that we will render
+    unsigned get_first_index() const {
+      return first_index;
+    }
+
     /// Get the kind of primitive we are drawing. (ie. GL_TRIANGLES etc.)
     unsigned get_mode() const {
       return mode;
@@ -240,6 +302,11 @@ namespace octet { namespace scene {
     /// get the type of the indices (ie. GL_UNSIGNED_SHORT/GL_UNSIGNED_INT)
     unsigned get_index_type() const {
       return index_type;
+    }
+
+    /// get the size of an index element in bytes.
+    size_t get_index_size() const {
+      return index_type == GL_UNSIGNED_SHORT ? 2 : 4;
     }
 
     /// Set the kind of index to use (0 means use glDrawArrays)
@@ -266,6 +333,11 @@ namespace octet { namespace scene {
     /// Set the number of indices to draw. (may be smaller that the buffer size).
     void set_num_indices(unsigned value) {
       num_indices = value;
+    }
+
+    /// Set the first index to draw.
+    void set_first_index(unsigned value) {
+      first_index = value;
     }
 
     /// Set the kind of primitive to draw. (ie. GL_TRIANGLES etc.)
@@ -320,7 +392,7 @@ namespace octet { namespace scene {
         {
           gl_resource::rolock idx_lock(get_indices());
           gl_resource::rolock vtx_lock(get_vertices());
-          memcpy((void*)mesh.m_triangleIndexBase, idx_lock.u8(), get_indices()->get_size());
+          memcpy((void*)mesh.m_triangleIndexBase, idx_lock.u8() + get_index_size() * first_index, get_indices()->get_size());
           memcpy((void*)mesh.m_vertexBase, vtx_lock.u8(), get_vertices()->get_size());
         }
 
@@ -342,75 +414,15 @@ namespace octet { namespace scene {
       return ~0;
     }
 
-    /// Get a vec4 value of an attribute. (Deprecated)
-    vec4 get_value(unsigned slot, unsigned index) const {
-      if (get_kind(slot) == GL_FLOAT) {
-        const float *src = (float*)((uint8_t*)vertices->lock_read_only() + stride * index + get_offset(slot));
-        unsigned size = get_size(slot);
-        float x = src[0];
-        float y = size > 1 ? src[1] : 0;
-        float z = size > 2 ? src[2] : 0;
-        float w = size > 3 ? src[3] : 1;
-        vertices->unlock_read_only();
-        return vec4(x, y, z, w);
-	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
-        const uint8_t *src = (uint8_t*)((uint8_t*)vertices->lock_read_only() + stride * index + get_offset(slot));
-        unsigned size = get_size(slot);
-        float x = src[0]*(1.0f/255);
-        float y = size > 1 ? src[1]*(1.0f/255) : 0;
-        float z = size > 2 ? src[2]*(1.0f/255) : 0;
-        float w = size > 3 ? src[3]*(1.0f/255) : 1;
-        vertices->unlock_read_only();
-        return vec4(x, y, z, w);
-      }
-      return vec4(0, 0, 0, 0);
-    }
-
-    /// get the values of a specific attribute. dest must match kind. (Deprecated)
-    void get_values(unsigned slot, uint8_t *dest, unsigned dest_stride) {
-      unsigned bytes = kind_size(get_kind(slot)) * get_size(slot);
-      unsigned nv = get_num_vertices();
-      uint8_t *src = (uint8_t*)vertices->lock_read_only() + get_offset(slot);
-      for (unsigned i  = 0; i != nv; ++i) {
-        memcpy(dest, src, bytes);
-        src += stride;
-        dest += dest_stride;
-      }
-      vertices->unlock_read_only();
-    }
-
-    /// set a vec4 value of an attribute (only when not in a vbo)  (Deprecated)
-    void set_value(unsigned slot, unsigned index, const vec4 &value) {
-      if (get_kind(slot) == GL_FLOAT) {
-        float *src = (float*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
-        unsigned size = get_size(slot);
-        src[0] = value[0];
-        if (size > 1) src[1] = value[1];
-        if (size > 2) src[2] = value[2];
-        if (size > 3) src[3] = value[3];
-        vertices->unlock();
-  	  } else if (get_kind(slot) == GL_UNSIGNED_BYTE) {
-        uint8_t *src = (uint8_t*)((uint8_t*)vertices->lock() + stride * index + get_offset(slot));
-        unsigned size = get_size(slot);
-        src[0] = (uint8_t)( value[0] * 255.0f );
-        if (size > 1) src[1] = (uint8_t)( value[1] * 255.0f );
-        if (size > 2) src[2] = (uint8_t)( value[2] * 255.0f );
-        if (size > 3) src[3] = (uint8_t)( value[3] * 255.0f );
-        vertices->unlock();
-      }
-    }
-
     /// Get an index value from the index buffer object.
-    unsigned get_index(unsigned index) const {
+    unsigned get_index(const uint8_t *bytes, unsigned index) const {
       unsigned result = 0;
       if (index_type == GL_UNSIGNED_SHORT) {
-        uint16_t *src = (uint16_t*)((uint8_t*)indices->lock_read_only() + index*2);
+        uint16_t *src = (uint16_t*)((uint8_t*)bytes + (first_index + index)*2);
         result = *src;
-        indices->unlock_read_only();
       } else if (index_type == GL_UNSIGNED_INT) {
-        unsigned int *src = (unsigned int*)((uint8_t*)indices->lock_read_only() + index*4);
+        unsigned int *src = (unsigned int*)((uint8_t*)bytes + (first_index + index)*4);
         result = *src;
-        indices->unlock_read_only();
       }
       return result;
     }
@@ -438,12 +450,15 @@ namespace octet { namespace scene {
 
     /// dump the mesh to a file in ASCII. Used to debug mesh transforms.
     void dump(FILE *file) {
+      gl_resource::rolock vtx_lock(get_vertices());
+      gl_resource::rolock idx_lock(get_indices());
+
       fprintf(file, "<model mode=%04x index_type=%04x stride=%d>\n", mode, index_type, stride);
       for (unsigned slot = 0; slot != num_slots; ++slot) {
         fprintf(file, "  <slot n=%d attr=%d kind=%04x size=%d offset=%d>\n", slot, get_attr(slot), get_kind(slot), get_size(slot), get_offset(slot)); 
         const char *fmt[] = { "", "    [%d %f]\n", "    [%d %f %f]\n", "    [%d %f %f %f]\n", "    [%d %f %f %f %f]\n" };
         for (unsigned i = 0; i != num_vertices; ++i) {
-          vec4 value = get_value(slot, i);
+          vec4 value = get_value(vtx_lock.u8(), slot, i);
           fprintf(file, fmt[get_size(slot)], i, value[0], value[1], value[2], value[3]);
         }
         fprintf(file, "  </slot>\n");
@@ -451,7 +466,7 @@ namespace octet { namespace scene {
       fprintf(file, "  <indices>\n    ");
       unsigned ni = get_num_indices();
       for (unsigned i = 0; i != ni; ++i) {
-        fprintf(file, "%d ", get_index(i));
+        fprintf(file, "%d ", get_index(vtx_lock.u8(), i));
       }
       fprintf(file, "\n  </indices>\n");
       fprintf(file, "</model>\n");
@@ -479,7 +494,7 @@ namespace octet { namespace scene {
       //printf("de %04x %d %d\n", get_mode(), get_num_vertices(), get_index_type());
       if (get_index_type()) {
         indices->bind();
-        glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)0);
+        glDrawElements(get_mode(), get_num_indices(), get_index_type(), (GLvoid*)(get_index_size() * first_index));
       } else {
         glDrawArrays(get_mode(), 0, get_num_vertices());
       }
@@ -500,186 +515,6 @@ namespace octet { namespace scene {
       disable_attributes();
     }
 
-    /// Use the mesh builder to make a cube (Deprecated).
-    void make_cube(float size = 1.0f) {
-      init();
-      mesh_builder b;
-    
-      b.init(6*4, 6*6);
-
-      b.add_cube(size);
-      b.get_mesh(*this);
-    }
-
-    /// Use the mesh builder to make an axis aligned  box cube (Deprecated).
-    void make_aa_box(float x, float y, float z) {
-      init();
-      mesh_builder b;
-    
-      b.init(6*4, 6*6);
-      b.scale(x, y, z);
-
-      b.add_cube(1.0f);
-      b.get_mesh(*this);
-    }
-
-    /// Use the mesh builder to make a plane (Deprecated).
-    void make_plane(float size = 1.0f, unsigned nx=1, unsigned ny=1) {
-      init();
-      mesh_builder b;
-      b.init(nx*ny*2, nx*ny*6);
-      b.add_plane(size, nx, ny);
-      b.get_mesh(*this);
-    }
-
-    /// Use the mesh builder to make a sphere (Deprecated)
-    void make_sphere(float radius=1.0f, unsigned slices=16, unsigned stacks=16) {
-      init();
-      mesh_builder b;
-    
-      b.init(stacks*(slices+1), stacks*slices*6);
-
-      b.add_sphere(radius, slices, stacks, 8);
-      b.get_mesh(*this);
-    }
-
-    /// Use the mesh builder to make a cone (Deprecated)
-    void make_cone(float radius=1.0f, float height=1.0f, unsigned slices=32, unsigned stacks=1) {
-      init();
-      mesh_builder b;
-    
-      b.init(stacks*slices, stacks*slices*6+1);
-
-      b.add_cone(radius, height, slices, stacks);
-      b.get_mesh(*this);
-    }
-
-    /// Make a mesh to visualise normals (Deprecated)
-    void make_normal_visualizer(const mesh &source, float length, unsigned normal_attr) {
-      init();
-      mesh_builder builder;
-    
-      builder.init(source.get_num_vertices()*2, source.get_num_vertices()*2);
-
-      unsigned pos_slot = source.get_slot(attribute_pos);
-      unsigned normal_slot = source.get_slot(normal_attr);
-      for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
-        vec4 pos = source.get_value(pos_slot, i);
-        vec4 normal = source.get_value(normal_slot, i);
-        unsigned idx = builder.add_vertex(pos, normal, 0, 0);
-        builder.add_vertex(pos + normal * length, normal, 0, 0);
-        builder.add_index(idx);
-        builder.add_index(idx+1);
-      }
-
-      builder.get_mesh(*this);
-      set_mode( GL_LINES );
-    }
-
-    /// make the normal, tangent, bitangent space for each vertex (Deprectated).
-    void add_3d_normals(const mesh &source) {
-      init();
-      if (source.get_mode() != GL_TRIANGLES || source.get_num_indices() % 3 != 0) {
-        printf("warning: make_3d_normals expected triangles\n");
-        return;
-      }
-
-      //s = source.s; 
-
-      // add tangent and bitangent
-      unsigned stride = source.get_stride();
-      unsigned tangent_slot = add_attribute(attribute_tangent, 3, GL_FLOAT, stride);
-      unsigned bitangent_slot = add_attribute(attribute_bitangent, 3, GL_FLOAT, stride + 12);
-
-      size_t vsize = (stride + 24) * source.get_num_vertices();
-      size_t isize = source.get_indices()->get_size(); //mesh::kind_size(get_index_type()) * source.get_num_indices();
-      allocate(vsize, isize);
-      set_params(stride + 24, source.get_num_indices(), source.get_num_vertices(), source.get_mode(), source.get_index_type());
-      indices = source.get_indices();
-
-      unsigned pos_slot = source.get_slot(attribute_pos);
-      unsigned uv_slot = source.get_slot(attribute_uv);
-      //unsigned normal_slot = source.get_slot(attribute_normal);
-
-      for (unsigned slot = 0; slot != source.get_num_slots(); ++slot) {
-        for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
-          vec4 value = source.get_value(slot, i);
-          set_value(slot, i, value);
-        }
-      }
-
-      for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
-        vec4 value(0, 0, 0, 0);
-        set_value(tangent_slot, i, value);
-        set_value(bitangent_slot, i, value);
-      }
-
-      for (unsigned i = 0; i != source.get_num_indices(); i += 3) {
-        unsigned idx[3] = {
-          source.get_index(i),
-          source.get_index(i+1),
-          source.get_index(i+2)
-        };
-        vec4 uv0 = source.get_value(uv_slot, idx[0]);
-        vec4 uv1 = source.get_value(uv_slot, idx[1]);
-        vec4 uv2 = source.get_value(uv_slot, idx[2]);
-        vec4 pos0 = source.get_value(pos_slot, idx[0]);
-        vec4 pos1 = source.get_value(pos_slot, idx[1]);
-        vec4 pos2 = source.get_value(pos_slot, idx[2]);
-        vec4 duv1 = uv1 - uv0;
-        vec4 duv2 = uv2 - uv0;
-        vec4 dpos1 = pos1 - pos0;
-        vec4 dpos2 = pos2 - pos0;
-
-        // solve:
-        //   duv1.x() * tangent + duv1.y() * bitangent = dpos1
-        //   duv2.x() * tangent + duv2.y() * bitangent = dpos2
-
-        //float rdet = 1.0f / (duv1.x() * duv2.y() - duv1.y() * duv2.x());
-        float rdet = 1.0f;
-        vec4 tangent = (dpos1 * duv2.y() - dpos2 * duv1.y()) * rdet;
-        vec4 bitangent = (dpos2 * duv1.x() - dpos1 * duv2.x()) * rdet;
-
-        /*vec4 normal = source.get_value(normal_slot, idx[0]);
-        printf("normal=%s\n", normal.toString());
-        printf("tangent=%s\n", tangent.toString());
-        printf("bitangent=%s\n", bitangent.toString());
-        printf("duv1.x() * tangent + duv1.y() * bitangent=%s\n", (tangent * duv1.x() + bitangent * duv1.y()).toString());
-        printf("dpos1=%s\n", dpos1.toString());
-        printf("duv2.x() * tangent + duv2.y() * bitangent=%s\n", (tangent * duv2.x() + bitangent * duv2.y()).toString());
-        printf("dpos2=%s\n", dpos2.toString());*/
-
-        for (unsigned j = 0; j != 3; ++j) {
-          vec4 new_tangent = tangent + get_value(tangent_slot, idx[j]);
-          vec4 new_bitangent = bitangent + get_value(bitangent_slot, idx[j]);
-          set_value(tangent_slot, idx[j], new_tangent);
-          set_value(bitangent_slot, idx[j], new_bitangent);
-        }
-      }
-
-      // normalize
-      for (unsigned i = 0; i != source.get_num_vertices(); ++i) {
-        vec3 new_tangent = get_value(tangent_slot, i).xyz().normalize();
-        vec3 new_bitangent = get_value(bitangent_slot, i).xyz().normalize();
-        set_value(tangent_slot, i, vec4(new_tangent,0));
-        set_value(bitangent_slot, i, vec4(new_bitangent,0));
-      }
-    }
-
-    /// Apply a matrix to every position
-    void transform(unsigned attr, mat4t &matrix) {
-      if (get_num_vertices() == 0) {
-        return;
-      }
-
-      unsigned slot = get_slot(attr);
-      for (unsigned i = 0; i != get_num_vertices(); ++i) {
-        vec4 pos = get_value(slot, i);
-        vec4 tpos = pos * matrix;
-        set_value(slot, i, tpos);
-      }
-    }
-
     /// Compute the axis aligned bounding box for this mesh in model space and set it.
     void calc_aabb() {
       unsigned num_vertices = get_num_vertices();
@@ -688,11 +523,13 @@ namespace octet { namespace scene {
         return;
       }
 
+      gl_resource::rolock vtx_lock(get_vertices());
+
       unsigned slot = get_slot(attribute_pos);
-      vec3 vmin = get_value(slot, 0).xyz();
+      vec3 vmin = get_value(vtx_lock.u8(), slot, 0).xyz();
       vec3 vmax = vmin;
       for (unsigned i = 1; i < num_vertices; ++i) {
-        vec3 pos = get_value(slot, i).xyz();
+        vec3 pos = get_value(vtx_lock.u8(), slot, i).xyz();
         vmin = min(pos, vmin);
         vmax = max(pos, vmin);
       }
@@ -716,7 +553,7 @@ namespace octet { namespace scene {
       unsigned pos_offset = get_offset(pos_slot);
       gl_resource::rolock idx_lock(get_indices());
       gl_resource::rolock vtx_lock(get_vertices());
-      const uint32_t *idx = idx_lock.u32();
+      const uint32_t *idx = idx_lock.u32() + first_index;
       const uint8_t *vtx = vtx_lock.u8();
 
       float best_denom = 0;
@@ -824,21 +661,46 @@ namespace octet { namespace scene {
       indices->assign(rhs.data(), 0, rhs.size() * sizeof(elem_t));
       set_index_type(sizeof(elem_t) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
       set_num_indices(rhs.size());
+      set_first_index(0);
     }
 
     /// Get all the edges in a hash map to avoid duplicates.
     /// record the triangle indices that they came from.
-    void get_edges(hash_map<uint64_t, uint64_t> &edges) {
+    void get_edges(dynarray<edge> &edges) {
       if (get_index_type() != GL_UNSIGNED_INT) return;
 
       gl_resource::rolock idx_lock(get_indices());
       const uint32_t *ip = idx_lock.u32();
 
+      edges.resize(0);
       for (unsigned i = 0; i < get_num_indices(); i += 3) {
         add_edge(edges, i, ip[i+0], ip[i+1]);
         add_edge(edges, i, ip[i+1], ip[i+2]);
         add_edge(edges, i, ip[i+2], ip[i+0]);
       }
+
+      std::sort(edges.data(), edges.data() + edges.size());
+
+      size_t dest = 0, src = 0;
+      for (; src < edges.size()-1; ) {
+        edge &e0 = edges[src];
+        edge &e1 = edges[src+1];
+        if (dest != src && e0.idx0 == e1.idx0 && e0.idx1 == e1.idx1) {
+          // combine two similar edges.
+          edge &ed = edges[dest++];
+          ed = e0;
+          ed.tri1 = e1.tri0;
+          src += 2;
+        } else {
+          edges[dest++] = e0;
+          src++;
+        }
+      }
+
+      if (src < edges.size()-1) {
+        edges[dest++] = edges[src++];
+      }
+      edges.resize(dest);
     }
 
     /// Generate silhouette edges.
@@ -849,7 +711,7 @@ namespace octet { namespace scene {
     ///
     ///   There is only one triangle that uses the edge.
     ///   One triangle can be seen from the viewpoint, the other can't.
-    void get_silhouette_edges(const vec3 &viewpoint, bool is_directional, dynarray<unsigned> &indices) {
+    void get_silhouette_edges(const vec3 &viewpoint, bool is_directional, dynarray<edge> &edges) {
       unsigned pos_slot = get_slot(attribute_pos);
       if (get_index_type() != GL_UNSIGNED_INT) return;
       if (get_size(pos_slot) < 3) return;
@@ -857,37 +719,28 @@ namespace octet { namespace scene {
 
       unsigned pos_offset = get_offset(pos_slot);
 
-      hash_map<uint64_t, uint64_t> edges;
       get_edges(edges);
 
       gl_resource::rolock idx_lock(get_indices());
       gl_resource::rolock vtx_lock(get_vertices());
-      const uint32_t *ip = idx_lock.u32();
+      const uint32_t *ip = idx_lock.u32() + first_index;
       const uint8_t *vp = vtx_lock.u8();
       unsigned stride = get_stride();
       
-      for (unsigned i = 0; i != edges.size(); ++i) {
-        if (edges.get_key(i)) {
-          uint64_t tris = edges.get_value(i);
-          uint32_t tri_a = (uint32_t)(tris) - 1;
-          uint32_t tri_b = (uint32_t)(tris >> 32) - 1;
-          assert(edges.get_value(i));
-          if (
-            tri_b == 0 ||
-            tri_is_visible(
-              tri_a, pos_offset, stride, ip, vp, viewpoint, is_directional
-            ) != tri_is_visible(
-              tri_b, pos_offset, stride, ip, vp, viewpoint, is_directional
-            )
-          ) {
-            uint64_t idxs = edges.get_value(i);
-            uint32_t idx_a = (uint32_t)idxs;
-            uint32_t idx_b = (uint32_t)(idxs >> 32);
-            indices.push_back(idx_a);
-            indices.push_back(idx_b);
-          }
+      size_t dest = 0;
+      for (size_t i = 0; i != edges.size(); ++i) {
+        const edge &edge = edges[i];
+        if (
+          tri_is_visible(
+            edge.tri0, pos_offset, stride, ip, vp, viewpoint, is_directional
+          ) != tri_is_visible(
+            edge.tri1, pos_offset, stride, ip, vp, viewpoint, is_directional
+          )
+        ) {
+          edges[dest++] = edge;
         }
       }
+      edges.resize(dest);
     }
 
     /// Debugging: show the effect of the vertex shader on the vertices
