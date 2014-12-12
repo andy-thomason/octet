@@ -145,6 +145,7 @@
   #include "helpers/http_server.h"
   #include "helpers/text_overlay.h"
   #include "helpers/object_picker.h"
+  #include "helpers/helper_fps_controller.h"
 
   // asset loaders
   #include "loaders/collada_builder.h"
