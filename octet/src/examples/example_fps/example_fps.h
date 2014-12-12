@@ -16,70 +16,28 @@ namespace octet {
 
     ref<camera_instance> the_camera;
 
-    // a class derived from mesh box that scales its vertices.
-    class mesh_terrain : public mesh {
-      ivec3 dimensions;
-    public:
-      // construct using an empty box and then set mesh.
-      mesh_terrain(vec3_in size, ivec3_in dimensions) : mesh(), dimensions(dimensions) {
-        set_default_attributes();
-        set_aabb(aabb(vec3(0, 0, 0), size));
-        update();
-      }
+    struct example_geometry_source : mesh_terrain::geometry_source {
+      mesh::vertex vertex(vec3_in bb_min, vec3_in uv_min, vec3_in uv_delta, vec3_in pos) {
+        static const vec3 bumps[] = { vec3(100, 0, 100), vec3(50, 0, 50), vec3(150, 0, 50) };
 
-      // override the update function to draw different geometry.
-      void update() {
-        dynarray<mesh::vertex> vertices;
-        dynarray<uint32_t> indices;
+        float y =
+          expf((pos - bumps[0]).squared() / (-100.0f)) * 3.0f +
+          expf((pos - bumps[1]).squared() / (-100.0f)) * 4.0f +
+          expf((pos - bumps[2]).squared() / (-10000.0f)) * (-20.0f) +
+          (15.0f)
+        ;
 
-        vertices.reserve((dimensions.x()+1) * (dimensions.z()+1));
-
-        vec3 dimf = (vec3)(dimensions);
-        aabb bb = get_aabb();
-        vec3 bb_min = bb.get_min();
-        vec3 bb_delta = bb.get_half_extent() / dimf * 2.0f;
-        vec3 uv_min = vec3(0);
-        vec3 uv_delta = vec3(30.0f/dimf.x(), 30.0f/dimf.z(), 0);
-        vec3 bumps[] = { vec3(100, 0, 100), vec3(50, 0, 50), vec3(-50, 0, -100) };
-        for (int x = 0; x <= dimensions.x(); ++x) {
-          for (int z = 0; z <= dimensions.z(); ++z) {
-            vec3 xz = vec3((float)x, 0, (float)z) * bb_delta;
-            float y =
-              expf((xz - bumps[0]).squared() / (-100.0f)) * 10.0f +
-              expf((xz - bumps[1]).squared() / (-100.0f)) * 4.0f +
-              //expf((xz - bumps[2]).squared() / (-1000.0f)) * (-3.0f) -
-              0.0f
-            ;
-            //float y = sinf(xz.x() * 0.01f) * 1.0f + sinf(xz.z() * 0.03f) * 0.5f;
-            float dy_dx = cosf(xz.x() * 0.01f);
-            float dy_dz = cosf(xz.z() * 0.03f);
-            vec3 pos = bb_min + xz + vec3(0, y, 0);
-            vec3 normal = normalize(vec3(dy_dx, 1, dy_dz));
-            vec3 uv = uv_min + vec3((float)x, (float)z, 0) * uv_delta;
-            vertices.push_back(mesh::vertex(pos, normal, uv));
-          }
-        }
-
-        indices.reserve(dimensions.x() * dimensions.z() * 6);
-
-        int stride = dimensions.x() + 1;
-        for (int x = 0; x < dimensions.x(); ++x) {
-          for (int z = 0; z < dimensions.z(); ++z) {
-            // 01 11
-            // 00 10
-            indices.push_back((x+0) + (z+0)*stride);
-            indices.push_back((x+0) + (z+1)*stride);
-            indices.push_back((x+1) + (z+0)*stride);
-            indices.push_back((x+1) + (z+0)*stride);
-            indices.push_back((x+0) + (z+1)*stride);
-            indices.push_back((x+1) + (z+1)*stride);
-          }
-        }
-
-        set_vertices(vertices);
-        set_indices(indices);
+        //float y = sinf(xz.x() * 0.01f) * 1.0f + sinf(xz.z() * 0.03f) * 0.5f;
+        float dy_dx = std::cos(pos.x() * 0.01f);
+        float dy_dz = std::cos(pos.z() * 0.03f);
+        vec3 p = bb_min + pos + vec3(0, y, 0);
+        vec3 normal = normalize(vec3(dy_dx, 1, dy_dz));
+        vec3 uv = uv_min + vec3((float)pos.x(), (float)pos.z(), 0) * uv_delta;
+        return mesh::vertex(p, normal, uv);
       }
     };
+
+    example_geometry_source source;
 
     void update_keys(scene_node *player_node, scene_node *camera_node) {
       float friction = 0.0f;
@@ -124,7 +82,7 @@ namespace octet {
 
       app_scene->add_shape(
         mat,
-        new mesh_terrain(vec3(100.0f, 0.5f, 100.0f), ivec3(100, 1, 100)),
+        new mesh_terrain(vec3(100.0f, 0.5f, 100.0f), ivec3(100, 1, 100), source),
         new material(new image("assets/grass.jpg")),
         false, 0
       );
