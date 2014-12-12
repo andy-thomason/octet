@@ -9,6 +9,18 @@ inline btVector3 get_btVector3(const octet::vec3 &v) {
   return btVector3(v.x(),  v.y(), v.z());
 }
 
+inline octet::vec4_ret get_vec4(const btVector3 &v, float w) {
+  return octet::vec4(v.x(),  v.y(), v.z(), w);
+}
+
+inline octet::mat4t_ret get_mat4t(btMatrix3x3 &m, btVector3 &p) {
+  return octet::mat4t(get_vec4(m[0], 0), get_vec4(m[1], 0), get_vec4(m[2], 0), get_vec4(p, 1));
+}
+
+inline octet::vec3_ret get_vec3(const btVector3 &v) {
+  return octet::vec3(v.x(),  v.y(), v.z());
+}
+
 
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"

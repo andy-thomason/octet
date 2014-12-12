@@ -253,30 +253,39 @@ namespace octet { namespace scene {
         rigid_body->applyTorque(get_btVector3(value));
       }
 
-      void set_angular_velocity(vec3_in value) {
-        rigid_body->setAngularVelocity(get_btVector3(value));
-      }
-
+      /// set the sliding friction of the object.
       void set_friction(float value) {
         rigid_body->setFriction(value);
       }
 
+      /// set the rolling friction of the object (tyres for example).
       void set_rolling_friction(float value) {
         rigid_body->setRollingFriction(value);
       }
 
+      /// set the "bounciness" of the object. 0 is dead, 1 is bouncy.
       void set_resitution(float value) {
         rigid_body->setRestitution(value);
       }
 
-      /// brute force tranform set: warning, this may break something!
+      /// brute force set the angular velocity (spin) of the object directly: warning, this may break something!
+      void set_angular_velocity(vec3_in value) {
+        rigid_body->setAngularVelocity(get_btVector3(value));
+      }
+
+      /// brute force set the linear velocity of the object directly: warning, this may break something!
+      void set_linear_velocity(vec3_in value) {
+        rigid_body->setLinearVelocity(get_btVector3(value));
+      }
+
+      /// brute force transform set: warning, this may break something!
       void set_transform(mat4t_in value) {
         btTransform trans;// = rigid_body->getWorldTransform();
         trans.setFromOpenGLMatrix(value.get());
         rigid_body->setWorldTransform(trans);
       }
 
-      /// brute force tranform set: warning, this may break something!
+      /// brute force transform set: warning, this may break something!
       void set_position(vec3_in value) {
         btTransform trans = rigid_body->getWorldTransform();
         trans.setOrigin(get_btVector3(value));
@@ -288,6 +297,57 @@ namespace octet { namespace scene {
         btTransform trans = rigid_body->getWorldTransform();
         trans.setBasis(get_btMatrix3x3(value));
         rigid_body->setWorldTransform(trans);
+      }
+
+      /// activate the rigid body. You must do this periodicaly if you want your object to stay awake (see fps example).
+      void activate() {
+        rigid_body->activate();
+      }
+
+      /// This is the amount that the body will respond to torques in certain directions.
+      void set_angular_factor(vec3_in value) {
+        rigid_body->setAngularFactor(get_btVector3(value));
+      }
+
+      /// This is the amount that the body will respond to forces in diferrent directions.
+      void set_linear_factor(vec3_in value) {
+        rigid_body->setLinearFactor(get_btVector3(value));
+      }
+
+      /// gravity is a constant force that affects the object.
+      void set_gravity(vec3_in value) {
+        rigid_body->setGravity(get_btVector3(value));
+      }
+
+      /// sleep the object if its velocity falls below these values.
+      void set_sleeping_thresholds(float linear, float angular) {
+        rigid_body->setSleepingThresholds(linear, angular);
+      }
+
+      /// get the current position and orientation of the matrix.
+      mat4t get_physics_transform() const {
+        mat4t result;
+        rigid_body->getWorldTransform().getOpenGLMatrix(result.get());
+        return result;
+      }
+
+      /// get the angular velocity (spin) of the object.
+      vec3_ret get_angular_velocity() const {
+        return get_vec3(rigid_body->getAngularVelocity());
+      }
+
+      /// get the linear velocity of the object.
+      vec3_ret get_linear_velocity() const {
+        return get_vec3(rigid_body->getLinearVelocity());
+      }
+
+      /// set a speed limit for this object on this frame
+      void clamp_linear_velocity(float max_speed) {
+        btVector3 vel = rigid_body->getLinearVelocity();
+        float s2 = vel.dot(vel);
+        if (s2 > max_speed * max_speed) {
+          rigid_body->setLinearVelocity(vel * (max_speed/std::sqrt(s2)));
+        }
       }
     #endif
   };
