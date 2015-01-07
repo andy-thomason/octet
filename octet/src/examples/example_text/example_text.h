@@ -33,7 +33,7 @@ namespace octet {
       // create the overlay
       overlay = new text_overlay();
 
-      // get the defualt font.
+      // get the default font.
       bitmap_font *font = overlay->get_default_font();
 
       // create a box containing text (in pixels)
