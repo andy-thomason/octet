@@ -47,7 +47,13 @@
 #include <assert.h>
 #include <string>
 #include <vector>
+#include <array>
+#include <deque>
+#include <queue>
 #include <algorithm>
+#include <numeric>
+#include <iostream>
+#include <fstream>
 
 #if defined(WIN32)
   #include <direct.h>

@@ -264,6 +264,14 @@ namespace octet { namespace math {
       #endif
     }
 
+    OCTET_HOT operator const vec3&() const {
+      return (const vec3&)v;
+    }
+
+    OCTET_HOT operator const vec2&() const {
+      return (const vec2&)v;
+    }
+
     // get xy
     OCTET_HOT const vec2 &xy() const {
       return (const vec2&)v;
@@ -483,5 +491,11 @@ namespace octet { namespace math {
   #else
     #define OCTET_VEC4_CONST(VAR, X, Y, Z, W) vec4 VAR(X, Y, Z, W);
   #endif
+
+  std::ostream &operator <<(std::ostream &os, const vec4 &rhs) {
+    char tmp[256];
+    os << rhs.toString(tmp, sizeof(tmp));
+    return os;
+  }
 } }
 

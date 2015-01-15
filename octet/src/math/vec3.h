@@ -463,5 +463,11 @@ namespace octet { namespace math {
     };
     static vec3_unit_test vec3_unit_test;
   #endif
+
+  std::ostream &operator <<(std::ostream &os, const vec3 &rhs) {
+    char tmp[256];
+    os << rhs.toString(tmp, sizeof(tmp));
+    return os;
+  }
 } }
 

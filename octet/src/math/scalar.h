@@ -145,21 +145,6 @@ namespace octet { namespace math {
     return f != 0 && (fu.i & 0x007fffff) == 0;
   }
 
-  /// swap two objects
-  template <class T> void swap(T &a, T &b) {
-    T t = a; a = b; b = t;
-  }
-
-  /// find the minimum of two objects
-  template <class T> T min(const T &a, const T &b) {
-    return a < b ? a : b;
-  }
-
-  /// find the maximum of two objects
-  template <class T> T max(const T &a, const T &b) {
-    return a > b ? a : b;
-  }
-
   /// big endian unaligned load
   inline static unsigned uint32_be(const uint8_t *src) {
     return (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | (src[3] << 0);

@@ -21,24 +21,18 @@ namespace octet { namespace scene {
     // Parameters connect colors and other values to uniform buffers.
     dynarray<ref<param> > params;
 
-    dynarray<uint8_t> static_buffer;
-    dynarray<uint8_t> dynamic_buffer;
-
-    int dynamic_size;
-    int static_size;
+    //dynarray<uint8_t> static_buffer;
+    dynarray<uint8_t> buffer;
 
     // create the parameters that change frequently such as the matrices and lighting
     void create_dynamic_params() {
-      static_buffer.resize(0x100);
-      dynamic_buffer.resize(0x400);
-      param_buffer_info dynamic_pbi(dynamic_buffer.data(), 0);
+      buffer.reserve(0x200);
+      param_buffer_info dynamic_pbi(buffer);
 
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToProjection, GL_FLOAT_MAT4, 1, param::stage_vertex));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_modelToCamera, GL_FLOAT_MAT4, 1, param::stage_vertex));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_lighting, GL_FLOAT_VEC4, ambient_size + max_lights * light_size, param::stage_fragment));
       params.push_back(new param_uniform(dynamic_pbi, NULL, atom_num_lights, GL_INT, 1, param::stage_fragment));
-
-      dynamic_size = dynamic_pbi.size;
     }
 
     // create the attribute parameters
@@ -70,9 +64,8 @@ namespace octet { namespace scene {
       create_dynamic_params();
       create_attribute_params();
 
-      param_buffer_info static_pbi(static_buffer.data(), 1);
+      param_buffer_info static_pbi(buffer);
       params.push_back(new param_color(static_pbi, color, atom_diffuse, param::stage_fragment));
-      static_size = static_pbi.size;
 
       if (shader == NULL) {
         shader = new param_shader("shaders/default.vs", "shaders/default_solid.fs");
@@ -90,9 +83,8 @@ namespace octet { namespace scene {
       create_dynamic_params();
       create_attribute_params();
 
-      param_buffer_info static_pbi(static_buffer.data(), 1);
+      param_buffer_info static_pbi(buffer);
       params.push_back(new param_sampler(static_pbi, atom_diffuse_sampler, img, smpl, param::stage_fragment));
-      static_size = static_pbi.size;
 
       if (shader == NULL) {
         shader = new param_shader("shaders/default.vs", "shaders/default_textured.fs");
@@ -118,16 +110,16 @@ namespace octet { namespace scene {
       {
         // matrices and lighting go in the dynamic uniform buffer
         param_uniform *modelToProjection_param = get_param_uniform(atom_modelToProjection);
-        if (modelToProjection_param) modelToProjection_param->set_value(dynamic_buffer.data(), modelToProjection.get(), sizeof(modelToProjection));
+        if (modelToProjection_param) modelToProjection_param->set_value(buffer.data(), modelToProjection.get(), sizeof(modelToProjection));
 
         param_uniform *modelToCamera_param = get_param_uniform(atom_modelToCamera);
-        if (modelToCamera_param) modelToCamera_param->set_value(dynamic_buffer.data(), modelToCamera.get(), sizeof(modelToCamera));
+        if (modelToCamera_param) modelToCamera_param->set_value(buffer.data(), modelToCamera.get(), sizeof(modelToCamera));
 
         param_uniform *lighting_param = get_param_uniform(atom_lighting);
-        if (lighting_param) lighting_param->set_value(dynamic_buffer.data(), light_uniforms, sizeof(vec4) * num_light_uniforms);
+        if (lighting_param) lighting_param->set_value(buffer.data(), light_uniforms, sizeof(vec4) * num_light_uniforms);
 
         param_uniform *num_lights_param = get_param_uniform(atom_num_lights);
-        if (num_lights_param) num_lights_param->set_value(dynamic_buffer.data(), &num_lights, sizeof(int32_t));
+        if (num_lights_param) num_lights_param->set_value(buffer.data(), &num_lights, sizeof(int32_t));
       }
 
       custom_shader->render();
@@ -138,11 +130,7 @@ namespace octet { namespace scene {
           param_uniform *pu = params[i]->get_param_uniform();
           if (pu) {
             //printf("%s: %d off=%x\n", app_utils::get_atom_name(pu->get_name()), pu->get_uniform_buffer_index(), pu->get_offset());
-            if (pu->get_uniform_buffer_index()) {
-              pu->render(static_buffer.data());
-            } else {
-              pu->render(dynamic_buffer.data());
-            }
+            pu->render(buffer.data());
           }
         }
       }
@@ -173,16 +161,12 @@ namespace octet { namespace scene {
     /// set the diffuse color parameter (if it exists)
     void set_diffuse(const vec4 &color) {
       if (param *p = get_param_uniform(atom_diffuse)) {
-        p->get_param_uniform()->set_value(static_buffer.data(), &color, sizeof(color));
+        p->get_param_uniform()->set_value(buffer.data(), &color, sizeof(color));
       }
     }
 
-    void set_uniform(param_uniform *param, void *data, size_t size) {
-      if (param->get_uniform_buffer_index()) {
-        memcpy(static_buffer.data() + param->get_offset(), data, size);
-      } else {
-        memcpy(dynamic_buffer.data() + param->get_offset(), data, size);
-      }
+    void set_uniform(param_uniform *param, const void *data, size_t size) {
+      memcpy(buffer.data() + param->get_offset(), data, size);
     }
 
     dynarray<ref<param> > &get_params() {
@@ -190,11 +174,9 @@ namespace octet { namespace scene {
     }
 
     param_uniform *add_uniform(const void *data, atom_t name, uint16_t _type, uint16_t _repeat, param::stage_type _stage=param::stage_fragment) {
-      param_buffer_info pbi(dynamic_buffer.data(), 0);
-      pbi.size = dynamic_size;
+      param_buffer_info pbi(buffer);
       param_uniform *result = new param_uniform(pbi, data, name, _type, _repeat, _stage);
       params.push_back(result);
-      dynamic_size = pbi.size;
 
       param_bind_info pbind;
       pbind.program = custom_shader->get_program();
@@ -203,12 +185,10 @@ namespace octet { namespace scene {
     }
 
     param_sampler *add_sampler(GLint texture_slot, atom_t name, image *_image, sampler *_sampler, param::stage_type _stage=param::stage_fragment) {
-      param_buffer_info pbi(static_buffer.data(), 1);
+      param_buffer_info pbi(buffer);
       pbi.texture_slot = texture_slot;
-      pbi.size = static_size;
       param_sampler *result = new param_sampler(pbi, name, _image, _sampler, _stage);
       params.push_back(result);
-      static_size = pbi.size;
 
       param_bind_info pbind;
       pbind.program = custom_shader->get_program();

@@ -289,5 +289,11 @@ namespace octet { namespace math {
   #else
     typedef vec2 vec2p;
   #endif
+
+  std::ostream &operator <<(std::ostream &os, const vec2 &rhs) {
+    char tmp[256];
+    os << rhs.toString(tmp, sizeof(tmp));
+    return os;
+  }
 } }
 

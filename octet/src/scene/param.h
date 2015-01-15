@@ -90,15 +90,10 @@ namespace octet { namespace scene {
 
   struct param_buffer_info {
     GLint texture_slot;
-    unsigned size;
-    //gl_resource::rwlock lock;
-    uint8_t *uniform_data;
-    uint8_t uniform_buffer;
+    dynarray<uint8_t> &buffer;
 
-    param_buffer_info(uint8_t *data, uint8_t _uniform_buffer) : uniform_data(data) {
+    param_buffer_info(dynarray<uint8_t> &buffer) : buffer(buffer) {
       texture_slot = 0;
-      size = 0;
-      uniform_buffer = _uniform_buffer;
     }
   };
 
@@ -126,8 +121,6 @@ namespace octet { namespace scene {
       param(name, _type, _stage)
     {
       repeat = _repeat;
-      offset = (uint32_t)pbi.size;
-      uniform_buffer = pbi.uniform_buffer;
 
       // in uniform buffers, everything is in units of 16 bytes
       // matrices are repeats of vec4s
@@ -138,13 +131,15 @@ namespace octet { namespace scene {
         case GL_FLOAT_MAT4: size *= 4; break;
       }
 
-      pbi.size += size;
+      //pbi.size += size;
+      offset = pbi.buffer.size();
+      pbi.buffer.resize(offset + size);
 
       // if data is non-null, we add to the "buffer" part of pbi. (eg. colors)
       // otherwise we just grow the buffer size (eg. matrices, lighting)
       if (!data) return;
 
-      int32_t *idest = (int32_t*)(pbi.uniform_data + offset);
+      int32_t *idest = (int32_t*)(pbi.buffer.data() + offset);
       const int32_t *isrc = (const int32_t*)data;
 
       switch (get_gl_type()) {

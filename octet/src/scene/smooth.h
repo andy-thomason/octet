@@ -58,7 +58,7 @@ namespace octet { namespace scene {
     }
 
     unsigned add_edge(int i0, int i1) {
-      if (i0 > i1) { swap(i0, i1); }
+      if (i0 > i1) { std::swap(i0, i1); }
 
       unsigned &e = edges[((uint64_t)i1 << 32) | i0];
 

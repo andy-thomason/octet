@@ -444,7 +444,7 @@ namespace octet { namespace loaders {
         TiXmlElement *lambert = child(technique, "lambert");
         TiXmlElement *shader = phong ? phong : blinn ? blinn : lambert;
         dynarray<uint8_t> static_buffer(256);
-        param_buffer_info pbi(static_buffer.data(), 1);
+        param_buffer_info pbi(static_buffer);
         GLint texture_slot = 0;
         if (shader) {
           url += url[0] == '#';

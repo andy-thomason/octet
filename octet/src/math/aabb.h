@@ -26,6 +26,15 @@ namespace octet { namespace math {
       half_extent = half_extent_;
     }
 
+    template <class _It> aabb(_It a, _It b) {
+      if (a != b) {
+        vec3 min3 = *a, max3 = *a;
+        std::for_each(a+1, b, [&](vec3_in v){ min3 = math::min(min3, v); max3 = math::max(max3, v); });
+        center = (max3 + min3) * 0.5f;
+        half_extent = (max3 - min3) * 0.5f;
+      }
+    }
+
     // Find the union of two axis aligned bounding boxes
     aabb get_union(const aabb &rhs) {
       vec3 min = get_min().min(rhs.get_min());
@@ -212,7 +221,7 @@ namespace octet { namespace math {
 
         // back
         #undef OCTET_FACE
-        #define OCTET_FACE(X, Y, U, V) -(X), -(Y), -1,  0, 0, -1, U, V,
+        #define OCTET_FACE(X, Y, U, V) -(X), (Y), -1,  0, 0, -1, U, V,
         OCTET_FACE( 1,  1,  1, 1 ) OCTET_FACE( 1, -1,  1, 0 ) OCTET_FACE(-1, -1,  0, 0 ) OCTET_FACE(-1,  1,  0, 1 )
 
         // top
@@ -222,7 +231,7 @@ namespace octet { namespace math {
 
         // bottom
         #undef OCTET_FACE
-        #define OCTET_FACE(X, Y, U, V) -(Y), -1, -(X),  0, 0, -1, U, V,
+        #define OCTET_FACE(X, Y, U, V) (Y), -1, -(X),  0, 0, -1, U, V,
         OCTET_FACE( 1,  1,  1, 1 ) OCTET_FACE( 1, -1,  1, 0 ) OCTET_FACE(-1, -1,  0, 0 ) OCTET_FACE(-1,  1,  0, 1 )
 
         // right
@@ -232,7 +241,7 @@ namespace octet { namespace math {
 
         // left
         #undef OCTET_FACE
-        #define OCTET_FACE(X, Y, U, V) -1, -(X), -(Y),  -1, 0, 0, U, V,
+        #define OCTET_FACE(X, Y, U, V) -1, -(X), (Y),  -1, 0, 0, U, V,
         OCTET_FACE( 1,  1,  1, 1 ) OCTET_FACE( 1, -1,  1, 0 ) OCTET_FACE(-1, -1,  0, 0 ) OCTET_FACE(-1,  1,  0, 1 )
 
         #undef OCTET_FACE
@@ -261,5 +270,11 @@ namespace octet { namespace math {
       }
     }
   };
+
+  std::ostream &operator <<(std::ostream &os, aabb_in rhs) {
+    char tmp[256];
+    os << rhs.toString(tmp, sizeof(tmp));
+    return os;
+  }
 } }
 

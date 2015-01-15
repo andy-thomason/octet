@@ -49,7 +49,7 @@ namespace octet { namespace scene {
       if (!font) return;
 
       if (text.size() > max_quads) {
-        max_quads = max(32, (text.size() + 15) & ~15); // round up to 16
+        max_quads = std::max(32, (text.size() + 15) & ~15); // round up to 16
 	      unsigned max_vertices = max_quads * 4;
 	      unsigned max_indices = max_quads * 6;
 	      unsigned vsize = sizeof(vertex) * max_vertices;
