@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{dda91860-e541-4fdb-a790-f6b5e7902ffb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{1280c880-8181-435f-8975-ff6ac07df6ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{f85a3f01-4932-410d-b0e9-3861cb4ebf0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loaders">
+      <UniqueIdentifier>{c05a7416-e0b3-4d3b-a560-c57b346f0665}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="containers">
+      <UniqueIdentifier>{579c6044-879b-4582-8dc0-08b19304347c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helpers">
+      <UniqueIdentifier>{294d83db-d00d-4c27-b636-2b796ecfd48b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{7c4ee1aa-1f06-43ef-9adf-8e1befbd9d0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{22786083-47af-48b2-98c4-2963f667bc44}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\helpers\http_server.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\helpers\mouse_ball.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\helpers\object_picker.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\helpers\text_overlay.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\aabb.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\bvec2.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\bvec3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\bvec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\half_space.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\ivec3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\ivec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\mat4t.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\obb.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\plane.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\polygon.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\quat.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\random.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\rational.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\ray.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\scalar.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\sphere.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\vec2.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\vec3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\vec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\math\zcylinder.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\AL\al.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\AL\alc.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\AL\efx-creative.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\AL\EFX-Util.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\AL\efx.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\AL\xram.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\al_defs.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\app_common.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\args_parser.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_d3d10_ext.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_d3d11_ext.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_d3d9_ext.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_ext.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_gl.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_gl_ext.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\cl_platform.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\CL\opencl.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\configure.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\direct_show.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\generic.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\GL\freeglut.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\GL\freeglut_ext.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\GL\freeglut_std.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\GL\glut.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\glut_specific.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\gl_defs.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\gl_skeleton.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\machine_specific.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\opencl.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\video_capture.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\windows_specific.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\app_utils.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\atoms.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\binary_reader.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\binary_writer.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\bitmap_font.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\classes.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\file_map.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\gl_resource.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\http_writer.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\job.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\mesh_builder.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\resource.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\resources.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\resource_dict.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\url_finder.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\visitor.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\xml_writer.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\resources\zip_file.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\animation.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\animation_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\camera_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\displacement_map.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\image.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\indexer.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\light.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\light_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\material.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_box.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_cylinder.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_instance.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_particle_system.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_points.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_sphere.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_text.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_voxels.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\mesh_voxel_subcube.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\param.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\sampler.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\scene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\scene_node.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\skeleton.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\skin.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\smooth.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\visual_scene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scene\wireframe.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\bump_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\color_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\compute_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\phong_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\shaders.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\shaders\texture_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\collada_builder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\dds_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\gif_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\jpeg_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\jpeg_encoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\loaders.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\nifti_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\tga_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\loaders\zip_decoder.h">
+      <Filter>loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\allocator.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\bitset.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\containers.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\dictionary.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\double_list.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\dynarray.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\hash_map.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\ref.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\containers\string.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\resources\mesh_builder.inl">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\resources\resources.inl">
+      <Filter>resources</Filter>
+    </None>
+  </ItemGroup>
+</Project>

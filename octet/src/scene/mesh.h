@@ -466,7 +466,7 @@ namespace octet { namespace scene {
       fprintf(file, "  <indices>\n    ");
       unsigned ni = get_num_indices();
       for (unsigned i = 0; i != ni; ++i) {
-        fprintf(file, "%d ", get_index(vtx_lock.u8(), i));
+        fprintf(file, "%d ", get_index(idx_lock.u8(), i));
       }
       fprintf(file, "\n  </indices>\n");
       fprintf(file, "</model>\n");

@@ -20,7 +20,7 @@ namespace octet {
     class molecule : public resource {
       aabb bbox;
       std::vector<vec4> pos;
-      //std::vector<vec4> pos;
+      std::vector<vec4> bvh;
     public:
       molecule(const char *begin, const char *end) {
         vec3 min, max;
@@ -99,18 +99,29 @@ namespace octet {
         bbox = aabb((min+max)*0.5f, (max-min)*0.5f);
         std::cout << min << "\n";
         std::cout << max << "\n";
-        std::cout << (int)pos.size()/2 << "\n";
+        std::cout << (int)pos.size() << "\n";
 
         typedef std::vector<vec4>::iterator it;
-        std::deque<std::pair<it, it>> stack;
+        struct stack_t {
+          it begin;
+          it end;
+          int level;
+          stack_t(it begin, it end, int level) : begin(begin), end(end), level(level) {}
+        };
+        std::deque<stack_t> stack;
 
-        stack.emplace_back(pos.begin(), pos.end());
-        std::vector<vec4> bvh;
-        std::ofstream fred("c:/tmp/1.txt");
-        fred << pos.size() << "\n";
+        pos.resize(1024+64);
+        int pos_size = (int)pos.size();
+        it start = pos.begin();
+
+        int lg_pos_size = 1;
+        while (1<<(lg_pos_size+1) < pos_size) ++lg_pos_size;
+
+        stack.emplace_back(pos.begin(), pos.end(), 0);
         while (!stack.empty()) {
-          it begin = stack.back().first;
-          it end = stack.back().second;
+          it begin = stack.back().begin;
+          it end = stack.back().end;
+          int level = stack.back().level;
           stack.pop_back();
           aabb bb(begin, end);
 
@@ -120,9 +131,13 @@ namespace octet {
           std::for_each(begin, end, [&r, cen](vec4_in a) { r = std::max(r, math::length(a.xyz() - cen) + a.w()); } );
 
           bvh.emplace_back(bb.get_center(), r);
-          fred << bvh.size() << " " << bb.get_min() << " " << bb.get_max() << " " << bvh.back() << " " << end-begin << "\n";
+          //fred << bvh.size() << " " << bb.get_min() << " " << bb.get_max() << " " << bvh.back() << " " << end-begin << "\n";
+          char tmp[256];
+          log("%d %s %d\n", (int)bvh.size(), bvh.back().toString(tmp, sizeof(tmp)), end-begin);
+          fflush(log(""));
 
           if (begin+1 != end) {
+            // sort by the longest dimension.
             if (ha.x() >= ha.y() && ha.x() >= ha.z()) {
               std::sort(begin, end, [](vec4_in a, vec4_in b) {return a.x() < b.x();});
             } else if(ha.y() >= ha.x() && ha.y() >= ha.z()) {
@@ -131,22 +146,44 @@ namespace octet {
               std::sort(begin, end, [](vec4_in a, vec4_in b) {return a.z() < b.z();});
             }
 
-            size_t mid = (end-begin+1)/2;
-            if (mid >= 1) {
-              stack.emplace_front(begin, begin + mid);
-            }
+            if (level <= lg_pos_size) {
+              // split the atoms into equal sized groups
+              //size_t mid = end - begin == 2 ? 1 : end - begin == 3 ? 2 : (end - begin + 3)/2 & ~1;
+              ptrdiff_t mid = std::min((ptrdiff_t)1 << (lg_pos_size - level), end - begin);
+              if (mid >= 1) {
+                stack.emplace_front(begin, begin + mid, level+1);
+              }
 
-            if (end - (begin + mid) >= 1) {
-              stack.emplace_front(begin + mid, end);
+              if (end - (begin + mid) >= 1) {
+                stack.emplace_front(begin + mid, end, level+1);
+              }
             }
           }
         }
-        fred.close();
-        exit(1);
       }
 
       const std::vector<vec4> &get_pos() const {
         return pos;
+      }
+
+      const std::vector<vec4> &get_bvh() const {
+        return bvh;
+      }
+
+      // get all spheres in this radius
+      template <class _OutIt> void query(_OutIt dest, vec3_in centre, float radius) {
+        /*int stack[32];
+        int stack_in = 0;
+        int stack_out = 0;
+        stack[stack_in++] = 0;
+        while (stack_out != stack_in) {
+          int i = stack[stack_out++];
+          if (squared(bvh[i].xyz() - centre) <= squared(radius + bvh[i].w)) {
+            //stack[stack_in++] = 
+            //stack[stack_in++] = 
+          }
+        }
+        */
       }
     };
 
@@ -186,7 +223,9 @@ namespace octet {
       mesh_box *box = new mesh_box(vec3(20));
       scene_node *node = new scene_node();
       app_scene->add_child(node);
-      app_scene->add_mesh_instance(new mesh_instance(node, box, custom_mat));
+      //app_scene->add_mesh_instance(new mesh_instance(node, box, custom_mat));
+
+      //mesh *mol = new mesh(
     }
 
     /// this is called to draw the world
@@ -199,7 +238,7 @@ namespace octet {
       glFrontFace(GL_CW);
       glEnable(GL_CULL_FACE);
 
-      scene_node *camera_node = app_scene->get_camera_instance(0)->get_node();
+      /*scene_node *camera_node = app_scene->get_camera_instance(0)->get_node();
       scene_node *box_node = app_scene->get_mesh_instance(0)->get_node();
 
       // camera position in model space
@@ -230,7 +269,7 @@ namespace octet {
 
       // tumble the box  (there is only one mesh instance)
       box_node->rotate(1, vec3(1, 0, 0));
-      box_node->rotate(1, vec3(0, 1, 0));
+      box_node->rotate(1, vec3(0, 1, 0));*/
     }
   };
 }
