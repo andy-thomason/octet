@@ -197,8 +197,8 @@ namespace octet {
         float c = math::cos(frame_number*0.01f);
         float s = math::sin(frame_number*0.01f);
         prev_density[50 +(dim.x()+1) * 50] += 100;
-        u_prev[50 +(dim.x()+1) * 50] += c * 10;
-        v_prev[50 +(dim.x()+1) * 50] += s * 10;
+        u_prev[50 +(dim.x()+1) * 50] += c * 100;
+        v_prev[50 +(dim.x()+1) * 50] += s * 100;
 
 	      //get_from_UI( dens_prev, u_prev, v_prev );
 	      velocity_step( N, u, v, u_prev, v_prev, visc, dt );
