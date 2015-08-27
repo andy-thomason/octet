@@ -48,16 +48,24 @@ namespace octet {
       // materials for LODs (it is common to have simpler shaders for further objects).
       material *mats[] = {
         mat, mat, mat, mat  // show smallest lod in different cocalclour
-        //mat, mat, mat, mat // regular setting
       };
 
-      for (int x = 0; x <= 20; ++x) {
-        for (int y = 0; y <= 5; ++y) {
-          for (int z = 0; z <= 100; ++z) {
+      int num_x = 10;
+      int num_y = 5;
+      int num_z = 50;
+
+      printf("generating %d sphere instances\n", (num_x+1)*(num_y+1)*(num_z+1));
+
+      for (int x = 0; x <= num_x; ++x) {
+        for (int y = 0; y <= num_y; ++y) {
+          for (int z = 0; z <= num_z; ++z) {
             scene_node *node = new scene_node();
-            node->translate(vec3((x-10.0f) * 2.0f, (y - 2.5f) * 2.0f, -z * 2.0f));
+            node->translate(vec3((x-num_x*0.5f) * 2.0f, (y - num_y*0.5f) * 2.0f, -z * 2.0f));
             app_scene->add_child(node);
             for (int k = 0; k != 4; ++k) {
+              // The mesh instance has a min and max distance.
+              // By choosing these carefully, we will draw only one of the four variants
+              // depending on distance.
               mesh_instance *mi = new mesh_instance(node, spheres[k], mats[k]);
               mi->set_min_draw_distance(distances[k]);
               mi->set_max_draw_distance(distances[k+1]);
