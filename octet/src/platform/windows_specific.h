@@ -50,9 +50,12 @@
   #include "CL/cl_gl.h"
 #endif
 
-// windows sockets (a BSD socket clone)
-#pragma comment(lib, "Ws2_32.lib")
-#include <winsock2.h>
+// As of Windows 8.1, winsock2.h does not exist!
+//#pragma comment(lib, "Ws2_32.lib")
+//#include <winsock2.h>
+
+#pragma comment(lib, "WSock32.Lib")
+#include <winsock.h>
 
 // some standard c++ definitions
 #include <map>
