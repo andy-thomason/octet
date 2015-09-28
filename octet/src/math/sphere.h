@@ -21,7 +21,7 @@ namespace octet { namespace math {
     vec3_ret get_center() const {
       return center;
     }
-	//test
+
     float get_radius() const {
       return radius;
     }
