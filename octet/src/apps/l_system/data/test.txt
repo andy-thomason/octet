@@ -1,7 +1,0 @@
-{n:7,delta:20}
-X
-X(50):F[+X]F[-X]+X
-X(150):F[+X][-X]FX
-X(90):F-[[X]+X]+F[+FX]-X
-F:FF
-
