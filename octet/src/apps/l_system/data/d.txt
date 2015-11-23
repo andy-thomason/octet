@@ -1,0 +1,4 @@
+{n:7,delta:20}
+X
+X:F[+X]F[-X]+X
+F:FF
