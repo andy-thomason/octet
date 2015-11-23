@@ -20,7 +20,7 @@ install/
 maple/
 bin/
 build/
-src/apps
+src/apps/
 DerivedData/
 vita/PSVita_Debug
 vc2010/layer1/Debug
