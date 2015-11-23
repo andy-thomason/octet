@@ -346,7 +346,7 @@ namespace octet { namespace scene {
         btVector3 vel = rigid_body->getLinearVelocity();
         float s2 = vel.dot(vel);
         if (s2 > max_speed * max_speed) {
-          rigid_body->setLinearVelocity(vel * (max_speed/std::sqrt(s2)));
+          rigid_body->setLinearVelocity(vel * (max_speed/sqrt(s2)));
         }
       }
     #endif
