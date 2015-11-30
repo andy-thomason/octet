@@ -87,7 +87,7 @@ namespace octet { namespace scene {
 
     // add a new edge to a hash map. (index, index) -> (triangle+1, triangle+1)
     static void add_edge(dynarray<edge> &edges, unsigned tri_idx, unsigned i0, unsigned i1) {
-      edge e = { std::min(i0, i1), std::max(i0, i1), tri_idx, ~0 };
+      edge e = { static_cast<int32_t> (std::min(i0,i1)), static_cast<int32_t> (std::max(i0, i1)), static_cast<int32_t> (tri_idx), ~0 };
       edges.push_back(e);
     }
 

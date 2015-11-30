@@ -25,7 +25,7 @@ else
     endif
     ifeq ($(UNAME_S),Darwin)
         CC = clang
-        CCFLAGS += -g -O2 -Wswitch -D OCTET_MAC -F/System/Library/Frameworks -framework GLUT -framework OpenGL -framework OpenAL -lstdc++ -DOCTET_PREFIX=\"\" -Iopen_source/bullet
+        CCFLAGS += -g -O2 -Wswitch -D OCTET_MAC -F/System/Library/Frameworks -framework GLUT -framework OpenGL -framework OpenAL -lstdc++ -std=c++11 -DOCTET_PREFIX=\"\" -Iopen_source/bullet
     endif
 endif
 
