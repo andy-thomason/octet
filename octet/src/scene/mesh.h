@@ -87,7 +87,7 @@ namespace octet { namespace scene {
 
     // add a new edge to a hash map. (index, index) -> (triangle+1, triangle+1)
     static void add_edge(dynarray<edge> &edges, unsigned tri_idx, unsigned i0, unsigned i1) {
-      edge e = { std::min(i0, i1), std::max(i0, i1), tri_idx, ~0 };
+      edge e = { (int32_t)std::min(i0, i1), (int32_t)std::max(i0, i1), (int32_t)tri_idx, (int32_t)~0 };
       edges.push_back(e);
     }
 
@@ -482,7 +482,7 @@ namespace octet { namespace scene {
         unsigned size = get_size(slot);
         unsigned kind = get_kind(slot);
         unsigned attr = get_attr(slot);
-        unsigned offset = get_offset(slot);
+        size_t offset = get_offset(slot);
         glVertexAttribPointer(attr, size, kind, n & 1, get_stride(), (void*)(offset));
         glEnableVertexAttribArray(attr);
         n >>= 1;
@@ -531,7 +531,7 @@ namespace octet { namespace scene {
       for (unsigned i = 1; i < num_vertices; ++i) {
         vec3 pos = get_value(vtx_lock.u8(), slot, i).xyz();
         vmin = min(pos, vmin);
-        vmax = max(pos, vmin);
+        vmax = max(pos, vmax);
       }
       mesh_aabb = aabb((vmax + vmin) * 0.5f, (vmax - vmin) * 0.5f);
     }
