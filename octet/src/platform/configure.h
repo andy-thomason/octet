@@ -54,6 +54,7 @@
 #include <numeric>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #if defined(WIN32)
   #include <direct.h>
