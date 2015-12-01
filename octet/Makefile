@@ -20,12 +20,12 @@ else
     ifeq ($(UNAME_S),Linux)
 	EXE=
         CC = clang -I /usr/include/x86_64-linux-gnu/ -I/usr/include/x86_64-linux-gnu/c++/4.8 -fno-inline
-        CCFLAGS += -w -g -O2 -D OCTET_LINUX -Iopen_source/bullet -lstdc++ -lm -lglut -lGL -lopenal
+        CCFLAGS += -w -g -O2 -std=c++11 -D OCTET_LINUX -Iopen_source/bullet -lstdc++ -lm -lglut -lGL -lopenal
 
     endif
     ifeq ($(UNAME_S),Darwin)
         CC = clang
-        CCFLAGS += -g -O2 -Wswitch -D OCTET_MAC -F/System/Library/Frameworks -framework GLUT -framework OpenGL -framework OpenAL -lstdc++ -DOCTET_PREFIX=\"\" -Iopen_source/bullet
+        CCFLAGS += -g -O2 -std=c++11 -Wswitch -D OCTET_MAC -F/System/Library/Frameworks -framework GLUT -framework OpenGL -framework OpenAL -lstdc++ -DOCTET_PREFIX=\"\" -Iopen_source/bullet
     endif
 endif
 
