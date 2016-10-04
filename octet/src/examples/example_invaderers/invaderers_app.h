@@ -191,6 +191,7 @@ namespace octet {
     // sounds
     ALuint whoosh;
     ALuint bang;
+	ALuint aaah;
     unsigned cur_source;
     ALuint sources[num_sound_sources];
 
@@ -227,7 +228,7 @@ namespace octet {
     // called when we are hit
     void on_hit_ship() {
       ALuint source = get_sound_source();
-      alSourcei(source, AL_BUFFER, bang);
+      alSourcei(source, AL_BUFFER, aaah);
       alSourcePlay(source);
 
       if (--num_lives == 0) {
@@ -251,6 +252,14 @@ namespace octet {
           sprites[ship_sprite].translate(-ship_speed, 0);
         }
       }
+	  else if (is_key_down(key_up))
+	  {
+		  sprites[ship_sprite].translate(0, +ship_speed);
+	  }
+	  else if (is_key_going_down(key_down))
+	  {
+		  sprites[ship_sprite].translate(0, -ship_speed);
+	  }
     }
 
     // fire button (space)
@@ -466,6 +475,7 @@ namespace octet {
       // sounds
       whoosh = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
       bang = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
+	  aaah = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/aaah.wav");
       cur_source = 0;
       alGenSources(num_sound_sources, sources);
 
