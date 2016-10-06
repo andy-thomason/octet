@@ -220,8 +220,19 @@ namespace octet {
       if (live_invaderers == 4) {
         invader_velocity *= 4;
       } else if (live_invaderers == 0) {
-        game_over = true;
-        sprites[game_over_sprite].translate(-20, 0);
+		  live_invaderers = num_invaderers;
+		  invader_velocity *= 0.5f;
+        //game_over = true;
+        //sprites[game_over_sprite].translate(-20, 0);
+		GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
+		for (int j = 0; j != num_rows; ++j) {
+			for (int i = 0; i != num_cols; ++i) {
+				assert(first_invaderer_sprite + i + j*num_cols <= last_invaderer_sprite);
+				sprites[first_invaderer_sprite + i + j*num_cols].init(
+					invaderer, ((float)i - num_cols * 0.5f) * 0.5f, 2.50f - ((float)j * 0.5f), 0.25f, 0.25f
+				);
+			}
+		}
       }
     }
 
@@ -439,7 +450,7 @@ namespace octet {
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
 
-      GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
+	  GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
       for (int j = 0; j != num_rows; ++j) {
         for (int i = 0; i != num_cols; ++i) {
           assert(first_invaderer_sprite + i + j*num_cols <= last_invaderer_sprite);
