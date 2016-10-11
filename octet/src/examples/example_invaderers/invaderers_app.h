@@ -184,6 +184,7 @@ namespace octet {
     // game state
     bool game_over;
     int score;
+	bool restart_marker;
 
     // speed of enemy
     float invader_velocity;
@@ -243,10 +244,18 @@ namespace octet {
       alSourcePlay(source);
 
       if (--num_lives == 0) {
-        game_over = true;
-        sprites[game_over_sprite].translate(-20, 0);
+          game_over = true;
+		  restart_marker = true;
+		  sprites[game_over_sprite].translate(-20, 0);
       }
     }
+
+	void restart_game() {
+		if (restart_marker == true) {
+			sprites[game_over_sprite].translate(-20, 0);
+			game_over = true;
+		}
+	}
 
     // use the keyboard to move the ship
     void move_ship() {
@@ -497,6 +506,7 @@ namespace octet {
       live_invaderers = num_invaderers;
       num_lives = 3;
       game_over = false;
+	  restart_marker = false;
       score = 0;
     }
 
