@@ -252,8 +252,8 @@ namespace octet {
 
 	void restart_game() {
 		if (restart_marker == true) {
-			sprites[game_over_sprite].translate(-20, 0);
-			game_over = true;
+			//sprites[game_over_sprite].translate(20, 0);
+			app_init();
 		}
 	}
 
@@ -275,10 +275,16 @@ namespace octet {
 	  else if (is_key_down(key_up))
 	  {
 		  sprites[ship_sprite].translate(0, +ship_speed);
+		  if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) {
+			  sprites[ship_sprite].translate(0, -ship_speed);
+		  }
 	  }
-	  else if (is_key_going_down(key_down))
+	  else if (is_key_down(key_down))
 	  {
 		  sprites[ship_sprite].translate(0, -ship_speed);
+		  if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) {
+			  sprites[ship_sprite].translate(0, +ship_speed);
+		  }
 	  }
     }
 
@@ -513,7 +519,14 @@ namespace octet {
     // called every frame to move things
     void simulate() {
       if (game_over) {
+		  //app_init() basically makes the game restart.
+		  //Next step is to make a function to wait until the player asks to restart the game
+		  app_init();
         return;
+		if (is_key_down(key_f1)) {
+			restart_game();
+		}
+
       }
 
       move_ship();
