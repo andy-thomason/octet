@@ -148,13 +148,14 @@ namespace octet {
       num_sound_sources = 8,
       num_rows = 5,
       num_cols = 10,
-      num_missiles = 2,
+      num_missiles = 8,
       num_bombs = 2,
       num_borders = 4,
       num_invaderers = num_rows * num_cols,
 
       // sprite definitions
       ship_sprite = 0,
+	  restart_sprite,
       game_over_sprite,
 
       first_invaderer_sprite,
@@ -244,17 +245,37 @@ namespace octet {
       alSourcePlay(source);
 
       if (--num_lives == 0) {
-          game_over = true;
+          //game_over = true;
 		  restart_marker = true;
-		  sprites[game_over_sprite].translate(-20, 0);
+		  //sprites[game_over_sprite].translate(-20, 0);
       }
     }
 
 	void restart_game() {
-		if (restart_marker == true) {
-			//sprites[game_over_sprite].translate(20, 0);
-			app_init();
+		
+		sprites[restart_sprite].translate(-20, 0);
+		//game_over = false;
+		std::printf("While Loop");
+		int count = 0;
+		while (restart_marker && count < 1000)
+		{
+			std::printf("/nCount is currently " + count);
+			count++;
+			if (is_key_down(0x59) || is_key_down(0x79))
+			{
+				restart_marker = false;
+				app_init();
+			}
+			if (is_key_down(0x4E) || is_key_down(0x6E))
+			{
+				sprites[restart_sprite].translate(20, 0);
+				sprites[game_over_sprite].translate(-20, 0);
+				game_over = true;
+				restart_marker = false;
+			}
 		}
+		//return;
+		//app_init();
 	}
 
     // use the keyboard to move the ship
@@ -292,7 +313,7 @@ namespace octet {
     void fire_missiles() {
       if (missiles_disabled) {
         --missiles_disabled;
-      } else if (is_key_going_down(' ')) {
+      } else if (is_key_down(' ')) {
         // find a missile
         for (int i = 0; i != num_missiles; ++i) {
           if (!sprites[first_missile_sprite+i].is_enabled()) {
@@ -465,6 +486,9 @@ namespace octet {
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
 
+	  GLuint RestartGif = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/Restart.gif");
+	  sprites[restart_sprite].init(RestartGif, 20, 0, 3, 1.5f);
+
 	  GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
       for (int j = 0; j != num_rows; ++j) {
         for (int i = 0; i != num_cols; ++i) {
@@ -521,13 +545,14 @@ namespace octet {
       if (game_over) {
 		  //app_init() basically makes the game restart.
 		  //Next step is to make a function to wait until the player asks to restart the game
-		  app_init();
-        return;
-		if (is_key_down(key_f1)) {
-			restart_game();
-		}
-
+		  //app_init();
+		  //restart_game();
+		  return;
       }
+
+	  if (restart_marker) {
+		  restart_game();
+	  }
 
       move_ship();
 
