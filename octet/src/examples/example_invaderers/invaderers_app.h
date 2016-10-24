@@ -247,38 +247,32 @@ namespace octet {
       alSourcePlay(source);
 
       if (--num_lives == 0) {
+		  pause_bool = true;
           //game_over = true;
-		  restart_marker = true;
 		  //sprites[game_over_sprite].translate(-20, 0);
+		  sprites[restart_sprite].translate(-20, 0);
       }
     }
 
-	/*void restart_game() {
-		
-		sprites[restart_sprite].translate(-20, 0);
-		//game_over = false;
-		std::printf("While Loop");
-		int count = 0;
-		while (restart_marker && count < 1000)
-		{
-			std::printf("/nCount is currently " + count);
-			count++;
-			if (is_key_down(0x59) || is_key_down(0x79))
-			{
-				restart_marker = false;
-				app_init();
-			}
-			if (is_key_down(0x4E) || is_key_down(0x6E))
-			{
-				sprites[restart_sprite].translate(20, 0);
-				sprites[game_over_sprite].translate(-20, 0);
-				game_over = true;
-				restart_marker = false;
-			}
+
+	void restart_game() {
+		//restarts the game
+		if (is_key_going_down(key_f2)) {
+			restart_marker = true;
 		}
-		//return;
+
+		//kills the game
+		if (is_key_going_down(key_f4)) {
+			game_over = true;
+		}
+		
+		//pause_bool = true;
+		//sprites[restart_sprite].translate(-20, 0);
+		//restart_marker = false;
+		
+		
 		//app_init();
-	}*/
+	}
 
     // use the keyboard to move the ship
     void move_ship() {
@@ -561,18 +555,19 @@ namespace octet {
 
     // called every frame to move things
     void simulate() {
-      if (game_over) {
+      if (restart_marker) {
 		  //app_init() basically makes the game restart.
 		  //Next step is to make a function to wait until the player asks to restart the game
-		  //app_init();
-		  //restart_game();
-		  return;
+		  app_init();
       }
 
-	  if (restart_marker) {
-		 // restart_game();
-		  printf("Restart/n");
+	  if (game_over) {
+		  return;
 	  }
+
+	  restart_game();
+	  
+	  //gameover();
 
 	  pause_game();
 	  if (!pause_bool) {
