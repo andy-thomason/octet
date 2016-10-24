@@ -157,6 +157,7 @@ namespace octet {
       ship_sprite = 0,
 	  restart_sprite,
       game_over_sprite,
+	  pause_sprite,
 
       first_invaderer_sprite,
       last_invaderer_sprite = first_invaderer_sprite + num_invaderers - 1,
@@ -186,6 +187,7 @@ namespace octet {
     bool game_over;
     int score;
 	bool restart_marker;
+	bool pause_bool;
 
     // speed of enemy
     float invader_velocity;
@@ -251,7 +253,7 @@ namespace octet {
       }
     }
 
-	void restart_game() {
+	/*void restart_game() {
 		
 		sprites[restart_sprite].translate(-20, 0);
 		//game_over = false;
@@ -276,7 +278,7 @@ namespace octet {
 		}
 		//return;
 		//app_init();
-	}
+	}*/
 
     // use the keyboard to move the ship
     void move_ship() {
@@ -308,6 +310,19 @@ namespace octet {
 		  }
 	  }
     }
+
+	void pause_game() {
+		if (is_key_going_down(key_esc)) {
+			pause_bool = !pause_bool;
+
+			if (pause_bool) {
+				sprites[pause_sprite].translate(-20, 0);
+			}
+			else if (!pause_bool) {
+				sprites[pause_sprite].translate(20, 0);
+			}
+		}
+	}
 
     // fire button (space)
     void fire_missiles() {
@@ -489,6 +504,9 @@ namespace octet {
 	  GLuint RestartGif = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/Restart.gif");
 	  sprites[restart_sprite].init(RestartGif, 20, 0, 3, 1.5f);
 
+	  GLuint PauseMenu = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/PauseMenu.gif");
+	  sprites[pause_sprite].init(PauseMenu, 20, 0, 3, 1.5f);
+
 	  GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
       for (int j = 0; j != num_rows; ++j) {
         for (int i = 0; i != num_cols; ++i) {
@@ -537,6 +555,7 @@ namespace octet {
       num_lives = 3;
       game_over = false;
 	  restart_marker = false;
+	  pause_bool = false;
       score = 0;
     }
 
@@ -551,20 +570,25 @@ namespace octet {
       }
 
 	  if (restart_marker) {
-		  restart_game();
+		 // restart_game();
+		  printf("Restart/n");
 	  }
 
-      move_ship();
+	  pause_game();
+	  if (!pause_bool) {
 
-      fire_missiles();
+		  move_ship();
 
-      fire_bombs();
+		  fire_missiles();
 
-      move_missiles();
+		  fire_bombs();
 
-      move_bombs();
+		  move_missiles();
 
-      move_invaders(invader_velocity, 0);
+		  move_bombs();
+
+		  move_invaders(invader_velocity, 0);
+	  }
 
       sprite &border = sprites[first_border_sprite+(invader_velocity < 0 ? 2 : 3)];
       if (invaders_collide(border)) {
