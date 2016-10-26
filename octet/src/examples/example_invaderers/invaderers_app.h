@@ -249,7 +249,7 @@ namespace octet {
 
       if (--num_lives == 0) {
 		  pause_bool = true;
-          //game_over = true;
+          game_over = true;
 		  //sprites[game_over_sprite].translate(-20, 0);
 		  sprites[restart_sprite].translate(-20, 0);
       }
@@ -265,6 +265,7 @@ namespace octet {
 		//kills the game
 		if (is_key_going_down(key_f4)) {
 			game_over = true;
+			sprites[restart_sprite].translate(-20, 0);
 		}
 		
 		//pause_bool = true;
@@ -575,6 +576,8 @@ namespace octet {
       }
 
 	  if (game_over) {
+		  if (is_key_down(0x59) || is_key_down(0x79))
+			  restart_marker = true;
 		  return;
 	  }
 
