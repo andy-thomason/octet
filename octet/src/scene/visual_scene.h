@@ -334,6 +334,32 @@ namespace octet { namespace scene {
       return result;
     }
 
+	/*
+	http://bulletphysics.org/mediawiki-1.5.8/index.php/Constraints
+	*/
+
+#ifdef OCTET_BULLET
+
+	void addHinge(btRigidBody* rbA, btVector3 pivotInA, btVector3 axisInA) {
+		bool useReferenceFrameA = true;
+		btHingeConstraint* hinge = new btHingeConstraint(*rbA, pivotInA, axisInA, useReferenceFrameA); //second declaration from btHingeConstraint.h
+		
+		world->addConstraint(hinge);
+	}
+
+	void addSpring(btRigidBody *rbA, btRigidBody *rbB, btTransform tran1, btTransform tran2) {
+		btGeneric6DofSpringConstraint* spring = new btGeneric6DofSpringConstraint(*rbA, *rbB, tran1, tran2, true);
+
+		spring->setLinearLowerLimit(btVector3(0, 0, 0));
+		spring->setLinearUpperLimit(btVector3(0.8f, 0, 0));
+		//spring->setDamping(5, 0.01f);
+		spring->enableSpring(0, true);
+
+		world->addConstraint(spring, true);
+	}
+#endif // OCTET_BULLET
+
+
     /// Serialization
     void visit(visitor &v) {
       scene_node::visit(v);
