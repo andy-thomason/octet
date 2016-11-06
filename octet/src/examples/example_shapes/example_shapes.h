@@ -15,12 +15,12 @@ namespace octet {
 	 
 	mat4t mat;
 
-	material *red = new material(vec4((1.0f, 0.0f, 0.0f, 1.0f)));
-	material *green = new material(vec4((0.0f, 1.0f, 0.0f, 1.0f)));
-	material *blue = new material(vec4((0.0f, 0.0f, 1.0f, 1.0f)));
-	material *grey = new material(vec4((0.5f, 0.5f, 0.5f, 1.0f)));
-	material *black = new material(vec4((1.0f, 1.0f, 1.0f, 1.0f)));
-	material *white = new material(vec4((0.0f, 0.0f, 0.0f, 1.0f)));
+	material *red;
+	material *green;
+	material *blue;
+	material *grey;
+	material *black;
+	material *white;
 
 	btVector3 ballForce = btVector3(0, 0, 0);
 	float ballMass = 1;
@@ -45,44 +45,49 @@ namespace octet {
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 
-      
+	  red = new material(vec4((1.0f, 0.0f, 0.0f, 1.0f)));
+	  green = new material(vec4((0.0f, 1.0f, 0.0f, 1.0f)));
+	  blue = new material(vec4((0.0f, 0.0f, 1.0f, 1.0f)));
+	  grey = new material(vec4((0.5f, 0.5f, 0.5f, 1.0f)));
+	  black = new material(vec4((1.0f, 1.0f, 1.0f, 1.0f)));
+	  white = new material(vec4((0.0f, 0.0f, 0.0f, 1.0f)));
 
 	  //West Side of bridge
 	  mat.loadIdentity();
-	  mat.translate(-11, 0, 0);
-	  mesh_instance *west_side = app_scene->add_shape(mat, new mesh_box(vec3(20, 1, 50), 1), green, false);
+	  mat.translate(-14, 0, 0);
+	  mesh_instance *west_side = app_scene->add_shape(mat, new mesh_box(vec3(1, 1, 20), 1), green, false);
 	  rb_bridge[0] = west_side->get_node()->get_rigid_body();
 
 	  //Run through and draw planks of bridge
 	  for (int i = 1; i < numPlanks+1; i++) {
 		  mat.loadIdentity();
-		  mat.translate(-8 + (i * 2), 0, 0);
-		  mesh_instance *p = app_scene->add_shape(mat, new mesh_box(vec3(0.8f, 0.1f, 5), 1), grey, false);
+		  mat.translate(-12.0f + (i * 2), 0.0f, 0.0f);
+		  mesh_instance *p = app_scene->add_shape(mat, new mesh_box(vec3(0.8f, 0.1f, 10), 1), grey, false);
 		  rb_bridge[i] = p->get_node()->get_rigid_body();
 	  }
 
 	  //East Side of bridge
 	  mat.loadIdentity();
-	  mat.translate(11, 0, 0);
+	  mat.translate(14, 0, 0);
 	  mesh_instance *east_side = app_scene->add_shape(mat, new mesh_box(vec3(1, 1, 20), 1), green, false);
 	  rb_bridge[numPlanks + 1] = west_side->get_node()->get_rigid_body();
 
 	  //Constraints
 	  btTransform tran1A = btTransform::getIdentity();
-	  tran1A.setOrigin(btVector3(0.5f, 0, 8.0f));
+	  tran1A.setOrigin(btVector3(0.8f, 0.0f, 18.0f));
 
 	  btTransform tran1B = btTransform::getIdentity();
-	  tran1B.setOrigin(btVector3(-0.5f, 0, 8.0f));
+	  tran1B.setOrigin(btVector3(-0.8f, 0.0f, 18.0f));
 
 	  btTransform tran2A = btTransform::getIdentity();
-	  tran2A.setOrigin(btVector3(0.5f, 0, -8.0f));
+	  tran2A.setOrigin(btVector3(0.8f, 0.0f, -18.0f));
 
 	  btTransform tran2B = btTransform::getIdentity();
-	  tran2B.setOrigin(btVector3(-0.5f, 0, -8.0f));
+	  tran2B.setOrigin(btVector3(-0.8f, 0.0f, -18.0f));
 
 	  //Apply the spring to the rb_bridge array populated above
 
-	  for (int i = 0; i < numPlanks + 1; i++) {
+	  for (int i = 0; i < numPlanks ; i++) {
 		  app_scene->addSpring(rb_bridge[i], rb_bridge[i + 1], tran1A, tran1B);
 		  app_scene->addSpring(rb_bridge[i], rb_bridge[i + 1], tran2A, tran2B);
 	  }
