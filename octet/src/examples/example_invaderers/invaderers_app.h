@@ -250,7 +250,7 @@ namespace octet {
       if (--num_lives == 0) {
 		  pause_bool = true;
           game_over = true;
-		  //sprites[game_over_sprite].translate(-20, 0);
+		  sprites[game_over_sprite].translate(-20, 0);
 		  sprites[restart_sprite].translate(-20, 0);
       }
     }
@@ -265,6 +265,7 @@ namespace octet {
 		//kills the game
 		if (is_key_going_down(key_f4)) {
 			game_over = true;
+			sprites[game_over_sprite].translate(-20, 0);
 			sprites[restart_sprite].translate(-20, 0);
 		}
 		
@@ -507,10 +508,10 @@ namespace octet {
 	  sprites[ship_sprite_2].init(ship, 0.25f, -2.75f, 0.25f, 0.25f);
 
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
-      sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
+      sprites[game_over_sprite].init(GameOver, 20, 1, 3, 1.5f);
 
 	  GLuint RestartGif = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/Restart.gif");
-	  sprites[restart_sprite].init(RestartGif, 20, 0, 3, 1.5f);
+	  sprites[restart_sprite].init(RestartGif, 20, -1, 3, 1.5f);
 
 	  GLuint PauseMenu = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/PauseMenu.gif");
 	  sprites[pause_sprite].init(PauseMenu, 20, 0, 3, 1.5f);
