@@ -123,7 +123,7 @@ namespace octet {
 
     /// returns true if a key has gone down this frame
     bool is_key_going_up(unsigned key) {
-      return keys[key & 0xff] != 0 && prev_keys[key & 0xff] == 0;
+      return keys[key & 0xff] == 0 && prev_keys[key & 0xff] != 0;
     }
 
     /// return the current set of keys down.
