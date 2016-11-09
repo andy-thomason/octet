@@ -116,12 +116,12 @@ namespace octet {
       return keys[key & 0xff] != 0;
     }
 
-    /// returns true if a key has gone down this frame
+    /// returns true if a key has gone down this frame (ie. pressed)
     bool is_key_going_down(unsigned key) {
       return keys[key & 0xff] != 0 && prev_keys[key & 0xff] == 0;
     }
 
-    /// returns true if a key has gone down this frame
+    /// returns true if a key has gone up this frame (ie. released)
     bool is_key_going_up(unsigned key) {
       return keys[key & 0xff] == 0 && prev_keys[key & 0xff] != 0;
     }
